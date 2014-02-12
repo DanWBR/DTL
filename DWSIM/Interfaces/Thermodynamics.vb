@@ -1,5 +1,5 @@
-﻿'    DWSIM/DTL Interface  Methods
-'    Copyright 2012 Daniel Wagner O. de Medeiros
+'    DWSIM/DTL Interface  Methods
+'    Copyright 2012-2014 Daniel Wagner O. de Medeiros
 '
 '    This file is part of DTL.
 '
@@ -938,7 +938,7 @@ Namespace Thermodynamics
         ''' <returns></returns>
         ''' <remarks></remarks>
         <System.Runtime.InteropServices.DispId(15)> Public Function CalcTwoPhaseProp( _
-            ByRef proppack As PropertyPackage, _
+            ByVal proppack As PropertyPackage, _
             ByVal prop As String, _
             ByVal basis As String, _
             ByVal phaselabel1 As String, _
@@ -1771,7 +1771,7 @@ Namespace Thermodynamics
         ''' <returns>A matrix containing phase fractions and compound distribution in mole fractions.</returns>
         ''' <remarks></remarks>
         <System.Runtime.InteropServices.DispId(6)> Public Function PTFlash( _
-            ByRef proppack As PropertyPackage, _
+            ByVal proppack As PropertyPackage, _
             ByVal flashalg As Integer, _
             ByVal P As Double, _
             ByVal T As Double, _
@@ -1817,16 +1817,6 @@ Namespace Thermodynamics
             pp.SetMaterial(ms)
 
             pp.FlashAlgorithm = flashalg
-
-            pp._ioquick = False
-            pp._tpseverity = 2
-            Dim comps(compounds.Length - 1) As String
-            Dim k As Integer
-            For Each c As String In compounds
-                comps(k) = c
-                k += 1
-            Next
-            pp._tpcompids = comps
 
             pp.CalcEquilibrium(ms, "TP", "UNDEFINED")
 
@@ -1877,7 +1867,7 @@ Namespace Thermodynamics
         ''' <returns>A matrix containing phase fractions and compound distribution in mole fractions.</returns>
         ''' <remarks></remarks>
         <System.Runtime.InteropServices.DispId(7)> Public Function PHFlash( _
-            ByRef proppack As PropertyPackage, _
+            ByVal proppack As PropertyPackage, _
             ByVal flashalg As Integer, _
             ByVal P As Double, _
             ByVal H As Double, _
@@ -1923,16 +1913,6 @@ Namespace Thermodynamics
             pp.SetMaterial(ms)
 
             pp.FlashAlgorithm = flashalg
-
-            pp._ioquick = False
-            pp._tpseverity = 2
-            Dim comps(compounds.Length - 1) As String
-            Dim k As Integer
-            For Each c As String In compounds
-                comps(k) = c
-                k += 1
-            Next
-            pp._tpcompids = comps
 
             pp.CalcEquilibrium(ms, "PH", "UNDEFINED")
 
@@ -1985,7 +1965,7 @@ Namespace Thermodynamics
         ''' <returns>A matrix containing phase fractions and compound distribution in mole fractions.</returns>
         ''' <remarks></remarks>
         <System.Runtime.InteropServices.DispId(8)> Public Function PSFlash( _
-            ByRef proppack As PropertyPackage, _
+            ByVal proppack As PropertyPackage, _
             ByVal flashalg As Integer, _
             ByVal P As Double, _
             ByVal S As Double, _
@@ -2031,16 +2011,6 @@ Namespace Thermodynamics
             pp.SetMaterial(ms)
 
             pp.FlashAlgorithm = flashalg
-
-            pp._ioquick = False
-            pp._tpseverity = 2
-            Dim comps(compounds.Length - 1) As String
-            Dim k As Integer
-            For Each c As String In compounds
-                comps(k) = c
-                k += 1
-            Next
-            pp._tpcompids = comps
 
             pp.CalcEquilibrium(ms, "PS", "UNDEFINED")
 
@@ -2093,7 +2063,7 @@ Namespace Thermodynamics
         ''' <returns>A matrix containing phase fractions and compound distribution in mole fractions.</returns>
         ''' <remarks></remarks>
         <System.Runtime.InteropServices.DispId(9)> Public Function PVFFlash( _
-            ByRef proppack As PropertyPackage, _
+            ByVal proppack As PropertyPackage, _
             ByVal flashalg As Integer, _
             ByVal P As Double, _
             ByVal VF As Double, _
@@ -2139,16 +2109,6 @@ Namespace Thermodynamics
             pp.SetMaterial(ms)
 
             pp.FlashAlgorithm = flashalg
-
-            pp._ioquick = False
-            pp._tpseverity = 2
-            Dim comps(compounds.Length - 1) As String
-            Dim k As Integer
-            For Each c As String In compounds
-                comps(k) = c
-                k += 1
-            Next
-            pp._tpcompids = comps
 
             pp.CalcEquilibrium(ms, "PVF", "UNDEFINED")
 
@@ -2201,7 +2161,7 @@ Namespace Thermodynamics
         ''' <returns>A matrix containing phase fractions and compound distribution in mole fractions.</returns>
         ''' <remarks></remarks>
         <System.Runtime.InteropServices.DispId(10)> Public Function TVFFlash( _
-            ByRef proppack As PropertyPackage, _
+            ByVal proppack As PropertyPackage, _
             ByVal flashalg As Integer, _
             ByVal T As Double, _
             ByVal VF As Double, _
@@ -2247,16 +2207,6 @@ Namespace Thermodynamics
             pp.SetMaterial(ms)
 
             pp.FlashAlgorithm = flashalg
-
-            pp._ioquick = False
-            pp._tpseverity = 2
-            Dim comps(compounds.Length - 1) As String
-            Dim k As Integer
-            For Each c As String In compounds
-                comps(k) = c
-                k += 1
-            Next
-            pp._tpcompids = comps
 
             pp.CalcEquilibrium(ms, "TVF", "UNDEFINED")
 
