@@ -1,5 +1,5 @@
-﻿'    Property Package Base Class
-'    Copyright 2008-2011 Daniel Wagner O. de Medeiros
+'    Property Package Base Class
+'    Copyright 2008-2014 Daniel Wagner O. de Medeiros
 '
 '    This file is part of DTL.
 '
@@ -7329,6 +7329,18 @@ Final3:
 
         Friend _availablecomps As Dictionary(Of String, ConstantProperties)
         Friend _selectedcomps As Dictionary(Of String, ConstantProperties)
+
+        Public ReadOnly Property AvailableCompounds As Dictionary(Of String, ConstantProperties)
+            Get
+                Return _availablecomps
+            End Get
+        End Property
+
+        Public ReadOnly Property SelectedCompounds As Dictionary(Of String, ConstantProperties)
+            Get
+                Return _selectedcomps
+            End Get
+        End Property
 
         <System.NonSerialized()> Friend _pme As Object
 
