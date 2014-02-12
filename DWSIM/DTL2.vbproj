@@ -1,0 +1,341 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{34BE2D2D-9B3C-4C12-8C90-732E21CD7CB1}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <StartupObject>
+    </StartupObject>
+    <RootNamespace>DTL</RootNamespace>
+    <AssemblyName>DTL</AssemblyName>
+    <MyType>Windows</MyType>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <ManifestCertificateThumbprint>9811384C174DFC8254FB98B174DA65366428B233</ManifestCertificateThumbprint>
+    <ManifestKeyFile>
+    </ManifestKeyFile>
+    <GenerateManifests>false</GenerateManifests>
+    <SignManifests>false</SignManifests>
+    <ApplicationIcon>
+    </ApplicationIcon>
+    <TargetZone>LocalIntranet</TargetZone>
+    <SignAssembly>false</SignAssembly>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+    <OptionStrict>Off</OptionStrict>
+    <OptionCompare>Binary</OptionCompare>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <ApplicationManifest>My Project\app.manifest</ApplicationManifest>
+    <TargetFrameworkProfile />
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>2</ApplicationRevision>
+    <ApplicationVersion>0.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>pdbonly</DebugType>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DocumentationFile>DTL.xml</DocumentationFile>
+    <NoWarn>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036,42353,42354,42355</NoWarn>
+    <WarningsAsErrors>
+    </WarningsAsErrors>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DocumentationFile>DTL.xml</DocumentationFile>
+    <NoWarn>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036,42353,42354,42355</NoWarn>
+    <WarningsAsErrors>
+    </WarningsAsErrors>
+    <DebugSymbols>true</DebugSymbols>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>false</DefineTrace>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DocumentationFile>DTL.xml</DocumentationFile>
+    <NoWarn>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036,42353,42354,42355</NoWarn>
+    <DebugType>Full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <WarningsAsErrors>
+    </WarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineTrace>false</DefineTrace>
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DocumentationFile>DTL.xml</DocumentationFile>
+    <NoWarn>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036,42353,42354,42355</NoWarn>
+    <DebugType>Full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <WarningsAsErrors>
+    </WarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'x86|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineTrace>true</DefineTrace>
+    <OutputPath>bin\x86\</OutputPath>
+    <DocumentationFile>DTL.xml</DocumentationFile>
+    <NoWarn>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036,42353,42354,42355</NoWarn>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <WarningsAsErrors>
+    </WarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'x86|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\x86\</OutputPath>
+    <DocumentationFile>DTL.xml</DocumentationFile>
+    <NoWarn>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036,42353,42354,42355</NoWarn>
+    <DebugType>Full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <WarningsAsErrors>
+    </WarningsAsErrors>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Cureos.Numerics">
+      <HintPath>References\Cureos.Numerics.dll</HintPath>
+    </Reference>
+    <Reference Include="FileHelpers, Version=1.6.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>References\FileHelpers.dll</HintPath>
+    </Reference>
+    <Reference Include="Mapack, Version=1.0.9.0, Culture=neutral">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>References\Mapack.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Import Include="Microsoft.VisualBasic" />
+    <Import Include="System" />
+    <Import Include="System.Collections" />
+    <Import Include="System.Collections.Generic" />
+    <Import Include="System.Data" />
+    <Import Include="System.Diagnostics" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Interfaces\Thermodynamics.vb" />
+    <Compile Include="My Project\Resources.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Objects\Classes\Databases\Databases.vb" />
+    <Compile Include="Objects\Classes\Math\AP.vb" />
+    <Compile Include="Objects\Classes\Math\Brent.vb" />
+    <Compile Include="Objects\Classes\Math\BrentMinimize.vb" />
+    <Compile Include="Objects\Classes\Math\Broyden.vb" />
+    <Compile Include="Objects\Classes\Math\BS.vb" />
+    <Compile Include="Objects\Classes\Math\cMatLib.vb" />
+    <Compile Include="Objects\Classes\Math\General.vb" />
+    <Compile Include="Objects\Classes\Math\GammaF.vb" />
+    <Compile Include="Objects\Classes\Math\Interpolation.vb" />
+    <Compile Include="Objects\Classes\Math\LBFGS.vb" />
+    <Compile Include="Objects\Classes\Math\LBFGSB.vb" />
+    <Compile Include="Objects\Classes\Math\LM.vb" />
+    <Compile Include="Objects\Classes\Math\MatrixOps.vb" />
+    <Compile Include="Objects\Classes\Math\SysLin.vb" />
+    <Compile Include="Objects\PropertyPackages\Base\CRITPT.vb" />
+    <Compile Include="Objects\PropertyPackages\Base\FlashAlgorithms\Base.vb" />
+    <Compile Include="Objects\PropertyPackages\Base\FlashAlgorithms\BostonBrittInsideOut.vb" />
+    <Compile Include="Objects\PropertyPackages\Base\FlashAlgorithms\BostonFournierInsideOut3P.vb" />
+    <Compile Include="Objects\PropertyPackages\Base\FlashAlgorithms\GibbsMinimization3P.vb" />
+    <Compile Include="Objects\PropertyPackages\Base\FlashAlgorithms\NestedLoops.vb" />
+    <Compile Include="Objects\PropertyPackages\Base\FlashAlgorithms\NestedLoops3P.vb" />
+    <Compile Include="Objects\PropertyPackages\Base\FlashAlgorithms\NestedLoopsImmiscible.vb" />
+    <Compile Include="Objects\PropertyPackages\Base\FlashAlgorithms\NestedLoopsSLE.vb" />
+    <Compile Include="Objects\PropertyPackages\Base\MichelsenBase.vb" />
+    <Compile Include="Objects\PropertyPackages\CAPE-OPEN\CAPEOPENPropertyPackageManager.vb" />
+    <Compile Include="Objects\PropertyPackages\ChaoSeader\ChaoSeaderPropertyPackage.vb" />
+    <Compile Include="Objects\PropertyPackages\ChaoSeader\Helper Classes\CS.vb" />
+    <Compile Include="Objects\PropertyPackages\GraysonStreed\GraysonStreedPropertyPackage.vb" />
+    <Compile Include="Objects\PropertyPackages\GraysonStreed\Helper Classes\GS.vb" />
+    <Compile Include="Objects\PropertyPackages\LeeKeslerPlocker\Helper Classes\LKP.vb" />
+    <Compile Include="Objects\PropertyPackages\LeeKeslerPlocker\LKPPropertyPackage.vb" />
+    <Compile Include="Objects\PropertyPackages\PengRobinson\Helper Classes\PR.vb" />
+    <Compile Include="Objects\PropertyPackages\PRSV2\PRSV2-VL.vb" />
+    <Compile Include="Objects\PropertyPackages\PRSV2\PRSV2.vb" />
+    <Compile Include="Objects\PropertyPackages\PRSV2\PRSV2PropertyPackage.vb" />
+    <Compile Include="Objects\PropertyPackages\PRSV2\PRSV2VLPropertyPackage.vb" />
+    <Compile Include="Objects\PropertyPackages\SRK\Helper Classes\SRK2.vb" />
+    <Compile Include="Objects\PropertyPackages\MODFAC\Helper Classes\MODFAC.vb" />
+    <Compile Include="Objects\PropertyPackages\MODFAC\MODFACPropertyPackage.vb" />
+    <Compile Include="Objects\PropertyPackages\NRTL\Helper Classes\NRTL.vb" />
+    <Compile Include="Objects\PropertyPackages\NRTL\NRTLPropertyPackage.vb" />
+    <Compile Include="Objects\PropertyPackages\UNIFAC\UNIFACLLPropertyPackage.vb" />
+    <Compile Include="Objects\PropertyPackages\UNIQUAC\Helper Classes\UNIQUAC.vb" />
+    <Compile Include="Objects\PropertyPackages\UNIQUAC\UNIQUACPropertyPackage.vb" />
+    <Compile Include="ApplicationEvents.vb" />
+    <Compile Include="Objects\Base\BaseClasses.vb" />
+    <Compile Include="Objects\PropertyPackages\Base\PropertyPackage.vb" />
+    <Compile Include="Objects\Streams\Streams.vb" />
+    <Compile Include="Objects\Base\BaseThermoClasses.vb" />
+    <Compile Include="Objects\Classes\Unit\SistemasDeUnidades.vb" />
+    <Compile Include="My Project\AssemblyInfo.vb" />
+    <Compile Include="My Project\Application.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Application.myapp</DependentUpon>
+    </Compile>
+    <Compile Include="My Project\Settings.Designer.vb">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="Objects\PropertyPackages\SRK\Helper Classes\SRK.vb" />
+    <Compile Include="Objects\PropertyPackages\SRK\SRKPropertyPackage.vb" />
+    <Compile Include="Objects\Classes\Shared\Shared Functions.vb" />
+    <Compile Include="Objects\PropertyPackages\PengRobinsonLK\Helper Classes\LK.vb" />
+    <Compile Include="Objects\PropertyPackages\PengRobinsonLK\PRLK.vb" />
+    <Compile Include="Objects\PropertyPackages\Base\MATRIX.vb" />
+    <Compile Include="Objects\PropertyPackages\Base\MATRIX2.vb" />
+    <Compile Include="Objects\PropertyPackages\PengRobinson\Helper Classes\PENGROB.vb" />
+    <Compile Include="Objects\PropertyPackages\Base\PROPS.vb" />
+    <Compile Include="Objects\PropertyPackages\PengRobinson\PengRobinsonPropertyPackage.vb" />
+    <Compile Include="Objects\PropertyPackages\Raoult\RaoultPropertyPackage.vb" />
+    <Compile Include="Objects\PropertyPackages\SteamTables\Helper Classes\IAPWS_IF97.vb" />
+    <Compile Include="Objects\PropertyPackages\SteamTables\SteamTablesPropertyPackage.vb" />
+    <Compile Include="Objects\PropertyPackages\UNIFAC\Helper Classes\UNIFAC.vb" />
+    <Compile Include="Objects\PropertyPackages\UNIFAC\UNIFACPropertyPackage.vb" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="My Project\Resources.resx">
+      <Generator>VbMyResourcesResXFileCodeGenerator</Generator>
+      <CustomToolNamespace>My.Resources</CustomToolNamespace>
+      <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.vb</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="My Project\Application.myapp">
+      <Generator>MyApplicationCodeGenerator</Generator>
+      <LastGenOutput>Application.Designer.vb</LastGenOutput>
+    </None>
+    <None Include="My Project\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <CustomToolNamespace>My</CustomToolNamespace>
+      <LastGenOutput>Settings.Designer.vb</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.2.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 2.0 %28x86%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.0">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.0 %28x86%29</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Sql.Server.Express.1.0">
+      <Visible>False</Visible>
+      <ProductName>SQL Server 2005 Express Edition</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="My Project\licenses.licx" />
+  </ItemGroup>
+  <ItemGroup>
+    <BaseApplicationManifest Include="My Project\app.manifest" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="bin\x86\Release\data\chemsep1.xml" />
+    <EmbeddedResource Include="bin\x86\Release\data\dwsim.xml" />
+    <EmbeddedResource Include="bin\x86\Release\data\joback.txt" />
+    <EmbeddedResource Include="bin\x86\Release\data\modfac.txt" />
+    <EmbeddedResource Include="bin\x86\Release\data\modfac_ip.txt" />
+    <EmbeddedResource Include="bin\x86\Release\data\unifac.txt" />
+    <EmbeddedResource Include="bin\x86\Release\data\unifac_ip.txt" />
+    <EmbeddedResource Include="bin\x86\Release\data\unifac_ll_ip.txt" />
+    <EmbeddedResource Include="bin\x86\Release\data\csid.dat" />
+    <EmbeddedResource Include="bin\x86\Release\data\kij_pr.dat" />
+    <EmbeddedResource Include="bin\x86\Release\data\kij_srk.dat" />
+    <EmbeddedResource Include="bin\x86\Release\data\lkp_ip.dat" />
+    <EmbeddedResource Include="bin\x86\Release\data\nrtl.dat" />
+    <EmbeddedResource Include="bin\x86\Release\data\pcsaft.dat" />
+    <EmbeddedResource Include="bin\x86\Release\data\pcsaft_ip.dat" />
+    <EmbeddedResource Include="bin\x86\Release\data\prsv2.dat" />
+    <EmbeddedResource Include="bin\x86\Release\data\prsv2_ip.dat" />
+    <EmbeddedResource Include="bin\x86\Release\data\prsv2_ip_vl.dat" />
+    <EmbeddedResource Include="bin\x86\Release\data\pr_ip.dat" />
+    <EmbeddedResource Include="bin\x86\Release\data\srk_ip.dat" />
+    <EmbeddedResource Include="bin\x86\Release\data\uniquac.dat" />
+    <EmbeddedResource Include="bin\x86\Release\data\uniquacip.dat" />
+    <None Include="My Project\DataSources\RssItem.datasource" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="CAPEOPEN110">
+      <Guid>{4A5E2E81-C093-11D4-9F1B-0010A4D198C2}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>1</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
