@@ -176,7 +176,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
             End If
 
-               Initialize()
+            Initialize()
 
         End Sub
 
@@ -243,6 +243,25 @@ Namespace DTL.SimulationObjects.PropertyPackages
 #End Region
 
 #Region "   Properties"
+
+        Public Property StabilityTestKeyCompounds As String()
+            Get
+                Return _tpcompids
+            End Get
+            Set(value As String())
+                _tpcompids = value
+            End Set
+        End Property
+
+        Public Property StabilityTestSeverity() As Integer
+            Get
+                Return _tpseverity
+            End Get
+            Set(value As Integer)
+                _tpseverity = value
+            End Set
+        End Property
+
 
         Public ReadOnly Property PhaseMappings() As Dictionary(Of String, PhaseInfo)
             Get
@@ -1944,7 +1963,7 @@ redirect2:                      result = Me.FlashBase.Flash_PS(RET_VMOL(Fase.Mix
 
         Public MustOverride Function DW_CalcViscosidadeDinamica_ISOL(ByVal fase1 As Fase, ByVal T As Double, ByVal P As Double) As Double
 
-    
+
         Public MustOverride Function DW_CalcEnergiaMistura_ISOL(ByVal T As Double, ByVal P As Double) As Double
 
         Public MustOverride Function DW_CalcCp_ISOL(ByVal fase1 As DTL.SimulationObjects.PropertyPackages.Fase, ByVal T As Double, ByVal P As Double) As Double
@@ -6221,21 +6240,21 @@ Final3:
                     comps.Add(c.Nome)
                 Next
 
-            Dim f As Integer = -1
-            Dim phs As DTL.SimulationObjects.PropertyPackages.Fase
-            Select Case phaseLabel.ToLower
-                Case "overall"
-                    f = 0
-                    phs = PropertyPackages.Fase.Mixture
-                Case Else
-                    For Each pi As PhaseInfo In Me.PhaseMappings.Values
-                        If phaseLabel = pi.PhaseLabel Then
-                            f = pi.DWPhaseIndex
-                            phs = pi.DWPhaseID
-                            Exit For
-                        End If
-                    Next
-            End Select
+                Dim f As Integer = -1
+                Dim phs As DTL.SimulationObjects.PropertyPackages.Fase
+                Select Case phaseLabel.ToLower
+                    Case "overall"
+                        f = 0
+                        phs = PropertyPackages.Fase.Mixture
+                    Case Else
+                        For Each pi As PhaseInfo In Me.PhaseMappings.Values
+                            If phaseLabel = pi.PhaseLabel Then
+                                f = pi.DWPhaseIndex
+                                phs = pi.DWPhaseID
+                                Exit For
+                            End If
+                        Next
+                End Select
 
                 If f = -1 Then
                     Dim ex As New Exception("Invalid Phase ID", New ArgumentException)
