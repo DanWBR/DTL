@@ -1,4 +1,4 @@
-﻿'    Steam Tables Property Package 
+'    Steam Tables Property Package 
 '    Copyright 2008-2014 Daniel Wagner O. de Medeiros
 '
 '    This file is part of DTL.
@@ -69,6 +69,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
             'for TVF/PVF/PH/PS flashes
             H = Me.CurrentMaterialStream.Fases(0).SPMProperties.enthalpy.GetValueOrDefault
             S = Me.CurrentMaterialStream.Fases(0).SPMProperties.entropy.GetValueOrDefault
+            vf = Me.CurrentMaterialStream.Fases(2).SPMProperties.molarfraction.GetValueOrDefault
 
             Me.DW_ZerarPhaseProps(Fase.Vapor)
             Me.DW_ZerarPhaseProps(Fase.Liquid)
@@ -173,7 +174,6 @@ Namespace DTL.SimulationObjects.PropertyPackages
                         Case FlashSpec.VAP
 
                             T = Me.CurrentMaterialStream.Fases(0).SPMProperties.temperature.GetValueOrDefault
-                            vf = Me.CurrentMaterialStream.Fases(2).SPMProperties.molarfraction.GetValueOrDefault
 
                             With Me.m_iapws97
                                 Hl = .enthalpySatLiqTW(T)
@@ -253,7 +253,6 @@ Namespace DTL.SimulationObjects.PropertyPackages
                         Case FlashSpec.VAP
 
                             P = Me.CurrentMaterialStream.Fases(0).SPMProperties.pressure.GetValueOrDefault
-                            vf = Me.CurrentMaterialStream.Fases(2).SPMProperties.molarfraction.GetValueOrDefault
 
                             With Me.m_iapws97
                                 Hl = .enthalpySatLiqPW(P / 100000)
@@ -508,7 +507,9 @@ FINAL:
                 Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.massfraction = result
             End If
 
-            If Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.molarfraction.GetValueOrDefault <> 1 Then
+            Dim Tsat As Double = Me.m_iapws97.tSatW(P / 100000)
+
+            If Math.Abs(T - Tsat) < 0.001 Then
 
                 If phaseID = 3 Then
 
