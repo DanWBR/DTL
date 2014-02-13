@@ -1316,6 +1316,7 @@ Namespace Thermodynamics
         ''' <param name="ip2">Interaction Parameters Set #2.</param>
         ''' <param name="ip3">Interaction Parameters Set #3.</param>
         ''' <param name="ip4">Interaction Parameters Set #4.</param>
+        ''' <param name="InitialTemperatureEstimate">Initial estimate for the temperature, in K.</param>
         ''' <returns>A matrix containing phase fractions and compound distribution in mole fractions.</returns>
         ''' <remarks></remarks>
         <System.Runtime.InteropServices.DispId(2)> Public Function PHFlash( _
@@ -1328,7 +1329,8 @@ Namespace Thermodynamics
             Optional ByVal ip1 As Object = Nothing, _
             Optional ByVal ip2 As Object = Nothing, _
             Optional ByVal ip3 As Object = Nothing, _
-            Optional ByVal ip4 As Object = Nothing) As Object(,)
+            Optional ByVal ip4 As Object = Nothing,
+            Optional ByVal InitialTemperatureEstimate As Double = 0.0#) As Object(,)
 
             Dim ppm As New CAPEOPENPropertyPackageManager()
 
@@ -1375,6 +1377,8 @@ Namespace Thermodynamics
                 k += 1
             Next
             pp._tpcompids = comps
+
+            ms.Fases(0).SPMProperties.temperature = InitialTemperatureEstimate
 
             pp.CalcEquilibrium(ms, "PH", "UNDEFINED")
 
@@ -1429,6 +1433,7 @@ Namespace Thermodynamics
         ''' <param name="ip2">Interaction Parameters Set #2.</param>
         ''' <param name="ip3">Interaction Parameters Set #3.</param>
         ''' <param name="ip4">Interaction Parameters Set #4.</param>
+        ''' <param name="InitialTemperatureEstimate">Initial estimate for the temperature, in K.</param>
         ''' <returns>A matrix containing phase fractions and compound distribution in mole fractions.</returns>
         ''' <remarks></remarks>
         <System.Runtime.InteropServices.DispId(3)> Public Function PSFlash( _
@@ -1441,7 +1446,8 @@ Namespace Thermodynamics
             Optional ByVal ip1 As Object = Nothing, _
             Optional ByVal ip2 As Object = Nothing, _
             Optional ByVal ip3 As Object = Nothing, _
-            Optional ByVal ip4 As Object = Nothing) As Object(,)
+            Optional ByVal ip4 As Object = Nothing,
+            Optional ByVal InitialTemperatureEstimate As Double = 0.0#) As Object(,)
 
             Dim ppm As New CAPEOPENPropertyPackageManager()
 
@@ -1488,6 +1494,8 @@ Namespace Thermodynamics
                 k += 1
             Next
             pp._tpcompids = comps
+
+            ms.Fases(0).SPMProperties.temperature = InitialTemperatureEstimate
 
             pp.CalcEquilibrium(ms, "PS", "UNDEFINED")
 
@@ -1542,6 +1550,7 @@ Namespace Thermodynamics
         ''' <param name="ip2">Interaction Parameters Set #2.</param>
         ''' <param name="ip3">Interaction Parameters Set #3.</param>
         ''' <param name="ip4">Interaction Parameters Set #4.</param>
+        ''' <param name="InitialTemperatureEstimate">Initial estimate for the temperature, in K.</param>
         ''' <returns>A matrix containing phase fractions and compound distribution in mole fractions.</returns>
         ''' <remarks></remarks>
         <System.Runtime.InteropServices.DispId(4)> Public Function PVFFlash( _
@@ -1554,7 +1563,8 @@ Namespace Thermodynamics
             Optional ByVal ip1 As Object = Nothing, _
             Optional ByVal ip2 As Object = Nothing, _
             Optional ByVal ip3 As Object = Nothing, _
-            Optional ByVal ip4 As Object = Nothing) As Object(,)
+            Optional ByVal ip4 As Object = Nothing,
+            Optional ByVal InitialTemperatureEstimate As Double = 0.0#) As Object(,)
 
             Dim ppm As New CAPEOPENPropertyPackageManager()
 
@@ -1601,6 +1611,8 @@ Namespace Thermodynamics
                 k += 1
             Next
             pp._tpcompids = comps
+
+            ms.Fases(0).SPMProperties.temperature = InitialTemperatureEstimate
 
             pp.CalcEquilibrium(ms, "PVF", "UNDEFINED")
 
@@ -1655,6 +1667,7 @@ Namespace Thermodynamics
         ''' <param name="ip2">Interaction Parameters Set #2.</param>
         ''' <param name="ip3">Interaction Parameters Set #3.</param>
         ''' <param name="ip4">Interaction Parameters Set #4.</param>
+        '''<param name="InitialPressureEstimate">Initial estimate for the pressure, in Pa.</param>
         ''' <returns>A matrix containing phase fractions and compound distribution in mole fractions.</returns>
         ''' <remarks></remarks>
         <System.Runtime.InteropServices.DispId(5)> Public Function TVFFlash( _
@@ -1667,7 +1680,8 @@ Namespace Thermodynamics
             Optional ByVal ip1 As Object = Nothing, _
             Optional ByVal ip2 As Object = Nothing, _
             Optional ByVal ip3 As Object = Nothing, _
-            Optional ByVal ip4 As Object = Nothing) As Object(,)
+            Optional ByVal ip4 As Object = Nothing,
+            Optional ByVal InitialPressureEstimate As Double = 0.0#) As Object(,)
 
             Dim ppm As New CAPEOPENPropertyPackageManager()
 
@@ -1714,6 +1728,8 @@ Namespace Thermodynamics
                 k += 1
             Next
             pp._tpcompids = comps
+
+            ms.Fases(0).SPMProperties.pressure = InitialPressureEstimate
 
             pp.CalcEquilibrium(ms, "TVF", "UNDEFINED")
 
@@ -1864,6 +1880,7 @@ Namespace Thermodynamics
         ''' <param name="ip2">Interaction Parameters Set #2.</param>
         ''' <param name="ip3">Interaction Parameters Set #3.</param>
         ''' <param name="ip4">Interaction Parameters Set #4.</param>
+        ''' <param name="InitialTemperatureEstimate">Initial estimate for the temperature, in K.</param>
         ''' <returns>A matrix containing phase fractions and compound distribution in mole fractions.</returns>
         ''' <remarks></remarks>
         <System.Runtime.InteropServices.DispId(7)> Public Function PHFlash( _
@@ -1876,7 +1893,8 @@ Namespace Thermodynamics
             Optional ByVal ip1 As Object = Nothing, _
             Optional ByVal ip2 As Object = Nothing, _
             Optional ByVal ip3 As Object = Nothing, _
-            Optional ByVal ip4 As Object = Nothing) As Object(,)
+            Optional ByVal ip4 As Object = Nothing,
+            Optional ByVal InitialTemperatureEstimate As Double = 0.0#) As Object(,)
 
             Dim ppm As New CAPEOPENPropertyPackageManager()
 
@@ -1913,6 +1931,8 @@ Namespace Thermodynamics
             pp.SetMaterial(ms)
 
             pp.FlashAlgorithm = flashalg
+
+            ms.Fases(0).SPMProperties.temperature = InitialTemperatureEstimate
 
             pp.CalcEquilibrium(ms, "PH", "UNDEFINED")
 
@@ -1962,6 +1982,7 @@ Namespace Thermodynamics
         ''' <param name="ip2">Interaction Parameters Set #2.</param>
         ''' <param name="ip3">Interaction Parameters Set #3.</param>
         ''' <param name="ip4">Interaction Parameters Set #4.</param>
+        ''' <param name="InitialTemperatureEstimate">Initial estimate for the temperature, in K.</param>
         ''' <returns>A matrix containing phase fractions and compound distribution in mole fractions.</returns>
         ''' <remarks></remarks>
         <System.Runtime.InteropServices.DispId(8)> Public Function PSFlash( _
@@ -1974,7 +1995,8 @@ Namespace Thermodynamics
             Optional ByVal ip1 As Object = Nothing, _
             Optional ByVal ip2 As Object = Nothing, _
             Optional ByVal ip3 As Object = Nothing, _
-            Optional ByVal ip4 As Object = Nothing) As Object(,)
+            Optional ByVal ip4 As Object = Nothing,
+            Optional ByVal InitialTemperatureEstimate As Double = 0.0#) As Object(,)
 
             Dim ppm As New CAPEOPENPropertyPackageManager()
 
@@ -2011,6 +2033,8 @@ Namespace Thermodynamics
             pp.SetMaterial(ms)
 
             pp.FlashAlgorithm = flashalg
+
+            ms.Fases(0).SPMProperties.temperature = InitialTemperatureEstimate
 
             pp.CalcEquilibrium(ms, "PS", "UNDEFINED")
 
@@ -2060,6 +2084,7 @@ Namespace Thermodynamics
         ''' <param name="ip2">Interaction Parameters Set #2.</param>
         ''' <param name="ip3">Interaction Parameters Set #3.</param>
         ''' <param name="ip4">Interaction Parameters Set #4.</param>
+        ''' <param name="InitialTemperatureEstimate">Initial estimate for the temperature, in K.</param>
         ''' <returns>A matrix containing phase fractions and compound distribution in mole fractions.</returns>
         ''' <remarks></remarks>
         <System.Runtime.InteropServices.DispId(9)> Public Function PVFFlash( _
@@ -2072,7 +2097,8 @@ Namespace Thermodynamics
             Optional ByVal ip1 As Object = Nothing, _
             Optional ByVal ip2 As Object = Nothing, _
             Optional ByVal ip3 As Object = Nothing, _
-            Optional ByVal ip4 As Object = Nothing) As Object(,)
+            Optional ByVal ip4 As Object = Nothing,
+            Optional ByVal InitialTemperatureEstimate As Double = 0.0#) As Object(,)
 
             Dim ppm As New CAPEOPENPropertyPackageManager()
 
@@ -2109,6 +2135,8 @@ Namespace Thermodynamics
             pp.SetMaterial(ms)
 
             pp.FlashAlgorithm = flashalg
+
+            ms.Fases(0).SPMProperties.temperature = InitialTemperatureEstimate
 
             pp.CalcEquilibrium(ms, "PVF", "UNDEFINED")
 
@@ -2158,6 +2186,7 @@ Namespace Thermodynamics
         ''' <param name="ip2">Interaction Parameters Set #2.</param>
         ''' <param name="ip3">Interaction Parameters Set #3.</param>
         ''' <param name="ip4">Interaction Parameters Set #4.</param>
+        '''<param name="InitialPressureEstimate">Initial estimate for the pressure, in Pa.</param>
         ''' <returns>A matrix containing phase fractions and compound distribution in mole fractions.</returns>
         ''' <remarks></remarks>
         <System.Runtime.InteropServices.DispId(10)> Public Function TVFFlash( _
@@ -2170,7 +2199,8 @@ Namespace Thermodynamics
             Optional ByVal ip1 As Object = Nothing, _
             Optional ByVal ip2 As Object = Nothing, _
             Optional ByVal ip3 As Object = Nothing, _
-            Optional ByVal ip4 As Object = Nothing) As Object(,)
+            Optional ByVal ip4 As Object = Nothing,
+            Optional ByVal InitialPressureEstimate As Double = 0.0#) As Object(,)
 
             Dim ppm As New CAPEOPENPropertyPackageManager()
 
@@ -2207,6 +2237,8 @@ Namespace Thermodynamics
             pp.SetMaterial(ms)
 
             pp.FlashAlgorithm = flashalg
+
+            ms.Fases(0).SPMProperties.pressure = InitialPressureEstimate
 
             pp.CalcEquilibrium(ms, "TVF", "UNDEFINED")
 
