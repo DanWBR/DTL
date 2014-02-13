@@ -1,4 +1,4 @@
-﻿'    DWSIM Nested Loops Flash Algorithms for Simplified (Immiscible) VLLE
+'    DWSIM Nested Loops Flash Algorithms for Simplified (Immiscible) VLLE
 '    Copyright 2013 Daniel Wagner O. de Medeiros
 '
 '    This file is part of DTL.
@@ -74,19 +74,19 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                 For i = 0 To n
                     If CompoundProperties(i).Name = Me.StabSearchCompIDs(0) Then
                         wid = i
-                        nwm = Vz(i)
-                        Vz(i) = 0
+                        nwm = fi(i)
+                        fi(i) = 0
                     End If
                 Next
 
                 If nwm <> 0 Then
                     For i = 0 To n
-                        If i <> wid And nwm <> 1.0# Then Vz(i) = Vz(i) / (1 - nwm)
+                        If i <> wid And nwm <> 1.0# Then fi(i) = fi(i) / (1 - nwm)
                     Next
                 End If
 
                 Dim results As Object
-                If MathEx.Common.Sum(Vz) = 0.0# Then
+                If MathEx.Common.Sum(fi) = 0.0# Then
                     If PP.AUX_PVAPi(wid, T) / P > 1.0# Then
                         L = 0.0#
                         V = 1.0#
@@ -98,7 +98,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                     Vy = PP.RET_NullVector()
                     ecount = 0.0#
                 Else
-                    results = _nl.Flash_PT(Vz, P, T, PP, ReuseKI, PrevKi)
+                    results = _nl.Flash_PT(fi, P, T, PP, ReuseKI, PrevKi)
                     L = results(0)
                     V = results(1)
                     Vx = results(2)
@@ -111,12 +111,18 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                 For i = 0 To n
                     If CompoundProperties(i).Name = Me.StabSearchCompIDs(0) Then
                         wid = i
-                        nwm = Vz(i)
+                        nwm = fi(i)
                     End If
                 Next
 
+                If nwm <> 0 Then
+                    For i = 0 To n
+                        If i <> wid Then fi(i) = fi(i) / (1 - nwm) Else fi(i) = 0.0#
+                    Next
+                End If
+
                 Dim results As Object
-                results = _nl.Flash_PT(Vz, P, T, PP, ReuseKI, PrevKi)
+                results = _nl.Flash_PT(fi, P, T, PP, ReuseKI, PrevKi)
                 L = results(0)
                 V = results(1)
                 Vx = results(2)
@@ -125,77 +131,14 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
             End If
 
-            If nwm <> 0 And PP._ioquick Then
-
-                Vz(wid) = nwm
-
-                Dim nm, nwv, nwl, nml, nmv, pratio As Double
-
-                nml = L * (1 - nwm)
-                nmv = V * (1 - nwm)
-                nm = nml + nmv
-
-                If V > 0 Then
-
-                    pratio = PP.AUX_PVAPi(wid, T) / P
-                    If Vy(wid) >= 1 Then
-                        nwv = nwm
-                        nwl = 0.0#
-                        Vx(wid) = 0.0#
-                        Vy(wid) = nwv / (nwv + nmv)
-                    Else
-                        nwv = 0.0#
-                        nwl = nwm - nwv
-                        Vx(wid) = nwl / (nml + nwl)
-                        Vy(wid) = nwv / (nmv + nwv)
-                    End If
-
-                    For i = 0 To n
-                        If i <> wid Then
-                            Vx(i) = Vx(i) * nml / (nml + nwl)
-                            Vy(i) = Vy(i) * nmv / (nmv + nwv)
-                            Vz(i) = Vz(i) * (1 - nwm)
-                        End If
-                    Next
-
-                ElseIf V = 0 And L <> 0 Then
-
-                    nwl = nwm
-                    Vx(wid) = nwl / (nwl + nml)
-
-                    For i = 0 To n
-                        If i <> wid Then
-                            Vx(i) = Vx(i) * (1 - Vx(wid))
-                            Vz(i) = Vz(i) * (1 - nwm)
-                        End If
-                    Next
-
-                ElseIf V <> 0 And L = 0 Then
-
-                    nwv = nwm
-                    Vy(wid) = nwv / (nwv + nmv)
-
-                    For i = 0 To n
-                        If i <> wid Then
-                            Vy(i) = Vy(i) * (1 - Vy(wid))
-                            Vz(i) = Vz(i) * (1 - nwm)
-                        End If
-                    Next
-
-                End If
-
-            End If
-
             Dim xl1, xl2, Vx1(n), Vx2(n) As Double
 
-            xl1 = L * (1 - Vx(wid))
-            xl2 = L - xl1
+            V = V * (1 - nwm)
+            xl1 = L * (1 - nwm)
+            xl2 = nwm
             Vx1 = Vx.Clone
-            Vx2 = Vx.Clone
-            Vx1(wid) = 0
-            Vx1 = PP.AUX_NORMALIZE(Vx1)
-            Vx2 = PP.AUX_ERASE(Vx)
-            Vx2(wid) = 1
+            Vx2 = PP.RET_NullVector
+            Vx2(wid) = 1.0#
 
             d2 = Date.Now
 
