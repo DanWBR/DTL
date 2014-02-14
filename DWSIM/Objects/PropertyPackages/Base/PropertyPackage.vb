@@ -244,6 +244,12 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
 #Region "   Properties"
 
+        ''' <summary>
+        ''' Get or sets the list of compounds to be used in the liquid phase stability test during three-phase flash calculations.
+        ''' </summary>
+        ''' <value>A string array containing the names of the compounds.</value>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
         Public Property StabilityTestKeyCompounds As String()
             Get
                 Return _tpcompids
@@ -253,6 +259,12 @@ Namespace DTL.SimulationObjects.PropertyPackages
             End Set
         End Property
 
+        ''' <summary>
+        ''' Defines the severity of the liquid phase stability test during three-phase flash calculations.
+        ''' </summary>
+        ''' <value>0 is the lowest, 2 is the highest.</value>
+        ''' <returns></returns>
+        ''' <remarks></remarks>
         Public Property StabilityTestSeverity() As Integer
             Get
                 Return _tpseverity
