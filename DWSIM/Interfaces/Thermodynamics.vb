@@ -95,7 +95,7 @@ Namespace Thermodynamics
         End Sub
 
         ''' <summary>
-        ''' Disables CPU parallel processing.
+        ''' Disables GPU parallel processing.
         ''' </summary>
         ''' <remarks></remarks>
         Sub DisableGPUProcessing()

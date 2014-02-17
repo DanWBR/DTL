@@ -13,7 +13,7 @@ Module Module1
 
         Dim proppacks As String() = dtlc.GetPropPackList()
 
-        Dim nrtl As String = proppacks(5)
+        Dim nrtl As String = proppacks(8)
 
         Dim prpp As PropertyPackage = dtlc.GetPropPackInstance(nrtl)
 
@@ -66,8 +66,9 @@ Module Module1
         Console.WriteLine("Water/Ethanol Interaction Parameters for NRTL model:")
         Console.Write(vbCrLf)
 
-        dtlc.EnableGPUProcessing()
-        dtlc.InitComputeDevice(Cudafy.eLanguage.Cuda, 0)
+        'uncheck this if you have a CUDA or OpenCL device to use
+        'dtlc.EnableGPUProcessing()
+        'dtlc.InitComputeDevice(Cudafy.eLanguage.Cuda, 0)
 
         Dim ip As DTL.DTL.ClassesBasicasTermodinamica.InteractionParameter = dtlc.GetInteractionParameterSet("NRTL", "Water", "Ethanol")
         Console.WriteLine("A12 = " & ip.Parameters("A12").ToString & " cal/mol")
