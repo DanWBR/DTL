@@ -1,4 +1,6 @@
-﻿Namespace My
+﻿Imports Cudafy
+
+Namespace My
 
     ' The following events are availble for MyApplication:
     ' 
@@ -17,6 +19,9 @@
         Public Shared CommandLineMode As Boolean = False
         Public CAPEOPENMode As Boolean = False
         Public Shared IsRunningParallelTasks As Boolean = False
+
+        Public Shared gpu As Cudafy.Host.GPGPU
+        Public Shared gpumod As CudafyModule
 
     End Class
 

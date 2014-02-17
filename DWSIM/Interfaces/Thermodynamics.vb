@@ -84,6 +84,48 @@ Namespace Thermodynamics
 
         End Sub
 
+        ''' <summary>
+        ''' Enables GPU parallel processing for some tasks. A call to 'InitComputeDevice' is required after this one.
+        ''' </summary>
+        ''' <remarks></remarks>
+        Sub EnableGPUProcessing()
+
+            My.Settings.EnableGPUProcessing = True
+
+        End Sub
+
+        ''' <summary>
+        ''' Disables CPU parallel processing.
+        ''' </summary>
+        ''' <remarks></remarks>
+        Sub DisableGPUProcessing()
+
+            My.Settings.EnableGPUProcessing = False
+
+        End Sub
+
+        ''' <summary>
+        ''' Initializes the Compute (GPU) device with the default settings (language = OpenCL, first device on the list).
+        ''' </summary>
+        ''' <remarks></remarks>
+        Sub InitComputeDevice()
+
+            DTL.App.InitComputeDevice()
+
+        End Sub
+
+        ''' <summary>
+        ''' Initializes the Compute (GPU) device.
+        ''' </summary>
+        ''' <param name="CudafyTarget">Target language for calculations.</param>
+        ''' <param name="DeviceID">ID of the compute device. Defaults to the first device on the system (DeviceID = 0).</param>
+        ''' <remarks></remarks>
+        Sub InitComputeDevice(ByVal CudafyTarget As Cudafy.eLanguage, Optional ByVal DeviceID As Integer = 0)
+
+            DTL.App.InitComputeDevice(CudafyTarget, DeviceID)
+
+        End Sub
+
         Private Sub TransferComps(ByRef pp As PropertyPackage)
 
             pp._availablecomps = _availablecomps
