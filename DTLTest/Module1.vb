@@ -83,7 +83,7 @@ Module Module1
         Console.WriteLine("PT Flash of an equimolar mixture of Water and Ethanol at T = " & T.ToString("###.##") & " K and P = " & P.ToString("#") & " Pa:" & vbCrLf)
         Console.WriteLine("Using NRTL model for equilibrim calculations.")
         Console.Write(vbCrLf)
-        Dim result2 As Object(,) = dtlc.PTFlash(prpp, 5, P, T, New String() {"Water", "Ethanol"}, New Double() {0.5, 0.5})
+        Dim result2 As Object(,) = dtlc.PTFlash(prpp, 11, P, T, New String() {"Water", "Ethanol"}, New Double() {0.5, 0.5})
 
         Console.Write(vbCrLf)
         Console.WriteLine("Flash calculation results:")

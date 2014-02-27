@@ -145,9 +145,14 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                         L2 = F * result(3)(imaxl)
                         L1 = F - L2 - V
 
-                        If L2 < 0 Then
+                        If L1 < 0.0# Then
+                            L1 = Abs(L1)
+                            L2 = F - L1 - V
+                        End If
+
+                        If L2 < 0.0# Then
+                            V += L2
                             L2 = Abs(L2)
-                            L1 = F - L2 - V
                         End If
 
                         For i = 0 To n
@@ -1462,7 +1467,7 @@ restart:    Do
                 i = i + 1
             Loop Until i = n + 1
 
-            Kb = CalcKbjw(Ki1, Ki2, L1, L2, Vx1, Vx2)
+            Kb = 1.0# 'CalcKbjw(Ki1, Ki2, L1, L2, Vx1, Vx2)
             Kb0 = Kb
 
             For i = 0 To n
@@ -1499,18 +1504,18 @@ restart:    Do
                 Do
                     R0 = R
                     If R > 0.999 Then
-                        R1 = R - 0.0001
+                        R1 = R - 0.01
                         fr = Me.TPErrorFunc(R0)
-                        dfr = (fr - Me.TPErrorFunc(R1)) / 0.0001
+                        dfr = (fr - Me.TPErrorFunc(R1)) / 0.01
                     Else
-                        R1 = R + 0.0001
+                        R1 = R + 0.01
                         fr = Me.TPErrorFunc(R0)
-                        dfr = (fr - Me.TPErrorFunc(R1)) / (-0.0001)
+                        dfr = (fr - Me.TPErrorFunc(R1)) / (-0.01)
                     End If
                     R0 = R
-                    R += -0.1 * fr / dfr
-                    If R < 0 Then R = 0
-                    If R > 1 Then R = 1
+                    R += -0.5 * fr / dfr
+                    If R < 0 Then R = 0.0#
+                    If R > 1 Then R = 1.0#
                     icount += 1
                 Loop Until Abs(fr) < itol Or icount > maxit_i Or R = 0 Or R = 1
 
@@ -1581,6 +1586,8 @@ restart:    Do
 
                 Console.WriteLine("PT Flash [IO]: Iteration #" & ecount & ", VF = " & V)
 
+
+
             Loop Until AbsSum(fx) < etol
 
 out:
@@ -1611,12 +1618,12 @@ out:
             S = 1 - Rt
             Do
                 S0 = S
-                S1 = S + 0.001
+                S1 = S + 0.01
                 fr = Me.SErrorFunc(S0, Rt)
-                dfr = (fr - Me.SErrorFunc(S1, Rt)) / -0.001
+                dfr = (fr - Me.SErrorFunc(S1, Rt)) / -0.01
                 S += -fr / dfr
-                If S < -(1 - Rt) Then S = -(1 - Rt) + 0.001
-                If S > (1 - Rt) Then S = (1 - Rt) - 0.001
+                If S < -(1 - Rt) Then S = -(1 - Rt) + 0.01
+                If S > (1 - Rt) Then S = (1 - Rt) - 0.01
                 icount += 1
             Loop Until Abs(fr) < itol Or icount > maxit_i
 

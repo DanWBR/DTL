@@ -1227,7 +1227,7 @@ Namespace Thermodynamics
         ''' Calculates a PT Flash using the selected Property Package.
         ''' </summary>
         ''' <param name="proppack">The name of the Property Package to use.</param>
-        ''' <param name="flashalg">Flash Algorithm (0 or 2 = Nested Loops VLE, 1 = Inside-Out VLE, 3 = Inside-Out VLLE, 4 = Gibbs VLE, 5 = Gibbs VLLE, 6 = Nested-Loops VLLE, 7 = Nested-Loops SLE, 8 = Nested-Loops Immisc., 9 = Simple LLE)</param>
+        ''' <param name="flashalg">Flash Algorithm (0 or 2 = Nested Loops VLE, 1 = Inside-Out VLE, 3 = Inside-Out VLLE, 4 = Gibbs VLE, 5 = Gibbs VLLE, 6 = Nested-Loops VLLE (Hybrid), 7 = Nested-Loops SLE, 8 = Nested-Loops Immisc., 9 = Simple LLE, 10 = Nested-Loops SLE (Solid Solution), 11 = Nested Loops VLLE)</param>
         ''' <param name="P">Pressure in Pa.</param>
         ''' <param name="T">Temperature in K.</param>
         ''' <param name="compounds">Compound names.</param>
@@ -1349,7 +1349,7 @@ Namespace Thermodynamics
         ''' Calculates a PH Flash using the selected Property Package.
         ''' </summary>
         ''' <param name="proppack">The name of the Property Package to use.</param>
-        ''' <param name="flashalg">Flash Algorithm (0 or 2 = Nested Loops VLE, 1 = Inside-Out VLE, 3 = Inside-Out VLLE, 4 = Gibbs VLE, 5 = Gibbs VLLE, 6 = Nested-Loops VLLE, 7 = Nested-Loops SLE, 8 = Nested-Loops Immisc., 9 = Simple LLE)</param>
+        ''' <param name="flashalg">Flash Algorithm (0 or 2 = Nested Loops VLE, 1 = Inside-Out VLE, 3 = Inside-Out VLLE, 4 = Gibbs VLE, 5 = Gibbs VLLE, 6 = Nested-Loops VLLE (Hybrid), 7 = Nested-Loops SLE, 8 = Nested-Loops Immisc., 9 = Simple LLE, 10 = Nested-Loops SLE (Solid Solution), 11 = Nested Loops VLLE)</param>
         ''' <param name="P">Pressure in Pa.</param>
         ''' <param name="H">Mixture Mass Enthalpy in kJ/kg.</param>
         ''' <param name="compounds">Compound names.</param>
@@ -1466,7 +1466,7 @@ Namespace Thermodynamics
         ''' Calculates a PH Flash using the selected Property Package.
         ''' </summary>
         ''' <param name="proppack">The name of the Property Package to use.</param>
-        ''' <param name="flashalg">Flash Algorithm (0 or 2 = Nested Loops VLE, 1 = Inside-Out VLE, 3 = Inside-Out VLLE, 4 = Gibbs VLE, 5 = Gibbs VLLE, 6 = Nested-Loops VLLE, 7 = Nested-Loops SLE, 8 = Nested-Loops Immisc., 9 = Simple LLE)</param>
+        ''' <param name="flashalg">Flash Algorithm (0 or 2 = Nested Loops VLE, 1 = Inside-Out VLE, 3 = Inside-Out VLLE, 4 = Gibbs VLE, 5 = Gibbs VLLE, 6 = Nested-Loops VLLE (Hybrid), 7 = Nested-Loops SLE, 8 = Nested-Loops Immisc., 9 = Simple LLE, 10 = Nested-Loops SLE (Solid Solution), 11 = Nested Loops VLLE)</param>
         ''' <param name="P">Pressure in Pa.</param>
         ''' <param name="S">Mixture Mass Entropy in kJ/[kg.K].</param>
         ''' <param name="compounds">Compound names.</param>
@@ -1583,7 +1583,7 @@ Namespace Thermodynamics
         ''' Calculates a PVF Flash using the selected Property Package.
         ''' </summary>
         ''' <param name="proppack">The name of the Property Package to use.</param>
-        ''' <param name="flashalg">Flash Algorithm (0 or 2 = Nested Loops VLE, 1 = Inside-Out VLE, 3 = Inside-Out VLLE, 4 = Gibbs VLE, 5 = Gibbs VLLE, 6 = Nested-Loops VLLE, 7 = Nested-Loops SLE, 8 = Nested-Loops Immisc., 9 = Simple LLE)</param>
+        ''' <param name="flashalg">Flash Algorithm (0 or 2 = Nested Loops VLE, 1 = Inside-Out VLE, 3 = Inside-Out VLLE, 4 = Gibbs VLE, 5 = Gibbs VLLE, 6 = Nested-Loops VLLE (Hybrid), 7 = Nested-Loops SLE, 8 = Nested-Loops Immisc., 9 = Simple LLE, 10 = Nested-Loops SLE (Solid Solution), 11 = Nested Loops VLLE)</param>
         ''' <param name="P">Pressure in Pa.</param>
         ''' <param name="VF">Mixture Mole Vapor Fraction.</param>
         ''' <param name="compounds">Compound names.</param>
@@ -1700,7 +1700,7 @@ Namespace Thermodynamics
         ''' Calculates a TVF Flash using the selected Property Package.
         ''' </summary>
         ''' <param name="proppack">The name of the Property Package to use.</param>
-        ''' <param name="flashalg">Flash Algorithm (0 or 2 = Nested Loops VLE, 1 = Inside-Out VLE, 3 = Inside-Out VLLE, 4 = Gibbs VLE, 5 = Gibbs VLLE, 6 = Nested-Loops VLLE, 7 = Nested-Loops SLE, 8 = Nested-Loops Immisc., 9 = Simple LLE)</param>
+        ''' <param name="flashalg">Flash Algorithm (0 or 2 = Nested Loops VLE, 1 = Inside-Out VLE, 3 = Inside-Out VLLE, 4 = Gibbs VLE, 5 = Gibbs VLLE, 6 = Nested-Loops VLLE (Hybrid), 7 = Nested-Loops SLE, 8 = Nested-Loops Immisc., 9 = Simple LLE, 10 = Nested-Loops SLE (Solid Solution), 11 = Nested Loops VLLE)</param>
         ''' <param name="T">Temperature in K.</param>
         ''' <param name="VF">Mixture Mole Vapor Fraction.</param>
         ''' <param name="compounds">Compound names.</param>
@@ -1817,7 +1817,7 @@ Namespace Thermodynamics
         ''' Calculates a PT Flash using the referenced Property Package.
         ''' </summary>
         ''' <param name="proppack">A reference to the Property Package object to use.</param>
-        ''' <param name="flashalg">Flash Algorithm (0 or 2 = Nested Loops VLE, 1 = Inside-Out VLE, 3 = Inside-Out VLLE, 4 = Gibbs VLE, 5 = Gibbs VLLE, 6 = Nested-Loops VLLE, 7 = Nested-Loops SLE, 8 = Nested-Loops Immisc., 9 = Simple LLE)</param>
+        ''' <param name="flashalg">Flash Algorithm (0 or 2 = Nested Loops VLE, 1 = Inside-Out VLE, 3 = Inside-Out VLLE, 4 = Gibbs VLE, 5 = Gibbs VLLE, 6 = Nested-Loops VLLE (Hybrid), 7 = Nested-Loops SLE, 8 = Nested-Loops Immisc., 9 = Simple LLE, 10 = Nested-Loops SLE (Solid Solution), 11 = Nested Loops VLLE)</param>
         ''' <param name="T">Temperature in K.</param>
         ''' <param name="P">Pressure in Pa.</param>
         ''' <param name="compounds">Compound names.</param>
@@ -1913,7 +1913,7 @@ Namespace Thermodynamics
         ''' Calculates a PH Flash using the referenced Property Package.
         ''' </summary>
         ''' <param name="proppack">A reference to the Property Package object to use.</param>
-        ''' <param name="flashalg">Flash Algorithm (0 or 2 = Nested Loops VLE, 1 = Inside-Out VLE, 3 = Inside-Out VLLE, 4 = Gibbs VLE, 5 = Gibbs VLLE, 6 = Nested-Loops VLLE, 7 = Nested-Loops SLE, 8 = Nested-Loops Immisc., 9 = Simple LLE)</param>
+        ''' <param name="flashalg">Flash Algorithm (0 or 2 = Nested Loops VLE, 1 = Inside-Out VLE, 3 = Inside-Out VLLE, 4 = Gibbs VLE, 5 = Gibbs VLLE, 6 = Nested-Loops VLLE (Hybrid), 7 = Nested-Loops SLE, 8 = Nested-Loops Immisc., 9 = Simple LLE, 10 = Nested-Loops SLE (Solid Solution), 11 = Nested Loops VLLE)</param>
         ''' <param name="P">Pressure in Pa.</param>
         ''' <param name="H">Mixture Mass Enthalpy in kJ/kg.</param>
         ''' <param name="compounds">Compound names.</param>
@@ -2015,7 +2015,7 @@ Namespace Thermodynamics
         ''' Calculates a PS Flash using the referenced Property Package.
         ''' </summary>
         ''' <param name="proppack">A reference to the Property Package object to use.</param>
-        ''' <param name="flashalg">Flash Algorithm (0 or 2 = Nested Loops VLE, 1 = Inside-Out VLE, 3 = Inside-Out VLLE, 4 = Gibbs VLE, 5 = Gibbs VLLE, 6 = Nested-Loops VLLE, 7 = Nested-Loops SLE, 8 = Nested-Loops Immisc., 9 = Simple LLE)</param>
+        ''' <param name="flashalg">Flash Algorithm (0 or 2 = Nested Loops VLE, 1 = Inside-Out VLE, 3 = Inside-Out VLLE, 4 = Gibbs VLE, 5 = Gibbs VLLE, 6 = Nested-Loops VLLE (Hybrid), 7 = Nested-Loops SLE, 8 = Nested-Loops Immisc., 9 = Simple LLE, 10 = Nested-Loops SLE (Solid Solution), 11 = Nested Loops VLLE)</param>
         ''' <param name="P">Pressure in Pa.</param>
         ''' <param name="S">Mixture Mass Entropyin kJ/[kg.K].</param>
         ''' <param name="compounds">Compound names.</param>
@@ -2117,7 +2117,7 @@ Namespace Thermodynamics
         ''' Calculates a PVF Flash using the referenced Property Package.
         ''' </summary>
         ''' <param name="proppack">A reference to the Property Package object to use.</param>
-        ''' <param name="flashalg">Flash Algorithm (0 or 2 = Nested Loops VLE, 1 = Inside-Out VLE, 3 = Inside-Out VLLE, 4 = Gibbs VLE, 5 = Gibbs VLLE, 6 = Nested-Loops VLLE, 7 = Nested-Loops SLE, 8 = Nested-Loops Immisc., 9 = Simple LLE)</param>
+        ''' <param name="flashalg">Flash Algorithm (0 or 2 = Nested Loops VLE, 1 = Inside-Out VLE, 3 = Inside-Out VLLE, 4 = Gibbs VLE, 5 = Gibbs VLLE, 6 = Nested-Loops VLLE (Hybrid), 7 = Nested-Loops SLE, 8 = Nested-Loops Immisc., 9 = Simple LLE, 10 = Nested-Loops SLE (Solid Solution), 11 = Nested Loops VLLE)</param>
         ''' <param name="P">Pressure in Pa.</param>
         ''' <param name="VF">Mixture Mole Vapor Fraction.</param>
         ''' <param name="compounds">Compound names.</param>
@@ -2219,7 +2219,7 @@ Namespace Thermodynamics
         ''' Calculates a TVF Flash using the referenced Property Package.
         ''' </summary>
         ''' <param name="proppack">A reference to the Property Package object to use.</param>
-        ''' <param name="flashalg">Flash Algorithm (0 or 2 = Nested Loops VLE, 1 = Inside-Out VLE, 3 = Inside-Out VLLE, 4 = Gibbs VLE, 5 = Gibbs VLLE, 6 = Nested-Loops VLLE, 7 = Nested-Loops SLE, 8 = Nested-Loops Immisc., 9 = Simple LLE)</param>
+        ''' <param name="flashalg">Flash Algorithm (0 or 2 = Nested Loops VLE, 1 = Inside-Out VLE, 3 = Inside-Out VLLE, 4 = Gibbs VLE, 5 = Gibbs VLLE, 6 = Nested-Loops VLLE (Hybrid), 7 = Nested-Loops SLE, 8 = Nested-Loops Immisc., 9 = Simple LLE, 10 = Nested-Loops SLE (Solid Solution), 11 = Nested Loops VLLE)</param>
         ''' <param name="T">Temperature in K.</param>
         ''' <param name="VF">Mixture Mole Vapor Fraction.</param>
         ''' <param name="compounds">Compound names.</param>
