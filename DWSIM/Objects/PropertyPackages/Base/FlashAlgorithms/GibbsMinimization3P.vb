@@ -289,6 +289,11 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                     Dim nt As Integer = Me.StabSearchCompIDs.Length - 1
                     Dim nc As Integer = UBound(Vz)
 
+                    If result(1) > 0 And n = 1 Then
+                        'the liquid phase cannot be unstable when there's also vapor and only two compounds in the system.
+                        Return result
+                    End If
+
                     If nt = -1 Then nt = nc
 
                     Dim Vtrials(nt, nc) As Double

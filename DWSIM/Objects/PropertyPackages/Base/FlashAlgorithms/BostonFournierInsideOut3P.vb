@@ -58,6 +58,11 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
             If result(0) > 0 Then ' we have a liquid phase
 
+                If result(1) > 0 And n = 1 Then
+                    'the liquid phase cannot be unstable when there's also vapor and only two compounds in the system (phase rule).
+                    Return result
+                End If
+
                 Dim nt As Integer = Me.StabSearchCompIDs.Length - 1
                 Dim nc As Integer = UBound(Vz)
 
@@ -173,7 +178,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                         Next
 
                         Try
-                            result = Flash_PT_3P(Vz, V, L1, L2, result(3), vx1e, vx2est, P, T, PP)
+                            result = Flash_PT_3P(Vz, V, L1, L2, result(3), result(2), vx2est, P, T, PP)
                         Catch ex As Exception
                             'if there was an error, keep the two-phase result.
                             result = _io.Flash_PT(Vz, P, T, PP, ReuseKI, PrevKi)
@@ -1513,7 +1518,7 @@ restart:    Do
                         dfr = (fr - Me.TPErrorFunc(R1)) / (-0.01)
                     End If
                     R0 = R
-                    R += -0.5 * fr / dfr
+                    R += -1.0 * fr / dfr
                     If R < 0 Then R = 0.0#
                     If R > 1 Then R = 1.0#
                     icount += 1
@@ -1529,7 +1534,7 @@ restart:    Do
 
                 Ki1 = PP.DW_CalcKvalue(Vx1, Vy, T, P)
                 Ki2 = PP.DW_CalcKvalue(Vx2, Vy, T, P)
-                Kb = CalcKbjw(Ki1, Ki2, L1, L2, Vx1, Vx2)
+                'Kb = CalcKbjw(Ki1, Ki2, L1, L2, Vx1, Vx2)
 
                 For i = 0 To n
                     uic1(i) = Log(Ki1(i))
@@ -1585,8 +1590,6 @@ restart:    Do
                 If ecount > maxit_e Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt2"))
 
                 Console.WriteLine("PT Flash [IO]: Iteration #" & ecount & ", VF = " & V)
-
-
 
             Loop Until AbsSum(fx) < etol
 
@@ -1660,8 +1663,6 @@ out:
             beta = L1 / (L1 + L2)
 
             Dim err1 As Double = Kb - 1
-
-
 
             Return err1
 
