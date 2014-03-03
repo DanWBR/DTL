@@ -1,4 +1,0 @@
-DTL
-===
-
-DWSIM Thermodynamics Library

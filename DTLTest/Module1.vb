@@ -67,8 +67,8 @@ Module Module1
         Console.Write(vbCrLf)
 
         'uncheck this if you have a CUDA or OpenCL device to use
-        'dtlc.EnableGPUProcessing()
-        'dtlc.InitComputeDevice(Cudafy.eLanguage.Cuda, 0)
+        dtlc.EnableGPUProcessing()
+        dtlc.InitComputeDevice(Cudafy.eLanguage.Cuda, 0)
 
         Dim ip As DTL.DTL.ClassesBasicasTermodinamica.InteractionParameter = dtlc.GetInteractionParameterSet("NRTL", "Water", "Ethanol")
         Console.WriteLine("A12 = " & ip.Parameters("A12").ToString & " cal/mol")
