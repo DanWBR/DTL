@@ -58,7 +58,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
             If result(0) > 0 Then ' we have a liquid phase
 
-                If result(1) > 0 And n = 1 Then
+                If result(1) > 0.0001 And n = 1 Then
                     'the liquid phase cannot be unstable when there's also vapor and only two compounds in the system (phase rule).
                     Return result
                 End If

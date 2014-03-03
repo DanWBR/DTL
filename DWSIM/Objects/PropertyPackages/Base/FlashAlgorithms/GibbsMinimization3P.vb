@@ -51,14 +51,6 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
         Dim proppack As PropertyPackages.PropertyPackage
         Dim objval, objval0 As Double
 
-        Public Enum ObjFuncType As Integer
-            MinGibbs = 0
-            BubblePointT = 1
-            BubblePointP = 2
-            DewPointT = 3
-            DewPointP = 4
-        End Enum
-
         Public Enum numsolver
             Limited_Memory_BGFS = 0
             Truncated_Newton = 1
@@ -67,6 +59,14 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
         End Enum
 
         Public Property Solver As numsolver = numsolver.IPOPT
+
+        Public Enum ObjFuncType As Integer
+            MinGibbs = 0
+            BubblePointT = 1
+            BubblePointP = 2
+            DewPointT = 3
+            DewPointP = 4
+        End Enum
 
         Dim objfunc As ObjFuncType = ObjFuncType.MinGibbs
 
@@ -286,13 +286,13 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
                 If result(0) > 0 Then ' we have a liquid phase
 
-                    Dim nt As Integer = Me.StabSearchCompIDs.Length - 1
-                    Dim nc As Integer = UBound(Vz)
-
-                    If result(1) > 0 And n = 1 Then
+                    If result(1) > 0.0001 And n = 1 Then
                         'the liquid phase cannot be unstable when there's also vapor and only two compounds in the system.
                         Return result
                     End If
+
+                    Dim nt As Integer = Me.StabSearchCompIDs.Length - 1
+                    Dim nc As Integer = UBound(Vz)
 
                     If nt = -1 Then nt = nc
 
@@ -372,7 +372,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                             Dim lconstr2(2 * n + 1) As Double
                             Dim uconstr2(2 * n + 1) As Double
                             Dim finalval2(2 * n + 1) As Double
-                            Dim glow(n), gup(n) As Double
+                            Dim glow(n), gup(n), g(n) As Double
 
                             Dim maxl As Double = MathEx.Common.Max(vx2est)
                             Dim imaxl As Integer = Array.IndexOf(vx2est, maxl)
@@ -394,14 +394,15 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
                             For i = 0 To n
                                 If Vz(i) <> 0 Then
-                                    initval2(i) = Vy(i) * V
+                                    initval2(i) = Vy(i) * V - vx2est(i) * L2
+                                    If initval2(i) < 0.0# Then initval2(i) = 0.0#
                                 Else
                                     initval2(i) = 0.0#
                                 End If
                                 lconstr2(i) = 0.0#
                                 uconstr2(i) = fi(i) * F
                                 glow(i) = 0.0#
-                                gup(i) = 10000.0#
+                                gup(i) = 1000.0#
                             Next
                             For i = n + 1 To 2 * n + 1
                                 If Vz(i - n - 1) <> 0 Then
@@ -421,18 +422,53 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                             objval = 0.0#
                             objval0 = 0.0#
 
-                            Using problem As New Ipopt(initval2.Length, lconstr2, uconstr2, 0, Nothing, Nothing, 0, 0, _
+                            Solver = numsolver.IPOPT
+
+                            Select Case Me.Solver
+                                'Case numsolver.Limited_Memory_BGFS
+                                '    Dim variables(2 * n + 1) As OptBoundVariable
+                                '    For i = 0 To 2 * n + 1
+                                '        variables(i) = New OptBoundVariable("x" & CStr(i + 1), initval2(i), False, lconstr2(i), uconstr2(i))
+                                '    Next
+                                '    Dim solver As New L_BFGS_B
+                                '    solver.Tolerance = etol
+                                '    solver.MaxFunEvaluations = maxit_e
+                                '    initval2 = solver.ComputeMin(AddressOf FunctionValue, AddressOf FunctionGradient, variables)
+                                '    solver = Nothing
+                                'Case numsolver.Truncated_Newton
+                                '    Dim variables(2 * n + 1) As OptBoundVariable
+                                '    For i = 0 To 2 * n + 1
+                                '        variables(i) = New OptBoundVariable("x" & CStr(i + 1), initval2(i), False, lconstr2(i), uconstr2(i))
+                                '    Next
+                                '    Dim solver As New TruncatedNewton
+                                '    solver.Tolerance = etol
+                                '    solver.MaxFunEvaluations = maxit_e
+                                '    initval2 = solver.ComputeMin(AddressOf FunctionValue, AddressOf FunctionGradient, variables)
+                                '    solver = Nothing
+                                'Case numsolver.Simplex
+                                '    Dim variables(2 * n + 1) As OptBoundVariable
+                                '    For i = 0 To 2 * n + 1
+                                '        variables(i) = New OptBoundVariable("x" & CStr(i + 1), initval2(i), False, lconstr2(i), uconstr2(i))
+                                '    Next
+                                '    Dim solver As New Simplex
+                                '    solver.Tolerance = etol
+                                '    solver.MaxFunEvaluations = maxit_e
+                                '    initval2 = solver.ComputeMin(AddressOf FunctionValue, variables)
+                                '    solver = Nothing
+                                Case numsolver.IPOPT
+                                    Using problem As New Ipopt(initval2.Length, lconstr2, uconstr2, n + 1, glow, gup, (n + 1) * 2, 0, _
                                             AddressOf eval_f, AddressOf eval_g, _
                                             AddressOf eval_grad_f, AddressOf eval_jac_g, AddressOf eval_h)
-                                problem.AddOption("tol", etol * 10)
-                                problem.AddOption("max_iter", maxit_e * 10)
-                                problem.AddOption("mu_strategy", "adaptive")
-                                problem.AddOption("hessian_approximation", "limited-memory")
-                                problem.SetIntermediateCallback(AddressOf intermediate)
-                                'solve the problem 
-                                status = problem.SolveProblem(initval2, obj, Nothing, Nothing, Nothing, Nothing)
-                            End Using
-                          
+                                        problem.AddOption("tol", etol)
+                                        problem.AddOption("max_iter", maxit_e)
+                                        problem.AddOption("mu_strategy", "adaptive")
+                                        problem.AddOption("hessian_approximation", "limited-memory")
+                                        problem.SetIntermediateCallback(AddressOf intermediate)
+                                        'solve the problem 
+                                        status = problem.SolveProblem(initval2, obj, g, Nothing, Nothing, Nothing)
+                                    End Using
+                            End Select
+
                             For i = 0 To initval2.Length - 1
                                 If Double.IsNaN(initval2(i)) Then initval2(i) = 0.0#
                             Next
@@ -683,7 +719,7 @@ out:        Return result
             Dim herr As Double = Hf - (mmg * V / (mmg * V + mml * L1 + mml2 * L2)) * Hv - (mml * L1 / (mmg * V + mml * L1 + mml2 * L2)) * Hl1 - (mml2 * L2 / (mmg * V + mml * L1 + mml2 * L2)) * Hl2
             OBJ_FUNC_PH_FLASH = herr
 
-            Console.WriteLine("PH Flash [NL]: Current T = " & T & ", Current H Error = " & herr)
+            Console.WriteLine("PH Flash [GM]: Current T = " & T & ", Current H Error = " & herr)
 
         End Function
 
@@ -716,7 +752,7 @@ out:        Return result
             Dim serr As Double = Sf - (mmg * V / (mmg * V + mml * L1 + mml2 * L2)) * Sv - (mml * L1 / (mmg * V + mml * L1 + mml2 * L2)) * Sl1 - (mml2 * L2 / (mmg * V + mml * L1 + mml2 * L2)) * Sl2
             OBJ_FUNC_PS_FLASH = serr
 
-            Console.WriteLine("PS Flash [NL]: Current T = " & T & ", Current S Error = " & serr)
+            Console.WriteLine("PS Flash [GM]: Current T = " & T & ", Current S Error = " & serr)
 
         End Function
 
@@ -1015,7 +1051,7 @@ out:        Return result
                         P = P - fval / dFdP
                     End If
 
-                    Console.WriteLine("TV Flash [NL]: Iteration #" & ecount & ", P = " & P & ", VF = " & V)
+                    Console.WriteLine("TV Flash [GM]: Iteration #" & ecount & ", P = " & P & ", VF = " & V)
 
 
 
@@ -1119,7 +1155,7 @@ out:        Return result
                         P = P - fval / dFdP
                     End If
 
-                    Console.WriteLine("TV Flash [NL]: Iteration #" & ecount & ", P = " & P & ", VF = " & V)
+                    Console.WriteLine("TV Flash [GM]: Iteration #" & ecount & ", P = " & P & ", VF = " & V)
 
 
 
@@ -1131,7 +1167,7 @@ out:        Return result
 
             dt = d2 - d1
 
-            Console.WriteLine("TV Flash [NL]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms.")
+            Console.WriteLine("TV Flash [GM]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms.")
 
             Return New Object() {L, V, Vx, Vy, P, ecount, Ki, 0.0#, PP.RET_NullVector, 0.0#, PP.RET_NullVector}
 
@@ -1340,7 +1376,7 @@ out:        Return result
                     If T < Tmin Then T = Tmin
                     If T > Tmax Then T = Tmax
 
-                    Console.WriteLine("PV Flash [NL]: Iteration #" & ecount & ", T = " & T & ", VF = " & V)
+                    Console.WriteLine("PV Flash [GM]: Iteration #" & ecount & ", T = " & T & ", VF = " & V)
 
 
 
@@ -1442,7 +1478,7 @@ out:        Return result
                     If T < Tmin Then T = Tmin
                     If T > Tmax Then T = Tmax
 
-                    Console.WriteLine("PV Flash [NL]: Iteration #" & ecount & ", T = " & T & ", VF = " & V)
+                    Console.WriteLine("PV Flash [GM]: Iteration #" & ecount & ", T = " & T & ", VF = " & V)
 
 
 
@@ -1454,7 +1490,7 @@ out:        Return result
 
             dt = d2 - d1
 
-            Console.WriteLine("PV Flash [NL]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms.")
+            Console.WriteLine("PV Flash [GM]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms.")
 
             Return New Object() {L, V, Vx, Vy, T, ecount, Ki, 0.0#, PP.RET_NullVector, 0.0#, PP.RET_NullVector}
 
@@ -1486,6 +1522,9 @@ out:        Return result
 
                         If My.Settings.EnableParallelProcessing Then
                             My.MyApplication.IsRunningParallelTasks = True
+                            If My.Settings.EnableGPUProcessing Then
+                                My.MyApplication.gpu.EnableMultithreading()
+                            End If
                             Try
                                 Dim task1 As Task = New Task(Sub()
                                                                  fcv = proppack.DW_CalcFugCoeff(Vy, Tf, Pf, State.Vapor)
@@ -1501,6 +1540,10 @@ out:        Return result
                                     Throw ex
                                 Next
                             Finally
+                                If My.Settings.EnableGPUProcessing Then
+                                    My.MyApplication.gpu.DisableMultithreading()
+                                    My.MyApplication.gpu.FreeAll()
+                                End If
                             End Try
                             My.MyApplication.IsRunningParallelTasks = False
                         Else
@@ -1516,6 +1559,8 @@ out:        Return result
                         Next
 
                         Gm = Gv + Gl1
+
+                        Console.WriteLine("[GM] V = " & Format(V, "N4") & ", L = " & Format(L, "N4") & " / GE = " & Format(Gm * 8.314 * Tf, "N2") & " kJ/kmol")
 
                     Else
 
@@ -1537,10 +1582,9 @@ out:        Return result
                             If V <> 0.0# Then Vy(i) = (x(i) / V) Else Vy(i) = 0.0#
                             If L2 <> 0.0# Then Vx2(i) = (x(i + n + 1) / L2) Else Vx2(i) = 0.0#
                             If L1 <> 0.0# Then Vx1(i) = ((fi(i) * F - Vy(i) * V - Vx2(i) * L2) / L1) Else Vx1(i) = 0.0#
-                            If Vx1(i) < 0 Then
-                                pval += Abs(Vx1(i) * L1)
-                                Vx1(i) = 1.0E-20
-                            End If
+                            If Vy(i) < 0.0# Then Vy(i) = 1.0E-20
+                            If Vx1(i) < 0.0# Then Vx1(i) = 1.0E-20
+                            If Vx2(i) < 0.0# Then Vx2(i) = 1.0E-20
                         Next
 
                         soma_x1 = 0
@@ -1553,6 +1597,9 @@ out:        Return result
 
                         If My.Settings.EnableParallelProcessing Then
                             My.MyApplication.IsRunningParallelTasks = True
+                            If My.Settings.EnableGPUProcessing Then
+                                My.MyApplication.gpu.EnableMultithreading()
+                            End If
                             Try
                                 Dim task1 As Task = New Task(Sub()
                                                                  fcv = proppack.DW_CalcFugCoeff(Vy, Tf, Pf, State.Vapor)
@@ -1572,6 +1619,10 @@ out:        Return result
                                     Throw ex
                                 Next
                             Finally
+                                If My.Settings.EnableGPUProcessing Then
+                                    My.MyApplication.gpu.DisableMultithreading()
+                                    My.MyApplication.gpu.FreeAll()
+                                End If
                             End Try
                             My.MyApplication.IsRunningParallelTasks = False
                         Else
@@ -1590,6 +1641,8 @@ out:        Return result
                         Next
 
                         Gm = Gv + Gl1 + Gl2 + pval
+
+                        Console.WriteLine("[GM] V = " & Format(V / 1000, "N4") & ", L1 = " & Format(L1 / 1000, "N4") & ", L2 = " & Format(L2 / 1000, "N4") & " / GE = " & Format(Gm * 8.314 * Tf / 1000, "N2") & " kJ/kmol")
 
                     End If
 
@@ -1645,6 +1698,9 @@ out:        Return result
 
                     If My.Settings.EnableParallelProcessing Then
                         My.MyApplication.IsRunningParallelTasks = True
+                        If My.Settings.EnableGPUProcessing Then
+                            My.MyApplication.gpu.EnableMultithreading()
+                        End If
                         Try
                             Dim task1 As Task = New Task(Sub()
                                                              fcv = proppack.DW_CalcFugCoeff(Vy, Tf, Pf, State.Vapor)
@@ -1664,6 +1720,10 @@ out:        Return result
                                 Throw ex
                             Next
                         Finally
+                            If My.Settings.EnableGPUProcessing Then
+                                My.MyApplication.gpu.DisableMultithreading()
+                                My.MyApplication.gpu.FreeAll()
+                            End If
                         End Try
                         My.MyApplication.IsRunningParallelTasks = False
                     Else
@@ -1696,7 +1756,7 @@ out:        Return result
         Private Function FunctionGradient(ByVal x() As Double) As Double()
 
             Dim g(x.Length - 1) As Double
-            Dim epsilon As Double = 0.001
+            Dim epsilon As Double = 0.000001
             Dim fcv(x.Length - 1), fcl(x.Length - 1), fcl2(x.Length - 1) As Double
             Dim i As Integer
 
@@ -1717,6 +1777,9 @@ out:        Return result
 
                         If My.Settings.EnableParallelProcessing Then
                             My.MyApplication.IsRunningParallelTasks = True
+                            If My.Settings.EnableGPUProcessing Then
+                                My.MyApplication.gpu.EnableMultithreading()
+                            End If
                             Try
                                 Dim task1 As Task = New Task(Sub()
                                                                  fcv = proppack.DW_CalcFugCoeff(Vy, Tf, Pf, State.Vapor)
@@ -1732,6 +1795,10 @@ out:        Return result
                                     Throw ex
                                 Next
                             Finally
+                                If My.Settings.EnableGPUProcessing Then
+                                    My.MyApplication.gpu.DisableMultithreading()
+                                    My.MyApplication.gpu.FreeAll()
+                                End If
                             End Try
                             My.MyApplication.IsRunningParallelTasks = False
                         Else
@@ -1759,10 +1826,12 @@ out:        Return result
                         L1 = F - V - L2
 
                         For i = 0 To n
-                            Vy(i) = (x(i) / V)
-                            Vx2(i) = (x(i + n + 1) / L2)
-                            Vx1(i) = ((fi(i) * F - Vy(i) * V - Vx2(i) * L2) / L1)
-                            If Vx1(i) <= 0 Then Vx1(i) = 1.0E-20
+                            If V <> 0.0# Then Vy(i) = (x(i) / V) Else Vy(i) = 0.0#
+                            If L2 <> 0.0# Then Vx2(i) = (x(i + n + 1) / L2) Else Vx2(i) = 0.0#
+                            If L1 <> 0.0# Then Vx1(i) = ((fi(i) * F - Vy(i) * V - Vx2(i) * L2) / L1) Else Vx1(i) = 0.0#
+                            If Vy(i) < 0.0# Then Vy(i) = 1.0E-20
+                            If Vx1(i) < 0.0# Then Vx1(i) = 1.0E-20
+                            If Vx2(i) < 0.0# Then Vx2(i) = 1.0E-20
                         Next
 
                         soma_x1 = 0
@@ -1775,6 +1844,9 @@ out:        Return result
 
                         If My.Settings.EnableParallelProcessing Then
                             My.MyApplication.IsRunningParallelTasks = True
+                            If My.Settings.EnableGPUProcessing Then
+                                My.MyApplication.gpu.EnableMultithreading()
+                            End If
                             Try
                                 Dim task1 As Task = New Task(Sub()
                                                                  fcv = proppack.DW_CalcFugCoeff(Vy, Tf, Pf, State.Vapor)
@@ -1794,6 +1866,10 @@ out:        Return result
                                     Throw ex
                                 Next
                             Finally
+                                If My.Settings.EnableGPUProcessing Then
+                                    My.MyApplication.gpu.DisableMultithreading()
+                                    My.MyApplication.gpu.FreeAll()
+                                End If
                             End Try
                             My.MyApplication.IsRunningParallelTasks = False
                         Else
@@ -1861,6 +1937,9 @@ out:        Return result
 
                     If My.Settings.EnableParallelProcessing Then
                         My.MyApplication.IsRunningParallelTasks = True
+                        If My.Settings.EnableGPUProcessing Then
+                            My.MyApplication.gpu.EnableMultithreading()
+                        End If
                         Try
                             Dim task1 As Task = New Task(Sub()
                                                              fcv = proppack.DW_CalcFugCoeff(Vy, Tf, Pf, State.Vapor)
@@ -1880,6 +1959,10 @@ out:        Return result
                                 Throw ex
                             Next
                         Finally
+                            If My.Settings.EnableGPUProcessing Then
+                                My.MyApplication.gpu.DisableMultithreading()
+                                My.MyApplication.gpu.FreeAll()
+                            End If
                         End Try
                         My.MyApplication.IsRunningParallelTasks = False
                     Else
@@ -1933,6 +2016,9 @@ out:        Return result
                 Next
                 If My.Settings.EnableParallelProcessing Then
                     My.MyApplication.IsRunningParallelTasks = True
+                    If My.Settings.EnableGPUProcessing Then
+                        My.MyApplication.gpu.EnableMultithreading()
+                    End If
                     Try
                         Dim task1 As Task = New Task(Sub()
                                                          f2 = FunctionGradient(x2)
@@ -1948,6 +2034,10 @@ out:        Return result
                             Throw ex
                         Next
                     Finally
+                        If My.Settings.EnableGPUProcessing Then
+                            My.MyApplication.gpu.DisableMultithreading()
+                            My.MyApplication.gpu.FreeAll()
+                        End If
                     End Try
                     My.MyApplication.IsRunningParallelTasks = False
                 Else
@@ -1981,7 +2071,7 @@ out:        Return result
 
         Public Function eval_g(ByVal n As Integer, ByVal x As Double(), ByVal new_x As Boolean, ByVal m As Integer, ByRef g As Double()) As Boolean
             For i = 0 To m - 1
-                g(i) = fi(i) - x(i) - x(i + m)
+                g(i) = fi(i) * F - x(i) - x(i + m)
             Next
             Return True
         End Function
@@ -1995,11 +2085,10 @@ out:        Return result
 
                 k = 0
                 For i = 0 To m - 1
-                    For j = 0 To n - 1
-                        row(k) = i
-                        col(k) = j
-                        k += 1
-                    Next
+                    row(i) = i
+                    row(i + m) = i
+                    col(i) = i
+                    col(i + m) = i + m
                 Next
 
                 iRow = row
