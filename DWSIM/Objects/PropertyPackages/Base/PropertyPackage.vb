@@ -99,6 +99,21 @@ Namespace DTL.SimulationObjects.PropertyPackages
         NestedLoops3PV2 = 11
     End Enum
 
+    Public Enum Parameter
+        PHFlash_Internal_Loop_Tolerance = 0
+        PSFlash_Internal_Loop_Tolerance = 1
+        PHFlash_External_Loop_Tolerance = 2
+        PSFlash_External_Loop_Tolerance = 3
+        PHFlash_Maximum_Number_Of_External_Iterations = 4
+        PSFlash_Maximum_Number_Of_External_Iterations = 5
+        PHFlash_Maximum_Number_Of_Internal_Iterations = 6
+        PSFlash_Maximum_Number_Of_Internal_Iterations = 7
+        PTFlash_Maximum_Number_Of_External_Iterations = 8
+        PTFlash_Maximum_Number_Of_Internal_Iterations = 9
+        PTFlash_External_Loop_Tolerance = 10
+        PTFlash_Internal_Loop_Tolerance = 11
+    End Enum
+
 #End Region
 
     ''' <summary>
@@ -206,6 +221,41 @@ Namespace DTL.SimulationObjects.PropertyPackages
             End With
         End Sub
 
+        ''' <summary>
+        ''' Globally sets a value for the maximum number of iteractions and tolerances for the flash algorithms.
+        ''' </summary>
+        ''' <param name="p">Parameter to be set.</param>
+        ''' <param name="value">Value of the parameter.</param>
+        ''' <remarks></remarks>
+        Public Sub SetParameterValue(p As Parameter, value As Object)
+            Select Case p
+                Case Parameter.PHFlash_External_Loop_Tolerance
+                    Me.Parameters("PP_PHFELT") = value
+                Case Parameter.PHFlash_Internal_Loop_Tolerance
+                    Me.Parameters("PP_PHFILT") = value
+                Case Parameter.PHFlash_Maximum_Number_Of_External_Iterations
+                    Me.Parameters("PP_PHFMEI") = value
+                Case Parameter.PHFlash_Maximum_Number_Of_Internal_Iterations
+                    Me.Parameters("PP_PHFMII") = value
+                Case Parameter.PSFlash_External_Loop_Tolerance
+                    Me.Parameters("PP_PSFELT") = value
+                Case Parameter.PSFlash_Internal_Loop_Tolerance
+                    Me.Parameters("PP_PSFILT") = value
+                Case Parameter.PSFlash_Maximum_Number_Of_External_Iterations
+                    Me.Parameters("PP_PSFMEI") = value
+                Case Parameter.PSFlash_Maximum_Number_Of_Internal_Iterations
+                    Me.Parameters("PP_PSFMII") = value
+                Case Parameter.PTFlash_External_Loop_Tolerance
+                    Me.Parameters("PP_PTFELT") = value
+                Case Parameter.PTFlash_Internal_Loop_Tolerance
+                    Me.Parameters("PP_PTFILT") = value
+                Case Parameter.PTFlash_Maximum_Number_Of_External_Iterations
+                    Me.Parameters("PP_PTFMEI") = value
+                Case Parameter.PTFlash_Maximum_Number_Of_Internal_Iterations
+                    Me.Parameters("PP_PTFMII") = value
+            End Select
+        End Sub
+
         Public Function AddCompound(ByVal compname As String) As Boolean
 
             If Not _selectedcomps.ContainsKey(compname) Then
@@ -275,6 +325,8 @@ Namespace DTL.SimulationObjects.PropertyPackages
                 _tpseverity = value
             End Set
         End Property
+
+
 
 
         Public ReadOnly Property PhaseMappings() As Dictionary(Of String, PhaseInfo)

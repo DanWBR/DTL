@@ -1026,8 +1026,8 @@ restart:    Do
 
                 ecount += 1
 
-                If ecount > maxit_e Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt"))
-                If Double.IsNaN(AbsSum(fx)) Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashError"))
+                If ecount > maxit_e Then Throw New Exception("The flash algorithm reached the maximum number of external iterations.")
+                If Double.IsNaN(AbsSum(fx)) Then Throw New Exception("The flash algorithm encountered an error during the iteration process.")
 
                 Console.WriteLine("PH Flash 3P [IO]: Iteration #" & ecount & ", T = " & T)
                 Console.WriteLine("PH Flash 3P [IO]: Iteration #" & ecount & ", VF = " & V)
@@ -1305,8 +1305,8 @@ restart:    Do
 
                 ecount += 1
 
-                If ecount > maxit_e Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt"))
-                If Double.IsNaN(AbsSum(fx)) Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashError"))
+                If ecount > maxit_e Then Throw New Exception("The flash algorithm reached the maximum number of external iterations.")
+                If Double.IsNaN(AbsSum(fx)) Then Throw New Exception("The flash algorithm encountered an error during the iteration process.")
 
                 Console.WriteLine("PS Flash 3P [IO]: Iteration #" & ecount & ", T = " & T)
                 Console.WriteLine("PS Flash 3P [IO]: Iteration #" & ecount & ", VF = " & V)
@@ -1586,8 +1586,8 @@ restart:    Do
 
                 ecount += 1
 
-                If Double.IsNaN(V) Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashTPVapFracError"))
-                If ecount > maxit_e Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt2"))
+                If Double.IsNaN(V) Then Throw New Exception("Error calculating the vapor fraction.")
+                If ecount > maxit_e Then Throw New Exception("The flash algorithm reached the maximum number of external iterations.")
 
                 Console.WriteLine("PT Flash [IO]: Iteration #" & ecount & ", VF = " & V)
 
@@ -1857,10 +1857,10 @@ out:
                 ecount += 1
 
                 If ecount > maxit_e Then
-                    Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt"))
+                    Throw New Exception("The flash algorithm reached the maximum number of external iterations.")
                 End If
                 If Double.IsNaN(AbsSum(fx)) Then
-                    Throw New Exception(DTL.App.GetLocalString("PropPack_FlashError"))
+                    Throw New Exception("The flash algorithm encountered an error during the iteration process.")
                 End If
 
                 Console.WriteLine("PV Flash 3P [IO]: Iteration #" & ecount & ", T = " & T & ", VF = " & V)
@@ -2047,8 +2047,8 @@ out:
 
                 ecount += 1
 
-                If ecount > maxit_e Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt"))
-                If Double.IsNaN(AbsSum(fx)) Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashError"))
+                If ecount > maxit_e Then Throw New Exception("The flash algorithm reached the maximum number of external iterations.")
+                If Double.IsNaN(AbsSum(fx)) Then Throw New Exception("The flash algorithm encountered an error during the iteration process.")
 
                 Console.WriteLine("TV Flash 3P [IO]: Iteration #" & ecount & ", P = " & P & ", VF = " & V)
 

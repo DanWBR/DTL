@@ -788,7 +788,7 @@ out:        Return result
                     Tf = Tant * 1.01
                 End If
                 cnt += 1
-                If cnt >= maxit Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt2"))
+                If cnt >= maxit Then Throw New Exception("The flash algorithm reached the maximum number of external iterations.")
             Loop Until Math.Abs(fi_ / HT) < tol Or Double.IsNaN(Tf) Or Abs(Tf - Tant) < tol
 
             Return Tf
@@ -827,7 +827,7 @@ out:        Return result
                     Tf = Tant * 1.01
                 End If
                 cnt += 1
-                If cnt >= maxit Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt2"))
+                If cnt >= maxit Then Throw New Exception("The flash algorithm reached the maximum number of external iterations.")
             Loop Until Math.Abs(fi_ / ST) < tol Or Double.IsNaN(Tf) Or Abs(Tf - Tant) < tol
 
             Return Tf

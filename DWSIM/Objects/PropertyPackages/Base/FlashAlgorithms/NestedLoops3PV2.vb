@@ -226,7 +226,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
                 If Double.IsNaN(Math.Abs(e1) + Math.Abs(e2)) Then
 
-                    Throw New Exception(DTL.App.GetLocalString("PropPack_FlashError"))
+                    Throw New Exception("The flash algorithm encountered an error during the iteration process.")
 
                 ElseIf Math.Abs(e3) < 0.0000000001 Then
 
@@ -277,12 +277,10 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
                 ecount += 1
 
-                If Double.IsNaN(V) Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashTPVapFracError"))
-                If ecount > maxit_e Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt2"))
+                If Double.IsNaN(V) Then Throw New Exception("Error calculating the vapor fraction.")
+                If ecount > maxit_e Then Throw New Exception("The flash algorithm reached the maximum number of external iterations.")
 
                 Console.WriteLine("PT Flash [NL]: Iteration #" & ecount & ", VF = " & V)
-
-
 
             Loop Until convergiu = 1
 
@@ -628,7 +626,7 @@ out:
 
                 ElseIf Double.IsNaN(Math.Abs(e1) + Math.Abs(e4) + Math.Abs(e2)) Then
 
-                    Throw New Exception(DTL.App.GetLocalString("PropPack_FlashTPVapFracError"))
+                    Throw New Exception("Error calculating the vapor fraction.")
 
                 Else
 
@@ -640,12 +638,14 @@ out:
                     Do
                         F1 = F1 + b1(i) * Vz(i) / (1 - b1(i) * L1 - b2(i) * L2)
                         F2 = F2 + b2(i) * Vz(i) / (1 - b1(i) * L1 - b2(i) * L2)
-                        dF1dL1 = dF1dL1 + b1(i) * Vz(i) * (-b1(i)) / (1 - b1(i) * L1 - b2(i) * L2)
-                        dF1dL2 = dF1dL2 + b1(i) * Vz(i) * (-b2(i)) / (1 - b1(i) * L1 - b2(i) * L2)
-                        dF2dL1 = dF2dL1 + b2(i) * Vz(i) * (-b1(i)) / (1 - b1(i) * L1 - b2(i) * L2)
-                        dF2dL2 = dF2dL2 + b2(i) * Vz(i) * (-b2(i)) / (1 - b1(i) * L1 - b2(i) * L2)
+                        dF1dL1 = dF1dL1 + b1(i) * Vz(i) * (-b1(i)) / (1 - b1(i) * L1 - b2(i) * L2) ^ 2
+                        dF1dL2 = dF1dL2 + b1(i) * Vz(i) * (-b2(i)) / (1 - b1(i) * L1 - b2(i) * L2) ^ 2
+                        dF2dL1 = dF2dL1 + b2(i) * Vz(i) * (-b1(i)) / (1 - b1(i) * L1 - b2(i) * L2) ^ 2
+                        dF2dL2 = dF2dL2 + b2(i) * Vz(i) * (-b2(i)) / (1 - b1(i) * L1 - b2(i) * L2) ^ 2
                         i = i + 1
                     Loop Until i = n + 1
+
+                    If Abs(F1) + Abs(F2) = etol Then Exit Do
 
                     Dim MA As Mapack.Matrix = New Mapack.Matrix(2, 2)
                     Dim MB As Mapack.Matrix = New Mapack.Matrix(2, 1)
@@ -659,7 +659,6 @@ out:
                     MB(1, 0) = -F2
 
                     MX = MA.Solve(MB)
-
                     dL1 = MX(0, 0)
                     dL2 = MX(1, 0)
 
@@ -672,23 +671,31 @@ out:
 
                     L1 += -dL1
                     L2 += -dL2
+
                     V = 1 - L1 - L2
 
-
-                    'L1 = L1 + (dL1 * L1 / (Math.Abs(dL1) + Math.Abs(dL2)))
-                    'L2 = L2 + (dL2 * L2 / (Math.Abs(dL1) + Math.Abs(dL2)))
-                    'Vant = V
-                    'V = 1 - L1 - L2
-
-                    'L1 = Math.Abs(L1) / (Math.Abs(L1) + Math.Abs(L2) + Math.Abs(V))
-                    'L2 = Math.Abs(L2) / (Math.Abs(L1) + Math.Abs(L2) + Math.Abs(V))
-                    'V = 1 - L1 - L2
+                    If V <= 0.0# Or Abs(L1) > 1.0# Or Abs(L2) > 1.0# Then
+                        'switch to simple LLE flash procedure.
+                        Dim slle As New SimpleLLE() With {.InitialEstimatesForPhase1 = Vx1, .InitialEstimatesForPhase2 = Vx2, .UseInitialEstimatesForPhase1 = True, .UseInitialEstimatesForPhase2 = True}
+                        Dim result As Object = slle.Flash_PT(Vz, P, T, PP)
+                        L1 = result(0)
+                        V = result(1)
+                        L2 = result(5)
+                        Vx1 = result(2)
+                        Vy = result(3)
+                        Vx2 = result(6)
+                        Exit Do
+                    ElseIf V > 1.0# Then
+                        V = 1.0#
+                    End If
 
                 End If
 
+                If ecount > maxit_e Then Throw New Exception("The flash algorithm reached the maximum number of external iterations.")
+
                 ecount += 1
 
-                Console.WriteLine("PT Flash [NL-3PV2]: Iteration #" & ecount & ", VF = " & V)
+                Console.WriteLine("PT Flash [NL-3PV2]: Iteration #" & ecount & ", VF = " & V & ", L1 = " & L1 & ", L2 = " & L2)
 
             Loop
 
