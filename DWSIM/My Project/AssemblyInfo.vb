@@ -11,7 +11,7 @@ Imports System.Runtime.InteropServices
 ' Review the values of the assembly attributes
 
 <Assembly: AssemblyTitle("DWSIM Thermodynamics Library (DTL)")> 
-<Assembly: AssemblyDescription("DWSIM - Open Source Chemical Process Simulator")> 
+<Assembly: AssemblyDescription("DWSIM Thermodynamics Library (DTL)")> 
 <Assembly: AssemblyCompany("DWSIM Project")> 
 <Assembly: AssemblyProduct("DWSIM")> 
 <Assembly: AssemblyCopyright("Copyright 2007-2014 Daniel Wagner O. de Medeiros")> 
@@ -33,7 +33,7 @@ Imports System.Runtime.InteropServices
 ' by using the '*' as shown below:
 ' <Assembly: AssemblyVersion("1.0.*")> 
 
-<Assembly: AssemblyVersion("2.2.3")> 
+<Assembly: AssemblyVersion("2.2.4")> 
 '<Assembly: AssemblyFileVersion("1.6")> 
 
 <Assembly: NeutralResourcesLanguageAttribute("pt-BR")> 

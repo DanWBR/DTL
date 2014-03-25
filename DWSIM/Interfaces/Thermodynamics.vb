@@ -24,7 +24,12 @@ Imports CAPEOPEN110
 
 Namespace Thermodynamics
 
-    <System.Serializable()> <Microsoft.VisualBasic.ComClass()> Public Class Calculator
+    <System.Serializable()> <ComClass(Calculator.ClassId, Calculator.InterfaceId, Calculator.EventsId)>
+    Public Class Calculator
+
+        Public Const ClassId As String = "5F2B671E-FA61-401e-8D14-71FB5B328F9B"
+        Public Const InterfaceId As String = "0EA44EDE-AD65-435c-B8CC-0D1146BD182B"
+        Public Const EventsId As String = "0817BD3F-5278-4e49-A7FB-92416A8A7E4E"
 
         Private _availablecomps As Dictionary(Of String, ConstantProperties)
 
