@@ -21,9 +21,8 @@
     <ApplicationIcon>
     </ApplicationIcon>
     <TargetZone>LocalIntranet</TargetZone>
-    <SignAssembly>false</SignAssembly>
-    <AssemblyOriginatorKeyFile>
-    </AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>DTL.snk</AssemblyOriginatorKeyFile>
     <OptionStrict>Off</OptionStrict>
     <OptionCompare>Binary</OptionCompare>
     <FileUpgradeFlags>
@@ -169,7 +168,6 @@
     <Compile Include="Objects\Classes\Math\LM.vb" />
     <Compile Include="Objects\Classes\Math\MatrixOps.vb" />
     <Compile Include="Objects\Classes\Math\SysLin.vb" />
-    <Compile Include="Objects\PropertyPackages\Base\CRITPT.vb" />
     <Compile Include="Objects\PropertyPackages\Base\FlashAlgorithms\Base.vb" />
     <Compile Include="Objects\PropertyPackages\Base\FlashAlgorithms\BostonBrittInsideOut.vb" />
     <Compile Include="Objects\PropertyPackages\Base\FlashAlgorithms\BostonFournierInsideOut3P.vb" />
@@ -242,6 +240,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="DTL.snk" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>

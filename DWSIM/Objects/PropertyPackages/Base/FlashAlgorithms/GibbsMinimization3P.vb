@@ -2063,21 +2063,21 @@ out:        Return result
             Return True
         End Function
 
-        Public Function eval_grad_f(ByVal n As Integer, ByVal x As Double(), ByVal new_x As Boolean, ByRef grad_f As Double()) As Boolean
+        Public Function eval_grad_f(ByVal n As Integer, ByVal x As Double(), ByVal new_x As Boolean, grad_f As Double()) As Boolean
             Dim g As Double() = FunctionGradient(x)
             grad_f = g
             Return True
         End Function
 
-        Public Function eval_g(ByVal n As Integer, ByVal x As Double(), ByVal new_x As Boolean, ByVal m As Integer, ByRef g As Double()) As Boolean
+        Public Function eval_g(ByVal n As Integer, ByVal x As Double(), ByVal new_x As Boolean, ByVal m As Integer, g As Double()) As Boolean
             For i = 0 To m - 1
                 g(i) = fi(i) * F - x(i) - x(i + m)
             Next
             Return True
         End Function
 
-        Public Function eval_jac_g(ByVal n As Integer, ByVal x As Double(), ByVal new_x As Boolean, ByVal m As Integer, ByVal nele_jac As Integer, ByRef iRow As Integer(), _
-         ByRef jCol As Integer(), ByRef values As Double()) As Boolean
+        Public Function eval_jac_g(ByVal n As Integer, ByVal x As Double(), ByVal new_x As Boolean, ByVal m As Integer, ByVal nele_jac As Integer, iRow As Integer(), _
+          jCol As Integer(), values As Double()) As Boolean
 
             If values Is Nothing Then
 
@@ -2109,7 +2109,7 @@ out:        Return result
         End Function
 
         Public Function eval_h(ByVal n As Integer, ByVal x As Double(), ByVal new_x As Boolean, ByVal obj_factor As Double, ByVal m As Integer, ByVal lambda As Double(), _
-         ByVal new_lambda As Boolean, ByVal nele_hess As Integer, ByRef iRow As Integer(), ByRef jCol As Integer(), ByRef values As Double()) As Boolean
+         ByVal new_lambda As Boolean, ByVal nele_hess As Integer, iRow As Integer(), jCol As Integer(), values As Double()) As Boolean
 
             If values Is Nothing Then
 
