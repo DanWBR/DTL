@@ -188,9 +188,9 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
                 If Double.IsNaN(Math.Abs(e1) + Math.Abs(e2)) Then
 
-                    Throw New Exception("The flash algorithm encountered an error during the iteration process.")
+                    Throw New Exception(DTL.App.GetLocalString("PropPack_FlashError"))
 
-                ElseIf Math.Abs(e3) < 0.0000000001 Then
+                ElseIf Math.Abs(e3) < 0.0000000001 And ecount > 0 Then
 
                     convergiu = 1
 
@@ -240,9 +240,11 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                 ecount += 1
 
                 If Double.IsNaN(L) Then Throw New Exception("Error calculating the vapor fraction.")
-                If ecount > maxit_e Then Throw New Exception("The flash algorithm reached the maximum number of external iterations.")
+                If ecount > maxit_e Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt2"))
 
                 Console.WriteLine("PT Flash [NL-SLE]: Iteration #" & ecount & ", LF = " & L)
+
+
 
             Loop Until convergiu = 1
 
@@ -373,6 +375,8 @@ out:        Return New Object() {L, V, Vx, Vy, ecount, 0.0#, PP.RET_NullVector, 
                 If ecount > maxit_e Then Throw New Exception("The flash algorithm reached the maximum number of external iterations.")
 
                 ecount += 1
+
+
 
             Loop
 
@@ -894,6 +898,8 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
                 'If T > Tmax Then T = Tmax
 
                 Console.WriteLine("PV Flash [NL-SLE]: Iteration #" & ecount & ", T = " & T & ", LF = " & L)
+
+
 
             Loop Until Math.Abs(T - Tant) < 0.01 Or Double.IsNaN(T) = True Or ecount > maxit_e Or Double.IsNaN(T) Or Double.IsInfinity(T)
 

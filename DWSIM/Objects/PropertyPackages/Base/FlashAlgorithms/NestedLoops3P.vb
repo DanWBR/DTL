@@ -1,4 +1,4 @@
-'    DWSIM Three-Phase Nested Loops Flash Algorithms
+'    DWSIM Three-Phase Hybrid Nested Loops / Inside-Out Flash Algorithms
 '    Copyright 2012 Daniel Wagner O. de Medeiros
 '
 '    This file is part of DTL.
@@ -227,9 +227,9 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
                 If Double.IsNaN(Math.Abs(e1) + Math.Abs(e2)) Then
 
-                    Throw New Exception("The flash algorithm encountered an error during the iteration process.")
+                    Throw New Exception(DTL.App.GetLocalString("PropPack_FlashError"))
 
-                ElseIf Math.Abs(e3) < 0.0000000001 Then
+                ElseIf Math.Abs(e3) < 0.0000000001 And ecount > 0 Then
 
                     convergiu = 1
 
@@ -279,11 +279,14 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                 ecount += 1
 
                 If Double.IsNaN(V) Then Throw New Exception("Error calculating the vapor fraction.")
-                If ecount > maxit_e Then Throw New Exception("The flash algorithm reached the maximum number of external iterations.")
+                If ecount > maxit_e Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt2"))
 
                 Console.WriteLine("PT Flash [NL]: Iteration #" & ecount & ", VF = " & V)
 
+
+
             Loop Until convergiu = 1
+
 out:
 
             Dim result As Object = New Object() {L, V, Vx, Vy, ecount, 0.0#, PP.RET_NullVector, 0.0#, PP.RET_NullVector}
@@ -292,7 +295,7 @@ out:
 
             If result(0) > 0 Then ' we have a liquid phase
 
-                If result(1) > 0.0001 And n = 1 Then
+                If V > 0.0001 And n = 1 Then
                     'the liquid phase cannot be unstable when there's also vapor and only two compounds in the system.
                     Return result
                 End If
@@ -411,7 +414,7 @@ out:
                             vx1e(i) = Abs(vx1e(i)) / sumvx2
                         Next
 
-                        result = Flash_PT_3P(Vz, V, L1, L2, Vy, result(2), vx2est, P, T, PP)
+                        result = Flash_PT_3P(Vz, V, L1, L2, Vy, Vx, vx2est, P, T, PP)
 
                     End If
 
@@ -567,11 +570,19 @@ out:
                         dfr = (fr - Me.TPErrorFunc(R1)) / (-0.01)
                     End If
                     R0 = R
-                    R += -0.5 * fr / dfr
+                    If (R - fr / dfr) < 0.0# Or (R - fr / dfr) > 1.0# Then
+                        If (R + 0.1) < 1.0# Then R += 0.1 Else R -= 0.1
+                    Else
+                        R = R - fr / dfr
+                    End If
                     If R < 0 Then R = 0.0#
                     If R > 1 Then R = 1.0#
                     icount += 1
                 Loop Until Abs(fr) < itol Or icount > maxit_i Or R = 0 Or R = 1
+
+                If icount > maxit_i Then R = Rant
+                If Rant = 0.0# And R = 1.0# Then R = 0.0#
+                If Rant = 1.0# And R = 0.0# Then R = 1.0#
 
                 Me.TPErrorFunc(R)
 
@@ -636,7 +647,7 @@ out:
                 ecount += 1
 
                 If Double.IsNaN(V) Then Throw New Exception("Error calculating the vapor fraction.")
-                If ecount > maxit_e Then Throw New Exception("The flash algorithm reached the maximum number of external iterations.")
+                If ecount > maxit_e Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt2"))
 
                 Console.WriteLine("PT Flash [IO]: Iteration #" & ecount & ", VF = " & V)
 
@@ -647,19 +658,33 @@ out:
 out:
             'order liquid phases by mixture NBP
 
-            Dim VNBP = PP.RET_VTB()
-            Dim nbp1 As Double = 0
-            Dim nbp2 As Double = 0
-
+            'check if liquid phase compositions are the same.
+            Dim Kl(n) As Double
             For i = 0 To n
-                nbp1 += Vx1(i) * VNBP(i)
-                nbp2 += Vx2(i) * VNBP(i)
+                If Vx1(i) <> 0.0# Then Kl(i) = Vx2(i) / Vx1(i) Else Kl(i) = 0.0#
             Next
 
-            If nbp1 >= nbp2 Then
+            If PP.AUX_CheckTrivial(Kl) Then
+                'the liquid phases are the same. condense them into only one phase.
+                L1 = L1 + L2
+                L2 = 0.0#
+                Vx2 = PP.RET_NullVector
                 Return New Object() {L1, V, Vx1, Vy, ecount, L2, Vx2, 0.0#, PP.RET_NullVector}
             Else
-                Return New Object() {L2, V, Vx2, Vy, ecount, L1, Vx1, 0.0#, PP.RET_NullVector}
+                'order liquid phases by mixture NBP
+
+                Dim VNBP = PP.RET_VTB()
+                Dim nbp1 As Double = 0
+                Dim nbp2 As Double = 0
+                For i = 0 To n
+                    nbp1 += Vx1(i) * VNBP(i)
+                    nbp2 += Vx2(i) * VNBP(i)
+                Next
+                If nbp1 >= nbp2 Then
+                    Return New Object() {L1, V, Vx1, Vy, ecount, L2, Vx2, 0.0#, PP.RET_NullVector}
+                Else
+                    Return New Object() {L2, V, Vx2, Vy, ecount, L1, Vx1, 0.0#, PP.RET_NullVector}
+                End If
             End If
 
         End Function
@@ -1637,4 +1662,3 @@ alt:            Tf = bo.BrentOpt(Tinf, Tsup, 4, tolEXT, maxitEXT, Nothing)
     End Class
 
 End Namespace
-

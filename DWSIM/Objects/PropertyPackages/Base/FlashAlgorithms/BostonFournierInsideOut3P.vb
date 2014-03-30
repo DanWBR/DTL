@@ -1,4 +1,4 @@
-﻿'    Boston-Fournier Inside-Out Three-Phase Flash Algorithm
+'    Boston-Fournier Inside-Out Three-Phase Flash Algorithm
 '    Copyright 2011 Daniel Wagner O. de Medeiros
 '
 '    This file is part of DTL.
@@ -46,6 +46,9 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
             Dim d1, d2 As Date, dt As TimeSpan
 
+            Dim nt As Integer = Me.StabSearchCompIDs.Length - 1
+            Dim nc As Integer = UBound(Vz)
+
             d1 = Date.Now
 
             ' try a two-phase flash first.
@@ -58,13 +61,10 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
             If result(0) > 0 Then ' we have a liquid phase
 
-                If result(1) > 0.0001 And n = 1 Then
-                    'the liquid phase cannot be unstable when there's also vapor and only two compounds in the system (phase rule).
+                If result(1) > 0.0001 And nc = 1 Then
+                    'the liquid phase cannot be unstable when there's also vapor and only two compounds in the system.
                     Return result
                 End If
-
-                Dim nt As Integer = Me.StabSearchCompIDs.Length - 1
-                Dim nc As Integer = UBound(Vz)
 
                 If nt = -1 Then nt = nc
 
@@ -475,6 +475,8 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
             Dim result As Object = _io.Flash_TV(Vz, T, V, Pref, PP, ReuseKI, PrevKi)
 
+            P = result(4)
+
             If result(0) > 0 Then
 
                 Dim nt As Integer = Me.StabSearchCompIDs.Length - 1
@@ -575,6 +577,8 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
             Dim _io As New BostonBrittInsideOut
 
             Dim result As Object = _io.Flash_PV(Vz, P, V, Tref, PP, ReuseKI, PrevKi)
+
+            T = result(4)
 
             If result(0) > 0 Then
 
@@ -1027,7 +1031,7 @@ restart:    Do
                 ecount += 1
 
                 If ecount > maxit_e Then Throw New Exception("The flash algorithm reached the maximum number of external iterations.")
-                If Double.IsNaN(AbsSum(fx)) Then Throw New Exception("The flash algorithm encountered an error during the iteration process.")
+                If Double.IsNaN(AbsSum(fx)) Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashError"))
 
                 Console.WriteLine("PH Flash 3P [IO]: Iteration #" & ecount & ", T = " & T)
                 Console.WriteLine("PH Flash 3P [IO]: Iteration #" & ecount & ", VF = " & V)
@@ -1070,7 +1074,7 @@ restart:    Do
                 End If
             End If
 
-            Return New Object() {L1, V, Vx1, Vy, T, ecount, Ki1, L2, Vx2, Ki2, 0.0#, PP.RET_NullVector}
+            Return New Object() {L1, V, Vx1, Vy, T, ecount, Ki1, L2, Vx2, 0.0#, PP.RET_NullVector}
 
         End Function
 
@@ -1306,7 +1310,7 @@ restart:    Do
                 ecount += 1
 
                 If ecount > maxit_e Then Throw New Exception("The flash algorithm reached the maximum number of external iterations.")
-                If Double.IsNaN(AbsSum(fx)) Then Throw New Exception("The flash algorithm encountered an error during the iteration process.")
+                If Double.IsNaN(AbsSum(fx)) Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashError"))
 
                 Console.WriteLine("PS Flash 3P [IO]: Iteration #" & ecount & ", T = " & T)
                 Console.WriteLine("PS Flash 3P [IO]: Iteration #" & ecount & ", VF = " & V)
@@ -1354,7 +1358,7 @@ restart:    Do
                 End If
             End If
 
-            Return New Object() {L1, V, Vx1, Vy, T, ecount, Ki1, L2, Vx2, Ki2, 0.0#, PP.RET_NullVector}
+            Return New Object() {L1, V, Vx1, Vy, T, ecount, Ki1, L2, Vx2, 0.0#, PP.RET_NullVector}
 
         End Function
 
@@ -1518,11 +1522,19 @@ restart:    Do
                         dfr = (fr - Me.TPErrorFunc(R1)) / (-0.01)
                     End If
                     R0 = R
-                    R += -1.0 * fr / dfr
-                    If R < 0 Then R = 0.0#
-                    If R > 1 Then R = 1.0#
+                    If (R - fr / dfr) < 0.0# Or (R - fr / dfr) > 1.0# Then
+                        If (R + 0.1) < 1.0# Then R += 0.1 Else R -= 0.1
+                    Else
+                        R = R - fr / dfr
+                    End If
+                    If R < 0.0# Then R = 0.0#
+                    If R > 1.0# Then R = 1.0#
                     icount += 1
                 Loop Until Abs(fr) < itol Or icount > maxit_i Or R = 0 Or R = 1
+
+                If icount > maxit_i Then R = Rant
+                If Rant = 0.0# And R = 1.0# Then R = 0.0#
+                If Rant = 1.0# And R = 0.0# Then R = 1.0#
 
                 Me.TPErrorFunc(R)
 
@@ -1587,29 +1599,45 @@ restart:    Do
                 ecount += 1
 
                 If Double.IsNaN(V) Then Throw New Exception("Error calculating the vapor fraction.")
-                If ecount > maxit_e Then Throw New Exception("The flash algorithm reached the maximum number of external iterations.")
+                If ecount > maxit_e Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt2"))
 
                 Console.WriteLine("PT Flash [IO]: Iteration #" & ecount & ", VF = " & V)
+
+
 
             Loop Until AbsSum(fx) < etol
 
 out:
-            'order liquid phases by mixture NBP
 
-            Dim VNBP = PP.RET_VTB()
-            Dim nbp1 As Double = 0
-            Dim nbp2 As Double = 0
-
+            'check if liquid phase compositions are the same.
+            Dim Kl(n) As Double
             For i = 0 To n
-                nbp1 += Vx1(i) * VNBP(i)
-                nbp2 += Vx2(i) * VNBP(i)
+                If Vx1(i) <> 0.0# Then Kl(i) = Vx2(i) / Vx1(i) Else Kl(i) = 0.0#
             Next
 
-            If nbp1 >= nbp2 Then
+            If PP.AUX_CheckTrivial(Kl) Then
+                'the liquid phases are the same. condense them into only one phase.
+                L1 = L1 + L2
+                L2 = 0.0#
+                Vx2 = PP.RET_NullVector
                 Return New Object() {L1, V, Vx1, Vy, ecount, L2, Vx2, 0.0#, PP.RET_NullVector}
             Else
-                Return New Object() {L2, V, Vx2, Vy, ecount, L1, Vx1, 0.0#, PP.RET_NullVector}
+                'order liquid phases by mixture NBP
+
+                Dim VNBP = PP.RET_VTB()
+                Dim nbp1 As Double = 0
+                Dim nbp2 As Double = 0
+                For i = 0 To n
+                    nbp1 += Vx1(i) * VNBP(i)
+                    nbp2 += Vx2(i) * VNBP(i)
+                Next
+                If nbp1 >= nbp2 Then
+                    Return New Object() {L1, V, Vx1, Vy, ecount, L2, Vx2, 0.0#, PP.RET_NullVector}
+                Else
+                    Return New Object() {L2, V, Vx2, Vy, ecount, L1, Vx1, 0.0#, PP.RET_NullVector}
+                End If
             End If
+
 
         End Function
 
@@ -1663,6 +1691,8 @@ out:
             beta = L1 / (L1 + L2)
 
             Dim err1 As Double = Kb - 1
+
+
 
             Return err1
 
@@ -1786,11 +1816,21 @@ out:
                         fr = Me.LiquidFractionBalance(R)
                         dfr = (fr - Me.LiquidFractionBalance(R1)) / -0.001
                         R0 = R
-                        R += -fr / dfr
-                        If R < 0 Then R = 0
-                        If R > 1 Then R = 1
+                        If (R - fr / dfr) < 0.0# Or (R - fr / dfr) > 1.0# Then
+                            If (R + 0.1) < 1.0# Then R += 0.1 Else R -= 0.1
+                        Else
+                            R = R - fr / dfr
+                        End If
+                        If R < 0.0# Then R = 0.0#
+                        If R > 1.0# Then R = 1.0#
                         icount += 1
-                    Loop Until Abs(fr) < itol Or icount > maxit_i Or Abs(R - R0) < 0.000001
+                    Loop Until Abs(fr) < itol Or icount > maxit_i Or R = 0 Or R = 1
+
+                    If icount > maxit_i Then R = Rant
+                    If Rant = 0.0# And R = 1.0# Then R = 0.0#
+                    If Rant = 1.0# And R = 0.0# Then R = 1.0#
+
+                    Me.LiquidFractionBalance(R)
 
                 Else
 
@@ -1835,8 +1875,8 @@ out:
                 x(2 * n + 3) = B
 
                 If ecount = 0 Then
-                    For i = 0 To 2 * n + 1
-                        For j = 0 To 2 * n + 1
+                    For i = 0 To 2 * n + 3
+                        For j = 0 To 2 * n + 3
                             If i = j Then dfdx(i, j) = 1 Else dfdx(i, j) = 0
                         Next
                     Next
@@ -1860,7 +1900,7 @@ out:
                     Throw New Exception("The flash algorithm reached the maximum number of external iterations.")
                 End If
                 If Double.IsNaN(AbsSum(fx)) Then
-                    Throw New Exception("The flash algorithm encountered an error during the iteration process.")
+                    Throw New Exception(DTL.App.GetLocalString("PropPack_FlashError"))
                 End If
 
                 Console.WriteLine("PV Flash 3P [IO]: Iteration #" & ecount & ", T = " & T & ", VF = " & V)
@@ -1869,7 +1909,7 @@ out:
 
             Loop Until AbsSum(fx) < etol * (n + 2)
 
-            Return New Object() {L1, V, Vx1, Vy, T, ecount, Ki1, L2, Vx2, Ki2, 0.0#, PP.RET_NullVector}
+            Return New Object() {L1, V, Vx1, Vy, T, ecount, Ki1, L2, Vx2, 0.0#, PP.RET_NullVector}
 
         End Function
 
@@ -1930,12 +1970,14 @@ out:
 
             'Estimate V
 
-            Kb_ = CalcKbj1(PP.DW_CalcKvalue(Vx1EST, VyEST, T_, P))
-            Kb = CalcKbj1(PP.DW_CalcKvalue(Vx1EST, VyEST, T, P))
-            Kb0 = Kb_
+            T_ = 298.15
 
-            B = Log(Kb_ / Kb) / (1 / T_ - 1 / T)
-            A = Log(Kb) - B * (1 / T - 1 / T_)
+            Kb0 = CalcKbj1(PP.DW_CalcKvalue(Vx1, Vy, T, P0))
+            Kb_ = CalcKbj1(PP.DW_CalcKvalue(Vx1, Vy, T, P_))
+            Kb = CalcKbj1(PP.DW_CalcKvalue(Vx1, Vy, T, P))
+
+            B = Log(Kb_ * P_ / (Kb0 * P0)) / Log(P_ / P0)
+            A = Log(Kb * P) - B * Log(P / P0)
 
             For i = 0 To n
                 ui1(i) = Log(Ki1(i) / Kb)
@@ -1973,15 +2015,25 @@ out:
                     Dim icount As Integer = 0
 
                     Do
-                        R1 = R + 0.001
+                        R1 = R + 0.01
                         fr = Me.LiquidFractionBalanceP(R)
-                        dfr = (fr - Me.LiquidFractionBalanceP(R1)) / -0.001
+                        dfr = (fr - Me.LiquidFractionBalanceP(R1)) / -0.01
                         R0 = R
-                        R += -fr / dfr
-                        If R < 0 Then R = 0
-                        If R > 1 Then R = 1
+                        If (R - fr / dfr) < 0.0# Or (R - fr / dfr) > 1.0# Then
+                            If (R + 0.1) < 1.0# Then R += 0.1 Else R -= 0.1
+                        Else
+                            R = R - fr / dfr
+                        End If
+                        If R < 0.0# Then R = 0.0#
+                        If R > 1.0# Then R = 1.0#
                         icount += 1
-                    Loop Until Abs(fr) < itol Or icount > maxit_i
+                    Loop Until Abs(fr) < itol Or icount > maxit_i Or R = 0 Or R = 1
+
+                    If icount > maxit_i Then R = Rant
+                    If Rant = 0.0# And R = 1.0# Then R = 0.0#
+                    If Rant = 1.0# And R = 0.0# Then R = 1.0#
+
+                    Me.LiquidFractionBalanceP(R)
 
                 Else
 
@@ -2026,8 +2078,8 @@ out:
                 x(2 * n + 3) = B
 
                 If ecount = 0 Then
-                    For i = 0 To 2 * n + 1
-                        For j = 0 To 2 * n + 1
+                    For i = 0 To 2 * n + 3
+                        For j = 0 To 2 * n + 3
                             If i = j Then dfdx(i, j) = 1 Else dfdx(i, j) = 0
                         Next
                     Next
@@ -2048,7 +2100,7 @@ out:
                 ecount += 1
 
                 If ecount > maxit_e Then Throw New Exception("The flash algorithm reached the maximum number of external iterations.")
-                If Double.IsNaN(AbsSum(fx)) Then Throw New Exception("The flash algorithm encountered an error during the iteration process.")
+                If Double.IsNaN(AbsSum(fx)) Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashError"))
 
                 Console.WriteLine("TV Flash 3P [IO]: Iteration #" & ecount & ", P = " & P & ", VF = " & V)
 
@@ -2056,7 +2108,7 @@ out:
 
             Loop Until AbsSum(fx) < etol * (n + 2)
 
-            Return New Object() {L1, V, Vx1, Vy, P, ecount, Ki1, L2, Vx2, Ki2, 0.0#, PP.RET_NullVector}
+            Return New Object() {L1, V, Vx1, Vy, P, ecount, Ki1, L2, Vx2, 0.0#, PP.RET_NullVector}
 
         End Function
 
@@ -2151,7 +2203,7 @@ out:
                 Vy(i) = pi(i) / sumpi
             Next
 
-            If R <> 1 Then
+            If R <> 1.0# Then
                 Kb = ((1 - R + S) * sumeuipi1 + (1 - R - S) * sumeuipi2) / (2 * (1 - R) * sumpi)
             Else
                 Kb = 1.0#

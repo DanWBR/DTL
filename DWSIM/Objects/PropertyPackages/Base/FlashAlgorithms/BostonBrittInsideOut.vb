@@ -136,8 +136,8 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                 V = 0.98
             ElseIf P >= Pb Then
                 'liquid only
-                L = 0.98
-                V = 0.02
+                L = 0.02
+                V = 0.98
             Else
                 'VLE
                 V = 1 - (P - Pd) / (Pb - Pd)
@@ -226,11 +226,15 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                         dfr = (fr - Me.TPErrorFunc(R1)) / -0.001
                     End If
                     R0 = R
-                    R += -fr / dfr
+                    R = R - 0.3 * fr / dfr
                     If R < 0.0# Then R = 0.0#
                     If R > 1.0# Then R = 1.0#
                     icount += 1
                 Loop Until Abs(fr) < itol Or icount > maxit_i
+
+                If icount > maxit_i Then R = Rant
+                If Rant = 0.0# And R = 1.0# Then R = 0.0#
+                If Rant = 1.0# And R = 0.0# Then R = 1.0#
 
                 Me.TPErrorFunc(R)
 
@@ -251,6 +255,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                         Vx(i) = pi(i) / sumpi
                         Vy(i) = Exp(ui(i)) * pi(i) / sumeuipi
                     Next
+                    Exit Do
                 End If
 
                 If R >= 1 Then
@@ -314,11 +319,13 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                 ecount += 1
 
                 If Double.IsNaN(V) Then Throw New Exception("Error calculating the vapor fraction.")
-                If ecount > maxit_e Then Throw New Exception("The flash algorithm reached the maximum number of external iterations.")
+                If ecount > maxit_e Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt2"))
 
                 Console.WriteLine("PT Flash [IO]: Iteration #" & ecount & ", VF = " & V)
 
-            Loop Until AbsSum(fx) < etol
+
+
+            Loop Until AbsSum(fx) < etol Or Abs(R - Rant) < 0.0000000001
 
             d2 = Date.Now
 
@@ -710,12 +717,14 @@ restart:    Do
                 ecount += 1
 
                 If ecount > maxit_e Then Throw New Exception("The flash algorithm reached the maximum number of external iterations.")
-                If Double.IsNaN(AbsSum(fx)) Then Throw New Exception("The flash algorithm encountered an error during the iteration process.")
+                If Double.IsNaN(AbsSum(fx)) Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashError"))
 
                 Console.WriteLine("PH Flash [IO]: Iteration #" & ecount & ", T = " & T)
                 Console.WriteLine("PH Flash [IO]: Iteration #" & ecount & ", VF = " & V)
                 Console.WriteLine("PH Flash [IO]: Iteration #" & ecount & ", H error = " & fr)
                 Console.WriteLine("PH Flash [IO]: Iteration #" & ecount & ", Damping Factor = " & alpha)
+
+
 
             Loop Until SumSqr(fx) < etol
 
@@ -1147,7 +1156,7 @@ restart:    Do
                 ecount += 1
 
                 If ecount > maxit_e Then Throw New Exception("The flash algorithm reached the maximum number of external iterations.")
-                If Double.IsNaN(AbsSum(fx)) Then Throw New Exception("The flash algorithm encountered an error during the iteration process.")
+                If Double.IsNaN(AbsSum(fx)) Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashError"))
 
                 Console.WriteLine("PS Flash [IO]: Iteration #" & ecount & ", T = " & T)
                 Console.WriteLine("PS Flash [IO]: Iteration #" & ecount & ", VF = " & V)
@@ -1475,7 +1484,7 @@ restart:    Do
                     Throw New Exception("The flash algorithm reached the maximum number of external iterations.")
                 End If
                 If Double.IsNaN(AbsSum(fx)) Then
-                    Throw New Exception("The flash algorithm encountered an error during the iteration process.")
+                    Throw New Exception(DTL.App.GetLocalString("PropPack_FlashError"))
                 End If
 
                 Console.WriteLine("PV Flash [IO]: Iteration #" & ecount & ", T = " & T & ", VF = " & V)
@@ -1749,7 +1758,7 @@ final:      d2 = Date.Now
                 ecount += 1
 
                 If ecount > maxit_e Then Throw New Exception("The flash algorithm reached the maximum number of external iterations.")
-                If Double.IsNaN(AbsSum(fx)) Then Throw New Exception("The flash algorithm encountered an error during the iteration process.")
+                If Double.IsNaN(AbsSum(fx)) Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashError"))
 
                 Console.WriteLine("TV Flash [IO]: Iteration #" & ecount & ", P = " & P & ", VF = " & V)
                 Console.WriteLine("TV Flash [IO]: Iteration #" & ecount & ", Damping Factor = " & alpha)
@@ -2174,6 +2183,8 @@ final:      d2 = Date.Now
             V = 1 - L
 
             Dim eberror As Double = sumpi / sumeuipi - 1
+
+
 
             Return eberror
 

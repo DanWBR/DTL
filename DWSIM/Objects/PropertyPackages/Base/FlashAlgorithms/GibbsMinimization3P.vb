@@ -286,7 +286,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
                 If result(0) > 0 Then ' we have a liquid phase
 
-                    If result(1) > 0.0001 And n = 1 Then
+                    If result(1) > 0.01 And n = 1 Then
                         'the liquid phase cannot be unstable when there's also vapor and only two compounds in the system.
                         Return result
                     End If
@@ -788,7 +788,7 @@ out:        Return result
                     Tf = Tant * 1.01
                 End If
                 cnt += 1
-                If cnt >= maxit Then Throw New Exception("The flash algorithm reached the maximum number of external iterations.")
+                If cnt >= maxit Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt2"))
             Loop Until Math.Abs(fi_ / HT) < tol Or Double.IsNaN(Tf) Or Abs(Tf - Tant) < tol
 
             Return Tf
@@ -827,7 +827,7 @@ out:        Return result
                     Tf = Tant * 1.01
                 End If
                 cnt += 1
-                If cnt >= maxit Then Throw New Exception("The flash algorithm reached the maximum number of external iterations.")
+                If cnt >= maxit Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt2"))
             Loop Until Math.Abs(fi_ / ST) < tol Or Double.IsNaN(Tf) Or Abs(Tf - Tant) < tol
 
             Return Tf
@@ -2063,21 +2063,21 @@ out:        Return result
             Return True
         End Function
 
-        Public Function eval_grad_f(ByVal n As Integer, ByVal x As Double(), ByVal new_x As Boolean, grad_f As Double()) As Boolean
+        Public Function eval_grad_f(ByVal n As Integer, ByVal x As Double(), ByVal new_x As Boolean, ByVal grad_f As Double()) As Boolean
             Dim g As Double() = FunctionGradient(x)
             grad_f = g
             Return True
         End Function
 
-        Public Function eval_g(ByVal n As Integer, ByVal x As Double(), ByVal new_x As Boolean, ByVal m As Integer, g As Double()) As Boolean
+        Public Function eval_g(ByVal n As Integer, ByVal x As Double(), ByVal new_x As Boolean, ByVal m As Integer, ByVal g As Double()) As Boolean
             For i = 0 To m - 1
                 g(i) = fi(i) * F - x(i) - x(i + m)
             Next
             Return True
         End Function
 
-        Public Function eval_jac_g(ByVal n As Integer, ByVal x As Double(), ByVal new_x As Boolean, ByVal m As Integer, ByVal nele_jac As Integer, iRow As Integer(), _
-          jCol As Integer(), values As Double()) As Boolean
+        Public Function eval_jac_g(ByVal n As Integer, ByVal x As Double(), ByVal new_x As Boolean, ByVal m As Integer, ByVal nele_jac As Integer, ByVal iRow As Integer(), _
+         ByVal jCol As Integer(), ByVal values As Double()) As Boolean
 
             If values Is Nothing Then
 
@@ -2109,7 +2109,7 @@ out:        Return result
         End Function
 
         Public Function eval_h(ByVal n As Integer, ByVal x As Double(), ByVal new_x As Boolean, ByVal obj_factor As Double, ByVal m As Integer, ByVal lambda As Double(), _
-         ByVal new_lambda As Boolean, ByVal nele_hess As Integer, iRow As Integer(), jCol As Integer(), values As Double()) As Boolean
+         ByVal new_lambda As Boolean, ByVal nele_hess As Integer, ByVal iRow As Integer(), ByVal jCol As Integer(), ByVal values As Double()) As Boolean
 
             If values Is Nothing Then
 

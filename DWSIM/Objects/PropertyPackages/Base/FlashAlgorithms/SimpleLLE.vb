@@ -116,7 +116,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                     err += Vx1(i) * gamma1(i) - Vx2(i) * gamma2(i)
                 Next
 
-                If Double.IsNaN(err) Then Throw New Exception("The flash algorithm encountered an error during the iteration process.")
+                If Double.IsNaN(err) Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashError"))
 
                 If ecount > 0 And Abs(err) < 0.000001 Then Exit Do
 

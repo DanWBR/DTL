@@ -1,4 +1,4 @@
-'    DWSIM Nested Loops Flash Algorithms for Simplified (Immiscible) VLLE
+﻿'    DWSIM Nested Loops Flash Algorithms for Simplified (Immiscible) VLLE
 '    Copyright 2013 Daniel Wagner O. de Medeiros
 '
 '    This file is part of DTL.
@@ -575,6 +575,8 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
 
                     Console.WriteLine("TV Flash [NL-I]: Iteration #" & ecount & ", P = " & P & ", VF = " & V)
 
+
+
                 Loop Until Math.Abs(P - Pant) < 1 Or Double.IsNaN(P) = True Or ecount > maxit_e Or Double.IsNaN(P) Or Double.IsInfinity(P)
 
             Else
@@ -676,6 +678,8 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
                     End If
 
                     Console.WriteLine("TV Flash [NL-I]: Iteration #" & ecount & ", P = " & P & ", VF = " & V)
+
+
 
                 Loop Until Math.Abs(fval) < etol Or Double.IsNaN(P) = True Or ecount > maxit_e
 
@@ -896,6 +900,8 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
 
                     Console.WriteLine("PV Flash [NL-I]: Iteration #" & ecount & ", T = " & T & ", VF = " & V)
 
+
+
                 Loop Until Math.Abs(T - Tant) < 0.1 Or Double.IsNaN(T) = True Or ecount > maxit_e Or Double.IsNaN(T) Or Double.IsInfinity(T)
 
             Else
@@ -995,6 +1001,8 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
                     If T > Tmax Then T = Tmax
 
                     Console.WriteLine("PV Flash [NL-I]: Iteration #" & ecount & ", T = " & T & ", VF = " & V)
+
+
 
                 Loop Until Math.Abs(fval) < etol Or Double.IsNaN(T) = True Or ecount > maxit_e
 

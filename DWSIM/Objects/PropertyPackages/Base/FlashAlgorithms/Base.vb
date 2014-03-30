@@ -22,13 +22,15 @@ Imports System.Threading.Tasks
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
     ''' <summary>
-    ''' This is the base class for the flash algorithms. All functions must be overriden.
+    ''' This is the base class for the flash algorithms.
     ''' </summary>
     ''' <remarks></remarks>
     <System.Serializable()> Public MustInherit Class FlashAlgorithm
 
         Public StabSearchSeverity As Integer = 0
         Public StabSearchCompIDs As String() = New String() {}
+
+        Private _P As Double, _Vz, _Vx1est, _Vx2est As Double(), _pp As PropertyPackage
 
         Sub New()
 
@@ -43,6 +45,92 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
         Public MustOverride Function Flash_PV(ByVal Vz As Double(), ByVal P As Double, ByVal V As Double, ByVal Tref As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
 
         Public MustOverride Function Flash_TV(ByVal Vz As Double(), ByVal T As Double, ByVal V As Double, ByVal Pref As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
+
+        Public Function BubbleTemperature_LLE(ByVal Vz As Double(), ByVal Vx1est As Double(), ByVal Vx2est As Double(), ByVal P As Double, ByVal Tmin As Double, ByVal Tmax As Double, ByVal PP As PropertyPackages.PropertyPackage) As Double
+
+            _P = P
+            _pp = PP
+            _Vz = Vz
+            _Vx1est = Vx1est
+            _Vx2est = Vx2est
+
+            Dim T, err As Double
+
+            Dim bm As New MathEx.BrentOpt.BrentMinimize
+            bm.DefineFuncDelegate(AddressOf BubbleTemperature_LLEPerror)
+
+            err = bm.brentoptimize(Tmin, Tmax, 0.0001, T)
+
+            err = BubbleTemperature_LLEPerror(T)
+
+            Return T
+
+        End Function
+
+        Private Function BubbleTemperature_LLEPerror(ByVal x As Double) As Double
+
+            Dim n As Integer = UBound(_Vz)
+
+            Dim Vp(n), fi1(n), fi2(n), act1(n), act2(n), Vx1(n), Vx2(n) As Double
+
+            Dim result As Object = New SimpleLLE() With {.UseInitialEstimatesForPhase1 = True, .UseInitialEstimatesForPhase2 = True,
+                                                          .InitialEstimatesForPhase1 = _Vx1est, .InitialEstimatesForPhase2 = _Vx2est}.Flash_PT(_Vz, _P, x, _pp)
+
+            'Dim result As Object = New GibbsMinimization3P() With {.ForceTwoPhaseOnly = False, .StabSearchSeverity = 0, .StabSearchCompIDs = _pp.RET_VNAMES}.Flash_PT(_Vz, _P, x, _pp)
+
+            Vx1 = result(2)
+            Vx2 = result(6)
+            fi1 = _pp.DW_CalcFugCoeff(Vx1, x, _P, State.Liquid)
+            fi2 = _pp.DW_CalcFugCoeff(Vx2, x, _P, State.Liquid)
+
+            Dim i As Integer
+
+            For i = 0 To n
+                Vp(i) = _pp.AUX_PVAPi(i, x)
+                act1(i) = _P / Vp(i) * fi1(i)
+                act2(i) = _P / Vp(i) * fi2(i)
+            Next
+
+            Dim err As Double = _P
+            For i = 0 To n
+                err -= Vx2(i) * act2(i) * Vp(i)
+            Next
+
+            Return Math.Abs(err)
+
+        End Function
+
+        Public Function BubblePressure_LLE(ByVal Vz As Double(), ByVal Vx1est As Double(), ByVal Vx2est As Double(), ByVal P As Double, ByVal T As Double, ByVal PP As PropertyPackages.PropertyPackage) As Double
+
+            Dim n As Integer = UBound(_Vz)
+
+            Dim Vp(n), fi1(n), fi2(n), act1(n), act2(n), Vx1(n), Vx2(n) As Double
+
+            Dim result As Object = New GibbsMinimization3P() With {.ForceTwoPhaseOnly = False,
+                                                                   .StabSearchCompIDs = _pp.RET_VNAMES,
+                                                                   .StabSearchSeverity = 0}.Flash_PT(_Vz, P, T, PP)
+
+            Vx1 = result(2)
+            Vx2 = result(6)
+            fi1 = _pp.DW_CalcFugCoeff(Vx1, T, P, State.Liquid)
+            fi2 = _pp.DW_CalcFugCoeff(Vx2, T, P, State.Liquid)
+
+            Dim i As Integer
+
+            For i = 0 To n
+                Vp(i) = _pp.AUX_PVAPi(i, T)
+                act1(i) = P / Vp(i) * fi1(i)
+                act2(i) = P / Vp(i) * fi2(i)
+            Next
+
+            _P = 0.0#
+            For i = 0 To n
+                _P += Vx2(i) * act2(i) * Vp(i)
+            Next
+
+            Return _P
+
+        End Function
 
         Public Function StabTest(ByVal T As Double, ByVal P As Double, ByVal Vz As Array, ByVal pp As PropertyPackage, Optional ByVal VzArray(,) As Double = Nothing, Optional ByVal searchseverity As Integer = 0)
 
@@ -83,6 +171,9 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
             If My.Settings.EnableParallelProcessing Then
                 My.MyApplication.IsRunningParallelTasks = True
+                If My.Settings.EnableGPUProcessing Then
+                    My.MyApplication.gpu.EnableMultithreading()
+                End If
                 Try
                     Dim task1 As Task = New Task(Sub()
                                                      hl = pp.DW_CalcEnthalpy(Vz, T, P, State.Liquid)
@@ -106,6 +197,10 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                         Throw ex
                     Next
                 Finally
+                    If My.Settings.EnableGPUProcessing Then
+                        My.MyApplication.gpu.DisableMultithreading()
+                        My.MyApplication.gpu.FreeAll()
+                    End If
                 End Try
                 My.MyApplication.IsRunningParallelTasks = False
             Else
@@ -207,6 +302,9 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
                         If My.Settings.EnableParallelProcessing Then
                             My.MyApplication.IsRunningParallelTasks = True
+                            If My.Settings.EnableGPUProcessing Then
+                                My.MyApplication.gpu.EnableMultithreading()
+                            End If
                             Try
                                 Dim task1 As Task = New Task(Sub()
                                                                  hl = pp.DW_CalcEnthalpy(currcomp, T, P, State.Liquid)
@@ -230,6 +328,10 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                                     Throw ex
                                 Next
                             Finally
+                                If My.Settings.EnableGPUProcessing Then
+                                    My.MyApplication.gpu.DisableMultithreading()
+                                    My.MyApplication.gpu.FreeAll()
+                                End If
                             End Try
                             My.MyApplication.IsRunningParallelTasks = False
                         Else

@@ -226,9 +226,9 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
                 If Double.IsNaN(Math.Abs(e1) + Math.Abs(e2)) Then
 
-                    Throw New Exception("The flash algorithm encountered an error during the iteration process.")
+                    Throw New Exception(DTL.App.GetLocalString("PropPack_FlashError"))
 
-                ElseIf Math.Abs(e3) < 0.0000000001 Then
+                ElseIf Math.Abs(e3) < 0.0000000001 And ecount > 0 Then
 
                     convergiu = 1
 
@@ -251,7 +251,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
                     If Abs(F) < 0.000001 Then Exit Do
 
-                    V = -F / dF + V
+                    V = -0.5 * F / dF + V
 
                 End If
 
@@ -278,9 +278,11 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                 ecount += 1
 
                 If Double.IsNaN(V) Then Throw New Exception("Error calculating the vapor fraction.")
-                If ecount > maxit_e Then Throw New Exception("The flash algorithm reached the maximum number of external iterations.")
+                If ecount > maxit_e Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt2"))
 
                 Console.WriteLine("PT Flash [NL]: Iteration #" & ecount & ", VF = " & V)
+
+
 
             Loop Until convergiu = 1
 
@@ -290,9 +292,9 @@ out:
 
             ' check if there is a liquid phase
 
-            If result(0) > 0 Then ' we have a liquid phase
+            If L > 0 Then ' we have a liquid phase
 
-                If result(1) > 0.0001 And n = 1 Then
+                If V > 0.0001 And n = 1 Then
                     'the liquid phase cannot be unstable when there's also vapor and only two compounds in the system.
                     Return result
                 End If
@@ -411,7 +413,7 @@ out:
                             vx1e(i) = Abs(vx1e(i)) / sumvx2
                         Next
 
-                        result = Flash_PT_3P(Vz, V, L1, L2, Vy, vx1e, vx2est, P, T, PP)
+                        result = Flash_PT_3P(Vz, V, L1, L2, Vy, Vx, vx2est, P, T, PP)
 
                     End If
 
@@ -457,7 +459,7 @@ out:
             proppack = PP
 
             ReDim Vn(n), Vx1(n), Vx2(n), Vy(n), Vp(n), ui1(n), ui2(n), uic1(n), uic2(n), pi(n), Ki1(n), Ki2(n), fi(n)
-            Dim b1(n), b2(n), CFL1(n), CFL2(n), CFV(n), L1ant, L2ant As Double
+            Dim b1(n), b2(n), CFL1(n), CFL2(n), CFV(n), Kil(n), L1ant, L2ant As Double
 
             Vn = PP.RET_VNAMES()
             fi = Vz.Clone
@@ -559,7 +561,11 @@ out:
 
             ecount = 0
 
-            Console.WriteLine("PT Flash [NL-3PV2]: Iteration #" & ecount & ", VF = " & V)
+            V = Vest
+            L1 = L1est
+            L2 = L2est
+
+            Console.WriteLine("PT Flash [NL-3PV2]: Iteration #" & ecount & ", VF = " & V & ", L1 = " & L1 & ", L2 = " & L2)
 
             Do
 
