@@ -1774,7 +1774,7 @@ out:
             Kb0 = Kb_
 
             B = Log(Kb_ / Kb) / (1 / T_ - 1 / T)
-            A = Log(Kb) - B * (1 / T - 1 / T_)
+            A = Log(Kb) - B * (1 / T - 1 / T0)
 
             For i = 0 To n
                 ui1(i) = Log(Ki1(i) / Kb)
@@ -1851,7 +1851,7 @@ out:
                     uic1(i) = Log(Ki1(i) / Kb)
                     uic2(i) = Log(Ki2(i) / Kb)
                 Next
-
+                
                 Bc = Log(Kb_ / Kb) / (1 / T_ - 1 / T)
                 Ac = Log(Kb) - Bc * (1 / T - 1 / T0)
 
@@ -1904,8 +1904,6 @@ out:
                 End If
 
                 Console.WriteLine("PV Flash 3P [IO]: Iteration #" & ecount & ", T = " & T & ", VF = " & V)
-
-
 
             Loop Until AbsSum(fx) < etol * (n + 2)
 
