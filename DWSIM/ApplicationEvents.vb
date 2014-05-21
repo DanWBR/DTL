@@ -20,6 +20,9 @@ Namespace My
         Public CAPEOPENMode As Boolean = False
         Public Shared IsRunningParallelTasks As Boolean = False
 
+        Public Shared _EnableGPUProcessing As Boolean = False
+        Public Shared _EnableParallelProcessing As Boolean = False
+
         Public Shared gpu As Cudafy.Host.GPGPU
         Public Shared gpumod As CudafyModule
 

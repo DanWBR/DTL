@@ -150,7 +150,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
 
         Public Overrides Function CalcLnFug(ByVal T As Double, ByVal P As Double, ByVal Vx As Array, ByVal VKij As Object, ByVal VTc As Array, ByVal VPc As Array, ByVal Vw As Array, Optional ByVal otherargs As Object = Nothing, Optional ByVal forcephase As String = "")
 
-            If My.Settings.EnableGPUProcessing Then
+            If My.MyApplication._EnableGPUProcessing Then
                 Return CalcLnFugGPU(T, P, Vx, VKij, VTc, VPc, Vw, otherargs, forcephase)
             Else
                 Return CalcLnFugCPU(T, P, Vx, VKij, VTc, VPc, Vw, otherargs, forcephase)

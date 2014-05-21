@@ -169,9 +169,9 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
             Dim gl, hl, sl, gv, hv, sv As Double
 
-            If My.Settings.EnableParallelProcessing Then
+            If My.MyApplication._EnableParallelProcessing Then
                 My.MyApplication.IsRunningParallelTasks = True
-                If My.Settings.EnableGPUProcessing Then
+                If My.MyApplication._EnableGPUProcessing Then
                     My.MyApplication.gpu.EnableMultithreading()
                 End If
                 Try
@@ -197,7 +197,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                         Throw ex
                     Next
                 Finally
-                    If My.Settings.EnableGPUProcessing Then
+                    If My.MyApplication._EnableGPUProcessing Then
                         My.MyApplication.gpu.DisableMultithreading()
                         My.MyApplication.gpu.FreeAll()
                     End If
@@ -300,9 +300,9 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                             j = j + 1
                         Loop Until j = n + 1
 
-                        If My.Settings.EnableParallelProcessing Then
+                        If My.MyApplication._EnableParallelProcessing Then
                             My.MyApplication.IsRunningParallelTasks = True
-                            If My.Settings.EnableGPUProcessing Then
+                            If My.MyApplication._EnableGPUProcessing Then
                                 My.MyApplication.gpu.EnableMultithreading()
                             End If
                             Try
@@ -328,7 +328,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                                     Throw ex
                                 Next
                             Finally
-                                If My.Settings.EnableGPUProcessing Then
+                                If My.MyApplication._EnableGPUProcessing Then
                                     My.MyApplication.gpu.DisableMultithreading()
                                     My.MyApplication.gpu.FreeAll()
                                 End If

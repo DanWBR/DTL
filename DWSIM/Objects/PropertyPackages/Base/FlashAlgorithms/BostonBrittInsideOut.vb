@@ -198,6 +198,8 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
             ecount = 0
 
+            R = Kb * V / (Kb * V + Kb0 * L)
+
             Do
 
                 '--------------------------------------------------------------
@@ -233,8 +235,10 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                 Loop Until Abs(fr) < itol Or icount > maxit_i
 
                 If icount > maxit_i Then R = Rant
-                If Rant = 0.0# And R = 1.0# Then R = 0.0#
-                If Rant = 1.0# And R = 0.0# Then R = 1.0#
+                If ecount > 0 Then
+                    If Rant = 0.0# And R = 1.0# Then R = 0.0#
+                    If Rant = 1.0# And R = 0.0# Then R = 1.0#
+                End If
 
                 Me.TPErrorFunc(R)
 
@@ -497,7 +501,7 @@ out:        Return New Object() {L, V, Vx, Vy, ecount, 0.0#, Vx, 0.0#, PP.RET_Nu
                 ui(i) = Log(Ki(i) / Kb)
             Next
 
-            If My.Settings.EnableParallelProcessing Then
+            If My.MyApplication._EnableParallelProcessing Then
                 My.MyApplication.IsRunningParallelTasks = True
                 Try
                     Dim task1 As Task = New Task(Sub()
@@ -605,7 +609,7 @@ restart:    Do
                 Bc = Log(Kb_ / Kb) / (1 / T_ - 1 / T)
                 Ac = Log(Kb) - Bc * (1 / T - 1 / T_)
 
-                If My.Settings.EnableParallelProcessing Then
+                If My.MyApplication._EnableParallelProcessing Then
                     My.MyApplication.IsRunningParallelTasks = True
                     Try
                         Dim task1 As Task = New Task(Sub()
@@ -939,7 +943,7 @@ restart:    Do
                 ui(i) = Log(Ki(i) / Kb)
             Next
 
-            If My.Settings.EnableParallelProcessing Then
+            If My.MyApplication._EnableParallelProcessing Then
                 My.MyApplication.IsRunningParallelTasks = True
                 Try
                     Dim task1 As Task = New Task(Sub()
@@ -1044,7 +1048,7 @@ restart:    Do
                 Bc = Log(Kb_ / Kb) / (1 / T_ - 1 / T)
                 Ac = Log(Kb) - Bc * (1 / T - 1 / T_)
 
-                If My.Settings.EnableParallelProcessing Then
+                If My.MyApplication._EnableParallelProcessing Then
                     My.MyApplication.IsRunningParallelTasks = True
                     Try
                         Dim task1 As Task = New Task(Sub()

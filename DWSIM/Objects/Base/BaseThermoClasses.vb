@@ -841,6 +841,20 @@ Namespace DTL.ClassesBasicasTermodinamica
         Public Liquid_Thermal_Conductivity_Const_E As Double
         Public Liquid_Thermal_Conductivity_Tmin As Double
         Public Liquid_Thermal_Conductivity_Tmax As Double
+        Public Vapor_Thermal_Conductivity_Const_A As Double
+        Public Vapor_Thermal_Conductivity_Const_B As Double
+        Public Vapor_Thermal_Conductivity_Const_C As Double
+        Public Vapor_Thermal_Conductivity_Const_D As Double
+        Public Vapor_Thermal_Conductivity_Const_E As Double
+        Public Vapor_Thermal_Conductivity_Tmin As Double
+        Public Vapor_Thermal_Conductivity_Tmax As Double
+        Public Vapor_Viscosity_Const_A As Double
+        Public Vapor_Viscosity_Const_B As Double
+        Public Vapor_Viscosity_Const_C As Double
+        Public Vapor_Viscosity_Const_D As Double
+        Public Vapor_Viscosity_Const_E As Double
+        Public Vapor_Viscosity_Tmin As Double
+        Public Vapor_Viscosity_Tmax As Double
         Public Solid_Density_Const_A As Double
         Public Solid_Density_Const_B As Double
         Public Solid_Density_Const_C As Double
@@ -848,6 +862,13 @@ Namespace DTL.ClassesBasicasTermodinamica
         Public Solid_Density_Const_E As Double
         Public Solid_Density_Tmin As Double
         Public Solid_Density_Tmax As Double
+        Public Surface_Tension_Const_A As Double
+        Public Surface_Tension_Const_B As Double
+        Public Surface_Tension_Const_C As Double
+        Public Surface_Tension_Const_D As Double
+        Public Surface_Tension_Const_E As Double
+        Public Surface_Tension_Tmin As Double
+        Public Surface_Tension_Tmax As Double
         Public Solid_Heat_Capacity_Const_A As Double
         Public Solid_Heat_Capacity_Const_B As Double
         Public Solid_Heat_Capacity_Const_C As Double
@@ -875,12 +896,15 @@ Namespace DTL.ClassesBasicasTermodinamica
         Public VaporPressureEquation As String = ""
         Public IdealgasCpEquation As String = ""
         Public LiquidViscosityEquation As String = ""
+        Public VaporViscosityEquation As String = ""
         Public VaporizationEnthalpyEquation As String = ""
         Public LiquidDensityEquation As String = ""
         Public LiquidHeatCapacityEquation As String = ""
         Public LiquidThermalConductivityEquation As String = ""
+        Public VaporThermalConductivityEquation As String = ""
         Public SolidDensityEquation As String = ""
         Public SolidHeatCapacityEquation As String = ""
+        Public SurfaceTensionEquation As String = ""
 
         Public PC_SAFT_sigma As Double = 0.0#
         Public PC_SAFT_epsilon_k As Double = 0.0#

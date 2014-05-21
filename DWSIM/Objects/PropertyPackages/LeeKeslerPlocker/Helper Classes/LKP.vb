@@ -753,7 +753,7 @@ Final3:
 
         Function CalcLnFug(ByVal TIPO As String, ByVal T As Double, ByVal P As Double, ByVal Vz As Object, ByVal VKij As Object, ByVal VTc As Object, ByVal VPc As Object, ByVal Vw As Object, ByVal VMM As Object, ByVal VVc As Object, ByVal Hid As Double) As Object
 
-            If My.Settings.EnableGPUProcessing Then
+            If My.MyApplication._EnableGPUProcessing Then
                 Return CalcLnFugGPU(TIPO, T, P, Vz, VKij, VTc, VPc, Vw, VMM, VVc, Hid)
             Else
                 Return CalcLnFugCPU(TIPO, T, P, Vz, VKij, VTc, VPc, Vw, VMM, VVc, Hid)

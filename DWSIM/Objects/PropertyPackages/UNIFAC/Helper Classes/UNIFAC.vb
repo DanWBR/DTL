@@ -146,7 +146,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         Function GAMMA_MR(ByVal T As Double, ByVal Vx As Double(), ByVal VQ As Double(), ByVal VR As Double(), ByVal VEKI As Double(,))
 
-            If My.Settings.EnableGPUProcessing Then
+            If My.MyApplication._EnableGPUProcessing Then
                 Return GAMMA_MR_GPU(T, Vx, VQ, VR, VEKI)
             Else
                 Return GAMMA_MR_CPU(T, Vx, VQ, VR, VEKI)

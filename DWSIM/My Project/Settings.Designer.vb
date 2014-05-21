@@ -53,30 +53,6 @@ Namespace My
                 Return defaultInstance
             End Get
         End Property
-        
-        <Global.System.Configuration.UserScopedSettingAttribute(),  _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
-        Public Property EnableParallelProcessing() As Boolean
-            Get
-                Return CType(Me("EnableParallelProcessing"),Boolean)
-            End Get
-            Set
-                Me("EnableParallelProcessing") = value
-            End Set
-        End Property
-        
-        <Global.System.Configuration.UserScopedSettingAttribute(),  _
-         Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.Configuration.DefaultSettingValueAttribute("False")>  _
-        Public Property EnableGPUProcessing() As Boolean
-            Get
-                Return CType(Me("EnableGPUProcessing"),Boolean)
-            End Get
-            Set
-                Me("EnableGPUProcessing") = value
-            End Set
-        End Property
     End Class
 End Namespace
 

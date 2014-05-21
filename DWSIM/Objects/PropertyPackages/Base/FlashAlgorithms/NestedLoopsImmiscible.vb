@@ -152,7 +152,7 @@ out:        Return New Object() {xl1, V, Vx1, Vy, ecount, xl2, Vx2, 0.0#, PP.RET
 
         Public Overrides Function Flash_PH(ByVal Vz As Double(), ByVal P As Double, ByVal H As Double, ByVal Tref As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
 
-            Dim doparallel As Boolean = My.Settings.EnableParallelProcessing
+            Dim doparallel As Boolean = My.MyApplication._EnableParallelProcessing
 
             Dim Vn(1) As String, Vx(1), Vx2(1), Vy(1), Vx_ant(1), Vy_ant(1), Vp(1), Ki(1), Ki_ant(1), fi(1) As Double
             Dim i, n, ecount As Integer
@@ -199,7 +199,7 @@ out:        Return New Object() {xl1, V, Vx1, Vy, ecount, xl2, Vx2, 0.0#, PP.RET
             If Tref = 0 Then Tref = 298.15
             x1 = Tref
             Do
-                If My.Settings.EnableParallelProcessing Then
+                If My.MyApplication._EnableParallelProcessing Then
                     My.MyApplication.IsRunningParallelTasks = True
                     Try
                         Dim task1 As Task = New Task(Sub()
@@ -261,7 +261,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
 
         Public Overrides Function Flash_PS(ByVal Vz As Double(), ByVal P As Double, ByVal S As Double, ByVal Tref As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
 
-            Dim doparallel As Boolean = My.Settings.EnableParallelProcessing
+            Dim doparallel As Boolean = My.MyApplication._EnableParallelProcessing
 
             Dim Vn(1) As String, Vx(1), Vx2(1), Vy(1), Vx_ant(1), Vy_ant(1), Vp(1), Ki(1), Ki_ant(1), fi(1) As Double
             Dim i, n, ecount As Integer
@@ -307,7 +307,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
             If Tref = 0 Then Tref = 298.15
             x1 = Tref
             Do
-                If My.Settings.EnableParallelProcessing Then
+                If My.MyApplication._EnableParallelProcessing Then
                     My.MyApplication.IsRunningParallelTasks = True
                     Try
                         Dim task1 As Task = New Task(Sub()

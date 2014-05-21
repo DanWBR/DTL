@@ -1520,9 +1520,9 @@ out:        Return result
                             If L <> 0.0# Then Vx1(i) = Abs((fi(i) - x(i)) / L) Else Vx1(i) = 0.0#
                         Next
 
-                        If My.Settings.EnableParallelProcessing Then
+                        If My.MyApplication._EnableParallelProcessing Then
                             My.MyApplication.IsRunningParallelTasks = True
-                            If My.Settings.EnableGPUProcessing Then
+                            If My.MyApplication._EnableGPUProcessing Then
                                 My.MyApplication.gpu.EnableMultithreading()
                             End If
                             Try
@@ -1540,7 +1540,7 @@ out:        Return result
                                     Throw ex
                                 Next
                             Finally
-                                If My.Settings.EnableGPUProcessing Then
+                                If My.MyApplication._EnableGPUProcessing Then
                                     My.MyApplication.gpu.DisableMultithreading()
                                     My.MyApplication.gpu.FreeAll()
                                 End If
@@ -1595,9 +1595,9 @@ out:        Return result
                             If soma_x1 <> 0.0# Then Vx1(i) /= soma_x1
                         Next
 
-                        If My.Settings.EnableParallelProcessing Then
+                        If My.MyApplication._EnableParallelProcessing Then
                             My.MyApplication.IsRunningParallelTasks = True
-                            If My.Settings.EnableGPUProcessing Then
+                            If My.MyApplication._EnableGPUProcessing Then
                                 My.MyApplication.gpu.EnableMultithreading()
                             End If
                             Try
@@ -1619,7 +1619,7 @@ out:        Return result
                                     Throw ex
                                 Next
                             Finally
-                                If My.Settings.EnableGPUProcessing Then
+                                If My.MyApplication._EnableGPUProcessing Then
                                     My.MyApplication.gpu.DisableMultithreading()
                                     My.MyApplication.gpu.FreeAll()
                                 End If
@@ -1696,9 +1696,9 @@ out:        Return result
                         Vx2(i) /= soma_x2
                     Next
 
-                    If My.Settings.EnableParallelProcessing Then
+                    If My.MyApplication._EnableParallelProcessing Then
                         My.MyApplication.IsRunningParallelTasks = True
-                        If My.Settings.EnableGPUProcessing Then
+                        If My.MyApplication._EnableGPUProcessing Then
                             My.MyApplication.gpu.EnableMultithreading()
                         End If
                         Try
@@ -1720,7 +1720,7 @@ out:        Return result
                                 Throw ex
                             Next
                         Finally
-                            If My.Settings.EnableGPUProcessing Then
+                            If My.MyApplication._EnableGPUProcessing Then
                                 My.MyApplication.gpu.DisableMultithreading()
                                 My.MyApplication.gpu.FreeAll()
                             End If
@@ -1775,9 +1775,9 @@ out:        Return result
                             Vx1(i) = Abs((fi(i) - x(i)) / L)
                         Next
 
-                        If My.Settings.EnableParallelProcessing Then
+                        If My.MyApplication._EnableParallelProcessing Then
                             My.MyApplication.IsRunningParallelTasks = True
-                            If My.Settings.EnableGPUProcessing Then
+                            If My.MyApplication._EnableGPUProcessing Then
                                 My.MyApplication.gpu.EnableMultithreading()
                             End If
                             Try
@@ -1795,7 +1795,7 @@ out:        Return result
                                     Throw ex
                                 Next
                             Finally
-                                If My.Settings.EnableGPUProcessing Then
+                                If My.MyApplication._EnableGPUProcessing Then
                                     My.MyApplication.gpu.DisableMultithreading()
                                     My.MyApplication.gpu.FreeAll()
                                 End If
@@ -1842,9 +1842,9 @@ out:        Return result
                             Vx1(i) /= soma_x1
                         Next
 
-                        If My.Settings.EnableParallelProcessing Then
+                        If My.MyApplication._EnableParallelProcessing Then
                             My.MyApplication.IsRunningParallelTasks = True
-                            If My.Settings.EnableGPUProcessing Then
+                            If My.MyApplication._EnableGPUProcessing Then
                                 My.MyApplication.gpu.EnableMultithreading()
                             End If
                             Try
@@ -1866,7 +1866,7 @@ out:        Return result
                                     Throw ex
                                 Next
                             Finally
-                                If My.Settings.EnableGPUProcessing Then
+                                If My.MyApplication._EnableGPUProcessing Then
                                     My.MyApplication.gpu.DisableMultithreading()
                                     My.MyApplication.gpu.FreeAll()
                                 End If
@@ -1935,9 +1935,9 @@ out:        Return result
                         Vx2(i) /= soma_x2
                     Next
 
-                    If My.Settings.EnableParallelProcessing Then
+                    If My.MyApplication._EnableParallelProcessing Then
                         My.MyApplication.IsRunningParallelTasks = True
-                        If My.Settings.EnableGPUProcessing Then
+                        If My.MyApplication._EnableGPUProcessing Then
                             My.MyApplication.gpu.EnableMultithreading()
                         End If
                         Try
@@ -1959,7 +1959,7 @@ out:        Return result
                                 Throw ex
                             Next
                         Finally
-                            If My.Settings.EnableGPUProcessing Then
+                            If My.MyApplication._EnableGPUProcessing Then
                                 My.MyApplication.gpu.DisableMultithreading()
                                 My.MyApplication.gpu.FreeAll()
                             End If
@@ -2014,9 +2014,9 @@ out:        Return result
                         x3(j) = x(j) * (1 - epsilon)
                     End If
                 Next
-                If My.Settings.EnableParallelProcessing Then
+                If My.MyApplication._EnableParallelProcessing Then
                     My.MyApplication.IsRunningParallelTasks = True
-                    If My.Settings.EnableGPUProcessing Then
+                    If My.MyApplication._EnableGPUProcessing Then
                         My.MyApplication.gpu.EnableMultithreading()
                     End If
                     Try
@@ -2034,7 +2034,7 @@ out:        Return result
                             Throw ex
                         Next
                     Finally
-                        If My.Settings.EnableGPUProcessing Then
+                        If My.MyApplication._EnableGPUProcessing Then
                             My.MyApplication.gpu.DisableMultithreading()
                             My.MyApplication.gpu.FreeAll()
                         End If

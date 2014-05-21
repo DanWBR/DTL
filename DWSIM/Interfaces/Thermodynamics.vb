@@ -75,7 +75,7 @@ Namespace Thermodynamics
         ''' <remarks></remarks>
         <System.Runtime.InteropServices.DispId(3)> Sub EnableParallelProcessing()
 
-            My.Settings.EnableParallelProcessing = True
+            My.MyApplication._EnableParallelProcessing = True
 
         End Sub
 
@@ -85,7 +85,7 @@ Namespace Thermodynamics
         ''' <remarks></remarks>
         <System.Runtime.InteropServices.DispId(4)> Sub DisableParallelProcessing()
 
-            My.Settings.EnableParallelProcessing = False
+            My.MyApplication._EnableParallelProcessing = False
 
         End Sub
 
@@ -95,7 +95,7 @@ Namespace Thermodynamics
         ''' <remarks></remarks>
         <System.Runtime.InteropServices.DispId(5)> Sub EnableGPUProcessing()
 
-            My.Settings.EnableGPUProcessing = True
+            My.MyApplication._EnableGPUProcessing = True
 
         End Sub
 
@@ -105,7 +105,7 @@ Namespace Thermodynamics
         ''' <remarks></remarks>
         <System.Runtime.InteropServices.DispId(6)> Sub DisableGPUProcessing()
 
-            My.Settings.EnableGPUProcessing = False
+            My.MyApplication._EnableGPUProcessing = False
 
         End Sub
 
