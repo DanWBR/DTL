@@ -123,19 +123,37 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                     Vy = Vz
                     GoTo out
                 End If
-            ElseIf P <= Pd Then
-                'vapor only
-                L = 0.0#
-                V = 1.0#
-            ElseIf P >= Pb Then
-                'liquid only
-                L = 1.0#
-                V = 0.0#
-            Else
-                'VLE
-                V = 1 - (P - Pd) / (Pb - Pd)
-                L = 1 - V
             End If
+
+            Dim Vmin, Vmax As Double
+            Vmin = 1.0#
+            Vmax = 0.0#
+            For i = 0 To n
+                If (Ki(i) * Vz(i) - 1) / (Ki(i) - 1) < Vmin Then Vmin = (Ki(i) * Vz(i) - 1) / (Ki(i) - 1)
+                If (1 - Vz(i)) / (1 - Ki(i)) > Vmax Then Vmax = (1 - Vz(i)) / (1 - Ki(i))
+            Next
+
+            If Vmin < 0.0# Then Vmin = 0.0#
+            If Vmax > 1.0# Then Vmax = 1.0#
+
+            V = (Vmin + Vmax) / 2
+
+            If V = 0.5# Then
+                If P <= Pd Then
+                    'vapor only
+                    L = 0.1
+                    V = 0.9
+                ElseIf P >= Pb Then
+                    'liquid only
+                    L = 0.9
+                    V = 0.1
+                Else
+                    'VLE
+                    V = 1 - (P - Pd) / (Pb - Pd)
+                End If
+            End If
+
+            L = 1 - V
 
             If n = 0 Then
                 If Vp(0) <= P Then

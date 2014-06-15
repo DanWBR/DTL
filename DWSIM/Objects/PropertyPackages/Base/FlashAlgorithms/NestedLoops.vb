@@ -1,14 +1,14 @@
-﻿'    DWSIM Nested Loops Flash Algorithms
+﻿'    DTL Nested Loops Flash Algorithms
 '    Copyright 2010 Daniel Wagner O. de Medeiros
 '
 '    This file is part of DTL.
 '
-'    DWSIM is free software: you can redistribute it and/or modify
+'    DTL is free software: you can redistribute it and/or modify
 '    it under the terms of the GNU General Public License as published by
 '    the Free Software Foundation, either version 3 of the License, or
 '    (at your option) any later version.
 '
-'    DWSIM is distributed in the hope that it will be useful,
+'    DTL is distributed in the hope that it will be useful,
 '    but WITHOUT ANY WARRANTY; without even the implied warranty of
 '    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 '    GNU General Public License for more details.
@@ -43,7 +43,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
             Dim Vn(1) As String, Vx(1), Vy(1), Vx_ant(1), Vy_ant(1), Vp(1), Ki(1), Ki_ant(1), fi(1) As Double
             Dim i, n, ecount As Integer
-            Dim Pb, Pd, Pmin, Pmax, Px, soma_x, soma_y As Double
+            Dim Pb, Pd, Pmin, Pmax, Px, soma_x, soma_y, dF, deltaV, g As Double
             Dim d1, d2 As Date, dt As TimeSpan
             Dim L, V, Vant As Double
 
@@ -61,12 +61,19 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
             Vn = PP.RET_VNAMES()
             fi = Vz.Clone
 
+            Dim VPc(n), VTc(n), Vw(n) As Double
+
+            VPc = PP.RET_VPC()
+            VTc = PP.RET_VTC()
+            Vw = PP.RET_VW()
+
             'Calculate Ki`s
 
             If Not ReuseKI Then
                 i = 0
                 Do
-                    Vp(i) = PP.AUX_PVAPi(i, T)
+                    'Vp(i) = PP.AUX_PVAPi(Vn(i), T)
+                    Vp(i) = VPc(i) * Exp(5.37 * (1 + Vw(i)) * (1 - VTc(i) / T))
                     Ki(i) = Vp(i) / P
                     i += 1
                 Loop Until i = n + 1
@@ -79,7 +86,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
             'Estimate V
 
-            If T > DTL.MathEx.Common.Max(pp.RET_VTC, Vz) Then
+            If T > DTL.MathEx.Common.Max(PP.RET_VTC, Vz) Then
                 Vy = Vz
                 V = 1
                 L = 0
@@ -117,19 +124,31 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                     Vy = Vz
                     GoTo out
                 End If
-            ElseIf P <= Pd Then
-                'vapor only
-                L = 0.02
-                V = 0.98
-            ElseIf P >= Pb Then
-                'liquid only
-                L = 0.98
-                V = 0.02
-            Else
-                'VLE
-                V = 1 - (P - Pd) / (Pb - Pd)
-                L = 1 - V
             End If
+
+            Dim Vmin, Vmax As Double
+            Vmin = 1.0#
+            Vmax = 0.0#
+            For i = 0 To n
+                If (Ki(i) * Vz(i) - 1) / (Ki(i) - 1) < Vmin Then Vmin = (Ki(i) * Vz(i) - 1) / (Ki(i) - 1)
+                If (1 - Vz(i)) / (1 - Ki(i)) > Vmax Then Vmax = (1 - Vz(i)) / (1 - Ki(i))
+            Next
+
+            If Vmin < 0.0# Then Vmin = 0.0#
+            If Vmax > 1.0# Then Vmax = 1.0#
+
+            V = (Vmin + Vmax) / 2
+
+            g = 0.0#
+            For i = 0 To n
+                g += Vz(i) * (Ki(i) - 1) / (V + (1 - V) * Ki(i))
+            Next
+
+            If g > 0 Then Vmin = V Else Vmax = V
+
+            V = Vmin + (Vmax - Vmin) / 4
+
+            L = 1 - V
 
             If n = 0 Then
                 If Vp(0) <= P Then
@@ -235,7 +254,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                     Vant = V
 
                     F = 0.0#
-                    Dim dF = 0
+                    dF = 0
                     i = 0
                     Do
                         If Vz(i) > 0 Then
@@ -245,9 +264,10 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                         i = i + 1
                     Loop Until i = n + 1
 
-                    If Abs(F) < etol * 0.0001 Then Exit Do
+                    If Abs(F) < etol Then Exit Do
 
-                    V = -F / dF + V
+                    deltaV = -F / dF
+                    V = V + deltaV
 
                 End If
 
@@ -273,12 +293,14 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
                 ecount += 1
 
-                If Double.IsNaN(V) Then Throw New Exception("Error calculating the vapor fraction.")
-                If ecount > maxit_e Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt2"))
+                If Double.IsNaN(V) Then
+                    Throw New Exception(DTL.App.GetLocalString("PropPack_FlashTPVapFracError"))
+                End If
+                If ecount > maxit_e Then
+                    Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt2"))
+                End If
 
                 Console.WriteLine("PT Flash [NL]: Iteration #" & ecount & ", VF = " & V)
-
-
 
             Loop Until convergiu = 1
 
@@ -305,7 +327,7 @@ out:        Return New Object() {L, V, Vx, Vy, ecount, 0.0#, PP.RET_NullVector, 
 
             n = UBound(Vz)
 
-            pp = PP
+            PP = PP
             Hf = H
             Pf = P
 
@@ -343,6 +365,9 @@ out:        Return New Object() {L, V, Vx, Vy, ecount, 0.0#, PP.RET_NullVector, 
             Do
                 If My.MyApplication._EnableParallelProcessing Then
                     My.MyApplication.IsRunningParallelTasks = True
+                    If My.MyApplication._EnableGPUProcessing Then
+                        My.MyApplication.gpu.EnableMultithreading()
+                    End If
                     Try
                         Dim task1 As Task = New Task(Sub()
                                                          fx = Herror(x1, {P, Vz, PP})
@@ -357,6 +382,11 @@ out:        Return New Object() {L, V, Vx, Vy, ecount, 0.0#, PP.RET_NullVector, 
                         For Each ex As Exception In ae.InnerExceptions
                             Throw
                         Next
+                    Finally
+                        If My.MyApplication._EnableGPUProcessing Then
+                            My.MyApplication.gpu.DisableMultithreading()
+                            My.MyApplication.gpu.FreeAll()
+                        End If
                     End Try
                     My.MyApplication.IsRunningParallelTasks = False
                 Else
@@ -369,7 +399,7 @@ out:        Return New Object() {L, V, Vx, Vy, ecount, 0.0#, PP.RET_NullVector, 
                 If x1 < 0 Then GoTo alt
                 cnt += 1
             Loop Until cnt > 20 Or Double.IsNaN(x1)
-            If Double.IsNaN(x1) Then
+            If Double.IsNaN(x1) Or cnt > 20 Then
 alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
             Else
                 T = x1
@@ -412,7 +442,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
 
             n = UBound(Vz)
 
-            pp = PP
+            PP = PP
             Sf = S
             Pf = P
 
@@ -449,6 +479,9 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
             Do
                 If My.MyApplication._EnableParallelProcessing Then
                     My.MyApplication.IsRunningParallelTasks = True
+                    If My.MyApplication._EnableGPUProcessing Then
+                        My.MyApplication.gpu.EnableMultithreading()
+                    End If
                     Try
                         Dim task1 As Task = New Task(Sub()
                                                          fx = Serror(x1, {P, Vz, PP})
@@ -463,6 +496,11 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
                         For Each ex As Exception In ae.InnerExceptions
                             Throw
                         Next
+                    Finally
+                        If My.MyApplication._EnableGPUProcessing Then
+                            My.MyApplication.gpu.DisableMultithreading()
+                            My.MyApplication.gpu.FreeAll()
+                        End If
                     End Try
                     My.MyApplication.IsRunningParallelTasks = False
                 Else
@@ -520,7 +558,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
 
             n = UBound(Vz)
 
-            pp = PP
+            PP = PP
             Vf = V
             L = 1 - V
             Lf = 1 - Vf
@@ -607,6 +645,15 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
                 Vy(i) = Vy(i) / soma_y
                 i = i + 1
             Loop Until i = n + 1
+
+            If PP.AUX_IS_SINGLECOMP(Vz) Then
+                Console.WriteLine("TV Flash [NL]: Converged in 1 iteration.")
+                P = 0
+                For i = 0 To n
+                    P += Vz(i) * PP.AUX_PVAPi(i, T)
+                Next
+                Return New Object() {L, V, Vx, Vy, P, 0, Ki, 0.0#, PP.RET_NullVector, 0.0#, PP.RET_NullVector}
+            End If
 
             Dim marcador3, marcador2, marcador As Integer
             Dim stmp4_ant, stmp4, Pant, fval As Double
@@ -713,8 +760,6 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
 
                     Console.WriteLine("TV Flash [NL]: Iteration #" & ecount & ", P = " & P & ", VF = " & V)
 
-
-
                 Loop Until Math.Abs(P - Pant) < 1 Or Double.IsNaN(P) = True Or ecount > maxit_e Or Double.IsNaN(P) Or Double.IsInfinity(P)
 
             Else
@@ -817,8 +862,6 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
 
                     Console.WriteLine("TV Flash [NL]: Iteration #" & ecount & ", P = " & P & ", VF = " & V)
 
-
-
                 Loop Until Math.Abs(fval) < etol Or Double.IsNaN(P) = True Or ecount > maxit_e
 
             End If
@@ -826,6 +869,8 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
             d2 = Date.Now
 
             dt = d2 - d1
+
+            If PP.AUX_CheckTrivial(Ki) Then Throw New Exception("TV Flash [NL]: Invalid result: converged to the trivial solution (P = " & P & " ).")
 
             Console.WriteLine("TV Flash [NL]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms.")
 
@@ -850,27 +895,31 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
 
             n = UBound(Vz)
 
-            pp = PP
+            PP = PP
             Vf = V
             L = 1 - V
             Lf = 1 - Vf
             Tf = T
 
             ReDim Vn(n), Vx(n), Vy(n), Vx_ant(n), Vy_ant(n), Vp(n), Ki(n), fi(n)
-            Dim Vt(n), VTc(n), Tmin, Tmax, dFdT As Double
+            Dim Vt(n), VTc(n), Tmin, Tmax, dFdT, Tsat(n) As Double
 
             Vn = PP.RET_VNAMES()
             VTc = PP.RET_VTC()
             fi = Vz.Clone
+
+            Tmin = 0.0#
+            Tmax = 0.0#
 
             If Tref = 0.0# Then
 
                 i = 0
                 Tref = 0
                 Do
-                    Tref += 0.7 * Vz(i) * VTc(i)
+                    Tsat(i) = PP.AUX_TSATi(P, i)
+                    Tref += Vz(i) * Tsat(i)
                     Tmin += 0.1 * Vz(i) * VTc(i)
-                    Tmax += 2.0 * Vz(i) * VTc(i)
+                    Tmax += 1.0 * Vz(i) * VTc(i)
                     i += 1
                 Loop Until i = n + 1
 
@@ -912,6 +961,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
             Do
                 If Vz(i) <> 0 Then
                     Vy(i) = Vz(i) * Ki(i) / ((Ki(i) - 1) * V + 1)
+                    If Double.IsInfinity(Vy(i)) Then Vy(i) = 0.0#
                     Vx(i) = Vy(i) / Ki(i)
                 Else
                     Vy(i) = 0
@@ -934,6 +984,15 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
                 Vy(i) = Vy(i) / soma_y
                 i = i + 1
             Loop Until i = n + 1
+
+            If PP.AUX_IS_SINGLECOMP(Vz) Then
+                Console.WriteLine("PV Flash [NL]: Converged in 1 iteration.")
+                T = 0
+                For i = 0 To n
+                    T += Vz(i) * PP.AUX_TSATi(P, i)
+                Next
+                Return New Object() {L, V, Vx, Vy, T, 0, Ki, 0.0#, PP.RET_NullVector, 0.0#, PP.RET_NullVector}
+            End If
 
             Dim marcador3, marcador2, marcador As Integer
             Dim stmp4_ant, stmp4, Tant, fval As Double
@@ -1010,10 +1069,10 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
                     Dim K1(n), K2(n), dKdT(n) As Double
 
                     K1 = PP.DW_CalcKvalue(Vx, Vy, T, P)
-                    K2 = PP.DW_CalcKvalue(Vx, Vy, T + 0.1, P)
+                    K2 = PP.DW_CalcKvalue(Vx, Vy, T + 0.5, P)
 
                     For i = 0 To n
-                        dKdT(i) = (K2(i) - K1(i)) / (0.1)
+                        dKdT(i) = (K2(i) - K1(i)) / 0.5
                     Next
 
                     fval = stmp4 - 1
@@ -1033,14 +1092,12 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
 
                     Tant = T
                     T = T - fval / dFdT
-                    If T < Tmin Then T = Tmin
-                    If T > Tmax Then T = Tmax
+                    'If T < Tmin Then T = Tmin
+                    'If T > Tmax Then T = Tmax
 
                     Console.WriteLine("PV Flash [NL]: Iteration #" & ecount & ", T = " & T & ", VF = " & V)
 
-
-
-                Loop Until Math.Abs(T - Tant) < 0.1 Or Double.IsNaN(T) = True Or ecount > maxit_e Or Double.IsNaN(T) Or Double.IsInfinity(T)
+                Loop Until Math.Abs(T - Tant) < 0.01 Or Double.IsNaN(T) = True Or ecount > maxit_e Or Double.IsNaN(T) Or Double.IsInfinity(T)
 
             Else
 
@@ -1135,12 +1192,10 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
 
                     Tant = T
                     T = T - fval / dFdT
-                    If T < Tmin Then T = Tmin
-                    If T > Tmax Then T = Tmax
+                    'If T < Tmin Then T = Tmin
+                    'If T > Tmax Then T = Tmax
 
                     Console.WriteLine("PV Flash [NL]: Iteration #" & ecount & ", T = " & T & ", VF = " & V)
-
-
 
                 Loop Until Math.Abs(fval) < etol Or Double.IsNaN(T) = True Or ecount > maxit_e
 
@@ -1149,6 +1204,8 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
             d2 = Date.Now
 
             dt = d2 - d1
+
+            If PP.AUX_CheckTrivial(Ki) Then Throw New Exception("PV Flash [NL]: Invalid result: converged to the trivial solution (T = " & T & " ).")
 
             Console.WriteLine("PV Flash [NL]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms.")
 

@@ -1243,6 +1243,30 @@ Namespace DTL.SimulationObjects.PropertyPackages
                             Dim Vx2 = result(6)
                             Dim Vs = result(8)
 
+                            If Me.ComponentName.Contains("SRK") Or Me.ComponentName.Contains("PR") Then
+                                If Not Me.AUX_IS_SINGLECOMP(Fase.Mixture) Then
+                                    Dim newphase, eos As String
+                                    If Me.ComponentName.Contains("SRK") Then eos = "SRK" Else eos = "PR"
+                                    If xv = 1.0# Or xl = 1.0# Then
+                                        If xv = 1.0# Then
+                                            'newphase = Auxiliary.FlashAlgorithms.FlashAlgorithm.IdentifyPhase(Vy, P, T, Me, eos)
+                                            'If newphase = "L" Then
+                                            '    xv = 0.0#
+                                            '    xl = 1.0#
+                                            '    Vx = Vy
+                                            'End If
+                                        Else
+                                            newphase = Auxiliary.FlashAlgorithms.FlashAlgorithm.IdentifyPhase(Vx, P, T, Me, eos)
+                                            If newphase = "V" Then
+                                                xv = 1.0#
+                                                xl = 0.0#
+                                                Vy = Vx
+                                            End If
+                                        End If
+                                    End If
+                                End If
+                            End If
+
                             If Not My.Application.CAPEOPENMode Then
                                 If Not Me.FlashAlgorithm = FlashMethod.NestedLoopsSLE _
                                 And Not Me.FlashAlgorithm = FlashMethod.NestedLoopsSLE_SS Then
@@ -3340,7 +3364,17 @@ Final3:
 
             If m_props Is Nothing Then m_props = New DTL.SimulationObjects.PropertyPackages.Auxiliary.PROPS
 
-            Dim val As Double = Me.m_props.condtg_elyhanley(T, Me.AUX_TCM(Fase.Vapor), Me.AUX_VCM(Fase.Vapor), Me.AUX_ZCM(Fase.Vapor), Me.AUX_WM(Fase.Vapor), Me.AUX_MMM(Fase.Vapor), Me.DW_CalcCv_ISOL(Fase.Vapor, T, P) * Me.AUX_MMM(Fase.Vapor))
+            Dim val As Double
+            Dim subst As DTL.ClassesBasicasTermodinamica.Substancia
+            Dim i As Integer = 0
+            For Each subst In Me.CurrentMaterialStream.Fases(2).Componentes.Values
+                If subst.ConstantProperties.VaporThermalConductivityEquation <> "" Then
+                    val += subst.FracaoMolar.GetValueOrDefault * Me.CalcCSTDepProp(subst.ConstantProperties.VaporThermalConductivityEquation, subst.ConstantProperties.Vapor_Thermal_Conductivity_Const_A, subst.ConstantProperties.Vapor_Thermal_Conductivity_Const_B, subst.ConstantProperties.Vapor_Thermal_Conductivity_Const_C, subst.ConstantProperties.Vapor_Thermal_Conductivity_Const_D, subst.ConstantProperties.Vapor_Thermal_Conductivity_Const_E, T, subst.ConstantProperties.Critical_Temperature)
+                Else
+                    val += subst.FracaoMolar.GetValueOrDefault * Me.m_props.condtg_elyhanley(T, Me.AUX_TCM(Fase.Vapor), Me.AUX_VCM(Fase.Vapor), Me.AUX_ZCM(Fase.Vapor), Me.AUX_WM(Fase.Vapor), Me.AUX_MMM(Fase.Vapor), Me.DW_CalcCv_ISOL(Fase.Vapor, T, P) * Me.AUX_MMM(Fase.Vapor))
+                End If
+                i = i + 1
+            Next
 
             Return val
 
@@ -3716,6 +3750,20 @@ Final3:
 
         End Function
 
+        Public Function AUX_LIQCPm(ByVal T As Double, ByVal phaseid As Double) As Double
+
+            Dim val As Double
+            Dim subst As DTL.ClassesBasicasTermodinamica.Substancia
+
+            val = 0
+            For Each subst In Me.CurrentMaterialStream.Fases(phaseid).Componentes.Values
+                val += subst.FracaoMassica.GetValueOrDefault * Me.AUX_LIQ_Cpi(subst.ConstantProperties, T)
+            Next
+
+            Return val
+
+        End Function
+
         Public Overridable Function AUX_LIQ_Cpi(ByVal cprop As ConstantProperties, ByVal T As Double) As Double
 
             Dim val As Double
@@ -3731,6 +3779,7 @@ Final3:
             Return val
 
         End Function
+
 
         Public MustOverride Function AUX_VAPDENS(ByVal T As Double, ByVal P As Double) As Double
 

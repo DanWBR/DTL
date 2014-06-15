@@ -1,14 +1,14 @@
 ﻿'    Boston-Britt Inside-Out Flash Algorithms
-'    Copyright 2010 Daniel Wagner O. de Medeiros
+'    Copyright 2010-2014 Daniel Wagner O. de Medeiros
 '
 '    This file is part of DTL.
 '
-'    DWSIM is free software: you can redistribute it and/or modify
+'    DTL is free software: you can redistribute it and/or modify
 '    it under the terms of the GNU General Public License as published by
 '    the Free Software Foundation, either version 3 of the License, or
 '    (at your option) any later version.
 '
-'    DWSIM is distributed in the hope that it will be useful,
+'    DTL is distributed in the hope that it will be useful,
 '    but WITHOUT ANY WARRANTY; without even the implied warranty of
 '    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 '    GNU General Public License for more details.
@@ -63,6 +63,12 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
             Vn = PP.RET_VNAMES()
             fi = Vz.Clone
 
+            Dim VPc(n), VTc(n), Vw(n), g As Double
+
+            VPc = PP.RET_VPC()
+            VTc = PP.RET_VTC()
+            Vw = PP.RET_VW()
+
             '--------------------------------------
             ' STEP 1 - Assume u, A, B, C, D, E, F 
             '--------------------------------------
@@ -74,11 +80,11 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
             'Calculate Ki`s
 
-
             If Not ReuseKI Then
                 i = 0
                 Do
-                    Vp(i) = PP.AUX_PVAPi(Vn(i), T)
+                    'Vp(i) = PP.AUX_PVAPi(Vn(i), T)
+                    Vp(i) = VPc(i) * Exp(5.37 * (1 + Vw(i)) * (1 - VTc(i) / T))
                     Ki(i) = Vp(i) / P
                     i += 1
                 Loop Until i = n + 1
@@ -130,19 +136,31 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                     Vy = Vz
                     GoTo out
                 End If
-            ElseIf P <= Pd Then
-                'vapor only
-                L = 0.02
-                V = 0.98
-            ElseIf P >= Pb Then
-                'liquid only
-                L = 0.02
-                V = 0.98
-            Else
-                'VLE
-                V = 1 - (P - Pd) / (Pb - Pd)
-                L = 1 - V
             End If
+
+             Dim Vmin, Vmax As Double
+            Vmin = 1.0#
+            Vmax = 0.0#
+            For i = 0 To n
+                If (Ki(i) * Vz(i) - 1) / (Ki(i) - 1) < Vmin Then Vmin = (Ki(i) * Vz(i) - 1) / (Ki(i) - 1)
+                If (1 - Vz(i)) / (1 - Ki(i)) > Vmax Then Vmax = (1 - Vz(i)) / (1 - Ki(i))
+            Next
+
+            If Vmin < 0.0# Then Vmin = 0.0#
+            If Vmax > 1.0# Then Vmax = 1.0#
+
+            V = (Vmin + Vmax) / 2
+
+            g = 0.0#
+            For i = 0 To n
+                g += Vz(i) * (Ki(i) - 1) / (V + (1 - V) * Ki(i))
+            Next
+
+            If g > 0 Then Vmin = V Else Vmax = V
+
+            V = (Vmin + Vmax) / 2
+
+            L = 1 - V
 
             If n = 0 Then
                 If Vp(0) <= P Then
@@ -205,36 +223,36 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                 '--------------------------------------------------------------
                 ' STEPS 2, 3, 4, 5, 6, 7 and 8 - Calculate R and Energy Balance
                 '--------------------------------------------------------------
+                'Rant = R
+                'R = Kb * V / (Kb * V + Kb0 * L)
+
+                Dim fr As Double
+                bo2.DefineFuncDelegate(AddressOf TPErrorFunc)
                 Rant = R
-                R = Kb * V / (Kb * V + Kb0 * L)
+                fr = bo2.brentoptimize(0.0#, 1.0#, 0.0000000001, R)
 
-                'Dim fr As Double
+                'Dim fr, dfr, R0, R1 As Double
+                'Dim icount As Integer = 0
 
-                'bo2.DefineFuncDelegate(AddressOf TPErrorFunc)
-                'fr = bo2.brentoptimize(0, 1, 0.0000000001, R)
+                'Do
+                '    R0 = R
+                '    If R > 0.99 Then
+                '        R1 = R - 0.01
+                '        fr = Me.TPErrorFunc(R0)
+                '        dfr = (fr - Me.TPErrorFunc(R1)) / 0.01
+                '    Else
+                '        R1 = R + 0.01
+                '        fr = Me.TPErrorFunc(R0)
+                '        dfr = (fr - Me.TPErrorFunc(R1)) / -0.01
+                '    End If
+                '    R0 = R
+                '    R = R - fr / dfr
+                '    If R < 0.0# Then R = 0.0#
+                '    If R > 1.0# Then R = 1.0#
+                '    icount += 1
+                'Loop Until Abs(fr) < itol Or icount > maxit_i
 
-                Dim fr, dfr, R0, R1 As Double
-                Dim icount As Integer = 0
-
-                Do
-                    R0 = R
-                    If R > 0.999 Then
-                        R1 = R - 0.001
-                        fr = Me.TPErrorFunc(R0)
-                        dfr = (fr - Me.TPErrorFunc(R1)) / 0.001
-                    Else
-                        R1 = R + 0.001
-                        fr = Me.TPErrorFunc(R0)
-                        dfr = (fr - Me.TPErrorFunc(R1)) / -0.001
-                    End If
-                    R0 = R
-                    R = R - 0.3 * fr / dfr
-                    If R < 0.0# Then R = 0.0#
-                    If R > 1.0# Then R = 1.0#
-                    icount += 1
-                Loop Until Abs(fr) < itol Or icount > maxit_i
-
-                If icount > maxit_i Then R = Rant
+                'If icount > maxit_i Then R = Rant
                 If ecount > 0 Then
                     If Rant = 0.0# And R = 1.0# Then R = 0.0#
                     If Rant = 1.0# And R = 0.0# Then R = 1.0#
@@ -322,14 +340,12 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
                 ecount += 1
 
-                If Double.IsNaN(V) Then Throw New Exception("Error calculating the vapor fraction.")
+                If Double.IsNaN(V) Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashTPVapFracError"))
                 If ecount > maxit_e Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt2"))
 
                 Console.WriteLine("PT Flash [IO]: Iteration #" & ecount & ", VF = " & V)
 
-
-
-            Loop Until AbsSum(fx) < etol Or Abs(R - Rant) < 0.0000000001
+            Loop Until AbsSum(fx) < etol
 
             d2 = Date.Now
 
@@ -706,7 +722,7 @@ restart:    Do
                 refx(n + 6) = Fc
 
                 err = 0
-                If Not PP._ioquick Then err = bo3.brentoptimize(0.2, 2, 0.0001, alpha)
+                If Not PP._ioquick Then err = bo3.brentoptimize(0, 2, 0.0001, alpha)
 
                 For i = 0 To n
                     ui(i) = ui(i) + alpha * dx(i)
@@ -720,8 +736,10 @@ restart:    Do
 
                 ecount += 1
 
-                If ecount > maxit_e Then Throw New Exception("The flash algorithm reached the maximum number of external iterations.")
-                If Double.IsNaN(AbsSum(fx)) Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashError"))
+                If ecount > maxit_e Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt"))
+                If Double.IsNaN(AbsSum(fx)) Then
+                    Throw New Exception(DTL.App.GetLocalString("PropPack_FlashError"))
+                End If
 
                 Console.WriteLine("PH Flash [IO]: Iteration #" & ecount & ", T = " & T)
                 Console.WriteLine("PH Flash [IO]: Iteration #" & ecount & ", VF = " & V)
@@ -1159,7 +1177,7 @@ restart:    Do
 
                 ecount += 1
 
-                If ecount > maxit_e Then Throw New Exception("The flash algorithm reached the maximum number of external iterations.")
+                If ecount > maxit_e Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt"))
                 If Double.IsNaN(AbsSum(fx)) Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashError"))
 
                 Console.WriteLine("PS Flash [IO]: Iteration #" & ecount & ", T = " & T)
@@ -1485,7 +1503,7 @@ restart:    Do
                 ecount += 1
 
                 If ecount > maxit_e Then
-                    Throw New Exception("The flash algorithm reached the maximum number of external iterations.")
+                    Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt"))
                 End If
                 If Double.IsNaN(AbsSum(fx)) Then
                     Throw New Exception(DTL.App.GetLocalString("PropPack_FlashError"))
@@ -1501,6 +1519,8 @@ restart:    Do
 final:      d2 = Date.Now
 
             dt = d2 - d1
+
+            If PP.AUX_CheckTrivial(Ki) Then Throw New Exception("PV Flash [IO]: Invalid result: converged to the trivial solution (T = " & T & " ).")
 
             Console.WriteLine("PV Flash [IO]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms. Error function value: " & AbsSum(fx))
 
@@ -1761,7 +1781,7 @@ final:      d2 = Date.Now
 
                 ecount += 1
 
-                If ecount > maxit_e Then Throw New Exception("The flash algorithm reached the maximum number of external iterations.")
+                If ecount > maxit_e Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt"))
                 If Double.IsNaN(AbsSum(fx)) Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashError"))
 
                 Console.WriteLine("TV Flash [IO]: Iteration #" & ecount & ", P = " & P & ", VF = " & V)
@@ -1774,6 +1794,8 @@ final:      d2 = Date.Now
 final:      d2 = Date.Now
 
             dt = d2 - d1
+
+            If PP.AUX_CheckTrivial(Ki) Then Throw New Exception("TV Flash [IO]: Invalid result: converged to the trivial solution (P = " & P & " ).")
 
             Console.WriteLine("TV Flash [IO]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms. Error function value: " & AbsSum(fx))
 
@@ -2184,13 +2206,15 @@ final:      d2 = Date.Now
             Next
 
             L = (1 - Rt) * sumpi
+
+            If L > 1.0# Then L = 1.0#
+            If L < 0.0# Then L = 0.0#
+
             V = 1 - L
 
             Dim eberror As Double = sumpi / sumeuipi - 1
 
-
-
-            Return eberror
+            Return eberror ^ 2
 
         End Function
 

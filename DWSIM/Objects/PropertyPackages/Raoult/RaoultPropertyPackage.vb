@@ -3,12 +3,12 @@
 '
 '    This file is part of DTL.
 '
-'    DWSIM is free software: you can redistribute it and/or modify
+'    DTL is free software: you can redistribute it and/or modify
 '    it under the terms of the GNU General Public License as published by
 '    the Free Software Foundation, either version 3 of the License, or
 '    (at your option) any later version.
 '
-'    DWSIM is distributed in the hope that it will be useful,
+'    DTL is distributed in the hope that it will be useful,
 '    but WITHOUT ANY WARRANTY; without even the implied warranty of
 '    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 '    GNU General Public License for more details.
@@ -31,10 +31,8 @@ Namespace DTL.SimulationObjects.PropertyPackages
         Public Shadows Const ClassId As String = "407A13EC-1C55-462a-AEA4-9709B11367B0"
 
         Private m_props As New DTL.SimulationObjects.PropertyPackages.Auxiliary.PROPS
-        Private m_pr As New DTL.SimulationObjects.PropertyPackages.Auxiliary.PengRobinson
         Private m_uni As New DTL.SimulationObjects.PropertyPackages.Auxiliary.Unifac
-        Private m_lk As New DTL.SimulationObjects.PropertyPackages.Auxiliary.LeeKesler
-        '<System.NonSerialized()> Private m_xn As DLLXnumbers.Xnumbers
+        Private m_id As New DTL.SimulationObjects.PropertyPackages.Auxiliary.Ideal
 
         Public Sub New(ByVal comode As Boolean)
             MyBase.New(comode)
@@ -53,7 +51,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
             MyBase.ReconfigureConfigForm()
         End Sub
 
-#Region "    DWSIM Functions"
+#Region "    DTL Functions"
 
         Public Overrides Function DW_CalcCp_ISOL(ByVal fase1 As DTL.SimulationObjects.PropertyPackages.Fase, ByVal T As Double, ByVal P As Double) As Double
             Return Me.AUX_CPm(fase1, T)
@@ -63,8 +61,8 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
             Dim HM, HV, HL As Double
 
-            HL = Me.H_RA_MIX("L", T, P, RET_VMOL(Fase.Liquid), RET_VKij(), RET_VTC, RET_VPC, RET_VW, RET_VMM, Me.RET_Hid(298.15, T, Fase.Liquid))
-            HV = Me.H_RA_MIX("V", T, P, RET_VMOL(Fase.Vapor), RET_VKij(), RET_VTC, RET_VPC, RET_VW, RET_VMM, Me.RET_Hid(298.15, T, Fase.Vapor))
+            HL = Me.m_id.H_RA_MIX("L", T, P, RET_VMOL(Fase.Liquid), RET_VKij(), RET_VTC, RET_VPC, RET_VW, RET_VMM, Me.RET_Hid(298.15, T, Fase.Liquid), Me.RET_VHVAP(T))
+            HV = Me.m_id.H_RA_MIX("V", T, P, RET_VMOL(Fase.Vapor), RET_VKij(), RET_VTC, RET_VPC, RET_VW, RET_VMM, Me.RET_Hid(298.15, T, Fase.Vapor), Me.RET_VHVAP(T))
             HM = Me.CurrentMaterialStream.Fases(1).SPMProperties.massfraction.GetValueOrDefault * HL + Me.CurrentMaterialStream.Fases(2).SPMProperties.massfraction.GetValueOrDefault * HV
 
             Dim ent_massica = HM
@@ -143,36 +141,44 @@ Namespace DTL.SimulationObjects.PropertyPackages
                     result = 0.0#
                     Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.compressibilityFactor = result
                 Case "heatcapacity", "heatcapacitycp"
-                    resultObj = CpCv(state, T, P, RET_VMOL(phase), RET_VKij(), RET_VMAS(phase), RET_VTC(), RET_VPC(), RET_VCP(T), RET_VMM(), RET_VW(), RET_VZRa())
-                    Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.heatCapacityCp = resultObj(1)
+                    If state = "L" Then
+                        result = Me.AUX_LIQCPm(T, phaseID)
+                    Else
+                        result = Me.AUX_CPm(phase, T)
+                    End If
+                    Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.heatCapacityCp = result
                 Case "heatcapacitycv"
-                    resultObj = CpCv(state, T, P, RET_VMOL(phase), RET_VKij(), RET_VMAS(phase), RET_VTC(), RET_VPC(), RET_VCP(T), RET_VMM(), RET_VW(), RET_VZRa())
-                    Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.heatCapacityCv = resultObj(2)
+                    If state = "L" Then
+                        result = Me.AUX_LIQCPm(T, phaseID)
+                    Else
+                        result = Me.AUX_CPm(phase, T) - 8.314 / Me.AUX_MMM(phase)
+                    End If
+                    Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.heatCapacityCv = result
                 Case "enthalpy", "enthalpynf"
-                    result = H_RA_MIX(state, T, P, RET_VMOL(phase), RET_VKij, RET_VTC(), RET_VPC(), RET_VW(), RET_VMM(), Me.RET_Hid(298.15, T, phase))
+                    result = m_id.H_RA_MIX(state, T, P, RET_VMOL(phase), RET_VKij, RET_VTC(), RET_VPC(), RET_VW(), RET_VMM(), Me.RET_Hid(298.15, T, phase), Me.RET_VHVAP(T))
                     Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.enthalpy = result
                     result = Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.enthalpy.GetValueOrDefault * Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.molecularWeight.GetValueOrDefault
                     Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.molar_enthalpy = result
                 Case "entropy", "entropynf"
-                    result = S_RA_MIX(state, T, P, RET_VMOL(phase), RET_VKij, RET_VTC(), RET_VPC(), RET_VW(), RET_VMM(), Me.RET_Sid(298.15, T, P, phase))
+                    result = m_id.S_RA_MIX(state, T, P, RET_VMOL(phase), RET_VKij, RET_VTC(), RET_VPC(), RET_VW(), RET_VMM(), Me.RET_Sid(298.15, T, P, phase), Me.RET_VHVAP(T), Me.RET_Hid(298.15, T, phase))
                     Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.entropy = result
                     result = Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.entropy.GetValueOrDefault * Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.molecularWeight.GetValueOrDefault
                     Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.molar_entropy = result
                 Case "excessenthalpy"
-                    result = H_RA_MIX(state, T, P, RET_VMOL(phase), RET_VKij, RET_VTC(), RET_VPC(), RET_VW(), RET_VMM(), 0)
+                    result = m_id.H_RA_MIX(state, T, P, RET_VMOL(phase), RET_VKij, RET_VTC(), RET_VPC(), RET_VW(), RET_VMM(), 0, Me.RET_VHVAP(T))
                     Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.excessEnthalpy = result
                 Case "excessentropy"
-                    result = S_RA_MIX(state, T, P, RET_VMOL(phase), RET_VKij, RET_VTC(), RET_VPC(), RET_VW(), RET_VMM(), 0)
+                    result = m_id.S_RA_MIX(state, T, P, RET_VMOL(phase), RET_VKij, RET_VTC(), RET_VPC(), RET_VW(), RET_VMM(), 0, Me.RET_VHVAP(T), Me.RET_Hid(298.15, T, phase))
                     Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.excessEntropy = result
                 Case "enthalpyf"
                     Dim entF As Double = Me.AUX_HFm25(phase)
-                    result = H_RA_MIX(state, T, P, RET_VMOL(phase), RET_VKij, RET_VTC(), RET_VPC(), RET_VW(), RET_VMM(), Me.RET_Hid(298.15, T, phase))
+                    result = m_id.H_RA_MIX(state, T, P, RET_VMOL(phase), RET_VKij, RET_VTC(), RET_VPC(), RET_VW(), RET_VMM(), Me.RET_Hid(298.15, T, phase), Me.RET_VHVAP(T))
                     Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.enthalpyF = result + entF
                     result = Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.enthalpyF.GetValueOrDefault * Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.molecularWeight.GetValueOrDefault
                     Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.molar_enthalpyF = result
                 Case "entropyf"
                     Dim entF As Double = Me.AUX_SFm25(phase)
-                    result = S_RA_MIX(state, T, P, RET_VMOL(phase), RET_VKij, RET_VTC(), RET_VPC(), RET_VW(), RET_VMM(), Me.RET_Sid(298.15, T, P, phase))
+                    result = m_id.S_RA_MIX(state, T, P, RET_VMOL(phase), RET_VKij, RET_VTC(), RET_VPC(), RET_VW(), RET_VMM(), Me.RET_Sid(298.15, T, P, phase), Me.RET_VHVAP(T), Me.RET_Hid(298.15, T, phase))
                     Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.entropyF = result + entF
                     result = Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.entropyF.GetValueOrDefault * Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.molecularWeight.GetValueOrDefault
                     Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.molar_entropyF = result
@@ -200,9 +206,9 @@ Namespace DTL.SimulationObjects.PropertyPackages
                     End If
                     Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.density = result
                 Case "surfacetension"
-                    Me.DW_CalcTwoPhaseProps(Fase.Mixture, Fase.Mixture)
+                    Me.CurrentMaterialStream.Fases(0).TPMProperties.surfaceTension = Me.AUX_SURFTM(T)
                 Case Else
-                    Dim ex As Exception = New NotImplementedException
+                    Dim ex As Exception = New Exception
                     ThrowCAPEException(ex, "Error", ex.Message, "ICapeThermoMaterial", ex.Source, ex.StackTrace, "CalcSinglePhaseProp/CalcTwoPhaseProp/CalcProp", ex.GetHashCode)
             End Select
 
@@ -266,15 +272,15 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
                 result = Me.AUX_LIQDENS(T, P, 0.0#, phaseID, False)
                 Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.density = result
-                result = Me.H_RA_MIX("L", T, P, RET_VMOL(dwpl), RET_VKij, RET_VTC(), RET_VPC(), RET_VW(), RET_VMM(), Me.RET_Hid(298.15, T, dwpl))
+                result = Me.m_id.H_RA_MIX("L", T, P, RET_VMOL(dwpl), RET_VKij, RET_VTC(), RET_VPC(), RET_VW(), RET_VMM(), Me.RET_Hid(298.15, T, dwpl), Me.RET_VHVAP(T))
                 Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.enthalpy = result
-                result = Me.S_RA_MIX("L", T, P, RET_VMOL(dwpl), RET_VKij, RET_VTC(), RET_VPC(), RET_VW(), RET_VMM(), Me.RET_Sid(298.15, T, P, dwpl))
+                result = Me.m_id.S_RA_MIX("L", T, P, RET_VMOL(dwpl), RET_VKij, RET_VTC(), RET_VPC(), RET_VW(), RET_VMM(), Me.RET_Sid(298.15, T, P, dwpl), Me.RET_VHVAP(T), Me.RET_Hid(298.15, T, dwpl))
                 Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.entropy = result
                 result = 0
                 Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.compressibilityFactor = result
-                resultObj = Me.CpCv("L", T, P, RET_VMOL(dwpl), RET_VKij(), RET_VMAS(dwpl), RET_VTC(), RET_VPC(), RET_VCP(T), RET_VMM(), RET_VW(), RET_VZRa())
-                Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.heatCapacityCp = resultObj(1)
-                Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.heatCapacityCv = resultObj(2)
+                resultObj = Me.m_id.CpCv("L", T, P, RET_VMOL(dwpl), RET_VKij(), RET_VMAS(dwpl), RET_VTC(), RET_VPC(), RET_VCP(T), RET_VMM(), RET_VW(), RET_VZRa())
+                Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.heatCapacityCp = Me.AUX_LIQCPm(T, phaseID)
+                Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.heatCapacityCv = Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.heatCapacityCp.GetValueOrDefault
                 result = Me.AUX_MMM(fase)
                 Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.molecularWeight = result
                 result = Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.enthalpy.GetValueOrDefault * Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.molecularWeight.GetValueOrDefault
@@ -291,16 +297,15 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
                 result = Me.AUX_VAPDENS(T, P)
                 Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.density = result
-                result = Me.H_RA_MIX("V", T, P, RET_VMOL(fase.Vapor), RET_VKij, RET_VTC(), RET_VPC(), RET_VW(), RET_VMM(), Me.RET_Hid(298.15, T, fase.Vapor))
+                result = Me.m_id.H_RA_MIX("V", T, P, RET_VMOL(fase.Vapor), RET_VKij, RET_VTC(), RET_VPC(), RET_VW(), RET_VMM(), Me.RET_Hid(298.15, T, fase.Vapor), Me.RET_VHVAP(T))
                 Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.enthalpy = result
-                result = Me.S_RA_MIX("V", T, P, RET_VMOL(fase.Vapor), RET_VKij, RET_VTC(), RET_VPC(), RET_VW(), RET_VMM(), Me.RET_Sid(298.15, T, P, fase.Vapor))
+                result = Me.m_id.S_RA_MIX("V", T, P, RET_VMOL(fase.Vapor), RET_VKij, RET_VTC(), RET_VPC(), RET_VW(), RET_VMM(), Me.RET_Sid(298.15, T, P, fase.Vapor), Me.RET_VHVAP(T), Me.RET_Hid(298.15, T, fase.Vapor))
                 Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.entropy = result
                 result = 1
                 Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.compressibilityFactor = result
                 result = Me.AUX_CPm(PropertyPackages.Fase.Vapor, T)
-                resultObj = Me.CpCv("V", T, P, RET_VMOL(PropertyPackages.Fase.Vapor), RET_VKij(), RET_VMAS(PropertyPackages.Fase.Vapor), RET_VTC(), RET_VPC(), RET_VCP(T), RET_VMM(), RET_VW(), RET_VZRa())
-                Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.heatCapacityCp = resultObj(1)
-                Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.heatCapacityCv = resultObj(2)
+                Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.heatCapacityCp = Me.AUX_CPm(fase.Vapor, T)
+                Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.heatCapacityCv = Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.heatCapacityCp.GetValueOrDefault - 8.314 / Me.AUX_MMM(fase.Vapor)
                 result = Me.AUX_MMM(fase)
                 Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.molecularWeight = result
                 result = Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.enthalpy.GetValueOrDefault * Me.CurrentMaterialStream.Fases(phaseID).SPMProperties.molecularWeight.GetValueOrDefault
@@ -337,6 +342,15 @@ Namespace DTL.SimulationObjects.PropertyPackages
         Public Overrides Function DW_CalcPVAP_ISOL(ByVal T As Double) As Double
             Return Me.m_props.Pvp_leekesler(T, Me.RET_VTC(Fase.Liquid), Me.RET_VPC(Fase.Liquid), Me.RET_VW(Fase.Liquid))
         End Function
+
+        Public Overrides Sub DW_CalcTwoPhaseProps(ByVal fase1 As DTL.SimulationObjects.PropertyPackages.Fase, ByVal fase2 As DTL.SimulationObjects.PropertyPackages.Fase)
+
+            Dim T As Double
+
+            T = Me.CurrentMaterialStream.Fases(0).SPMProperties.temperature
+            Me.CurrentMaterialStream.Fases(0).TPMProperties.surfaceTension = Me.AUX_SURFTM(T)
+
+        End Sub
 
         Public Overrides Sub DW_CalcVazaoMassica()
             With Me.CurrentMaterialStream
@@ -422,90 +436,6 @@ Namespace DTL.SimulationObjects.PropertyPackages
 #End Region
 
 #Region "    Extras"
-
-        Function H_RA_MIX(ByVal TIPO As String, ByVal T As Double, ByVal P As Double, ByVal Vz As Object, ByVal VKij As Object, ByVal VTc As Object, ByVal VPc As Object, ByVal Vw As Object, ByVal VMM As Object, ByVal Hid As Double) As Double
-
-            Dim i, n As Integer
-
-            n = UBound(Vz)
-
-            Dim R, DHres As Double
-
-            R = 8.314
-
-            i = 0
-            Dim MMm = 0
-            Do
-                MMm += Vz(i) * VMM(i)
-                i += 1
-            Loop Until i = n + 1
-
-            If TIPO = "L" Then
-
-                Dim val As Double
-                i = 0
-                Dim subst As DTL.ClassesBasicasTermodinamica.Substancia
-                For Each subst In Me.CurrentMaterialStream.Fases(0).Componentes.Values
-                    If T / VTc(i) <= 1 Then val += Vz(i) * Me.AUX_HVAPi(subst.Nome, T) * VMM(i)
-                    i += 1
-                Next
-
-                DHres = -val
-
-            Else
-
-                DHres = 0
-
-            End If
-
-            H_RA_MIX = Hid + DHres / MMm '/ 1000
-
-        End Function
-
-        Function S_RA_MIX(ByVal TIPO As String, ByVal T As Double, ByVal P As Double, ByVal Vz As Array, ByVal VKij As Object, ByVal VTc As Array, ByVal VPc As Array, ByVal Vw As Array, ByVal VMM As Array, ByVal Sid As Double) As Double
-
-            If TIPO = "L" Then
-                Return Sid + Me.H_RA_MIX(TIPO, T, P, Vz, VKij, VTc, VPc, Vw, VMM, Me.RET_Hid(298.15, T, Vz)) / T
-            Else
-                Return Sid + Me.H_RA_MIX(TIPO, T, P, Vz, VKij, VTc, VPc, Vw, VMM, Me.RET_Hid(298.15, T, Vz)) / T
-            End If
-
-        End Function
-
-        Function CpCv(ByVal TIPO, ByVal T, ByVal P, ByVal Vz, ByVal VKij, ByVal Vzmass, ByVal VTc, ByVal VPc, ByVal VCpig, ByVal VMM, ByVal Vw, ByVal VZRa)
-
-            Dim n As Double
-            Dim i As Integer
-
-            n = UBound(Vz)
-
-            i = 0
-            Dim MMm = 0
-            Do
-                MMm += Vz(i) * VMM(i)
-                i += 1
-            Loop Until i = n + 1
-
-            Dim Cpm_ig = 0
-            i = 0
-            Do
-                Cpm_ig += Vzmass(i) * VCpig(i) * MMm
-                i += 1
-            Loop Until i = n + 1
-
-            Dim Cv = Cpm_ig - 8.314
-            Dim Cp = Cpm_ig
-
-            Dim Cp_Cv2 = Cp / Cv
-
-            Dim tmp(2) As Double
-            tmp(0) = Cp_Cv2
-            tmp(1) = Cp / MMm
-            tmp(2) = Cv / MMm
-
-            CpCv = tmp
-
-        End Function
 
 #End Region
 
@@ -615,9 +545,9 @@ Namespace DTL.SimulationObjects.PropertyPackages
             Dim H As Double
 
             If st = State.Liquid Then
-                H = Me.H_RA_MIX("L", T, P, Vx, RET_VKij(), RET_VTC, RET_VPC, RET_VW, RET_VMM, Me.RET_Hid(298.15, T, Vx))
+                H = Me.m_id.H_RA_MIX("L", T, P, Vx, RET_VKij(), RET_VTC, RET_VPC, RET_VW, RET_VMM, Me.RET_Hid(298.15, T, Vx), Me.RET_VHVAP(T))
             Else
-                H = Me.H_RA_MIX("V", T, P, Vx, RET_VKij(), RET_VTC, RET_VPC, RET_VW, RET_VMM, Me.RET_Hid(298.15, T, Vx))
+                H = Me.m_id.H_RA_MIX("V", T, P, Vx, RET_VKij(), RET_VTC, RET_VPC, RET_VW, RET_VMM, Me.RET_Hid(298.15, T, Vx), Me.RET_VHVAP(T))
             End If
 
             Return H
@@ -628,9 +558,9 @@ Namespace DTL.SimulationObjects.PropertyPackages
             Dim H As Double
 
             If st = State.Liquid Then
-                H = Me.H_RA_MIX("L", T, P, Vx, RET_VKij(), RET_VTC, RET_VPC, RET_VW, RET_VMM, 0)
+                H = Me.m_id.H_RA_MIX("L", T, P, Vx, RET_VKij(), RET_VTC, RET_VPC, RET_VW, RET_VMM, 0, Me.RET_VHVAP(T))
             Else
-                H = Me.H_RA_MIX("V", T, P, Vx, RET_VKij(), RET_VTC, RET_VPC, RET_VW, RET_VMM, 0)
+                H = Me.m_id.H_RA_MIX("V", T, P, Vx, RET_VKij(), RET_VTC, RET_VPC, RET_VW, RET_VMM, 0, Me.RET_VHVAP(T))
             End If
 
             Return H
@@ -685,9 +615,9 @@ Namespace DTL.SimulationObjects.PropertyPackages
             Dim S As Double
 
             If st = State.Liquid Then
-                S = Me.S_RA_MIX("L", T, P, Vx, RET_VKij(), RET_VTC, RET_VPC, RET_VW, RET_VMM, Me.RET_Sid(298.15, T, P, Vx))
+                S = Me.m_id.S_RA_MIX("L", T, P, Vx, RET_VKij(), RET_VTC, RET_VPC, RET_VW, RET_VMM, Me.RET_Sid(298.15, T, P, Vx), Me.RET_VHVAP(T), Me.RET_Hid(298.15, T, Vx))
             Else
-                S = Me.S_RA_MIX("V", T, P, Vx, RET_VKij(), RET_VTC, RET_VPC, RET_VW, RET_VMM, Me.RET_Sid(298.15, T, P, Vx))
+                S = Me.m_id.S_RA_MIX("V", T, P, Vx, RET_VKij(), RET_VTC, RET_VPC, RET_VW, RET_VMM, Me.RET_Sid(298.15, T, P, Vx), Me.RET_VHVAP(T), Me.RET_Hid(298.15, T, Vx))
             End If
 
             Return S
@@ -698,9 +628,9 @@ Namespace DTL.SimulationObjects.PropertyPackages
             Dim S As Double
 
             If st = State.Liquid Then
-                S = Me.S_RA_MIX("L", T, P, Vx, RET_VKij(), RET_VTC, RET_VPC, RET_VW, RET_VMM, 0)
+                S = Me.m_id.S_RA_MIX("L", T, P, Vx, RET_VKij(), RET_VTC, RET_VPC, RET_VW, RET_VMM, 0, Me.RET_VHVAP(T), Me.RET_Hid(298.15, T, Vx))
             Else
-                S = Me.S_RA_MIX("V", T, P, Vx, RET_VKij(), RET_VTC, RET_VPC, RET_VW, RET_VMM, 0)
+                S = Me.m_id.S_RA_MIX("V", T, P, Vx, RET_VKij(), RET_VTC, RET_VPC, RET_VW, RET_VMM, 0, Me.RET_VHVAP(T), Me.RET_Hid(298.15, T, Vx))
             End If
 
             Return S

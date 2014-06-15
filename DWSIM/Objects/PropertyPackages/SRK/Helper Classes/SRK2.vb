@@ -1,3 +1,21 @@
+'    Soave-Redlich-Kwong Property Package 
+'    Copyright 2008-2014 Daniel Wagner O. de Medeiros
+'
+'    This file is part of DWSIM.
+'
+'    DWSIM is free software: you can redistribute it and/or modify
+'    it under the terms of the GNU General Public License as published by
+'    the Free Software Foundation, either version 3 of the License, or
+'    (at your option) any later version.
+'
+'    DWSIM is distributed in the hope that it will be useful,
+'    but WITHOUT ANY WARRANTY; without even the implied warranty of
+'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+'    GNU General Public License for more details.
+'
+'    You should have received a copy of the GNU General Public License
+'    along with DWSIM.  If not, see <http://www.gnu.org/licenses/>.
+
 Imports DTL.DTL.MathEx
 
 Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
@@ -6,7 +24,102 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
 
         Inherits DTL.SimulationObjects.PropertyPackages.ThermoPlug
 
-        Function ZtoMinG(ByVal Z_ As Array, ByVal T As Double, ByVal P As Double, ByVal Vz As Array, ByVal VKij As Object, ByVal VTc As Array, ByVal VPc As Array, ByVal Vw As Array) As Object
+        Shared Function ReturnParameters(ByVal T As Double, ByVal P As Double, ByVal Vx As Array, ByVal VKij As Object, ByVal VTc As Array, ByVal VPc As Array, ByVal Vw As Array)
+
+            Dim n, R, coeff(3) As Double
+            Dim Vant(0, 4) As Double
+            Dim criterioOK As Boolean = False
+            Dim AG, BG, aml, bml As Double
+
+            n = UBound(Vx)
+
+            Dim ai(n), bi(n), ci(n), tmp(n + 1), a(n, n), b(n, n)
+            Dim aml2(n), amv2(n), LN_CF(n), PHI(n) As Double
+            Dim Tc(n), Pc(n), W(n), alpha(n), m(n), Tr(n)
+
+            R = 8.314
+
+            Dim i, j As Integer
+            i = 0
+            Do
+                Tc(i) = VTc(i)
+                Tr(i) = T / Tc(i)
+                Pc(i) = VPc(i)
+                W(i) = Vw(i)
+                i = i + 1
+            Loop Until i = n + 1
+
+            i = 0
+            Do
+                alpha(i) = (1 + (0.48 + 1.574 * W(i) - 0.176 * W(i) ^ 2) * (1 - (T / Tc(i)) ^ 0.5)) ^ 2
+                ai(i) = 0.42748 * alpha(i) * R ^ 2 * Tc(i) ^ 2 / Pc(i)
+                bi(i) = 0.08664 * R * Tc(i) / Pc(i)
+                ci(i) = 0.48 + 1.574 * W(i) - 0.176 * W(i) ^ 2
+                i = i + 1
+            Loop Until i = n + 1
+
+            i = 0
+            Do
+                j = 0
+                Do
+                    a(i, j) = (ai(i) * ai(j)) ^ 0.5 * (1 - VKij(i, j))
+                    j = j + 1
+                Loop Until j = n + 1
+                i = i + 1
+            Loop Until i = n + 1
+
+            i = 0
+            Do
+                aml2(i) = 0
+                i = i + 1
+            Loop Until i = n + 1
+
+            i = 0
+            aml = 0
+            Do
+                j = 0
+                Do
+                    aml = aml + Vx(i) * Vx(j) * a(i, j)
+                    aml2(i) = aml2(i) + Vx(j) * a(j, i)
+                    j = j + 1
+                Loop Until j = n + 1
+                i = i + 1
+            Loop Until i = n + 1
+
+            i = 0
+            bml = 0
+            Do
+                bml = bml + Vx(i) * bi(i)
+                i = i + 1
+            Loop Until i = n + 1
+
+            AG = aml * P / (R * T) ^ 2
+            BG = bml * P / (R * T)
+
+            Dim _zarray As ArrayList, _mingz As Object, Z As Double
+            _zarray = CalcZ(T, P, Vx, VKij, VTc, VPc, Vw)
+            _mingz = ZtoMinG(_zarray.ToArray, T, P, Vx, VKij, VTc, VPc, Vw)
+            Z = _zarray(_mingz(0))
+
+            Dim aux1 = -R / 2 * (0.45724 / T) ^ 0.5
+            i = 0
+            Dim aux2 = 0
+            Do
+                j = 0
+                Do
+                    aux2 += Vx(i) * Vx(j) * (1 - VKij(i, j)) * (ci(j) * (ai(i) * Tc(j) / Pc(j)) ^ 0.5 + ci(i) * (ai(j) * Tc(i) / Pc(i)) ^ 0.5)
+                    j = j + 1
+                Loop Until j = n + 1
+                i = i + 1
+            Loop Until i = n + 1
+
+            Dim dadT = aux1 * aux2
+
+            Return New Double() {aml, bml, Z * R * T / P, dadT}
+
+        End Function
+
+        Shared Function ZtoMinG(ByVal Z_ As Array, ByVal T As Double, ByVal P As Double, ByVal Vz As Array, ByVal VKij As Object, ByVal VTc As Array, ByVal VPc As Array, ByVal Vw As Array) As Object
 
             Dim S, H, Z As Double
 
@@ -38,6 +151,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
                 alpha(i) = (1 + (0.48 + 1.574 * w(i) - 0.176 * w(i) ^ 2) * (1 - (T / Tc(i)) ^ 0.5)) ^ 2
                 ai(i) = 0.42748 * alpha(i) * R ^ 2 * Tc(i) ^ 2 / Pc(i)
                 bi(i) = 0.08664 * R * Tc(i) / Pc(i)
+                ci(i) = 0.48 + 1.574 * w(i) - 0.176 * w(i) ^ 2
                 i = i + 1
             Loop Until i = n + 1
 
@@ -204,22 +318,19 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
             _zarray = CalcZ(T, P, Vx, VKij, VTc, VPc, Vw)
             If forcephase <> "" Then
                 If forcephase = "L" Then
-                    Try
-                        Z = Common.Min(_zarray.ToArray())
-                    Catch ex As Exception
-                        Throw New ArgumentException("SRK fugacity calculation error: unable to find Z for liquid phase at " & T & " K and " & P & " Pa. " & ex.Message.ToString, ex)
-                    End Try
+                    Z = Common.Min(_zarray.ToArray())
                 ElseIf forcephase = "V" Then
-                    Try
-                        Z = Common.Max(_zarray.ToArray())
-                    Catch ex As Exception
-                        Throw New ArgumentException("SRK fugacity calculation error: unable to find Z for vapor phase at " & T & " K and " & P & " Pa. " & ex.Message.ToString, ex)
-                    End Try
+                    Z = Common.Max(_zarray.ToArray())
                 End If
             Else
                 _mingz = ZtoMinG(_zarray.ToArray, T, P, Vx, VKij, VTc, VPc, Vw)
                 Z = _zarray(_mingz(0))
             End If
+
+            Dim Pcorr As Double = P
+            Dim ZP As Double() = CheckRoot(Z, aml, bml, P, T, forcephase)
+            Z = ZP(0)
+            Pcorr = ZP(1)
 
             i = 0
             Do
@@ -228,7 +339,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
                 t3 = AG * (2 * aml2(i) / aml - bi(i) / bml)
                 t4 = Math.Log((Z + BG) / Z)
                 t5 = BG
-                LN_CF(i) = t1 + t2 - (t3 * t4 / t5)
+                LN_CF(i) = t1 + t2 - (t3 * t4 / t5) + Math.Log(Pcorr / P)
                 i = i + 1
             Loop Until i = n + 1
 
@@ -236,7 +347,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
 
         End Function
 
-        Function CalcZ(ByVal T, ByVal P, ByVal Vx, ByVal VKij, ByVal VTc, ByVal VPc, ByVal Vw) As ArrayList
+        Shared Function CalcZ(ByVal T, ByVal P, ByVal Vx, ByVal VKij, ByVal VTc, ByVal VPc, ByVal Vw) As ArrayList
 
             Dim ai(), bi(), aml2(), amv2() As Double
             Dim n, R, coeff(3), tmp() As Double
@@ -317,7 +428,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
 
             Dim result As New ArrayList
 
-            Try
+            If Not IsNumeric(temp1) Then
 
                 If temp1(0, 0) > temp1(1, 0) Then
                     tv = temp1(1, 0)
@@ -352,7 +463,11 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
                     End If
                 End If
 
-            Catch ex As Exception
+                If temp1(0, 1) = 0.0# And temp1(0, 0) > 0.0# Then result.Add(temp1(0, 0))
+                If temp1(1, 1) = 0.0# And temp1(1, 0) > 0.0# Then result.Add(temp1(1, 0))
+                If temp1(2, 1) = 0.0# And temp1(2, 0) > 0.0# Then result.Add(temp1(2, 0))
+
+            Else
 
                 Dim findZV
                 Dim lc As Integer = 0
@@ -368,11 +483,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
 
                 Return result
 
-            End Try
-
-            If temp1(0, 1) = 0 Then result.Add(temp1(0, 0))
-            If temp1(1, 1) = 0 Then result.Add(temp1(1, 0))
-            If temp1(2, 1) = 0 Then result.Add(temp1(2, 0))
+            End If
 
             Return result
 
@@ -1304,6 +1415,174 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
             Return LN_CF
 
         End Function
+
+        ''' <summary>
+        ''' This procedure checks if the compressibility factor is within the allowable region for the specified phase. 
+        ''' If not, it generates a pseudo-root cabable of generate properties for the specified phase in order to keep 
+        ''' the flash convergence process going forward.
+        ''' </summary>
+        ''' <param name="Z">The calculated compressibility factor, coming from the EOS</param>
+        ''' <param name="a">EOS 'a' mixture parameter</param>
+        ''' <param name="b">EOS 'b' mixture parameter</param>
+        ''' <param name="P">Pressure in Pa</param>
+        ''' <param name="T">Temperature in K</param>
+        ''' <param name="phaselabel">'L' for Liquid, 'V' for Vapor.</param>
+        ''' <returns>A vector containing the calculated compressibility factor and pressure, if required. 
+        ''' If the given compressibility factor is within the allowable range, it is returned together with 
+        ''' the specified pressure (no pseudoroot calculation is required).</returns>
+        ''' <remarks>This procedure is based on the paper: 
+        ''' Mathias, P. M., Boston, J. F. and Watanasiri, S. (1984), 
+        ''' Effective utilization of equations of state for thermodynamic properties in process simulation. 
+        ''' AIChE J., 30: 182–186. doi: 10.1002/aic.690300203</remarks>
+        Public Shared Function CheckRoot(Z As Double, a As Double, b As Double, P As Double, T As Double, phaselabel As String) As Double()
+
+            If a * b = 0.0# Then Return New Double() {Z, P}
+
+            Dim rho, dPdrho, R, Pnew, P_, rho_, Tmc,
+                Zcorr, rhomax, rhomin, rhomc, dPdrholim, C0, C1, rho2 As Double
+            Dim i As Integer
+
+            R = 8.314
+
+            Tmc = 0.20268 * a / (R * b)
+            If T > Tmc Then T = Tmc * 0.9
+
+            rho = P / (Z * R * T)
+
+            dPdrholim = 0.1 * R * T
+
+            'find rhomax
+
+            Dim fx, dfdx As Double
+            rhomax = rho
+            i = 0
+            Do
+                fx = -(1 - b ^ 2 * rhomax ^ 2) / (a * b * rhomax ^ 3 + (b * R * T - a) * rhomax ^ 2 + R * T * rhomax)
+                dfdx = (R * T * (b * rhomax + 1) ^ 2 - a * rhomax * (b * rhomax - 1) ^ 2 * (b * rhomax + 2)) / (rhomax ^ 2 * (a * rhomax * (b * rhomax - 1) + R * (b * T * rhomax + T)) ^ 2)
+                rhomax = rhomax - 0.7 * fx / dfdx
+                If rhomax < 0 Then rhomax = -rhomax
+                i += 1
+            Loop Until Math.Abs(fx) < 0.000001 Or i = 100
+
+            'find rhomin
+
+            rhomin = rho
+            i = 0
+            Do
+                fx = (a * b * rhomin ^ 3 + (b * R * T - a) * rhomin ^ 2 + R * T * rhomin) / (1 - b ^ 2 * rhomin ^ 2)
+                dfdx = (R * T * (b * rhomin + 1) ^ 2 - a * rhomin * (b * rhomin - 1) ^ 2 * (b * rhomin + 2)) / (b ^ 2 * rhomin ^ 2 - 1) ^ 2
+                rhomin = rhomin - 0.7 * fx / dfdx
+                If rhomin < 0 Then rhomin = -rhomin
+                i += 1
+            Loop Until Math.Abs(fx) < 0.000001 Or i = 100
+
+            'find rhomc
+
+            i = 0
+            rhomc = (rhomax - rhomin) / 2
+            Do
+                fx = -(2 * (a * (b * rhomc - 1) ^ 3 + b * R * T * (b * rhomc + 1) ^ 3)) / (b ^ 2 * rhomc ^ 2 - 1) ^ 3
+                dfdx = (2 * (3 * a * rhomc * (b * rhomc - 1) ^ 4 + R * T * (b * rhomc + 1) ^ 4 * (2 * b * rhomc + 1))) / (b ^ 2 * rhomc ^ 2 - 1) ^ 4
+                rhomc = rhomc - 0.7 * fx / dfdx
+                i += 1
+            Loop Until Math.Abs(fx) < 0.000001 Or i = 100
+
+            dPdrho = (R * T * (b * rho + 1) ^ 2 - a * rho * (b * rho - 1) ^ 2 * (b * rho + 2)) / (b ^ 2 * rho ^ 2 - 1) ^ 2
+
+            If phaselabel = "L" Then
+                If dPdrho > dPdrholim And rho > rhomc Then
+                    Return New Double() {Z, P}
+                End If
+            Else
+                If dPdrho > dPdrholim Then
+                    Return New Double() {Z, P}
+                End If
+            End If
+
+            If phaselabel = "L" Then
+
+                'find rho*, P*
+
+                i = 0
+                rho_ = rhomc * 1.1
+                Do
+                    fx = -0.1 * R * T + (R * T * (b * rho_ + 1) ^ 2 - a * rho_ * (b * rho_ - 1) ^ 2 * (b * rho_ + 2)) / (b ^ 2 * rho_ ^ 2 - 1) ^ 2
+                    dfdx = -(2 * (a * (b * rho_ - 1) ^ 3 + b * R * T * (b * rho_ + 1) ^ 3)) / (b ^ 2 * rho_ ^ 2 - 1) ^ 3
+                    rho_ = rho_ - fx / dfdx
+                    If rho_ < rhomc Then rho_ = rhomc * 1.02
+                    i += 1
+                Loop Until Math.Abs(fx) < 0.000001 Or i = 100
+
+                P_ = (a * b * rho_ ^ 3 + (b * R * T - a) * rho_ ^ 2 + R * T * rho_) / (1 - b ^ 2 * rho_ ^ 2)
+
+                C1 = 0.1 * R * T * (rho_ - 0.7 * rhomc)
+
+                C0 = P_ - C1 * Math.Log(rho_ - 0.7 * rhomc)
+
+                rho = 0.7 * rhomc + Math.Exp((P - C0) / C1)
+
+                Pnew = (a * b * rho ^ 3 + (b * R * T - a) * rho ^ 2 + R * T * rho) / (1 - b ^ 2 * rho ^ 2)
+
+                Zcorr = Pnew / (rho * R * T)
+
+                If Double.IsNaN(Zcorr) Or Double.IsNaN(Pnew) Or Double.IsInfinity(Zcorr) Or Double.IsInfinity(Pnew) Then
+                    Return New Double() {Z, P}
+                Else
+                    If Zcorr < 0.0# Or Pnew < 0.0# Then
+                        Return New Double() {Z, P}
+                    Else
+                        Return New Double() {Zcorr, Pnew}
+                    End If
+                End If
+
+            Else
+
+                'find rho*, P*
+
+                i = 0
+                rho_ = rhomc * 0.9
+                Do
+                    fx = -0.1 * R * T + (R * T * (b * rho_ + 1) ^ 2 - a * rho_ * (b * rho_ - 1) ^ 2 * (b * rho_ + 2)) / (b ^ 2 * rho_ ^ 2 - 1) ^ 2
+                    dfdx = -(2 * (a * (b * rho_ - 1) ^ 3 + b * R * T * (b * rho_ + 1) ^ 3)) / (b ^ 2 * rho_ ^ 2 - 1) ^ 3
+                    rho_ = rho_ - fx / dfdx
+                    If rho_ < rhomc Then rho_ = rhomc * 0.98
+                    i += 1
+                Loop Until Math.Abs(fx) < 0.000001 Or i = 100
+
+                P_ = (a * b * rho_ ^ 3 + (b * R * T - a) * rho_ ^ 2 + R * T * rho_) / (1 - b ^ 2 * rho_ ^ 2)
+
+                rho2 = (rho_ + rhomc) / 2
+
+                C0 = -2 * rho_ * rho2 ^ 2 / (0.1 * R * T * (rho_ ^ 2 - rho2 ^ 2))
+
+                C1 = 2 * rho_ / (0.1 * R * T * (rho_ ^ 2 - rho2 ^ 2))
+
+                rho = (((1 / P) - C0) / C1) ^ 0.5
+
+                Pnew = (a * b * rho ^ 3 + (b * R * T - a) * rho ^ 2 + R * T * rho) / (1 - b ^ 2 * rho ^ 2)
+
+                Zcorr = Pnew / (rho * R * T)
+
+                If Double.IsNaN(Zcorr) Or Double.IsNaN(Pnew) Or Double.IsInfinity(Zcorr) Or Double.IsInfinity(Pnew) Then
+                    Return New Double() {Z, P}
+                Else
+                    If Zcorr < 0.0# Or Pnew < 0.0# Then
+                        Return New Double() {Z, P}
+                    Else
+                        Return New Double() {Zcorr, Pnew}
+                    End If
+                End If
+
+            End If
+
+            'SRK EOS P=f(rho) derivatives
+            'P = (a * b * rho ^ 3 + (b * R * T - a) * rho ^ 2 + R * T * rho) / (1 - b ^ 2 * rho ^ 2)
+            'dPdrho = (R * T * (b * rho + 1) ^ 2 - a * rho * (b * rho - 1) ^ 2 * (b * rho + 2)) / (b ^ 2 * rho ^ 2 - 1) ^ 2
+            'd2Pdrho2 = -(2 * (a * (b * rho - 1) ^ 3 + b * R * T * (b * rho + 1) ^ 3)) / (b ^ 2 * rho ^ 2 - 1) ^ 3
+            'd3Pdrho3 = (2 * (3 * a * rho * (b * rho - 1) ^ 4 + R * T * (b * rho + 1) ^ 4 * (2 * b * rho + 1))) / (b ^ 2 * rho ^ 2 - 1) ^ 4
+
+        End Function
+
 
     End Class
 
