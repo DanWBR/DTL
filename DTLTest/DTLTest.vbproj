@@ -56,9 +56,6 @@
       <HintPath>..\DWSIM\References\Cudafy.NET.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="DWSIM.Thermodynamics">
-      <HintPath>..\DWSIM\bin\Release\DWSIM.Thermodynamics.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
@@ -104,6 +101,12 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DWSIM\DTL.vbproj">
+      <Project>{34be2d2d-9b3c-4c12-8c90-732e21cd7cb1}</Project>
+      <Name>DTL</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

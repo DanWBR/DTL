@@ -1221,17 +1221,6 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
             Me.CurrentMaterialStream.AtEquilibrium = False
 
-            If Not My.Application.CAPEOPENMode Then
-                Try
-                    Me._tpseverity = Me.CurrentMaterialStream.Flowsheet.Options.ThreePhaseFlashStabTestSeverity
-                    Me._tpcompids = Me.CurrentMaterialStream.Flowsheet.Options.ThreePhaseFlashStabTestCompIds
-                Catch ex As Exception
-                    Me._tpseverity = 0
-                    Me._tpcompids = New String() {}
-                Finally
-                End Try
-            End If
-
             Dim P, T, H, S, xv, xl, xl2, xs As Double
             Dim result As Object = Nothing
             Dim subst As DTL.ClassesBasicasTermodinamica.Substancia
@@ -1273,16 +1262,13 @@ Namespace DTL.SimulationObjects.PropertyPackages
                             Dim fge As Double = 0
                             Dim dge As Double = 0
 
-                            If Not My.Application.CAPEOPENMode Then
-                                If Me.CurrentMaterialStream.Flowsheet.Options.ValidateEquilibriumCalc _
-                                And Not Me.FlashAlgorithm = FlashMethod.NestedLoopsSLE _
-                                And Not Me.FlashAlgorithm = FlashMethod.NestedLoopsSLE_SS Then
+                            If Not Me.FlashAlgorithm = FlashMethod.NestedLoopsSLE _
+                            And Not Me.FlashAlgorithm = FlashMethod.NestedLoopsSLE_SS Then
 
-                                    ige = Me.DW_CalcGibbsEnergy(RET_VMOL(Fase.Mixture), T, P)
+                                ige = Me.DW_CalcGibbsEnergy(RET_VMOL(Fase.Mixture), T, P)
 
-                                End If
                             End If
-
+                           
                             result = Me.FlashBase.Flash_PT(RET_VMOL(Fase.Mixture), P, T, Me)
 
                             xl = result(0)
@@ -1295,74 +1281,67 @@ Namespace DTL.SimulationObjects.PropertyPackages
                             Dim Vx2 = result(6)
                             Dim Vs = result(8)
 
-                            If Not My.Application.CAPEOPENMode Then
-
-                                'identify phase
-                                If Me.CurrentMaterialStream.Flowsheet.Options.UsePhaseIdentificationAlgorithm Then
-                                    If Me.ComponentName.Contains("SRK") Or Me.ComponentName.Contains("PR") Then
-                                        If Not Me.AUX_IS_SINGLECOMP(Fase.Mixture) Then
-                                            Dim newphase, eos As String
-                                            If Me.ComponentName.Contains("SRK") Then eos = "SRK" Else eos = "PR"
-                                            If xv = 1.0# Or xl = 1.0# Then
-                                                If xv = 1.0# Then
-                                                    newphase = Auxiliary.FlashAlgorithms.FlashAlgorithm.IdentifyPhase(Vy, P, T, Me, eos)
-                                                    If newphase = "L" Then
-                                                        xv = 0.0#
-                                                        xl = 1.0#
-                                                        Vx = Vy
-                                                    End If
-                                                Else
-                                                    newphase = Auxiliary.FlashAlgorithms.FlashAlgorithm.IdentifyPhase(Vx, P, T, Me, eos)
-                                                    If newphase = "V" Then
-                                                        xv = 1.0#
-                                                        xl = 0.0#
-                                                        Vy = Vx
-                                                    End If
-                                                End If
-                                            Else
-                                                If xl2 = 0.0# Then
-                                                    newphase = Auxiliary.FlashAlgorithms.FlashAlgorithm.IdentifyPhase(Vy, P, T, Me, eos)
-                                                    If newphase = "L" Then
-                                                        xl2 = xv
-                                                        xv = 0.0#
-                                                        Vx2 = Vy
-                                                    End If
-                                                    newphase = Auxiliary.FlashAlgorithms.FlashAlgorithm.IdentifyPhase(Vx, P, T, Me, eos)
-                                                    If newphase = "V" Then
-                                                        xv = 1.0#
-                                                        xl = 0.0#
-                                                        xl2 = 0.0#
-                                                        Vy = RET_VMOL(Fase.Mixture)
-                                                    End If
-                                                ElseIf xv = 0.0# Then
-                                                    newphase = Auxiliary.FlashAlgorithms.FlashAlgorithm.IdentifyPhase(Vx2, P, T, Me, eos)
-                                                    If newphase = "V" Then
-                                                        xv = xl2
-                                                        xl2 = 0.0#
-                                                        Vy = Vx2
-                                                    End If
-                                                End If
+                            'identify phase
+                            If Me.ComponentName.Contains("SRK") Or Me.ComponentName.Contains("PR") Then
+                                If Not Me.AUX_IS_SINGLECOMP(Fase.Mixture) Then
+                                    Dim newphase, eos As String
+                                    If Me.ComponentName.Contains("SRK") Then eos = "SRK" Else eos = "PR"
+                                    If xv = 1.0# Or xl = 1.0# Then
+                                        If xv = 1.0# Then
+                                            newphase = Auxiliary.FlashAlgorithms.FlashAlgorithm.IdentifyPhase(Vy, P, T, Me, eos)
+                                            If newphase = "L" Then
+                                                xv = 0.0#
+                                                xl = 1.0#
+                                                Vx = Vy
+                                            End If
+                                        Else
+                                            newphase = Auxiliary.FlashAlgorithms.FlashAlgorithm.IdentifyPhase(Vx, P, T, Me, eos)
+                                            If newphase = "V" Then
+                                                xv = 1.0#
+                                                xl = 0.0#
+                                                Vy = Vx
+                                            End If
+                                        End If
+                                    Else
+                                        If xl2 = 0.0# Then
+                                            newphase = Auxiliary.FlashAlgorithms.FlashAlgorithm.IdentifyPhase(Vy, P, T, Me, eos)
+                                            If newphase = "L" Then
+                                                xl2 = xv
+                                                xv = 0.0#
+                                                Vx2 = Vy
+                                            End If
+                                            newphase = Auxiliary.FlashAlgorithms.FlashAlgorithm.IdentifyPhase(Vx, P, T, Me, eos)
+                                            If newphase = "V" Then
+                                                xv = 1.0#
+                                                xl = 0.0#
+                                                xl2 = 0.0#
+                                                Vy = RET_VMOL(Fase.Mixture)
+                                            End If
+                                        ElseIf xv = 0.0# Then
+                                            newphase = Auxiliary.FlashAlgorithms.FlashAlgorithm.IdentifyPhase(Vx2, P, T, Me, eos)
+                                            If newphase = "V" Then
+                                                xv = xl2
+                                                xl2 = 0.0#
+                                                Vy = Vx2
                                             End If
                                         End If
                                     End If
                                 End If
+                            End If
 
-                                If Me.CurrentMaterialStream.Flowsheet.Options.ValidateEquilibriumCalc _
-                                And Not Me.FlashAlgorithm = FlashMethod.NestedLoopsSLE _
-                                And Not Me.FlashAlgorithm = FlashMethod.NestedLoopsSLE_SS Then
+                            If Not Me.FlashAlgorithm = FlashMethod.NestedLoopsSLE _
+                            And Not Me.FlashAlgorithm = FlashMethod.NestedLoopsSLE_SS Then
 
-                                    fge = xl * Me.DW_CalcGibbsEnergy(Vx, T, P)
-                                    fge += xl2 * Me.DW_CalcGibbsEnergy(Vx2, T, P)
-                                    fge += xv * Me.DW_CalcGibbsEnergy(Vy, T, P)
+                                fge = xl * Me.DW_CalcGibbsEnergy(Vx, T, P)
+                                fge += xl2 * Me.DW_CalcGibbsEnergy(Vx2, T, P)
+                                fge += xv * Me.DW_CalcGibbsEnergy(Vy, T, P)
 
-                                    dge = fge - ige
+                                dge = fge - ige
 
-                                    Dim dgtol As Double = Me.CurrentMaterialStream.Flowsheet.Options.FlashValidationDGETolerancePct
+                                Dim dgtol As Double = 0.01
 
-                                    If dge > 0.0# And Math.Abs(dge / ige * 100) > Math.Abs(dgtol) Then
-                                        Throw New Exception(DTL.App.GetLocalString("InvalidFlashResult") & "(DGE = " & dge & " kJ/kg, " & Format(dge / ige * 100, "0.00") & "%)")
-                                    End If
-
+                                If dge > 0.0# And Math.Abs(dge / ige * 100) > Math.Abs(dgtol) Then
+                                    Throw New Exception(DTL.App.GetLocalString("InvalidFlashResult") & "(DGE = " & dge & " kJ/kg, " & Format(dge / ige * 100, "0.00") & "%)")
                                 End If
 
                             End If
@@ -1403,50 +1382,42 @@ Namespace DTL.SimulationObjects.PropertyPackages
                             i = 0
                             For Each subst In Me.CurrentMaterialStream.Fases(3).Componentes.Values
                                 subst.FracaoMolar = Vx(i)
+                                subst.FracaoMassica = Me.AUX_CONVERT_MOL_TO_MASS(Vx)(i)
                                 subst.FugacityCoeff = FCL(i)
                                 subst.ActivityCoeff = 0
                                 subst.PartialVolume = 0
                                 subst.PartialPressure = 0
                                 i += 1
                             Next
-                            For Each subst In Me.CurrentMaterialStream.Fases(3).Componentes.Values
-                                subst.FracaoMassica = Me.AUX_CONVERT_MOL_TO_MASS(subst.Nome, 3)
-                            Next
                             i = 0
                             For Each subst In Me.CurrentMaterialStream.Fases(4).Componentes.Values
                                 subst.FracaoMolar = Vx2(i)
+                                subst.FracaoMassica = Me.AUX_CONVERT_MOL_TO_MASS(Vx2)(i)
                                 subst.FugacityCoeff = FCL2(i)
                                 subst.ActivityCoeff = 0
                                 subst.PartialVolume = 0
                                 subst.PartialPressure = 0
                                 i += 1
                             Next
-                            For Each subst In Me.CurrentMaterialStream.Fases(4).Componentes.Values
-                                subst.FracaoMassica = Me.AUX_CONVERT_MOL_TO_MASS(subst.Nome, 4)
-                            Next
                             i = 0
                             For Each subst In Me.CurrentMaterialStream.Fases(2).Componentes.Values
                                 subst.FracaoMolar = Vy(i)
+                                subst.FracaoMassica = Me.AUX_CONVERT_MOL_TO_MASS(Vy)(i)
                                 subst.FugacityCoeff = FCV(i)
                                 subst.ActivityCoeff = 0
                                 subst.PartialVolume = 0
                                 subst.PartialPressure = 0
                                 i += 1
                             Next
-                            For Each subst In Me.CurrentMaterialStream.Fases(2).Componentes.Values
-                                subst.FracaoMassica = Me.AUX_CONVERT_MOL_TO_MASS(subst.Nome, 2)
-                            Next
                             i = 0
                             For Each subst In Me.CurrentMaterialStream.Fases(7).Componentes.Values
                                 subst.FracaoMolar = Vs(i)
+                                subst.FracaoMassica = Me.AUX_CONVERT_MOL_TO_MASS(Vs)(i)
                                 subst.FugacityCoeff = FCS(i)
                                 subst.ActivityCoeff = 0
                                 subst.PartialVolume = 0
                                 subst.PartialPressure = 0
                                 i += 1
-                            Next
-                            For Each subst In Me.CurrentMaterialStream.Fases(7).Componentes.Values
-                                subst.FracaoMassica = Me.AUX_CONVERT_MOL_TO_MASS(subst.Nome, 7)
                             Next
 
                             Me.CurrentMaterialStream.Fases(3).SPMProperties.massfraction = xl * Me.AUX_MMM(Fase.Liquid1) / (xl * Me.AUX_MMM(Fase.Liquid1) + xl2 * Me.AUX_MMM(Fase.Liquid2) + xv * Me.AUX_MMM(Fase.Vapor) + xs * Me.AUX_MMM(Fase.Solid))
@@ -1554,38 +1525,32 @@ Namespace DTL.SimulationObjects.PropertyPackages
                             i = 0
                             For Each subst In Me.CurrentMaterialStream.Fases(3).Componentes.Values
                                 subst.FracaoMolar = Vx(i)
+                                subst.FracaoMassica = Me.AUX_CONVERT_MOL_TO_MASS(Vx)(i)
                                 subst.FugacityCoeff = FCL(i)
                                 subst.ActivityCoeff = 0
                                 subst.PartialVolume = 0
                                 subst.PartialPressure = 0
                                 i += 1
                             Next
-                            For Each subst In Me.CurrentMaterialStream.Fases(3).Componentes.Values
-                                subst.FracaoMassica = Me.AUX_CONVERT_MOL_TO_MASS(subst.Nome, 3)
-                            Next
                             i = 0
                             For Each subst In Me.CurrentMaterialStream.Fases(4).Componentes.Values
                                 subst.FracaoMolar = Vx2(i)
+                                subst.FracaoMassica = Me.AUX_CONVERT_MOL_TO_MASS(Vx2)(i)
                                 subst.FugacityCoeff = FCL2(i)
                                 subst.ActivityCoeff = 0
                                 subst.PartialVolume = 0
                                 subst.PartialPressure = 0
                                 i += 1
                             Next
-                            For Each subst In Me.CurrentMaterialStream.Fases(4).Componentes.Values
-                                subst.FracaoMassica = Me.AUX_CONVERT_MOL_TO_MASS(subst.Nome, 4)
-                            Next
                             i = 0
                             For Each subst In Me.CurrentMaterialStream.Fases(2).Componentes.Values
                                 subst.FracaoMolar = Vy(i)
+                                subst.FracaoMassica = Me.AUX_CONVERT_MOL_TO_MASS(Vy)(i)
                                 subst.FugacityCoeff = FCV(i)
                                 subst.ActivityCoeff = 0
                                 subst.PartialVolume = 0
                                 subst.PartialPressure = 0
                                 i += 1
-                            Next
-                            For Each subst In Me.CurrentMaterialStream.Fases(2).Componentes.Values
-                                subst.FracaoMassica = Me.AUX_CONVERT_MOL_TO_MASS(subst.Nome, 2)
                             Next
 
                             Me.CurrentMaterialStream.Fases(3).SPMProperties.massfraction = xl * Me.AUX_MMM(Fase.Liquid1) / (xl * Me.AUX_MMM(Fase.Liquid1) + xl2 * Me.AUX_MMM(Fase.Liquid2) + xv * Me.AUX_MMM(Fase.Vapor))
@@ -1763,6 +1728,7 @@ redirect:                       result = Me.FlashBase.Flash_PH(RET_VMOL(Fase.Mix
                                 i = 0
                                 For Each subst In Me.CurrentMaterialStream.Fases(3).Componentes.Values
                                     subst.FracaoMolar = Vx(i)
+                                    subst.FracaoMassica = Me.AUX_CONVERT_MOL_TO_MASS(Vx)(i)
                                     subst.FugacityCoeff = FCL(i)
                                     subst.ActivityCoeff = 0
                                     subst.PartialVolume = 0
@@ -1770,49 +1736,35 @@ redirect:                       result = Me.FlashBase.Flash_PH(RET_VMOL(Fase.Mix
                                     i += 1
                                 Next
                                 i = 1
-                                For Each subst In Me.CurrentMaterialStream.Fases(3).Componentes.Values
-                                    subst.FracaoMassica = Me.AUX_CONVERT_MOL_TO_MASS(subst.Nome, 3)
-                                    i += 1
-                                Next
                                 i = 0
                                 For Each subst In Me.CurrentMaterialStream.Fases(4).Componentes.Values
                                     subst.FracaoMolar = Vx2(i)
+                                    subst.FracaoMassica = Me.AUX_CONVERT_MOL_TO_MASS(Vx2)(i)
                                     subst.FugacityCoeff = FCL2(i)
                                     subst.ActivityCoeff = 0
                                     subst.PartialVolume = 0
                                     subst.PartialPressure = 0
                                     i += 1
                                 Next
-                                i = 1
-                                For Each subst In Me.CurrentMaterialStream.Fases(4).Componentes.Values
-                                    subst.FracaoMassica = Me.AUX_CONVERT_MOL_TO_MASS(subst.Nome, 4)
-                                    i += 1
-                                Next
                                 i = 0
                                 For Each subst In Me.CurrentMaterialStream.Fases(2).Componentes.Values
                                     subst.FracaoMolar = Vy(i)
+                                    subst.FracaoMassica = Me.AUX_CONVERT_MOL_TO_MASS(Vy)(i)
                                     subst.FugacityCoeff = FCV(i)
                                     subst.ActivityCoeff = 0
                                     subst.PartialVolume = 0
                                     subst.PartialPressure = 0
                                     i += 1
                                 Next
-                                i = 1
-                                For Each subst In Me.CurrentMaterialStream.Fases(2).Componentes.Values
-                                    subst.FracaoMassica = Me.AUX_CONVERT_MOL_TO_MASS(subst.Nome, 2)
-                                    i += 1
-                                Next
                                 i = 0
                                 For Each subst In Me.CurrentMaterialStream.Fases(7).Componentes.Values
                                     subst.FracaoMolar = Vs(i)
+                                    subst.FracaoMassica = Me.AUX_CONVERT_MOL_TO_MASS(Vs)(i)
                                     subst.FugacityCoeff = FCS(i)
                                     subst.ActivityCoeff = 0
                                     subst.PartialVolume = 0
                                     subst.PartialPressure = 0
                                     i += 1
-                                Next
-                                For Each subst In Me.CurrentMaterialStream.Fases(7).Componentes.Values
-                                    subst.FracaoMassica = Me.AUX_CONVERT_MOL_TO_MASS(subst.Nome, 7)
                                 Next
 
                                 Me.CurrentMaterialStream.Fases(3).SPMProperties.massfraction = xl * Me.AUX_MMM(Fase.Liquid1) / (xl * Me.AUX_MMM(Fase.Liquid1) + xl2 * Me.AUX_MMM(Fase.Liquid2) + xv * Me.AUX_MMM(Fase.Vapor) + xs * Me.AUX_MMM(Fase.Solid))
@@ -2125,24 +2077,22 @@ redirect2:                      result = Me.FlashBase.Flash_PS(RET_VMOL(Fase.Mix
 
             End Select
 
-            If My.Application.CAPEOPENMode Then
-                Dim summf As Double = 0, sumwf As Double = 0
+            Dim summf As Double = 0, sumwf As Double = 0
+            For Each pi As PhaseInfo In Me.PhaseMappings.Values
+                If Not pi.PhaseLabel = "Disabled" Then
+                    summf += Me.CurrentMaterialStream.Fases(pi.DWPhaseIndex).SPMProperties.molarfraction.GetValueOrDefault
+                    sumwf += Me.CurrentMaterialStream.Fases(pi.DWPhaseIndex).SPMProperties.massfraction.GetValueOrDefault
+                End If
+            Next
+            If Abs(summf - 1) > 0.0001 Then
                 For Each pi As PhaseInfo In Me.PhaseMappings.Values
                     If Not pi.PhaseLabel = "Disabled" Then
-                        summf += Me.CurrentMaterialStream.Fases(pi.DWPhaseIndex).SPMProperties.molarfraction.GetValueOrDefault
-                        sumwf += Me.CurrentMaterialStream.Fases(pi.DWPhaseIndex).SPMProperties.massfraction.GetValueOrDefault
+                        If Not Me.CurrentMaterialStream.Fases(pi.DWPhaseIndex).SPMProperties.molarfraction.HasValue Then
+                            Me.CurrentMaterialStream.Fases(pi.DWPhaseIndex).SPMProperties.molarfraction = 1 - summf
+                            Me.CurrentMaterialStream.Fases(pi.DWPhaseIndex).SPMProperties.massfraction = 1 - sumwf
+                        End If
                     End If
                 Next
-                If Abs(summf - 1) > 0.0001 Then
-                    For Each pi As PhaseInfo In Me.PhaseMappings.Values
-                        If Not pi.PhaseLabel = "Disabled" Then
-                            If Not Me.CurrentMaterialStream.Fases(pi.DWPhaseIndex).SPMProperties.molarfraction.HasValue Then
-                                Me.CurrentMaterialStream.Fases(pi.DWPhaseIndex).SPMProperties.molarfraction = 1 - summf
-                                Me.CurrentMaterialStream.Fases(pi.DWPhaseIndex).SPMProperties.massfraction = 1 - sumwf
-                            End If
-                        End If
-                    Next
-                End If
             End If
 
             With Me.CurrentMaterialStream
@@ -4714,7 +4664,7 @@ Final3:
 
         End Function
 
-        Public Function RET_VCSACIDS()
+        Public Function RET_VCSACIDS() As String()
 
             Dim val(Me.CurrentMaterialStream.Fases(0).Componentes.Count - 1) As String
             Dim subst As DTL.ClassesBasicasTermodinamica.Substancia
@@ -4730,7 +4680,7 @@ Final3:
 
         End Function
 
-        Public Function RET_VIDS()
+        Public Function RET_VIDS() As String()
 
             Dim val(Me.CurrentMaterialStream.Fases(0).Componentes.Count - 1) As String
             Dim subst As DTL.ClassesBasicasTermodinamica.Substancia
@@ -4745,7 +4695,7 @@ Final3:
 
         End Function
 
-        Public Function RET_VCAS()
+        Public Function RET_VCAS() As String()
 
             Dim val(Me.CurrentMaterialStream.Fases(0).Componentes.Count - 1) As String
             Dim subst As DTL.ClassesBasicasTermodinamica.Substancia
@@ -4760,7 +4710,7 @@ Final3:
 
         End Function
 
-        Public Function RET_VNAMES()
+        Public Function RET_VNAMES() As String()
 
             Dim val(Me.CurrentMaterialStream.Fases(0).Componentes.Count - 1) As String
             Dim subst As DTL.ClassesBasicasTermodinamica.Substancia
@@ -4775,7 +4725,7 @@ Final3:
 
         End Function
 
-        Public Function RET_NullVector()
+        Public Function RET_NullVector() As Double()
 
             Dim val(Me.CurrentMaterialStream.Fases(0).Componentes.Count - 1) As Double
             Dim subst As DTL.ClassesBasicasTermodinamica.Substancia

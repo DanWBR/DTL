@@ -655,11 +655,11 @@ Namespace DTL.SimulationObjects.PropertyPackages
             For Each subst In Me.CurrentMaterialStream.Fases(0).Componentes.Values
                 sum = 0
                 If subst.ConstantProperties.NISTMODFACGroups.Collection.Count > 0 Then
-                    For Each s As String In subst.ConstantProperties.NISTMODFACGroups.Collection.Keys
+                    For Each s In subst.ConstantProperties.NISTMODFACGroups.Collection.Keys
                         sum += subst.ConstantProperties.NISTMODFACGroups.Collection(s) * Me.m_uni.ModfGroups.Groups(s).Q
                     Next
                 Else
-                    For Each s As String In subst.ConstantProperties.MODFACGroups.Collection.Keys
+                    For Each s In subst.ConstantProperties.MODFACGroups.Collection.Keys
                         sum += subst.ConstantProperties.MODFACGroups.Collection(s) * Me.m_uni.ModfGroups.Groups(s).Q
                     Next
                 End If

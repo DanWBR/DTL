@@ -274,6 +274,43 @@ Namespace DTL.SimulationObjects.Streams
 
         End Sub
 
+        Public Sub CalcPhaseMassComposition(ByVal phase As PropertyPackages.Fase)
+
+            Dim idx As Integer = 0
+
+            Select Case phase
+                Case PropertyPackages.Fase.Aqueous
+                    idx = 2
+                Case PropertyPackages.Fase.Liquid
+                    idx = 1
+                Case PropertyPackages.Fase.Liquid1
+                    idx = 3
+                Case PropertyPackages.Fase.Liquid2
+                    idx = 4
+                Case PropertyPackages.Fase.Liquid3
+                    idx = 5
+                Case PropertyPackages.Fase.Mixture
+                    idx = 0
+                Case PropertyPackages.Fase.Solid
+                    idx = 7
+                Case PropertyPackages.Fase.Vapor
+                    idx = 2
+            End Select
+
+            Dim mol_x_mm As Double
+
+            Dim sub1 As DTL.ClassesBasicasTermodinamica.Substancia
+
+            For Each sub1 In Fases(idx).Componentes.Values
+                mol_x_mm += sub1.FracaoMolar.GetValueOrDefault * sub1.ConstantProperties.Molar_Weight
+            Next
+
+            For Each sub1 In Fases(idx).Componentes.Values
+                sub1.FracaoMassica = sub1.FracaoMolar.GetValueOrDefault * sub1.ConstantProperties.Molar_Weight / mol_x_mm
+            Next
+
+        End Sub
+
         Public Overrides Function GetPropertyValue(ByVal prop As String, Optional ByVal su As SistemasDeUnidades.Unidades = Nothing) As Object
 
             If su Is Nothing Then su = New DTL.SistemasDeUnidades.UnidadesSI

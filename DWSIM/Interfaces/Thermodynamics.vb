@@ -828,6 +828,7 @@ Namespace Thermodynamics
             Next
 
             ms.SetPhaseComposition(molefractions, dwp)
+            ms.CalcPhaseMassComposition(dwp)
             ms.Fases(0).SPMProperties.temperature = temperature
             ms.Fases(0).SPMProperties.pressure = pressure
 

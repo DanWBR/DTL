@@ -121,7 +121,7 @@ Namespace DTL.Databases
 
         End Sub
 
-        Public Function Transfer() As ClassesBasicasTermodinamica.ConstantProperties()
+        Public Function Transfer(Optional ByVal CompName As String = "") As ClassesBasicasTermodinamica.ConstantProperties()
 
             Dim cp As ClassesBasicasTermodinamica.ConstantProperties
             Dim cpa As New ArrayList()
@@ -449,8 +449,8 @@ Namespace DTL.Databases
                             For Each node3 As XmlNode In node2.ChildNodes
                                 Select Case node3.Name
                                     Case "group"
-                                        If Not cp.UNIFACGroups.Collection.ContainsKey(unif.ID2Group(Integer.Parse(node3.Attributes("id").Value))) Then
-                                            cp.UNIFACGroups.Collection.Add(unif.ID2Group(Integer.Parse(node3.Attributes("id").Value)), Integer.Parse(node3.Attributes("value").Value))
+                                        If Not cp.UNIFACGroups.Collection.ContainsKey(node3.Attributes("id").Value) Then
+                                            cp.UNIFACGroups.Collection.Add(node3.Attributes("id").Value, Integer.Parse(node3.Attributes("value").Value))
                                         End If
                                 End Select
                             Next
@@ -459,8 +459,8 @@ Namespace DTL.Databases
                             For Each node3 As XmlNode In node2.ChildNodes
                                 Select Case node3.Name
                                     Case "group"
-                                        If Not cp.MODFACGroups.Collection.ContainsKey(modf.ID2Group(Integer.Parse(node3.Attributes("id").Value))) Then
-                                            cp.MODFACGroups.Collection.Add(modf.ID2Group(Integer.Parse(node3.Attributes("id").Value)), Integer.Parse(node3.Attributes("value").Value))
+                                        If Not cp.MODFACGroups.Collection.ContainsKey(node3.Attributes("id").Value) Then
+                                            cp.MODFACGroups.Collection.Add(node3.Attributes("id").Value, Integer.Parse(node3.Attributes("value").Value))
                                         End If
                                 End Select
                             Next
@@ -470,7 +470,16 @@ Namespace DTL.Databases
                             Next
                     End Select
                 Next
-                cpa.Add(cp)
+
+                If CompName = "" Then
+                    cpa.Add(cp)
+                Else
+                    If cp.Name = CompName Then
+                        cpa.Add(cp)
+                        Exit For
+                    End If
+                End If
+
             Next
 
             Return cpa.ToArray(Type.GetType("DTL.DTL.ClassesBasicasTermodinamica.ConstantProperties"))
@@ -504,12 +513,15 @@ Namespace DTL.Databases
 
         End Sub
 
-        Public Function Transfer() As ClassesBasicasTermodinamica.ConstantProperties()
+        Public Function Transfer(Optional ByVal CompName As String = "") As ClassesBasicasTermodinamica.ConstantProperties()
 
             Dim cp As ClassesBasicasTermodinamica.ConstantProperties
             Dim cpa As New ArrayList()
             Dim cult As Globalization.CultureInfo = New Globalization.CultureInfo("en-US")
             Dim nf As Globalization.NumberFormatInfo = cult.NumberFormat
+
+            Dim unif As New SimulationObjects.PropertyPackages.Auxiliary.Unifac
+            Dim modf As New SimulationObjects.PropertyPackages.Auxiliary.Modfac
 
             For Each node As XmlNode In xmldoc.ChildNodes(1)
                 cp = New ClassesBasicasTermodinamica.ConstantProperties
@@ -616,11 +628,11 @@ Namespace DTL.Databases
                             Case "UNIFAC"
                                 .UNIFACGroups.Collection = New SortedList
                                 For Each node3 As XmlNode In node2.ChildNodes
-                                    .UNIFACGroups.Collection.Add(node3.Attributes("name").InnerText, Integer.Parse(node3.InnerText))
+                                    .UNIFACGroups.Collection.Add(unif.Group2ID(node3.Attributes("name").InnerText), Integer.Parse(node3.InnerText))
                                 Next
                                 .MODFACGroups.Collection = New SortedList
                                 For Each node3 As XmlNode In node2.ChildNodes
-                                    .MODFACGroups.Collection.Add(node3.Attributes("name").InnerText, Integer.Parse(node3.InnerText))
+                                    .MODFACGroups.Collection.Add(modf.Group2ID(node3.Attributes("name").InnerText), Integer.Parse(node3.InnerText))
                                 Next
                             Case "elements"
                                 .Elements.Collection = New SortedList
@@ -632,8 +644,20 @@ Namespace DTL.Databases
                         End Select
                     Next
                 End With
-                cpa.Add(cp)
+
+                If CompName = "" Then
+                    cpa.Add(cp)
+                Else
+                    If cp.Name = CompName Then
+                        cpa.Add(cp)
+                        Exit For
+                    End If
+                End If
+
             Next
+
+            unif = Nothing
+            modf = Nothing
 
             Return cpa.ToArray(Type.GetType("DTL.DTL.ClassesBasicasTermodinamica.ConstantProperties"))
 

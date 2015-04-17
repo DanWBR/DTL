@@ -1,7 +1,7 @@
 '    Advanced Flash Calculation Routines (Michelsen's Stability Test & Phase Split Algorithm)
 '    Copyright 2008 Daniel Wagner O. de Medeiros
 '
-'    This file is part of DTL.
+'    This file is part of DWSIM.
 '
 '    DWSIM is free software: you can redistribute it and/or modify
 '    it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@
 '    GNU General Public License for more details.
 '
 '    You should have received a copy of the GNU General Public License
-'    along with DTL.  If not, see <http://www.gnu.org/licenses/>.
+'    along with DWSIM.  If not, see <http://www.gnu.org/licenses/>.
 
 Imports System.Math
 Imports DTL.DTL.MathEx
@@ -419,332 +419,6 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
         End Function
 
-        Private Function Flash_TP(ByVal T As Double, ByVal P As Double, ByVal Vz As Array, ByVal VKij As Object, ByVal VTc As Array, ByVal VPc As Array, ByVal Vw As Array, Optional ByVal otherargs As Object = Nothing)
-
-            Dim i, j, l, n, ci, co, cit As Integer
-
-            n = UBound(Vz)
-
-            'test the stability of the mixture
-
-            Dim res1 As Object = StabTest(T, P, Vz, VKij, VTc, VPc, Vw, Nothing, otherargs)
-
-            If CBool(res1(0)) = True Then
-
-                'mixture is stable (single phase)
-
-                Dim pf As Double, pty As String, pic As Double
-                Dim tmpfug, tmpres As Object
-                tmpfug = thermobase.CalcLnFug(T, P, Vz, VKij, VTc, VPc, Vw, otherargs)
-                tmpres = thermobase.PhaseType(T, P, Vz, VKij, VTc, VPc, Vw, otherargs)
-                pf = 1
-                pty = tmpres(0)
-                pic = tmpres(1)
-
-                ' return phase amounts, compositions, fugacity coefficients,
-                ' compr. factors and isothermal compressibilities
-
-                Dim result(0, 3) As Object
-
-                result(0, 0) = pf
-                result(0, 1) = Vz
-                result(0, 2) = tmpfug
-                result(0, 3) = pic
-
-                Return result
-
-            Else
-
-                'mixture is unstable
-
-                Dim res2 As Double(,)
-
-                'initial estimates for the incipient phases
-
-                res2 = res1(1)
-
-                'get number of phases
-
-                Dim m As Integer = res2.GetLength(0)
-
-                Dim V, Vant, fV, dfV_dV As Mapack.Matrix
-                V = New Mapack.Matrix(m, 1)
-                Vant = New Mapack.Matrix(m, 1)
-                fV = New Mapack.Matrix(m, 1)
-                dfV_dV = New Mapack.Matrix(m, m)
-                Dim K(m - 1, n), Kant(m - 1, n) As Double
-
-                i = 0
-                Do
-                    V(i, 0) = 1 / m 'New Random(i).Next(1, 10)
-                    j = 0
-                    Do
-                        If Vz(j) > 0 Then
-                            K(i, j) = res2(i, j) / Vz(j)
-                        Else
-                            K(i, j) = 1
-                        End If
-                        j = j + 1
-                    Loop Until j = n + 1
-                    i = i + 1
-                Loop Until i = m
-
-                Dim sum1(m - 1), sum2(m - 1), sum3(m - 1), H(n) As Double
-                Dim delta, delta0 As Double
-
-                cit = 0
-                co = 0
-restart2:       ci = 0
-restart:        i = 0
-                Do
-                    H(i) = 1
-                    j = 0
-                    Do
-                        H(i) += V(j, 0) * (K(j, i) - 1)
-                        j = j + 1
-                    Loop Until j = m
-                    i = i + 1
-                Loop Until i = n + 1
-
-                i = 0
-                Do
-                    fV(i, 0) = 0
-                    j = 0
-                    Do
-                        fV(i, 0) += Vz(j) * (K(i, j) - 1) / H(j)
-                        j = j + 1
-                    Loop Until j = n + 1
-                    i = i + 1
-                Loop Until i = m
-
-                i = 0
-                Do
-                    l = 0
-                    Do
-                        dfV_dV(i, l) = 0
-                        l = l + 1
-                    Loop Until l = m
-                    i = i + 1
-                Loop Until i = m
-
-                i = 0
-                Do
-                    l = 0
-                    Do
-                        j = 0
-                        Do
-                            dfV_dV(i, l) += -Vz(j) * (K(i, j) - 1) * (K(l, j) - 1) / H(j) ^ 2
-                            j = j + 1
-                        Loop Until j = n + 1
-                        l = l + 1
-                    Loop Until l = m
-                    i = i + 1
-                Loop Until i = m
-
-                Dim dV As Mapack.Matrix
-                Try
-                    dV = dfV_dV.Solve(Mapack.Matrix.Multiply(fV, -1))
-                Catch ex As Exception
-                    dV = New Mapack.Matrix(m, 1)
-                    i = 0
-                    Do
-                        dV(i, 0) = 0
-                        i = i + 1
-                    Loop Until i = m
-                End Try
-
-                i = 0
-                Do
-                    Vant(i, 0) = V(i, 0)
-                    V(i, 0) += dV(i, 0)
-                    If V(i, 0) < 0 Then V(i, 0) = 0
-                    If V(i, 0) > 0 Then V(i, 0) = 1
-                    i = i + 1
-                Loop Until i = m
-
-                ci = ci + 1
-                cit = cit + 1
-
-                Console.WriteLine("--------------------------")
-                Console.Write(fV.ToString)
-                Console.WriteLine("--------------------------")
-                Console.Write(dV.ToString)
-                Console.WriteLine("--------------------------")
-                Console.Write(V.ToString)
-
-
-
-                If ci >= m_miti Then
-                    Throw New Exception(ErrorCode.MaximumIterationsReached)
-                End If
-                If Double.IsNaN(fV.FrobeniusNorm) Then
-                    Throw New Exception(ErrorCode.IterationDiverged)
-                End If
-
-                delta0 = delta
-                delta = fV.FrobeniusNorm
-
-                If delta > m_tolerance Then GoTo restart
-
-out:            Dim yarray As New ArrayList, pf(m) As Double, pty(m) As String, pz(m) As Double, pic(m) As Double
-                Dim tmpcomp(n) As Double, sum4 As Double
-                i = 0
-                sum4 = 0
-                Do
-                    j = 0
-                    Do
-                        If i = 0 Then
-                            tmpcomp(j) = Vz(j) / H(j)
-                        Else
-                            tmpcomp(j) = Vz(j) / H(j) * K(i - 1, j)
-                            pf(i) = V(i - 1, 0)
-                            sum4 += pf(i)
-                        End If
-                        j = j + 1
-                    Loop Until j = n + 1
-                    yarray.Add(tmpcomp.Clone)
-                    i = i + 1
-                Loop Until i = m + 1
-                pf(0) = 1 - sum4
-
-                Dim fugarray As New ArrayList, tmpfug, tmpres As Object
-                i = 0
-                Do
-                    tmpfug = thermobase.CalcLnFug(T, P, yarray(i), VKij, VTc, VPc, Vw, otherargs)
-                    tmpres = thermobase.PhaseType(T, P, yarray(i), VKij, VTc, VPc, Vw, otherargs)
-                    pty(i) = tmpres(0)
-                    pic(i) = tmpres(1)
-                    fugarray.Add(tmpfug)
-                    i = i + 1
-                Loop Until i = m + 1
-
-                i = 0
-                Do
-                    j = 0
-                    Do
-                        Kant(i, j) = K(i, j)
-                        K(i, j) = Math.Exp(fugarray(1)(j)) / Math.Exp(fugarray(i + 1)(j))
-                        j = j + 1
-                    Loop Until j = n + 1
-                    i = i + 1
-                Loop Until i = m
-
-                Dim sum5 As Double = 0
-                i = 0
-                Do
-                    j = 0
-                    Do
-                        sum5 += Abs((K(i, j) - Kant(i, j)) / K(i, j))
-                        j = j + 1
-                    Loop Until j = n + 1
-                    i = i + 1
-                Loop Until i = m
-
-                If co >= m_mite Then Throw New Exception(ErrorCode.MaximumIterationsReached)
-                If Double.IsNaN(sum5) Then Throw New Exception(ErrorCode.IterationDiverged)
-
-                If Not sum5 < m_tolerance Then
-                    co = co + 1
-                    GoTo restart2
-                Else
-out2:               Dim order(m) As Integer, hasvp As Boolean = False
-
-                    'organize phases in the V, L1, L2, L3.. order
-
-                    i = 0
-                    Do
-                        If pty(i) = "V" Then
-                            order(0) = i
-                            hasvp = True
-                        End If
-                        i = i + 1
-                    Loop Until i = m + 1
-
-                    i = 0
-                    Do
-                        If pty(i) <> "V" Then
-                            If hasvp = True Then
-                                If i = 0 Then order(i + 1) = i Else order(i) = i
-                            Else
-                                order(i) = i
-                            End If
-                        End If
-                        i = i + 1
-                    Loop Until i = m + 1
-
-                    ' join similar phases
-                    Dim ep As Integer = 0, sum6 As Double
-                    i = 0
-                    Do
-                        sum6 = 0
-                        j = 0
-                        Do
-                            l = 0
-                            Do
-                                If i <> j Then
-                                    sum6 += Abs(yarray(order(i))(l) - yarray(order(j))(l))
-                                End If
-                                l = l + 1
-                            Loop Until l = n + 1
-                            If i <> j And sum6 < m_tolerance Then ep = j
-                            j = j + 1
-                        Loop Until j = m + 1
-                        i = i + 1
-                    Loop Until i = m + 1
-
-                    ' return phase amounts, compositions, fugacity coefficients,
-                    ' compr. factors and isothermal compressibilities
-
-                    Dim ct As Integer = 0
-                    If ep <> 0 Then ct = 1
-
-                    Dim result(m - ct, 3) As Object
-                    i = 0
-                    Do
-                        If ct = 1 Then
-                            If i < ep Then
-                                result(i, 0) = pf(order(i))
-                                result(i, 1) = yarray(order(i))
-                                result(i, 2) = fugarray(order(i))
-                                result(i, 3) = pic(order(i))
-                            End If
-                        Else
-                            result(i, 0) = pf(order(i))
-                            result(i, 1) = yarray(order(i))
-                            result(i, 2) = fugarray(order(i))
-                            result(i, 3) = pic(order(i))
-                        End If
-                        i = i + 1
-                    Loop Until i = m + 1
-
-                    If hasvp = False Then
-                        'creates an empty vapor phase for compatibility reasons
-                        Dim result2(m - ct + 1, 3) As Object
-                        result2(0, 0) = 0
-                        result2(0, 1) = yarray(0)
-                        result2(0, 2) = yarray(0)
-                        result2(0, 3) = pic(0)
-                        i = 0
-                        Do
-                            result2(i + 1, 0) = result(i, 0)
-                            result2(i + 1, 1) = result(i, 1)
-                            result2(i + 1, 2) = result(i, 2)
-                            result2(i + 1, 3) = result(i, 3)
-                            i = i + 1
-                        Loop Until i = m + 1
-                        Return result2
-                    Else
-                        Return result
-                    End If
-
-
-
-                End If
-
-            End If
-
-        End Function
-
         Private Function Flash_TP_RR(ByVal T As Double, ByVal P As Double, ByVal Vz As Array, ByVal VKij As Object, ByVal VTc As Array, ByVal VPc As Array, ByVal Vw As Array, Optional ByVal otherargs As Object = Nothing)
 
             Dim n, i, ci As Integer
@@ -835,8 +509,8 @@ out2:               Dim order(m) As Integer, hasvp As Boolean = False
 
                 'update vapor fraction by newton's method
                 vant = v
-                Dim F = 0
-                Dim dF = 0
+                Dim F = 0.0#
+                Dim dF = 0.0#
                 i = 0
                 Do
                     If Vz(i) > 0 Then
@@ -904,8 +578,6 @@ out2:               Dim order(m) As Integer, hasvp As Boolean = False
                 End If
 
                 ci += 1
-
-
 
             Loop
 
@@ -1074,9 +746,9 @@ out2:               Dim order(m) As Integer, hasvp As Boolean = False
                 Loop Until i = n + 1
 
                 Try
-                    'Console.WriteLine(df.ToString)
+                    'WriteDebugInfo(df.ToString)
                     dl = df.Solve(f)
-                    'Console.WriteLine(dl.ToString())
+                    'WriteDebugInfo(dl.ToString())
                     'Console.ReadKey()
 
                 Catch ex As Exception
@@ -1119,8 +791,6 @@ out2:               Dim order(m) As Integer, hasvp As Boolean = False
                     sum1 += Abs(l - lant) + Abs(l1 - l1ant)
                     i = i + 1
                 Loop Until i = n + 1
-
-
 
                 If sum1 <= m_tolerance Then Exit Do
                 If ci >= m_mite Then Throw New Exception(ErrorCode.MaximumIterationsReached)
@@ -1249,8 +919,8 @@ out2:               Dim order(m) As Integer, hasvp As Boolean = False
 
             'update vapor fraction by newton's method
             vant = v
-            Dim F = 0
-            Dim dF = 0
+            Dim F = 0.0#
+            Dim dF = 0.0#
             i = 0
             Do
                 If Vz(i) > 0 Then
@@ -1456,257 +1126,6 @@ Final3:
             Loop Until i = n + 1
 
             Return result
-
-        End Function
-
-#End Region
-
-#Region "        Main Flash and Auxiliary Functions"
-
-        Public Function GeneralFlash(ByVal spec1 As FlashSpec, ByVal spec2 As FlashSpec, ByVal val1 As Double, ByVal val2 As Double, ByVal Vz As Array, ByVal VKij As Object, ByVal VTc As Array, ByVal VPc As Array, ByVal Vw As Array, Optional ByVal FirstEstimate As Double = 0, Optional ByVal otherargs As Object = Nothing)
-
-            Dim result As Object(,) = Nothing
-
-            Dim brentsolver As New BrentOpt.Brent
-            brentsolver.DefineFuncDelegate(AddressOf BrentFunc)
-
-            Dim xtype, calctype As String
-            Dim P, T, H, S, var1, var2, vf As Double
-
-            Select Case spec1
-                Case FlashSpec.T
-                    Select Case spec2
-                        Case FlashSpec.P
-                            T = val1
-                            P = val2
-                        Case FlashSpec.H
-                            xtype = "P"
-                            calctype = "H"
-                            var1 = val2
-                            var2 = val1
-                            Dim args As Object = New Object() {xtype, calctype, var1, var2, Vz, VKij, VTc, VPc, Vw, otherargs}
-                            T = val1
-                            H = val2
-                            P = brentsolver.BrentOpt(100, 700 * 101325, 10, m_tolerance, m_mite, args)
-                        Case FlashSpec.S
-                            xtype = "P"
-                            calctype = "S"
-                            var1 = val2
-                            var2 = val1
-                            Dim args As Object = New Object() {xtype, calctype, var1, var2, Vz, VKij, VTc, VPc, Vw, otherargs}
-                            T = val1
-                            S = val2
-                            P = brentsolver.BrentOpt(100, 700 * 101325, 5, m_tolerance, m_mite, args)
-                        Case FlashSpec.VAP
-                            xtype = "P"
-                            calctype = "vf"
-                            var1 = val2
-                            var2 = val1
-                            T = val1
-                            vf = val2
-                            If vf = 0 Then
-                                Dim KI(UBound(Vz))
-                                Dim i As Integer = 0
-                                Do
-                                    KI(i) = 0
-                                    i = i + 1
-                                Loop Until i = UBound(Vz) + 1
-                                P = Me.BubP(T, Vz, VKij, VTc, VPc, Vw, KI, 0, otherargs)
-                            ElseIf vf > 0 And vf < 1 Then
-                                Dim args As Object = New Object() {xtype, calctype, var1, var2, Vz, VKij, VTc, VPc, Vw, otherargs}
-                                P = brentsolver.BrentOpt(100, 700 * 101325, 5, m_tolerance, m_mite, args)
-                            Else
-                                Dim KI(UBound(Vz))
-                                Dim i As Integer = 0
-                                Do
-                                    KI(i) = 0
-                                    i = i + 1
-                                Loop Until i = UBound(Vz) + 1
-                                P = Me.DewP(T, Vz, VKij, VTc, VPc, Vw, KI, 0, otherargs)
-                            End If
-                    End Select
-                Case FlashSpec.P
-                    Select Case spec2
-                        Case FlashSpec.T
-                            P = val1
-                            T = val2
-                        Case FlashSpec.H
-                            xtype = "T"
-                            calctype = "H"
-                            var1 = val2
-                            var2 = val1
-                            Dim args As Object = New Object() {xtype, calctype, var1, var2, Vz, VKij, VTc, VPc, Vw, otherargs}
-                            P = val1
-                            H = val2
-                            T = brentsolver.BrentOpt(100, 1000, 5, m_tolerance, m_mite, args)
-                        Case FlashSpec.S
-                            xtype = "T"
-                            calctype = "S"
-                            var1 = val2
-                            var2 = val1
-                            Dim args As Object = New Object() {xtype, calctype, var1, var2, Vz, VKij, VTc, VPc, Vw, otherargs}
-                            P = val1
-                            S = val2
-                            T = brentsolver.BrentOpt(100, 1000, 5, m_tolerance, m_mite, args)
-                        Case FlashSpec.VAP
-                            xtype = "T"
-                            calctype = "vf"
-                            var1 = val2
-                            var2 = val1
-                            P = val1
-                            vf = val2
-                            If vf = 0 Then
-                                Dim KI(UBound(Vz))
-                                Dim i As Integer = 0
-                                Do
-                                    KI(i) = 0
-                                    i = i + 1
-                                Loop Until i = UBound(Vz) + 1
-                                T = Me.BubT(P, Vz, VKij, VTc, VPc, Vw, KI, 0, otherargs)
-                            ElseIf vf > 0 And vf < 1 Then
-                                Dim args As Object = New Object() {xtype, calctype, var1, var2, Vz, VKij, VTc, VPc, Vw, otherargs}
-                                T = brentsolver.BrentOpt(100, 1000, 10, m_tolerance, m_mite, args)
-                            Else
-                                Dim KI(UBound(Vz))
-                                Dim i As Integer = 0
-                                Do
-                                    KI(i) = 0
-                                    i = i + 1
-                                Loop Until i = UBound(Vz) + 1
-                                T = Me.DewT(P, Vz, VKij, VTc, VPc, Vw, KI, 0, otherargs)
-                            End If
-                    End Select
-            End Select
-
-            result = Me.FlashFunc(T, P, Vz, VKij, VTc, VPc, Vw, otherargs)
-
-            Return New Object() {T, P, result}
-
-        End Function
-
-        Private Function FlashFunc(ByVal T As Double, ByVal P As Double, ByVal Vz As Array, ByVal VKij As Object, ByVal VTc As Array, ByVal VPc As Array, ByVal Vw As Array, Optional ByVal otherargs As Object = Nothing)
-
-            Dim result As Object = Nothing
-            Dim error1, error2 As Boolean
-
-            Try
-                result = Me.Flash_TP(T, P, Vz, VKij, VTc, VPc, Vw, otherargs)
-                error1 = False
-            Catch ex As Exception
-                error1 = True
-            End Try
-
-            If error1 Then
-                If m_flashfallback = FallbackType.VL Then
-                    Try
-                        result = Me.Flash_TP_RR(T, P, Vz, VKij, VTc, VPc, Vw, otherargs)
-                        error2 = False
-                    Catch ex As Exception
-                        error2 = True
-                    End Try
-                Else
-                    Try
-                        result = Me.Flash_TP_RR_3P(T, P, Vz, VKij, VTc, VPc, Vw, otherargs)
-                        error2 = False
-                    Catch ex As Exception
-                        error2 = True
-                    End Try
-                End If
-                If error2 Then
-                    result = Me.Flash_TP_Ideal(T, P, Vz, VKij, VTc, VPc, Vw, otherargs)
-                    Return result
-                Else
-                    Return result
-                End If
-            Else
-                Return result
-            End If
-
-        End Function
-
-        Private Function BrentFunc(ByVal x As Double, ByVal otherargs As Object) As Double
-
-            Dim P, T, H, S, vf As Double
-            Dim i As Integer
-            Dim result(,) As Object = Nothing
-
-            Dim xtype As String = otherargs(0)
-            Dim calctype As String = otherargs(1)
-            Dim var1 As Double = otherargs(2)
-            Dim var2 As Double = otherargs(3)
-
-            Dim Vz, VKij, VTc, VPc, Vw, otherargs1 As Object
-            Vz = otherargs(4)
-            VKij = otherargs(5)
-            VTc = otherargs(6)
-            VPc = otherargs(7)
-            Vw = otherargs(8)
-            otherargs1 = otherargs(9)
-
-            If xtype = "T" Then
-                P = var2
-                T = x
-            Else 'xtype = "P"
-                T = var2
-                P = x
-            End If
-
-            result = Me.FlashFunc(T, P, Vz, VKij, VTc, VPc, Vw, otherargs1)
-
-            If calctype = "H" Then
-                H = var1 * Me.ppbase.AUX_MMM(Vz)
-                Dim nf As Integer = result.GetLength(0)
-                Dim hv, hl(nf - 2) As Double
-                Dim fval As Double
-                hv = thermobase.CalcEnthalpy("V", T, P, result(0, 1), VKij, VTc, VPc, Vw, Me.ppbase.RET_Hid(298.15, T, result(0, 1)) * Me.ppbase.AUX_MMM(result(0, 1)), otherargs1)
-                If nf > 2 Then
-                    i = 0
-                    Do
-                        hl(i) = thermobase.CalcEnthalpy("L", T, P, result(i + 1, 1), VKij, VTc, VPc, Vw, Me.ppbase.RET_Hid(298.15, T, result(i + 1, 1)) * Me.ppbase.AUX_MMM(result(i + 1, 1)), otherargs1)
-                        i = i + 1
-                    Loop Until i = nf - 1
-                    fval = H - result(0, 0) * hv
-                    i = 0
-                    Do
-                        fval -= result(i + 1, 0) * hl(i)
-                        i = i + 1
-                    Loop Until i = nf - 1
-                    Return fval
-                ElseIf nf > 1 Then
-                    hl(0) = thermobase.CalcEnthalpy("L", T, P, result(1, 1), VKij, VTc, VPc, Vw, Me.ppbase.RET_Hid(298.15, T, result(1, 1)) * Me.ppbase.AUX_MMM(result(1, 1)), otherargs1)
-                    Return H - result(0, 0) * hv - result(1, 0) * hl(0)
-                Else
-                    Return H - hv
-                End If
-            ElseIf calctype = "S" Then
-                S = var1 * Me.ppbase.AUX_MMM(Vz)
-                Dim nf As Integer = result.GetLength(0)
-                Dim sv, sl(nf - 2) As Double
-                Dim fval As Double
-                sv = thermobase.CalcEntropy("V", T, P, result(0, 1), VKij, VTc, VPc, Vw, Me.ppbase.RET_Sid(298.15, T, P, result(0, 1)) * Me.ppbase.AUX_MMM(result(0, 1)), otherargs1)
-                If nf > 2 Then
-                    i = 0
-                    Do
-                        sl(i) = thermobase.CalcEntropy("L", T, P, result(i + 1, 1), VKij, VTc, VPc, Vw, Me.ppbase.RET_Sid(298.15, T, P, result(i + 1, 1)) * Me.ppbase.AUX_MMM(result(i + 1, 1)), otherargs1)
-                        i = i + 1
-                    Loop Until i = nf - 1
-                    fval = S - result(0, 0) * sv
-                    i = 0
-                    Do
-                        fval -= result(i + 1, 0) * sl(i)
-                        i = i + 1
-                    Loop Until i = nf - 1
-                    Return fval
-                ElseIf nf > 1 Then
-                    sl(0) = thermobase.CalcEntropy("L", T, P, result(1, 1), VKij, VTc, VPc, Vw, Me.ppbase.RET_Sid(298.15, T, P, result(1, 1)) * Me.ppbase.AUX_MMM(result(1, 1)), otherargs1)
-                    Return S - result(0, 0) * sv - result(1, 0) * sl(0)
-                Else
-                    Return S - sv
-                End If
-            Else 'calctype = "vf"
-                vf = var1
-                Return result(0, 0) - vf
-            End If
 
         End Function
 
