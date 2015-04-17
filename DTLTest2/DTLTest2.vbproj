@@ -121,9 +121,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DWSIM\DTL2.vbproj">
+    <ProjectReference Include="..\DWSIM\DTL.vbproj">
       <Project>{34BE2D2D-9B3C-4C12-8C90-732E21CD7CB1}</Project>
-      <Name>DTL2</Name>
+      <Name>DTL</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />

@@ -20,12 +20,12 @@ Module Module1
         prpp.StabilityTestSeverity = 0
         prpp._ioquick = True
 
-        Dim P As Double = 14
-        Dim T As Double = 140
+        Dim P As Double = 10
+        Dim T As Double = 25
 
-        Dim result2 As Object(,) = dtlc.PTFlash(prpp, 3, P * 101325, T + 273.15,
-                                                New String() {"Carbon dioxide", "Nitrogen", "Water", "Oxygen", "Hydrogen sulfide"},
-                                                New Double() {0.92, 0.043, 0.005, 0.031, 0.001})
+        Dim result2 As Object(,) = dtlc.PTFlash(prpp, 0, P * 101325, T + 273.15,
+                                                New String() {"Methane", "Ethane", "Propane", "N-butane", "N-pentane"},
+                                                New Double() {0.2, 0.2, 0.2, 0.2, 0.2})
 
         Console.Write(vbCrLf)
         Console.WriteLine("Flash calculation results at P = " & P & " bar and T = " & T & " C:")

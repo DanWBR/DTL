@@ -1,7 +1,7 @@
 '    Michelsen's Three-Phase Gibbs Minimization w/ Nested Loops Flash Algorithms
-'    Copyright 2012-2014 Daniel Wagner O. de Medeiros
+'    Copyright 2012-2015 Daniel Wagner O. de Medeiros
 '
-'    This file is part of DTL.
+'    This file is part of DWSIM.
 '
 '    DWSIM is free software: you can redistribute it and/or modify
 '    it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@
 '    GNU General Public License for more details.
 '
 '    You should have received a copy of the GNU General Public License
-'    along with DTL.  If not, see <http://www.gnu.org/licenses/>.
+'    along with DWSIM.  If not, see <http://www.gnu.org/licenses/>.
 
 Imports System.Math
 Imports DTL.DTL.SimulationObjects
@@ -29,12 +29,13 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
         Inherits FlashAlgorithm
 
-        Private _io As New BostonBrittInsideOut
+        Private _nl As New DWSIMDefault
+        Private _nl3p As New NestedLoops3PV2
 
         Public ForceTwoPhaseOnly As Boolean = False
         Public L1sat As Double = 0.0#
         Dim ThreePhase As Boolean = False
-        Dim i, j, k, n, ecount As Integer
+        Dim n, ecount As Integer
         Dim etol As Double = 0.01
         Dim itol As Double = 0.01
         Dim maxit_i As Integer = 1000
@@ -50,6 +51,10 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
         Dim Pb, Pd, Pmin, Pmax, Px, soma_x1, soma_x2, soma_y, soma_x, Tmin, Tmax As Double
         Dim proppack As PropertyPackages.PropertyPackage
         Dim objval, objval0 As Double
+
+        Dim Vx1_ant(n), Vx2_ant(n), Ki2(n), Ki2_ant(n) As Double
+        Dim Vant, T, Tant, P As Double
+        Dim Ki1(n) As Double
 
         Public Enum numsolver
             Limited_Memory_BGFS = 0
@@ -71,6 +76,8 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
         Dim objfunc As ObjFuncType = ObjFuncType.MinGibbs
 
         Public Overrides Function Flash_PT(ByVal Vz() As Double, ByVal P As Double, ByVal T As Double, ByVal PP As PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi() As Double = Nothing) As Object
+
+            Dim i, j As Integer
 
             Dim d1, d2 As Date, dt As TimeSpan
 
@@ -125,7 +132,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
             i = 0
             Px = 0
             Do
-                Px = Px + (Vz(i) / Vp(i))
+                If Vp(i) <> 0.0# Then Px = Px + (Vz(i) / Vp(i))
                 i = i + 1
             Loop Until i = n + 1
             Px = 1 / Px
@@ -157,7 +164,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                 End If
             End If
 
-            Dim Vmin, Vmax As Double
+            Dim Vmin, Vmax, g0 As Double
             Vmin = 1.0#
             Vmax = 0.0#
             For i = 0 To n
@@ -166,26 +173,20 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
             Next
 
             If Vmin < 0.0# Then Vmin = 0.0#
+            If Vmin = 1.0# Then Vmin = 0.0#
+            If Vmax = 0.0# Then Vmax = 1.0#
             If Vmax > 1.0# Then Vmax = 1.0#
 
             V = (Vmin + Vmax) / 2
 
-            If V = 0.5# Then V = 1 - (P - Pd) / (Pb - Pd)
+            g0 = 0.0#
+            For i = 0 To n
+                g0 += Vz(i) * (Ki(i) - 1) / (V + (1 - V) * Ki(i))
+            Next
 
-            If V = 0.5# Then
-                If P <= Pd Then
-                    'vapor only
-                    L = 0.1
-                    V = 0.9
-                ElseIf P >= Pb Then
-                    'liquid only
-                    L = 0.9
-                    V = 0.1
-                Else
-                    'VLE
-                    V = 1 - (P - Pd) / (Pb - Pd)
-                End If
-            End If
+            If g0 > 0 Then Vmin = V Else Vmax = V
+
+            V = Vmin + (Vmax - Vmin) / 4
 
             L = 1 - V
 
@@ -242,7 +243,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                 V = Vz(imaxy) / maxy * 0.8
             End If
 
-            'V = V * F
+            V = V '* F
 
             If V <= 0.0# Then V = 0.2
 
@@ -271,7 +272,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                 problem.AddOption("mu_strategy", "adaptive")
                 problem.AddOption("hessian_approximation", "limited-memory")
                 'problem.AddOption("hessian_approximation", "exact")
-                problem.SetIntermediateCallback(AddressOf intermediate)
+                'problem.SetIntermediateCallback(AddressOf intermediate)
                 'solve the problem 
                 status = problem.SolveProblem(initval, obj, Nothing, Nothing, Nothing, Nothing)
             End Using
@@ -286,13 +287,13 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
             'check if the algorithm converged to the trivial solution.
             If PP.AUX_CheckTrivial(Ki) Then
-                'rollback to inside-out PT flash.
-                Console.WriteLine("PT Flash [GM]: Converged to the trivial solution at specified conditions. Rolling back to Inside-Out PT-Flash...")
-                result = _io.Flash_PT(Vz, P, T, PP, ReuseKI, PrevKi)
+                'rollback to NL PT flash.
+                WriteDebugInfo("PT Flash [GM]: Converged to the trivial solution at specified conditions. Rolling back to Nested-Loops PT-Flash...")
+                result = _nl.Flash_PT(Vz, P, T, PP, ReuseKI, PrevKi)
             ElseIf status = IpoptReturnCode.Maximum_Iterations_Exceeded Then
-                'retry with inside-out PT flash.
-                Console.WriteLine("PT Flash [GM]: Maximum iterations exceeded. Recalculating with Inside-Out PT-Flash...")
-                result = _io.Flash_PT(Vz, P, T, PP, ReuseKI, PrevKi)
+                'retry with NL PT flash.
+                WriteDebugInfo("PT Flash [GM]: Maximum iterations exceeded. Recalculating with Nested-Loops PT-Flash...")
+                result = _nl.Flash_PT(Vz, P, T, PP, ReuseKI, PrevKi)
             Else
                 FunctionValue(initval)
                 result = New Object() {L, V, Vx1, Vy, ecount, 0.0#, PP.RET_NullVector, 0.0#, PP.RET_NullVector}
@@ -351,19 +352,21 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
                         ' liquid phase NOT stable. proceed to three-phase flash.
 
-                        Dim vx2est(UBound(Vz)) As Double
+                        Dim vx2est(n), fcl(n), fcv(n) As Double
                         Dim m As Double = LBound(stresult(1), 1)
-                        Dim gl, hl, sl, gv, hv, sv, gli As Double
+                        Dim gl, gv, gli As Double
 
                         If StabSearchSeverity = 2 Then
                             gli = 0
                             For j = 0 To m
-                                For i = 0 To UBound(Vz)
+                                For i = 0 To nc
                                     vx2est(i) = stresult(1)(j, i)
                                 Next
-                                hl = PP.DW_CalcEnthalpy(vx2est, T, P, State.Liquid)
-                                sl = PP.DW_CalcEntropy(vx2est, T, P, State.Liquid)
-                                gl = hl - T * sl
+                                fcl = PP.DW_CalcFugCoeff(vx2est, T, P, State.Liquid)
+                                gl = 0.0#
+                                For i = 0 To nc
+                                    If vx2est(i) <> 0.0# Then gl += vx2est(i) * Log(fcl(i) * vx2est(i))
+                                Next
                                 If gl <= gli Then
                                     gli = gl
                                     k = j
@@ -378,13 +381,15 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                             Next
                         End If
 
-                        hl = PP.DW_CalcEnthalpy(vx2est, T, P, State.Liquid)
-                        sl = PP.DW_CalcEntropy(vx2est, T, P, State.Liquid)
-                        gl = hl - T * sl
+                        fcl = PP.DW_CalcFugCoeff(vx2est, T, P, State.Liquid)
+                        fcv = PP.DW_CalcFugCoeff(vx2est, T, P, State.Vapor)
 
-                        hv = PP.DW_CalcEnthalpy(vx2est, T, P, State.Vapor)
-                        sv = PP.DW_CalcEntropy(vx2est, T, P, State.Vapor)
-                        gv = hv - T * sv
+                        gv = 0.0#
+                        gl = 0.0#
+                        For i = 0 To nc
+                            If vx2est(i) <> 0.0# Then gv += vx2est(i) * Log(fcv(i) * vx2est(i))
+                            If vx2est(i) <> 0.0# Then gl += vx2est(i) * Log(fcl(i) * vx2est(i))
+                        Next
 
                         If gl < gv Then 'test phase is liquid-like.
 
@@ -398,8 +403,8 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                             Dim imaxl As Integer = Array.IndexOf(vx2est, maxl)
 
                             F = 1000.0#
-                            V = result(1) * F
-                            L2 = F * fi(imaxl)
+                            V = result(1)
+                            L2 = F * result(3)(imaxl)
                             L1 = F - L2 - V
 
                             If L1 < 0.0# Then
@@ -423,6 +428,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                                 uconstr2(i) = fi(i) * F
                                 glow(i) = 0.0#
                                 gup(i) = 1000.0#
+                                If initval2(i) > uconstr2(i) Then initval2(i) = uconstr2(i)
                             Next
                             For i = n + 1 To 2 * n + 1
                                 If Vz(i - n - 1) <> 0 Then
@@ -433,6 +439,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                                 End If
                                 lconstr2(i) = 0.0#
                                 uconstr2(i) = fi(i - n - 1) * F
+                                If initval2(i) > uconstr2(i) Then initval2(i) = uconstr2(i)
                             Next
 
                             ecount = 0
@@ -444,54 +451,30 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
                             Solver = numsolver.IPOPT
 
-                            Select Case Me.Solver
-                                'Case numsolver.Limited_Memory_BGFS
-                                '    Dim variables(2 * n + 1) As OptBoundVariable
-                                '    For i = 0 To 2 * n + 1
-                                '        variables(i) = New OptBoundVariable("x" & CStr(i + 1), initval2(i), False, lconstr2(i), uconstr2(i))
-                                '    Next
-                                '    Dim solver As New L_BFGS_B
-                                '    solver.Tolerance = etol
-                                '    solver.MaxFunEvaluations = maxit_e
-                                '    initval2 = solver.ComputeMin(AddressOf FunctionValue, AddressOf FunctionGradient, variables)
-                                '    solver = Nothing
-                                'Case numsolver.Truncated_Newton
-                                '    Dim variables(2 * n + 1) As OptBoundVariable
-                                '    For i = 0 To 2 * n + 1
-                                '        variables(i) = New OptBoundVariable("x" & CStr(i + 1), initval2(i), False, lconstr2(i), uconstr2(i))
-                                '    Next
-                                '    Dim solver As New TruncatedNewton
-                                '    solver.Tolerance = etol
-                                '    solver.MaxFunEvaluations = maxit_e
-                                '    initval2 = solver.ComputeMin(AddressOf FunctionValue, AddressOf FunctionGradient, variables)
-                                '    solver = Nothing
-                                'Case numsolver.Simplex
-                                '    Dim variables(2 * n + 1) As OptBoundVariable
-                                '    For i = 0 To 2 * n + 1
-                                '        variables(i) = New OptBoundVariable("x" & CStr(i + 1), initval2(i), False, lconstr2(i), uconstr2(i))
-                                '    Next
-                                '    Dim solver As New Simplex
-                                '    solver.Tolerance = etol
-                                '    solver.MaxFunEvaluations = maxit_e
-                                '    initval2 = solver.ComputeMin(AddressOf FunctionValue, variables)
-                                '    solver = Nothing
-                                Case numsolver.IPOPT
-                                    Using problem As New Ipopt(initval2.Length, lconstr2, uconstr2, n + 1, glow, gup, (n + 1) * 2, 0, _
-                                            AddressOf eval_f, AddressOf eval_g, _
-                                            AddressOf eval_grad_f, AddressOf eval_jac_g, AddressOf eval_h)
-                                        problem.AddOption("tol", etol)
-                                        problem.AddOption("max_iter", maxit_e)
-                                        problem.AddOption("mu_strategy", "adaptive")
-                                        problem.AddOption("hessian_approximation", "limited-memory")
-                                        problem.SetIntermediateCallback(AddressOf intermediate)
-                                        'solve the problem 
-                                        status = problem.SolveProblem(initval2, obj, g, Nothing, Nothing, Nothing)
-                                    End Using
-                            End Select
+                            Using problem As New Ipopt(initval2.Length, lconstr2, uconstr2, n + 1, glow, gup, (n + 1) * 2, 0, _
+                                    AddressOf eval_f, AddressOf eval_g, _
+                                    AddressOf eval_grad_f, AddressOf eval_jac_g, AddressOf eval_h)
+                                problem.AddOption("tol", etol)
+                                problem.AddOption("max_iter", maxit_e)
+                                problem.AddOption("mu_strategy", "adaptive")
+                                'problem.AddOption("mehrotra_algorithm", "yes")
+                                problem.AddOption("hessian_approximation", "limited-memory")
+                                'problem.SetIntermediateCallback(AddressOf intermediate)
+                                'solve the problem 
+                                status = problem.SolveProblem(initval2, obj, g, Nothing, Nothing, Nothing)
+                            End Using
 
                             For i = 0 To initval2.Length - 1
                                 If Double.IsNaN(initval2(i)) Then initval2(i) = 0.0#
                             Next
+
+                            'check if maximum iterations exceeded.
+                            If status = IpoptReturnCode.Maximum_Iterations_Exceeded Then
+                                'retry with NL PT flash.
+                                WriteDebugInfo("PT Flash [GM]: Maximum iterations exceeded. Recalculating with Nested-Loops PT-Flash...")
+                                result = _nl3p.Flash_PT(Vz, P, T, PP, ReuseKI, PrevKi)
+                                Return result
+                            End If
 
                             FunctionValue(initval2)
 
@@ -511,7 +494,6 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                                 result = New Object() {L2 / F, V / F, Vx2, Vy, ecount, L1 / F, Vx1, 0.0#, PP.RET_NullVector}
                             End If
 
-
                         End If
 
                     End If
@@ -524,7 +506,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
             dt = d2 - d1
 
-            Console.WriteLine("PT Flash [GM]: Converged in " & ecount & " iterations. Status: " & [Enum].GetName(GetType(IpoptReturnCode), status) & ". Time taken: " & dt.TotalMilliseconds & " ms")
+            WriteDebugInfo("PT Flash [GM]: Converged in " & ecount & " iterations. Status: " & [Enum].GetName(GetType(IpoptReturnCode), status) & ". Time taken: " & dt.TotalMilliseconds & " ms")
 
 out:        Return result
 
@@ -532,17 +514,25 @@ out:        Return result
 
         Public Overrides Function Flash_PH(ByVal Vz As Double(), ByVal P As Double, ByVal H As Double, ByVal Tref As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
 
+            Dim doparallel As Boolean = My.MyApplication._EnableParallelProcessing
+
+            Dim Vn(1) As String, Vx(1), Vy(1), Vx_ant(1), Vy_ant(1), Vp(1), Ki(1), Ki_ant(1), fi(1) As Double
+            Dim i, n, ecount As Integer
             Dim d1, d2 As Date, dt As TimeSpan
+            Dim L, V, T, Pf As Double
+
+            Dim resultFlash As Object
+            Dim Tb, Td, Hb, Hd As Double
+            Dim ErrRes As Object
 
             d1 = Date.Now
 
             n = UBound(Vz)
 
-            proppack = PP
             Hf = H
             Pf = P
 
-            ReDim Vn(n), Vx1(n), Vx2(n), Vy(n), Vp(n), Ki(n), fi(n)
+            ReDim Vn(n), Vy(n), Vp(n), Ki(n), fi(n)
 
             Vn = PP.RET_VNAMES()
             fi = Vz.Clone
@@ -552,87 +542,173 @@ out:        Return result
             Dim tolINT As Double = CDbl(PP.Parameters("PP_PHFILT"))
             Dim tolEXT As Double = CDbl(PP.Parameters("PP_PHFELT"))
 
-            Dim Tsup, Tinf, Hsup, Hinf
+            Dim Tmin, Tmax As Double
 
-            If Tref <> 0 Then
-                Tinf = Tref - 250
-                Tsup = Tref + 250
+            Tmax = 2000.0#
+            Tmin = 50.0#
+
+            If Tref = 0.0# Then Tref = 298.15
+
+            'calculate dew point and boiling point
+
+            Dim alreadymt As Boolean = False
+
+            If My.MyApplication._EnableParallelProcessing Then
+                My.MyApplication.IsRunningParallelTasks = True
+                Try
+                    Dim task1 As Task = New Task(Sub()
+                                                     Dim ErrRes1 = Herror("PV", 0, P, Vz, PP)
+                                                     Hb = ErrRes1(0)
+                                                     Tb = ErrRes1(1)
+                                                 End Sub)
+                    Dim task2 As Task = New Task(Sub()
+                                                     Dim ErrRes2 = Herror("PV", 1, P, Vz, PP)
+                                                     Hd = ErrRes2(0)
+                                                     Td = ErrRes2(1)
+                                                 End Sub)
+                    task1.Start()
+                    task2.Start()
+                    Task.WaitAll(task1, task2)
+                Catch ae As AggregateException
+                    Throw ae.Flatten().InnerException
+                End Try
+                My.MyApplication.IsRunningParallelTasks = False
             Else
-                Tinf = 100
-                Tsup = 2000
+                ErrRes = Herror("PV", 0, P, Vz, PP)
+                Hb = ErrRes(0)
+                Tb = ErrRes(1)
+                ErrRes = Herror("PV", 1, P, Vz, PP)
+                Hd = ErrRes(0)
+                Td = ErrRes(1)
             End If
-            If Tinf < 100 Then Tinf = 100
 
-            Hinf = PP.DW_CalcEnthalpy(Vz, Tinf, P, State.Liquid)
-            Hsup = PP.DW_CalcEnthalpy(Vz, Tsup, P, State.Vapor)
+            If Hb > 0 And Hd < 0 Then
 
-            If H >= Hsup Then
-                Tf = Me.ESTIMAR_T_H(H, Tref, "V", P, Vz)
-            ElseIf H <= Hinf Then
-                Tf = Me.ESTIMAR_T_H(H, Tref, "L", P, Vz)
-            Else
-                Dim bo As New BrentOpt.Brent
-                bo.DefineFuncDelegate(AddressOf Herror)
-                Console.WriteLine("PH Flash: Starting calculation for " & Tinf & " <= T <= " & Tsup)
+                'specified enthalpy requires partial evaporation 
+                'calculate vapour fraction
 
-                Dim fx, dfdx, x1 As Double
-
-                Dim cnt As Integer = 0
-
-                If Tref = 0 Then Tref = 298.15
-                x1 = Tref
+                Dim H1, H2, V1, V2 As Double
+                ecount = 0
+                V = 0
+                H1 = Hb
                 Do
-                    fx = Herror(x1, Nothing)
-                    If Abs(fx) < etol Then Exit Do
-                    dfdx = (Herror(x1 + 1, Nothing) - fx)
-                    x1 = x1 - fx / dfdx
-                    cnt += 1
-                Loop Until cnt > maxit_e Or Double.IsNaN(x1)
-                If Double.IsNaN(x1) Then
-                    Tf = bo.BrentOpt(Tinf, Tsup, 4, tolEXT, maxitEXT, Nothing)
-                Else
-                    Tf = x1
-                End If
 
+                    ecount += 1
+                    V1 = V
+                    If V1 < 1 Then
+                        V2 = V1 + 0.01
+                    Else
+                        V2 = V1 - 0.01
+                    End If
+
+                    H2 = Herror("PV", V2, P, Vz, PP)(0)
+                    V = V1 + (V2 - V1) * (0 - H1) / (H2 - H1)
+                    If V < 0 Then V = 0.0#
+                    If V > 1 Then V = 1.0#
+                    resultFlash = Herror("PV", V, P, Vz, PP)
+                    H1 = resultFlash(0)
+
+                Loop Until Abs(H1) < itol Or ecount > maxitEXT
+
+                T = resultFlash(1)
+                L = resultFlash(3)
+                Vy = resultFlash(4)
+                Vx = resultFlash(5)
+
+                For i = 0 To n
+                    Ki(i) = Vy(i) / Vx(i)
+                Next
+
+            ElseIf Hd > 0 Then
+
+                'only gas phase
+                'calculate temperature
+
+                Dim H1, H2, T1, T2 As Double
+                ecount = 0
+                T = Td
+                H1 = Hd
+                Do
+                    ecount += 1
+                    T1 = T
+                    T2 = T1 + 1
+                    H2 = Hf - PP.DW_CalcEnthalpy(Vz, T2, P, State.Vapor)
+                    T = T1 + (T2 - T1) * (0 - H1) / (H2 - H1)
+                    H1 = Hf - PP.DW_CalcEnthalpy(Vz, T, P, State.Vapor)
+                Loop Until Abs(H1) < itol Or ecount > maxitEXT
+
+                L = 0
+                V = 1
+                Vy = Vz.Clone
+                Vx = Vz.Clone
+                L = 0
+                For i = 0 To n
+                    Ki(i) = 1
+                Next
+
+                If T <= Tmin Or T >= Tmax Then Throw New Exception("PH Flash [NL3PV3]: Invalid result: Temperature did not converge.")
+            Else
+
+                'specified enthalpy requires pure liquid 
+                'calculate temperature
+
+                Dim H1, H2, T1, T2 As Double
+                ecount = 0
+                T = Tb
+                H1 = Hb
+                Do
+                    ecount += 1
+                    T1 = T
+                    T2 = T1 - 1
+                    H2 = Herror("PT", T2, P, Vz, PP)(0)
+                    T = T1 + (T2 - T1) * (0 - H1) / (H2 - H1)
+                    resultFlash = Herror("PT", T, P, Vz, PP)
+                    H1 = resultFlash(0)
+                Loop Until Abs(H1) < itol Or ecount > maxitEXT
+
+                V = 0
+                L = resultFlash(3)
+                Vy = resultFlash(4)
+                Vx = resultFlash(5)
+
+                For i = 0 To n
+                    Ki(i) = Vy(i) / Vx(i)
+                Next
+
+                If T <= Tmin Or T >= Tmax Then Throw New Exception("PH Flash [GM]: Invalid result: Temperature did not converge.")
             End If
-
-            Dim tmp As Object = Flash_PT(Vz, P, Tf, PP)
-
-            L1 = tmp(0)
-            V = tmp(1)
-            Vx1 = tmp(2)
-            Vy = tmp(3)
-            ecount = tmp(4)
-            L2 = tmp(5)
-            Vx2 = tmp(6)
-
-            For i = 0 To n
-                Ki(i) = Vy(i) / Vx1(i)
-            Next
 
             d2 = Date.Now
 
             dt = d2 - d1
 
-            Console.WriteLine("PH Flash [GM]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms")
+            WriteDebugInfo("PH Flash [GM]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms")
 
-            Return New Object() {L, V, Vx1, Vy, Tf, ecount, Ki, L2, Vx2, 0.0#, PP.RET_NullVector}
+            Return New Object() {L, V, Vx, Vy, T, ecount, Ki, 0.0#, PP.RET_NullVector, 0.0#, PP.RET_NullVector}
 
         End Function
 
         Public Overrides Function Flash_PS(ByVal Vz As Double(), ByVal P As Double, ByVal S As Double, ByVal Tref As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
 
+            Dim doparallel As Boolean = My.MyApplication._EnableParallelProcessing
+
+            Dim Vn(1) As String, Vx(1), Vy(1), Vx_ant(1), Vy_ant(1), Vp(1), Ki(1), Ki_ant(1), fi(1) As Double
+            Dim i, n, ecount As Integer
             Dim d1, d2 As Date, dt As TimeSpan
+            Dim L, V, T, Pf As Double
+
+            Dim resultFlash As Object
+            Dim Tb, Td, Sb, Sd As Double
+            Dim ErrRes As Object
 
             d1 = Date.Now
 
             n = UBound(Vz)
 
-            proppack = PP
             Sf = S
             Pf = P
 
-            ReDim Vn(n), Vx1(n), Vx2(n), Vy(n), Vp(n), Ki(n), fi(n)
+            ReDim Vn(n), Vy(n), Vp(n), Ki(n), fi(n)
 
             Vn = PP.RET_VNAMES()
             fi = Vz.Clone
@@ -642,137 +718,288 @@ out:        Return result
             Dim tolINT As Double = CDbl(PP.Parameters("PP_PSFILT"))
             Dim tolEXT As Double = CDbl(PP.Parameters("PP_PSFELT"))
 
-            Dim Tsup, Tinf, Ssup, Sinf
+            Dim Tmin, Tmax As Double
 
-            If Tref <> 0 Then
-                Tinf = Tref - 200
-                Tsup = Tref + 200
+            Tmax = 2000.0#
+            Tmin = 50.0#
+
+            If Tref = 0.0# Then Tref = 298.15
+
+            'calculate dew point and boiling point
+
+            Dim alreadymt As Boolean = False
+
+            If My.MyApplication._EnableParallelProcessing Then
+                My.MyApplication.IsRunningParallelTasks = True
+                Try
+                    Dim task1 As Task = New Task(Sub()
+                                                     Dim ErrRes1 = Serror("PV", 0, P, Vz, PP)
+                                                     Sb = ErrRes1(0)
+                                                     Tb = ErrRes1(1)
+                                                 End Sub)
+                    Dim task2 As Task = New Task(Sub()
+                                                     Dim ErrRes2 = Serror("PV", 1, P, Vz, PP)
+                                                     Sd = ErrRes2(0)
+                                                     Td = ErrRes2(1)
+                                                 End Sub)
+                    task1.Start()
+                    task2.Start()
+                    Task.WaitAll(task1, task2)
+                Catch ae As AggregateException
+                    Throw ae.Flatten().InnerException
+                End Try
+                My.MyApplication.IsRunningParallelTasks = False
             Else
-                Tinf = 100
-                Tsup = 2000
+                ErrRes = Serror("PV", 0, P, Vz, PP)
+                Sb = ErrRes(0)
+                Tb = ErrRes(1)
+                ErrRes = Serror("PV", 1, P, Vz, PP)
+                Sd = ErrRes(0)
+                Td = ErrRes(1)
             End If
-            If Tinf < 100 Then Tinf = 100
 
-            Sinf = PP.DW_CalcEntropy(Vz, Tinf, P, State.Liquid)
-            Ssup = PP.DW_CalcEntropy(Vz, Tsup, P, State.Vapor)
+            Dim S1, S2, T1, T2, V1, V2 As Double
 
-            If S >= Ssup Then
-                Tf = Me.ESTIMAR_T_S(S, Tref, "V", P, Vz)
-            ElseIf S <= Sinf Then
-                Tf = Me.ESTIMAR_T_S(S, Tref, "L", P, Vz)
-            Else
-                Dim bo As New BrentOpt.Brent
-                bo.DefineFuncDelegate(AddressOf Serror)
-                Console.WriteLine("PS Flash: Starting calculation for " & Tinf & " <= T <= " & Tsup)
+            If Sb > 0 And Sd < 0 Then
 
-                Dim fx, dfdx, x1 As Double
+                'specified entropy requires partial evaporation 
+                'calculate vapour fraction
 
                 ecount = 0
-
-                If Tref = 0 Then Tref = 298.15
-                x1 = Tref
+                V = 0
+                S1 = Sb
                 Do
-                    fx = Serror(x1, Nothing)
-                    If Abs(fx) < etol Then Exit Do
-                    dfdx = (Serror(x1 + 1, Nothing) - fx)
-                    x1 = x1 - fx / dfdx
                     ecount += 1
-                Loop Until ecount > maxit_e Or Double.IsNaN(x1)
-                If Double.IsNaN(x1) Then
-                    Tf = bo.BrentOpt(Tinf, Tsup, 4, tolEXT, maxitEXT, Nothing)
-                Else
-                    Tf = x1
-                End If
+                    V1 = V
+                    If V1 < 1 Then
+                        V2 = V1 + 0.01
+                    Else
+                        V2 = V1 - 0.01
+                    End If
 
+                    S2 = Serror("PV", V2, P, Vz, PP)(0)
+                    V = V1 + (V2 - V1) * (0 - S1) / (S2 - S1)
+                    If V < 0 Then V = 0
+                    If V > 1 Then V = 1
+                    resultFlash = Serror("PV", V, P, Vz, PP)
+                    S1 = resultFlash(0)
+                Loop Until Abs(S1) < itol Or ecount > maxitEXT
+
+                T = resultFlash(1)
+                L = resultFlash(3)
+                Vy = resultFlash(4)
+                Vx = resultFlash(5)
+                For i = 0 To n
+                    Ki(i) = Vy(i) / Vx(i)
+                Next
+
+            ElseIf Sd > 0 Then
+
+                'only gas phase
+                'calculate temperature
+
+                ecount = 0
+                T = Td
+                S1 = Sd
+                Do
+                    ecount += 1
+                    T1 = T
+                    T2 = T1 + 1
+                    S2 = Sf - PP.DW_CalcEntropy(Vz, T2, P, State.Vapor)
+                    T = T1 + (T2 - T1) * (0 - S1) / (S2 - S1)
+                    S1 = Sf - PP.DW_CalcEntropy(Vz, T, P, State.Vapor)
+                Loop Until Abs(S1) < itol Or ecount > maxitEXT
+
+                L = 0
+                V = 1
+                Vy = Vz.Clone
+                Vx = Vz.Clone
+                L = 0
+                For i = 0 To n
+                    Ki(i) = 1
+                Next
+
+                If T <= Tmin Or T >= Tmax Then Throw New Exception("PS Flash [GM]: Invalid result: Temperature did not converge.")
+
+            Else
+
+                'specified enthalpy requires pure liquid 
+                'calculate temperature
+
+                ecount = 0
+                T = Tb
+                S1 = Sb
+                Do
+                    ecount += 1
+                    T1 = T
+                    T2 = T1 - 1
+                    S2 = Serror("PT", T2, P, Vz, PP)(0)
+                    T = T1 + (T2 - T1) * (0 - S1) / (S2 - S1)
+                    resultFlash = Serror("PT", T, P, Vz, PP)
+                    S1 = resultFlash(0)
+                Loop Until Abs(S1) < itol Or ecount > maxitEXT
+
+                V = 0
+                L = resultFlash(3)
+                Vy = resultFlash(4)
+                Vx = resultFlash(5)
+
+                For i = 0 To n
+                    Ki(i) = Vy(i) / Vx(i)
+                Next
+
+                If T <= Tmin Or T >= Tmax Then Throw New Exception("PS Flash [GM]: Invalid result: Temperature did not converge.")
             End If
-
-            Dim tmp As Object = Flash_PT(Vz, P, Tf, PP)
-
-            L1 = tmp(0)
-            V = tmp(1)
-            Vx1 = tmp(2)
-            Vy = tmp(3)
-            ecount = tmp(4)
-            L2 = tmp(5)
-            Vx2 = tmp(6)
-
-            For i = 0 To n
-                Ki(i) = Vy(i) / Vx1(i)
-            Next
 
             d2 = Date.Now
 
             dt = d2 - d1
 
-            Console.WriteLine("PS Flash [GM]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms")
+            WriteDebugInfo("PS Flash [GM]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms.")
 
-            Return New Object() {L, V, Vx1, Vy, Tf, ecount, Ki, L2, Vx2, 0.0#, PP.RET_NullVector}
+            Return New Object() {L, V, Vx, Vy, T, ecount, Ki, 0.0#, PP.RET_NullVector, 0.0#, PP.RET_NullVector}
 
         End Function
 
-        Function OBJ_FUNC_PH_FLASH(ByVal T As Double, ByVal H As Double, ByVal P As Double, ByVal Vz As Object) As Object
-
-            Dim tmp = Me.Flash_PT(Vz, Pf, T, proppack)
+        Function OBJ_FUNC_PH_FLASH(ByVal Type As String, ByVal X As Double, ByVal P As Double, ByVal Vz() As Double, ByVal PP As PropertyPackages.PropertyPackage) As Object
 
             Dim n = UBound(Vz)
+            Dim L1, L2, V, Vx1(), Vx2(), Vy() As Double
 
-            L1 = tmp(0)
-            V = tmp(1)
-            Vx1 = tmp(2)
-            Vy = tmp(3)
-            L2 = tmp(5)
-            Vx2 = tmp(6)
+            If Type = "PT" Then
+                Dim tmp = Me.Flash_PT(Vz, P, X, PP)
+                L1 = tmp(0)
+                V = tmp(1)
+                Vx1 = tmp(2)
+                Vy = tmp(3)
+                L2 = tmp(5)
+                Vx2 = tmp(6)
+                T = X
+            Else
+                Dim tmp = Me.Flash_PV(Vz, P, X, 298.15, PP)
+                L1 = tmp(0)
+                V = tmp(1)
+                Vx1 = tmp(2)
+                Vy = tmp(3)
+                T = tmp(4)
+                L2 = tmp(7)
+                Vx2 = tmp(8)
+            End If
 
-            Hv = 0
-            Hl1 = 0
-            Hl2 = 0
+            Dim _Hv, _Hl1, _Hl2 As Double
 
-            If V > 0.00000001 Then Hv = proppack.DW_CalcEnthalpy(Vy, T, Pf, State.Vapor)
-            If L1 > 0.00000001 Then Hl1 = proppack.DW_CalcEnthalpy(Vx1, T, Pf, State.Liquid)
-            If L2 > 0.00000001 Then Hl2 = proppack.DW_CalcEnthalpy(Vx2, T, Pf, State.Liquid)
+            _Hv = 0.0#
+            _Hl1 = 0.0#
+            _Hl2 = 0.0#
 
-            Dim mmg, mml, mml2
+            Dim alreadymt As Boolean = False
+
+            If My.MyApplication._EnableParallelProcessing Then
+                My.MyApplication.IsRunningParallelTasks = True
+                Try
+                    Dim task1 As Task = New Task(Sub()
+                                                     If V > 0 Then _Hv = proppack.DW_CalcEnthalpy(Vy, T, P, State.Vapor)
+                                                 End Sub)
+                    Dim task2 As Task = New Task(Sub()
+                                                     If L1 > 0 Then _Hl1 = proppack.DW_CalcEnthalpy(Vx1, T, P, State.Liquid)
+                                                 End Sub)
+                    Dim task3 As Task = New Task(Sub()
+                                                     If L2 > 0 Then _Hl2 = proppack.DW_CalcEnthalpy(Vx2, T, P, State.Liquid)
+                                                 End Sub)
+                    task1.Start()
+                    task2.Start()
+                    task3.Start()
+                    Task.WaitAll(task1, task2, task3)
+                Catch ae As AggregateException
+                    Throw ae.Flatten().InnerException
+                End Try
+                My.MyApplication.IsRunningParallelTasks = False
+            Else
+                If V > 0 Then _Hv = proppack.DW_CalcEnthalpy(Vy, T, P, State.Vapor)
+                If L1 > 0 Then _Hl1 = proppack.DW_CalcEnthalpy(Vx1, T, P, State.Liquid)
+                If L2 > 0 Then _Hl2 = proppack.DW_CalcEnthalpy(Vx2, T, P, State.Liquid)
+            End If
+
+            Dim mmg, mml, mml2 As Double
             mmg = proppack.AUX_MMM(Vy)
             mml = proppack.AUX_MMM(Vx1)
             mml2 = proppack.AUX_MMM(Vx2)
 
-            Dim herr As Double = Hf - (mmg * V / (mmg * V + mml * L1 + mml2 * L2)) * Hv - (mml * L1 / (mmg * V + mml * L1 + mml2 * L2)) * Hl1 - (mml2 * L2 / (mmg * V + mml * L1 + mml2 * L2)) * Hl2
-            OBJ_FUNC_PH_FLASH = herr
+            Dim herr As Double = Hf - (mmg * V / (mmg * V + mml * L1 + mml2 * L2)) * _Hv - (mml * L1 / (mmg * V + mml * L1 + mml2 * L2)) * _Hl1 - (mml2 * L2 / (mmg * V + mml * L1 + mml2 * L2)) * _Hl2
+            OBJ_FUNC_PH_FLASH = {herr, T, V, L1, L2, Vy, Vx1, Vx2}
 
-            Console.WriteLine("PH Flash [GM]: Current T = " & T & ", Current H Error = " & herr)
+            WriteDebugInfo("PH Flash [GM]: Current T = " & T & ", Current H Error = " & herr)
 
         End Function
 
-        Function OBJ_FUNC_PS_FLASH(ByVal T As Double, ByVal S As Double, ByVal P As Double, ByVal Vz As Object) As Object
-
-            Dim tmp = Me.Flash_PT(Vz, Pf, T, proppack)
+        Function OBJ_FUNC_PS_FLASH(ByVal Type As String, ByVal X As Double, ByVal P As Double, ByVal Vz() As Double, ByVal PP As PropertyPackages.PropertyPackage) As Object
 
             Dim n = UBound(Vz)
+            Dim L1, L2, V, Vx1(), Vx2(), Vy() As Double
 
-            L1 = tmp(0)
-            V = tmp(1)
-            Vx1 = tmp(2)
-            Vy = tmp(3)
-            L2 = tmp(5)
-            Vx2 = tmp(6)
+            If Type = "PT" Then
+                Dim tmp = Me.Flash_PT(Vz, P, X, PP)
+                L1 = tmp(0)
+                V = tmp(1)
+                Vx1 = tmp(2)
+                Vy = tmp(3)
+                L2 = tmp(5)
+                Vx2 = tmp(6)
+                T = X
+            Else
+                Dim tmp = Me.Flash_PV(Vz, P, X, 298.15, PP)
+                L1 = tmp(0)
+                V = tmp(1)
+                Vx1 = tmp(2)
+                Vy = tmp(3)
+                T = tmp(4)
+                L2 = tmp(7)
+                Vx2 = tmp(8)
+            End If
 
-            Sv = 0
-            Sl1 = 0
-            Sl2 = 0
+            Dim _Sv, _Sl1, _Sl2 As Double
 
-            If V > 0.00000001 Then Sv = proppack.DW_CalcEntropy(Vy, T, Pf, State.Vapor)
-            If L1 > 0.00000001 Then Sl1 = proppack.DW_CalcEntropy(Vx1, T, Pf, State.Liquid)
-            If L2 > 0.00000001 Then Sl2 = proppack.DW_CalcEntropy(Vx2, T, Pf, State.Liquid)
+            _Sv = 0.0#
+            _Sl1 = 0.0#
+            _Sl2 = 0.0#
 
-            Dim mmg, mml, mml2
+            Dim alreadymt As Boolean = False
+
+            If My.MyApplication._EnableParallelProcessing Then
+                My.MyApplication.IsRunningParallelTasks = True
+                Try
+                    Dim task1 As Task = New Task(Sub()
+                                                     If V > 0 Then _Sv = proppack.DW_CalcEntropy(Vy, T, P, State.Vapor)
+                                                 End Sub)
+                    Dim task2 As Task = New Task(Sub()
+                                                     If L1 > 0 Then _Sl1 = proppack.DW_CalcEntropy(Vx1, T, P, State.Liquid)
+                                                 End Sub)
+                    Dim task3 As Task = New Task(Sub()
+                                                     If L2 > 0 Then _Sl2 = proppack.DW_CalcEntropy(Vx2, T, P, State.Liquid)
+                                                 End Sub)
+                    task1.Start()
+                    task2.Start()
+                    task3.Start()
+                    Task.WaitAll(task1, task2, task3)
+                Catch ae As AggregateException
+                    Throw ae.Flatten().InnerException
+                End Try
+                My.MyApplication.IsRunningParallelTasks = False
+            Else
+                If V > 0 Then _Sv = proppack.DW_CalcEntropy(Vy, T, P, State.Vapor)
+                If L1 > 0 Then _Sl1 = proppack.DW_CalcEntropy(Vx1, T, P, State.Liquid)
+                If L2 > 0 Then _Sl2 = proppack.DW_CalcEntropy(Vx2, T, P, State.Liquid)
+            End If
+
+            Dim mmg, mml, mml2 As Double
             mmg = proppack.AUX_MMM(Vy)
             mml = proppack.AUX_MMM(Vx1)
             mml2 = proppack.AUX_MMM(Vx2)
 
-            Dim serr As Double = Sf - (mmg * V / (mmg * V + mml * L1 + mml2 * L2)) * Sv - (mml * L1 / (mmg * V + mml * L1 + mml2 * L2)) * Sl1 - (mml2 * L2 / (mmg * V + mml * L1 + mml2 * L2)) * Sl2
-            OBJ_FUNC_PS_FLASH = serr
+            Dim herr As Double = Hf - (mmg * V / (mmg * V + mml * L1 + mml2 * L2)) * _Sv - (mml * L1 / (mmg * V + mml * L1 + mml2 * L2)) * _Sl1 - (mml2 * L2 / (mmg * V + mml * L1 + mml2 * L2)) * _Sl2
+            OBJ_FUNC_PS_FLASH = {herr, T, V, L1, L2, Vy, Vx1, Vx2}
 
-            Console.WriteLine("PS Flash [GM]: Current T = " & T & ", Current S Error = " & serr)
+            WriteDebugInfo("PH Flash [GM]: Current T = " & T & ", Current H Error = " & herr)
 
         End Function
 
@@ -854,332 +1081,122 @@ out:        Return result
 
         End Function
 
-        Function Herror(ByVal Tt As Double, ByVal otherargs As Object) As Double
-            Return OBJ_FUNC_PH_FLASH(Tt, Sf, Pf, fi)
+        Function Herror(ByVal type As String, ByVal X As Double, ByVal P As Double, ByVal Vz() As Double, ByVal PP As PropertyPackages.PropertyPackage) As Object
+            Return OBJ_FUNC_PH_FLASH(type, X, P, Vz, PP)
         End Function
 
-        Function Serror(ByVal Tt As Double, ByVal otherargs As Object) As Double
-            Return OBJ_FUNC_PS_FLASH(Tt, Sf, Pf, fi)
+        Function Serror(ByVal type As String, ByVal X As Double, ByVal P As Double, ByVal Vz() As Double, ByVal PP As PropertyPackages.PropertyPackage) As Object
+            Return OBJ_FUNC_PS_FLASH(type, X, P, Vz, PP)
         End Function
-
 
         Public Overrides Function Flash_TV(ByVal Vz As Double(), ByVal T As Double, ByVal V As Double, ByVal Pref As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
 
-            Dim Vn(1) As String, Vx(1), Vy(1), Vx_ant(1), Vy_ant(1), Vp(1), Ki(1), Ki_ant(1), fi(1) As Double
-            Dim i, n, ecount As Integer
+            Dim i, j As Integer
+
             Dim d1, d2 As Date, dt As TimeSpan
-            Dim Pmin, Pmax, soma_x, soma_y As Double
-            Dim L, Lf, Vf, P, Pf As Double
 
             d1 = Date.Now
 
-            etol = CDbl(PP.Parameters("PP_PTFELT"))
-            maxit_e = CInt(PP.Parameters("PP_PTFMEI"))
-            itol = CDbl(PP.Parameters("PP_PTFILT"))
-            maxit_i = CInt(PP.Parameters("PP_PTFMII"))
+            Dim _nl As New DWSIMDefault
 
-            n = UBound(Vz)
+            Dim result As Object = _nl.Flash_TV(Vz, T, V, Pref, PP, ReuseKI, PrevKi)
 
-            PP = PP
-            Vf = V
-            L = 1 - V
-            Lf = 1 - Vf
-            Pf = P
+            P = result(4)
 
-            ReDim Vn(n), Vx(n), Vy(n), Vx_ant(n), Vy_ant(n), Vp(n), Ki(n), fi(n)
-            Dim dFdP As Double
+            If result(0) > 0 Then
 
-            Dim VTc = PP.RET_VTC()
+                Dim nt As Integer = Me.StabSearchCompIDs.Length - 1
+                Dim nc As Integer = UBound(Vz)
 
-            Vn = PP.RET_VNAMES()
-            fi = Vz.Clone
+                If nt = -1 Then nt = nc
+                n = nc
 
-            If Pref = 0 Then
+                Dim Vtrials(nt, nc) As Double
+                Dim idx(nt) As Integer
 
-                i = 0
-                Do
-                    Vp(i) = PP.AUX_PVAPi(Vn(i), T)
-                    i += 1
-                Loop Until i = n + 1
-
-                Pmin = Common.Min(Vp)
-                Pmax = Common.Max(Vp)
-
-                Pref = Pmin + (1 - V) * (Pmax - Pmin)
-
-            Else
-
-                Pmin = Pref * 0.8
-                Pmax = Pref * 1.2
-
-            End If
-
-            P = Pref
-
-            'Calculate Ki`s
-
-            If Not ReuseKI Then
-                i = 0
-                Do
-                    Vp(i) = PP.AUX_PVAPi(Vn(i), T)
-                    Ki(i) = Vp(i) / P
-                    i += 1
-                Loop Until i = n + 1
-            Else
-                If Not PP.AUX_CheckTrivial(PrevKi) Then
-                    For i = 0 To n
-                        Vp(i) = PP.AUX_PVAPi(Vn(i), T)
-                        Ki(i) = PrevKi(i)
-                    Next
-                Else
-                    i = 0
-                    Do
-                        Vp(i) = PP.AUX_PVAPi(Vn(i), T)
-                        Ki(i) = Vp(i) / P
-                        i += 1
-                    Loop Until i = n + 1
-                End If
-            End If
-
-            i = 0
-            Do
-                If Vz(i) <> 0 Then
-                    Vy(i) = Vz(i) * Ki(i) / ((Ki(i) - 1) * V + 1)
-                    Vx(i) = Vy(i) / Ki(i)
-                Else
-                    Vy(i) = 0
-                    Vx(i) = 0
-                End If
-                i += 1
-            Loop Until i = n + 1
-
-            i = 0
-            soma_x = 0
-            soma_y = 0
-            Do
-                soma_x = soma_x + Vx(i)
-                soma_y = soma_y + Vy(i)
-                i = i + 1
-            Loop Until i = n + 1
-            i = 0
-            Do
-                Vx(i) = Vx(i) / soma_x
-                Vy(i) = Vy(i) / soma_y
-                i = i + 1
-            Loop Until i = n + 1
-
-            Dim marcador3, marcador2, marcador As Integer
-            Dim stmp4_ant, stmp4, Pant, fval As Double
-            Dim chk As Boolean = False
-
-            If V = 1.0# Or V = 0.0# Then
-
-                ecount = 0
-                Do
-
-                    marcador3 = 0
-
-                    Dim cont_int = 0
-                    Do
-
-
-                        Ki = PP.DW_CalcKvalue(Vx, Vy, T, P)
-
-                        marcador = 0
-                        If stmp4_ant <> 0 Then
-                            marcador = 1
-                        End If
-                        stmp4_ant = stmp4
-
-                        If V = 0 Then
-                            i = 0
-                            stmp4 = 0
-                            Do
-                                stmp4 = stmp4 + Ki(i) * Vx(i)
-                                i = i + 1
-                            Loop Until i = n + 1
-                        Else
-                            i = 0
-                            stmp4 = 0
-                            Do
-                                stmp4 = stmp4 + Vy(i) / Ki(i)
-                                i = i + 1
-                            Loop Until i = n + 1
-                        End If
-
-                        If V = 0 Then
-                            i = 0
-                            Do
-                                Vy_ant(i) = Vy(i)
-                                Vy(i) = Ki(i) * Vx(i) / stmp4
-                                i = i + 1
-                            Loop Until i = n + 1
-                        Else
-                            i = 0
-                            Do
-                                Vx_ant(i) = Vx(i)
-                                Vx(i) = (Vy(i) / Ki(i)) / stmp4
-                                i = i + 1
-                            Loop Until i = n + 1
-                        End If
-
-                        marcador2 = 0
-                        If marcador = 1 Then
-                            If V = 0 Then
-                                If Math.Abs(Vy(0) - Vy_ant(0)) < itol Then
-                                    marcador2 = 1
-                                End If
-                            Else
-                                If Math.Abs(Vx(0) - Vx_ant(0)) < itol Then
-                                    marcador2 = 1
-                                End If
+                For i = 0 To nt
+                    If Me.StabSearchCompIDs.Length = 0 Then
+                        idx(i) = i
+                    Else
+                        j = 0
+                        For Each subst As DTL.ClassesBasicasTermodinamica.Substancia In PP.CurrentMaterialStream.Fases(0).Componentes.Values
+                            If subst.Nome = Me.StabSearchCompIDs(i) Then
+                                idx(i) = j
+                                Exit For
                             End If
-                        End If
+                            j += 1
+                        Next
+                    End If
+                Next
 
-                        cont_int = cont_int + 1
+                For i = 0 To nt
+                    For j = 0 To nc
+                        Vtrials(i, j) = 0.00001
+                    Next
+                Next
+                For j = 0 To nt
+                    Vtrials(j, idx(j)) = 1
+                Next
 
-                    Loop Until marcador2 = 1 Or Double.IsNaN(stmp4) Or cont_int > maxit_i
+                Dim stresult As Object = StabTest(T, P, result(2), PP, Vtrials, Me.StabSearchSeverity)
 
-                    Dim K1(n), K2(n), dKdP(n) As Double
+                If stresult(0) = False Then
 
-                    K1 = PP.DW_CalcKvalue(Vx, Vy, T, P)
-                    K2 = PP.DW_CalcKvalue(Vx, Vy, T, P * 1.001)
+                    Dim vx2est(n), fcl(n), fcv(n) As Double
+                    Dim m As Double = UBound(stresult(1), 1)
+                    Dim gl, gv, gli As Double
 
-                    For i = 0 To n
-                        dKdP(i) = (K2(i) - K1(i)) / (0.001 * P)
+                    If StabSearchSeverity = 2 Then
+                        gli = 0
+                        For j = 0 To m
+                            For i = 0 To nc
+                                vx2est(i) = stresult(1)(j, i)
+                            Next
+                            fcl = PP.DW_CalcFugCoeff(vx2est, T, P, State.Liquid)
+                            gl = 0.0#
+                            For i = 0 To nc
+                                If vx2est(i) <> 0.0# Then gl += vx2est(i) * Log(fcl(i) * vx2est(i))
+                            Next
+                            If gl <= gli Then
+                                gli = gl
+                                k = j
+                            End If
+                        Next
+                        For i = 0 To UBound(Vz)
+                            vx2est(i) = stresult(1)(k, i)
+                        Next
+                    Else
+                        For i = 0 To UBound(Vz)
+                            vx2est(i) = stresult(1)(m, i)
+                        Next
+                    End If
+
+                    fcl = PP.DW_CalcFugCoeff(vx2est, T, P, State.Liquid)
+                    fcv = PP.DW_CalcFugCoeff(vx2est, T, P, State.Vapor)
+
+                    gv = 0.0#
+                    gl = 0.0#
+                    For i = 0 To nc
+                        If vx2est(i) <> 0.0# Then gv += vx2est(i) * Log(fcv(i) * vx2est(i))
+                        If vx2est(i) <> 0.0# Then gl += vx2est(i) * Log(fcl(i) * vx2est(i))
                     Next
 
-                    fval = stmp4 - 1
+                    If gl < gv Then 'liquid-like
 
-                    ecount += 1
+                        'do a simple LLE calculation to get initial estimates.
+                        Dim slle As New SimpleLLE() With {.InitialEstimatesForPhase1 = result(2), .InitialEstimatesForPhase2 = vx2est, .UseInitialEstimatesForPhase1 = True, .UseInitialEstimatesForPhase2 = True}
+                        Dim resultL As Object = slle.Flash_PT(Vz, P, T * 0.9, PP)
 
-                    i = 0
-                    dFdP = 0
-                    Do
-                        If V = 0 Then
-                            dFdP = dFdP + Vx(i) * dKdP(i)
-                        Else
-                            dFdP = dFdP - Vy(i) / (Ki(i) ^ 2) * dKdP(i)
-                        End If
-                        i = i + 1
-                    Loop Until i = n + 1
+                        L1 = resultL(0)
+                        L2 = resultL(5)
+                        Vx1 = resultL(2)
+                        Vx2 = resultL(6)
 
-                    If (P - fval / dFdP) < 0 Then
-                        P = (P + Pant) / 2
-                    Else
-                        Pant = P
-                        P = P - fval / dFdP
+                        result = Flash_TV_3P(Vz, result(1), result(0) * L1, result(0) * L2, result(3), Vx1, Vx2, T, V, result(4), PP)
+
                     End If
 
-                    Console.WriteLine("TV Flash [GM]: Iteration #" & ecount & ", P = " & P & ", VF = " & V)
-
-
-
-                Loop Until Math.Abs(P - Pant) < 1 Or Double.IsNaN(P) = True Or ecount > maxit_e Or Double.IsNaN(P) Or Double.IsInfinity(P)
-
-            Else
-
-                ecount = 0
-
-                Do
-
-                    Ki = PP.DW_CalcKvalue(Vx, Vy, T, P)
-
-                    i = 0
-                    Do
-                        If Vz(i) <> 0 Then
-                            Vy_ant(i) = Vy(i)
-                            Vx_ant(i) = Vx(i)
-                            Vy(i) = Vz(i) * Ki(i) / ((Ki(i) - 1) * V + 1)
-                            Vx(i) = Vy(i) / Ki(i)
-                        Else
-                            Vy(i) = 0
-                            Vx(i) = 0
-                        End If
-                        i += 1
-                    Loop Until i = n + 1
-                    i = 0
-                    soma_x = 0
-                    soma_y = 0
-                    Do
-                        soma_x = soma_x + Vx(i)
-                        soma_y = soma_y + Vy(i)
-                        i = i + 1
-                    Loop Until i = n + 1
-                    i = 0
-                    Do
-                        Vx(i) = Vx(i) / soma_x
-                        Vy(i) = Vy(i) / soma_y
-                        i = i + 1
-                    Loop Until i = n + 1
-
-                    If V <= 0.5 Then
-
-                        i = 0
-                        stmp4 = 0
-                        Do
-                            stmp4 = stmp4 + Ki(i) * Vx(i)
-                            i = i + 1
-                        Loop Until i = n + 1
-
-                        Dim K1(n), K2(n), dKdP(n) As Double
-
-                        K1 = PP.DW_CalcKvalue(Vx, Vy, T, P)
-                        K2 = PP.DW_CalcKvalue(Vx, Vy, T, P * 1.001)
-
-                        For i = 0 To n
-                            dKdP(i) = (K2(i) - K1(i)) / (0.001 * P)
-                        Next
-
-                        i = 0
-                        dFdP = 0
-                        Do
-                            dFdP = dFdP + Vx(i) * dKdP(i)
-                            i = i + 1
-                        Loop Until i = n + 1
-
-                    Else
-
-                        i = 0
-                        stmp4 = 0
-                        Do
-                            stmp4 = stmp4 + Vy(i) / Ki(i)
-                            i = i + 1
-                        Loop Until i = n + 1
-
-                        Dim K1(n), K2(n), dKdP(n) As Double
-
-                        K1 = PP.DW_CalcKvalue(Vx, Vy, T, P)
-                        K2 = PP.DW_CalcKvalue(Vx, Vy, T, P * 1.001)
-
-                        For i = 0 To n
-                            dKdP(i) = (K2(i) - K1(i)) / (0.001 * P)
-                        Next
-
-                        i = 0
-                        dFdP = 0
-                        Do
-                            dFdP = dFdP - Vy(i) / (Ki(i) ^ 2) * dKdP(i)
-                            i = i + 1
-                        Loop Until i = n + 1
-                    End If
-
-                    ecount += 1
-
-                    fval = stmp4 - 1
-
-                    If (P - fval / dFdP) < 0 Then
-                        P = (P + Pant) / 2
-                    Else
-                        Pant = P
-                        P = P - fval / dFdP
-                    End If
-
-                    Console.WriteLine("TV Flash [GM]: Iteration #" & ecount & ", P = " & P & ", VF = " & V)
-
-
-
-                Loop Until Math.Abs(fval) < etol Or Double.IsNaN(P) = True Or ecount > maxit_e
+                End If
 
             End If
 
@@ -1187,21 +1204,136 @@ out:        Return result
 
             dt = d2 - d1
 
-            Console.WriteLine("TV Flash [GM]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms.")
+            WriteDebugInfo("TV Flash [GM-3P]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms.")
 
-            Return New Object() {L, V, Vx, Vy, P, ecount, Ki, 0.0#, PP.RET_NullVector, 0.0#, PP.RET_NullVector}
+            Return result
 
         End Function
 
         Public Overrides Function Flash_PV(ByVal Vz As Double(), ByVal P As Double, ByVal V As Double, ByVal Tref As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
 
-            Dim Vn(1) As String, Vx(1), Vy(1), Vx_ant(1), Vy_ant(1), Vp(1), Ki(1), Ki_ant(1), fi(1) As Double
-            Dim i, n, ecount As Integer
+            Dim i, j As Integer
+
             Dim d1, d2 As Date, dt As TimeSpan
-            Dim soma_x, soma_y As Double
-            Dim L, Lf, Vf, T, Tf As Double
 
             d1 = Date.Now
+
+            Dim _nl As New DWSIMDefault
+
+            Dim result As Object = _nl.Flash_PV(Vz, P, V, Tref, PP, ReuseKI, PrevKi)
+
+            T = result(4)
+
+            If result(0) > 0 Then
+
+                Dim nt As Integer = Me.StabSearchCompIDs.Length - 1
+                Dim nc As Integer = UBound(Vz)
+
+                If nt = -1 Then nt = nc
+                n = nc
+
+                Dim Vtrials(nt, nc) As Double
+                Dim idx(nt) As Integer
+
+                For i = 0 To nt
+                    If Me.StabSearchCompIDs.Length = 0 Then
+                        idx(i) = i
+                    Else
+                        j = 0
+                        For Each subst As DTL.ClassesBasicasTermodinamica.Substancia In PP.CurrentMaterialStream.Fases(0).Componentes.Values
+                            If subst.Nome = Me.StabSearchCompIDs(i) Then
+                                idx(i) = j
+                                Exit For
+                            End If
+                            j += 1
+                        Next
+                    End If
+                Next
+
+                For i = 0 To nt
+                    For j = 0 To nc
+                        Vtrials(i, j) = 0.00001
+                    Next
+                Next
+                For j = 0 To nt
+                    Vtrials(j, idx(j)) = 1
+                Next
+
+                Dim stresult As Object = StabTest(T, P, result(2), PP, Vtrials, Me.StabSearchSeverity)
+
+                If stresult(0) = False Then
+
+                    Dim vx2est(n), fcl(n), fcv(n) As Double
+                    Dim m As Double = UBound(stresult(1), 1)
+                    Dim gl, gv, gli As Double
+
+                    If StabSearchSeverity = 2 Then
+                        gli = 0
+                        For j = 0 To m
+                            For i = 0 To nc
+                                vx2est(i) = stresult(1)(j, i)
+                            Next
+                            fcl = PP.DW_CalcFugCoeff(vx2est, T, P, State.Liquid)
+                            gl = 0.0#
+                            For i = 0 To nc
+                                If vx2est(i) <> 0.0# Then gl += vx2est(i) * Log(fcl(i) * vx2est(i))
+                            Next
+                            If gl <= gli Then
+                                gli = gl
+                                k = j
+                            End If
+                        Next
+                        For i = 0 To UBound(Vz)
+                            vx2est(i) = stresult(1)(k, i)
+                        Next
+                    Else
+                        For i = 0 To UBound(Vz)
+                            vx2est(i) = stresult(1)(m, i)
+                        Next
+                    End If
+
+                    fcl = PP.DW_CalcFugCoeff(vx2est, T, P, State.Liquid)
+                    fcv = PP.DW_CalcFugCoeff(vx2est, T, P, State.Vapor)
+
+                    gv = 0.0#
+                    gl = 0.0#
+                    For i = 0 To nc
+                        If vx2est(i) <> 0.0# Then gv += vx2est(i) * Log(fcv(i) * vx2est(i))
+                        If vx2est(i) <> 0.0# Then gl += vx2est(i) * Log(fcl(i) * vx2est(i))
+                    Next
+
+                    If gl < gv Then 'liquid-like
+
+                        'do a simple LLE calculation to get initial estimates.
+                        Dim slle As New SimpleLLE() With {.InitialEstimatesForPhase1 = result(2), .InitialEstimatesForPhase2 = vx2est, .UseInitialEstimatesForPhase1 = True, .UseInitialEstimatesForPhase2 = True}
+                        Dim resultL As Object = slle.Flash_PT(Vz, P, T * 0.9, PP)
+
+                        L1 = resultL(0)
+                        L2 = resultL(5)
+                        Vx1 = resultL(2)
+                        Vx2 = resultL(6)
+
+                        result = Flash_PV_3P(Vz, result(1), result(0) * L1, result(0) * L2, result(3), Vx1, Vx2, P, V, T, PP)
+
+                    End If
+
+                End If
+
+            End If
+
+            d2 = Date.Now
+
+            dt = d2 - d1
+
+            WriteDebugInfo("PV Flash [GM-3P]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms.")
+
+            Return result
+
+        End Function
+
+        Public Function Flash_PV_3P(ByVal Vz() As Double, ByVal Vest As Double, ByVal L1est As Double, ByVal L2est As Double, ByVal VyEST As Double(), ByVal Vx1EST As Double(), ByVal Vx2EST As Double(), ByVal P As Double, ByVal V As Double, ByVal Tref As Double, ByVal PP As PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi() As Double = Nothing) As Object
+
+            Dim i As Integer
 
             etol = CDbl(PP.Parameters("PP_PTFELT"))
             maxit_e = CInt(PP.Parameters("PP_PTFMEI"))
@@ -1210,309 +1342,544 @@ out:        Return result
 
             n = UBound(Vz)
 
-            PP = PP
-            Vf = V
-            L = 1 - V
-            Lf = 1 - Vf
-            Tf = T
+            proppack = PP
 
-            ReDim Vn(n), Vx(n), Vy(n), Vx_ant(n), Vy_ant(n), Vp(n), Ki(n), fi(n)
-            Dim Vt(n), VTc(n), Tmin, Tmax, dFdT As Double
+            ReDim Vn(n), Vx1(n), Vx2(n), Vy(n), Vp(n), Ki1(n), Ki2(n), fi(n)
+            Dim b1(n), b2(n), CFL1(n), CFL2(n), CFV(n), db1dT(n), db2dT(n), Kil(n), Tant, L1ant, L2ant, Ki12(n), Ki22(n) As Double
 
             Vn = PP.RET_VNAMES()
-            VTc = PP.RET_VTC()
             fi = Vz.Clone
-
-            If Tref = 0.0# Then
-
-                i = 0
-                Tref = 0
-                Do
-                    Tref += 0.7 * Vz(i) * VTc(i)
-                    Tmin += 0.1 * Vz(i) * VTc(i)
-                    Tmax += 2.0 * Vz(i) * VTc(i)
-                    i += 1
-                Loop Until i = n + 1
-
-            Else
-
-                Tmin = Tref - 50
-                Tmax = Tref + 50
-
-            End If
-
-            T = Tref
 
             'Calculate Ki`s
 
-            If Not ReuseKI Then
-                i = 0
-                Do
-                    Vp(i) = PP.AUX_PVAPi(Vn(i), T)
-                    Ki(i) = Vp(i) / P
-                    i += 1
-                Loop Until i = n + 1
-            Else
-                If Not PP.AUX_CheckTrivial(PrevKi) And Not Double.IsNaN(PrevKi(0)) Then
-                    For i = 0 To n
-                        Vp(i) = PP.AUX_PVAPi(Vn(i), T)
-                        Ki(i) = PrevKi(i)
-                    Next
+            Tant = Tref
+            T = Tref
+
+            Ki1 = PP.DW_CalcKvalue(Vx1EST, VyEST, T, P)
+            Ki2 = PP.DW_CalcKvalue(Vx2EST, VyEST, T, P)
+
+            If n = 0 Then
+                If Vp(0) <= P Then
+                    L = 1
+                    V = 0
+                    Vx1 = Vz
+                    GoTo out
                 Else
-                    i = 0
-                    Do
-                        Vp(i) = PP.AUX_PVAPi(Vn(i), T)
-                        Ki(i) = Vp(i) / P
-                        i += 1
-                    Loop Until i = n + 1
+                    L = 0
+                    V = 1
+                    Vy = Vz
+                    GoTo out
                 End If
             End If
 
             i = 0
             Do
                 If Vz(i) <> 0 Then
-                    Vy(i) = Vz(i) * Ki(i) / ((Ki(i) - 1) * V + 1)
-                    Vx(i) = Vy(i) / Ki(i)
+                    Vy(i) = VyEST(i)
+                    Vx1(i) = Vx1EST(i)
+                    Vx2(i) = Vx2EST(i)
                 Else
                     Vy(i) = 0
-                    Vx(i) = 0
+                    Vx1(i) = 0
+                    Vx2(i) = 0
                 End If
                 i += 1
             Loop Until i = n + 1
 
             i = 0
-            soma_x = 0
+            soma_x1 = 0
+            soma_x2 = 0
             soma_y = 0
             Do
-                soma_x = soma_x + Vx(i)
+                soma_x1 = soma_x1 + Vx1(i)
+                soma_x2 = soma_x2 + Vx2(i)
                 soma_y = soma_y + Vy(i)
                 i = i + 1
             Loop Until i = n + 1
             i = 0
             Do
-                Vx(i) = Vx(i) / soma_x
+                Vx1(i) = Vx1(i) / soma_x1
+                Vx2(i) = Vx2(i) / soma_x2
                 Vy(i) = Vy(i) / soma_y
                 i = i + 1
             Loop Until i = n + 1
 
-            Dim marcador3, marcador2, marcador As Integer
-            Dim stmp4_ant, stmp4, Tant, fval As Double
-            Dim chk As Boolean = False
+            i = 0
+            Do
+                b1(i) = 1 - Ki1(i) ^ -1
+                b2(i) = 1 - Ki2(i) ^ -1
+                i = i + 1
+            Loop Until i = n + 1
 
-            If V = 1.0# Or V = 0.0# Then
+            i = 0
+            Do
+                If Vz(i) <> 0 Then
+                    Vy(i) = Vz(i) / (1 - b1(i) * L1 - b2(i) * L2)
+                    Vx1(i) = Vy(i) / Ki1(i)
+                    Vx2(i) = Vy(i) / Ki2(i)
+                Else
+                    Vy(i) = 0
+                    Vx1(i) = 0
+                    Vx2(i) = 0
+                End If
+                i += 1
+            Loop Until i = n + 1
 
-                ecount = 0
+            i = 0
+            soma_x1 = 0
+            soma_x2 = 0
+            soma_y = 0
+            Do
+                soma_x1 = soma_x1 + Vx1(i)
+                soma_x2 = soma_x2 + Vx2(i)
+                soma_y = soma_y + Vy(i)
+                i = i + 1
+            Loop Until i = n + 1
+
+            i = 0
+            Do
+                Vx1(i) = Vx1(i) / soma_x1
+                Vx2(i) = Vx2(i) / soma_x2
+                Vy(i) = Vy(i) / soma_y
+                i = i + 1
+            Loop Until i = n + 1
+
+            Vant = 0.0#
+            L1ant = 0.0#
+            L2ant = 0.0#
+
+            ecount = 0
+
+            L1 = L1est
+            L2 = L2est
+
+            WriteDebugInfo("PV Flash [GM-3P]: Iteration #" & ecount & ", VF = " & V & ", L1 = " & L1 & ", T = " & T)
+
+            Do
+
+                CFL1 = proppack.DW_CalcFugCoeff(Vx1, T, P, State.Liquid)
+                CFL2 = proppack.DW_CalcFugCoeff(Vx2, T, P, State.Liquid)
+                CFV = proppack.DW_CalcFugCoeff(Vy, T, P, State.Vapor)
+
+                i = 0
                 Do
+                    If Vz(i) <> 0 Then Ki1(i) = CFL1(i) / CFV(i)
+                    If Vz(i) <> 0 Then Ki2(i) = CFL2(i) / CFV(i)
+                    i = i + 1
+                Loop Until i = n + 1
 
-                    marcador3 = 0
+                i = 0
+                Dim Vx1ant(n), Vx2ant(n), Vyant(n)
+                Do
+                    Vx1ant(i) = Vx1(i)
+                    Vx2ant(i) = Vx2(i)
+                    Vyant(i) = Vy(i)
+                    b1(i) = 1 - Ki1(i) ^ -1
+                    b2(i) = 1 - Ki2(i) ^ -1
+                    Vy(i) = Vz(i) / (1 - b1(i) * L1 - b2(i) * L2)
+                    Vx1(i) = Vy(i) / Ki1(i)
+                    Vx2(i) = Vy(i) / Ki2(i)
+                    i = i + 1
+                Loop Until i = n + 1
 
-                    Dim cont_int = 0
-                    Do
+                i = 0
+                soma_x1 = 0
+                soma_x2 = 0
+                soma_y = 0
+                Do
+                    soma_x1 = soma_x1 + Vx1(i)
+                    soma_x2 = soma_x2 + Vx2(i)
+                    soma_y = soma_y + Vy(i)
+                    i = i + 1
+                Loop Until i = n + 1
 
+                i = 0
+                Do
+                    Vx1(i) = Vx1(i) / soma_x1
+                    Vx2(i) = Vx2(i) / soma_x2
+                    Vy(i) = Vy(i) / soma_y
+                    i = i + 1
+                Loop Until i = n + 1
 
-                        Ki = PP.DW_CalcKvalue(Vx, Vy, T, P)
+                Dim e1 = 0.0#
+                Dim e2 = 0.0#
+                Dim e3 = 0.0#
+                Dim e4 = 0.0#
+                i = 0
+                Do
+                    e1 = e1 + (Vx1(i) - Vx1ant(i))
+                    e4 = e4 + (Vx2(i) - Vx2ant(i))
+                    e2 = e2 + (Vy(i) - Vyant(i))
+                    i = i + 1
+                Loop Until i = n + 1
 
-                        marcador = 0
-                        If stmp4_ant <> 0 Then
-                            marcador = 1
-                        End If
-                        stmp4_ant = stmp4
+                e3 = (T - Tant) + (L1 - L1ant) + (L2 - L2ant)
 
-                        If V = 0 Then
-                            i = 0
-                            stmp4 = 0
-                            Do
-                                stmp4 = stmp4 + Ki(i) * Vx(i)
-                                i = i + 1
-                            Loop Until i = n + 1
-                        Else
-                            i = 0
-                            stmp4 = 0
-                            Do
-                                stmp4 = stmp4 + Vy(i) / Ki(i)
-                                i = i + 1
-                            Loop Until i = n + 1
-                        End If
+                If (Math.Abs(e1) + Math.Abs(e4) + Math.Abs(e3) + Math.Abs(e2) + Math.Abs(L1ant - L1) + Math.Abs(L2ant - L2)) < etol Then
 
-                        If V = 0 Then
-                            i = 0
-                            Do
-                                Vy_ant(i) = Vy(i)
-                                Vy(i) = Ki(i) * Vx(i) / stmp4
-                                i = i + 1
-                            Loop Until i = n + 1
-                        Else
-                            i = 0
-                            Do
-                                Vx_ant(i) = Vx(i)
-                                Vx(i) = (Vy(i) / Ki(i)) / stmp4
-                                i = i + 1
-                            Loop Until i = n + 1
-                        End If
+                    Exit Do
 
-                        marcador2 = 0
-                        If marcador = 1 Then
-                            If V = 0 Then
-                                If Math.Abs(Vy(0) - Vy_ant(0)) < itol Then
-                                    marcador2 = 1
-                                End If
-                            Else
-                                If Math.Abs(Vx(0) - Vx_ant(0)) < itol Then
-                                    marcador2 = 1
-                                End If
-                            End If
-                        End If
+                ElseIf Double.IsNaN(Math.Abs(e1) + Math.Abs(e4) + Math.Abs(e2)) Then
 
-                        cont_int = cont_int + 1
+                    Throw New Exception(DTL.App.GetLocalString("PropPack_FlashTPVapFracError"))
 
-                    Loop Until marcador2 = 1 Or Double.IsNaN(stmp4) Or cont_int > maxit_i
+                Else
 
-                    Dim K1(n), K2(n), dKdT(n) As Double
-
-                    K1 = PP.DW_CalcKvalue(Vx, Vy, T, P)
-                    K2 = PP.DW_CalcKvalue(Vx, Vy, T + 0.1, P)
+                    Ki12 = PP.DW_CalcKvalue(Vx1, Vy, T + 2, P)
+                    Ki22 = PP.DW_CalcKvalue(Vx2, Vy, T + 2, P)
 
                     For i = 0 To n
-                        dKdT(i) = (K2(i) - K1(i)) / (0.1)
+                        db1dT(i) = ((1 - Ki12(i) ^ -1) - (1 - Ki1(i) ^ -1)) / 2
+                        db2dT(i) = ((1 - Ki22(i) ^ -1) - (1 - Ki2(i) ^ -1)) / 2
                     Next
 
-                    fval = stmp4 - 1
-
-                    ecount += 1
-
+                    Dim F1 = 0.0#, F2 = 0.0#
+                    Dim dF1dT = 0.0#, dF1dL2 = 0.0#, dF2dT = 0.0#, dF2dL2 = 0.0#, dF1db1(n), dF1db2(n), dF2db1(n), dF2db2(n) As Double
+                    Dim dT, dL2 As Double
                     i = 0
-                    dFdT = 0
                     Do
-                        If V = 0 Then
-                            dFdT = dFdT + Vx(i) * dKdT(i)
-                        Else
-                            dFdT = dFdT - Vy(i) / (Ki(i) ^ 2) * dKdT(i)
-                        End If
+                        F1 = F1 + b1(i) * Vz(i) / (1 - b1(i) * L1 - b2(i) * L2)
+                        F2 = F2 + b2(i) * Vz(i) / (1 - b1(i) * L1 - b2(i) * L2)
+                        dF1db1(i) = -Vz(i) * (b2(i) * L2) / (b1(i) * L1 + b2(i) * L2 - 1) ^ 2
+                        dF1db2(i) = b1(i) * Vz(i) * L2 / (b1(i) * L1 + b2(i) * L2 - 1) ^ 2
+                        dF2db1(i) = b2(i) * Vz(i) * L1 / (b2(i) * L2 + b1(i) * L1 - 1) ^ 2
+                        dF2db2(i) = -Vz(i) * (b1(i) * L1) / (b2(i) * L2 + b1(i) * L1 - 1) ^ 2
+                        dF1dL2 = dF1dL2 + b1(i) * Vz(i) * (-b2(i)) / (1 - b1(i) * L1 - b2(i) * L2) ^ 2
+                        dF2dL2 = dF2dL2 + b2(i) * Vz(i) * (-b2(i)) / (1 - b1(i) * L1 - b2(i) * L2) ^ 2
+                        dF1dT = dF1dT + dF1db1(i) * db1dT(i) + dF1db2(i) * db2dT(i)
+                        dF2dT = dF2dT + dF2db1(i) * db1dT(i) + dF2db2(i) * db2dT(i)
                         i = i + 1
                     Loop Until i = n + 1
 
+                    If Abs(F1) + Abs(F2) < etol Then Exit Do
+
+                    Dim MA As Mapack.Matrix = New Mapack.Matrix(2, 2)
+                    Dim MB As Mapack.Matrix = New Mapack.Matrix(2, 1)
+                    Dim MX As Mapack.Matrix = New Mapack.Matrix(1, 2)
+
+                    MA(0, 0) = dF1dT
+                    MA(0, 1) = dF1dL2
+                    MA(1, 0) = dF2dT
+                    MA(1, 1) = dF2dL2
+                    MB(0, 0) = -F1
+                    MB(1, 0) = -F2
+
+                    MX = MA.Solve(MB)
+                    dT = MX(0, 0)
+                    dL2 = MX(1, 0)
+
+                    L2ant = L2
+                    L1ant = L1
                     Tant = T
-                    T = T - fval / dFdT
-                    If T < Tmin Then T = Tmin
-                    If T > Tmax Then T = Tmax
 
-                    Console.WriteLine("PV Flash [GM]: Iteration #" & ecount & ", T = " & T & ", VF = " & V)
+                    L2 += -dL2 * 0.3
 
+                    If L2 < 0.0# Then L2 = 0.0#
+                    If L2 > 1.0# - V Then L2 = 1.0# - V
 
+                    L1 = 1 - V - L2
 
-                Loop Until Math.Abs(T - Tant) < 0.1 Or Double.IsNaN(T) = True Or ecount > maxit_e Or Double.IsNaN(T) Or Double.IsInfinity(T)
-
-            Else
-
-                ecount = 0
-
-                Do
-
-                    Ki = PP.DW_CalcKvalue(Vx, Vy, T, P)
-
-                    i = 0
-                    Do
-                        If Vz(i) <> 0 Then
-                            Vy_ant(i) = Vy(i)
-                            Vx_ant(i) = Vx(i)
-                            Vy(i) = Vz(i) * Ki(i) / ((Ki(i) - 1) * V + 1)
-                            Vx(i) = Vy(i) / Ki(i)
-                        Else
-                            Vy(i) = 0
-                            Vx(i) = 0
-                        End If
-                        i += 1
-                    Loop Until i = n + 1
-                    i = 0
-                    soma_x = 0
-                    soma_y = 0
-                    Do
-                        soma_x = soma_x + Vx(i)
-                        soma_y = soma_y + Vy(i)
-                        i = i + 1
-                    Loop Until i = n + 1
-                    i = 0
-                    Do
-                        Vx(i) = Vx(i) / soma_x
-                        Vy(i) = Vy(i) / soma_y
-                        i = i + 1
-                    Loop Until i = n + 1
-
-                    If V <= 0.5 Then
-
-                        i = 0
-                        stmp4 = 0
-                        Do
-                            stmp4 = stmp4 + Ki(i) * Vx(i)
-                            i = i + 1
-                        Loop Until i = n + 1
-
-                        Dim K1(n), K2(n), dKdT(n) As Double
-
-                        K1 = PP.DW_CalcKvalue(Vx, Vy, T, P)
-                        K2 = PP.DW_CalcKvalue(Vx, Vy, T + 0.1, P)
-
-                        For i = 0 To n
-                            dKdT(i) = (K2(i) - K1(i)) / (0.1)
-                        Next
-
-                        i = 0
-                        dFdT = 0
-                        Do
-                            dFdT = dFdT + Vx(i) * dKdT(i)
-                            i = i + 1
-                        Loop Until i = n + 1
-
-                    Else
-
-                        i = 0
-                        stmp4 = 0
-                        Do
-                            stmp4 = stmp4 + Vy(i) / Ki(i)
-                            i = i + 1
-                        Loop Until i = n + 1
-
-                        Dim K1(n), K2(n), dKdT(n) As Double
-
-                        K1 = PP.DW_CalcKvalue(Vx, Vy, T, P)
-                        K2 = PP.DW_CalcKvalue(Vx, Vy, T + 0.1, P)
-
-                        For i = 0 To n
-                            dKdT(i) = (K2(i) - K1(i)) / (0.1)
-                        Next
-
-                        i = 0
-                        dFdT = 0
-                        Do
-                            dFdT = dFdT - Vy(i) / (Ki(i) ^ 2) * dKdT(i)
-                            i = i + 1
-                        Loop Until i = n + 1
+                    If V = 0.0# Then
+                        'switch to simple LLE flash procedure.
+                        Dim slle As New SimpleLLE() With {.InitialEstimatesForPhase1 = Vx1EST, .InitialEstimatesForPhase2 = Vx2EST, .UseInitialEstimatesForPhase1 = True, .UseInitialEstimatesForPhase2 = True}
+                        Dim result As Object = slle.Flash_PT(Vz, P, T, PP)
+                        L1 = result(0)
+                        'V = result(1)
+                        L2 = result(5)
+                        Vx1 = result(2)
+                        'Vy = result(3)
+                        Vx2 = result(6)
+                        Exit Do
                     End If
 
-                    ecount += 1
+                    T += -dT * 0.3
 
-                    fval = stmp4 - 1
+                End If
 
-                    Tant = T
-                    T = T - fval / dFdT
-                    If T < Tmin Then T = Tmin
-                    If T > Tmax Then T = Tmax
+                If ecount > maxit_e Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt"))
 
-                    Console.WriteLine("PV Flash [GM]: Iteration #" & ecount & ", T = " & T & ", VF = " & V)
+                ecount += 1
 
+                WriteDebugInfo("PV Flash [GM-3P]: Iteration #" & ecount & ", VF = " & V & ", L1 = " & L1 & ", T = " & T)
 
+            Loop
 
-                Loop Until Math.Abs(fval) < etol Or Double.IsNaN(T) = True Or ecount > maxit_e
+out:        Return New Object() {L1, V, Vx1, Vy, T, ecount, Ki1, L2, Vx2, 0.0#, PP.RET_NullVector}
 
+        End Function
+
+        Public Function Flash_TV_3P(ByVal Vz() As Double, ByVal Vest As Double, ByVal L1est As Double, ByVal L2est As Double, ByVal VyEST As Double(), ByVal Vx1EST As Double(), ByVal Vx2EST As Double(), ByVal T As Double, ByVal V As Double, ByVal Pref As Double, ByVal PP As PropertyPackage) As Object
+
+            Dim i As Integer
+
+            etol = CDbl(PP.Parameters("PP_PTFELT"))
+            maxit_e = CInt(PP.Parameters("PP_PTFMEI"))
+            itol = CDbl(PP.Parameters("PP_PTFILT"))
+            maxit_i = CInt(PP.Parameters("PP_PTFMII"))
+
+            n = UBound(Vz)
+
+            proppack = PP
+
+            ReDim Vn(n), Vx1(n), Vx2(n), Vy(n), Vp(n), Ki1(n), Ki2(n), fi(n)
+            Dim b1(n), b2(n), CFL1(n), CFL2(n), CFV(n), db1dP(n), db2dP(n), Kil(n), Pant, L1ant, L2ant, Ki12(n), Ki22(n) As Double
+
+            Vn = PP.RET_VNAMES()
+            fi = Vz.Clone
+
+            'Calculate Ki`s
+
+            Pant = Pref
+            P = Pref
+
+            Ki1 = PP.DW_CalcKvalue(Vx1EST, VyEST, T, P)
+            Ki2 = PP.DW_CalcKvalue(Vx2EST, VyEST, T, P)
+
+            If n = 0 Then
+                If Vp(0) <= P Then
+                    L = 1
+                    V = 0
+                    Vx1 = Vz
+                    GoTo out
+                Else
+                    L = 0
+                    V = 1
+                    Vy = Vz
+                    GoTo out
+                End If
             End If
 
-            d2 = Date.Now
+            i = 0
+            Do
+                If Vz(i) <> 0 Then
+                    Vy(i) = VyEST(i)
+                    Vx1(i) = Vx1EST(i)
+                    Vx2(i) = Vx2EST(i)
+                Else
+                    Vy(i) = 0
+                    Vx1(i) = 0
+                    Vx2(i) = 0
+                End If
+                i += 1
+            Loop Until i = n + 1
 
-            dt = d2 - d1
+            i = 0
+            soma_x1 = 0
+            soma_x2 = 0
+            soma_y = 0
+            Do
+                soma_x1 = soma_x1 + Vx1(i)
+                soma_x2 = soma_x2 + Vx2(i)
+                soma_y = soma_y + Vy(i)
+                i = i + 1
+            Loop Until i = n + 1
+            i = 0
+            Do
+                Vx1(i) = Vx1(i) / soma_x1
+                Vx2(i) = Vx2(i) / soma_x2
+                Vy(i) = Vy(i) / soma_y
+                i = i + 1
+            Loop Until i = n + 1
 
-            Console.WriteLine("PV Flash [GM]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms.")
+            i = 0
+            Do
+                b1(i) = 1 - Ki1(i) ^ -1
+                b2(i) = 1 - Ki2(i) ^ -1
+                i = i + 1
+            Loop Until i = n + 1
 
-            Return New Object() {L, V, Vx, Vy, T, ecount, Ki, 0.0#, PP.RET_NullVector, 0.0#, PP.RET_NullVector}
+            i = 0
+            Do
+                If Vz(i) <> 0 Then
+                    Vy(i) = Vz(i) / (1 - b1(i) * L1 - b2(i) * L2)
+                    Vx1(i) = Vy(i) / Ki1(i)
+                    Vx2(i) = Vy(i) / Ki2(i)
+                Else
+                    Vy(i) = 0
+                    Vx1(i) = 0
+                    Vx2(i) = 0
+                End If
+                i += 1
+            Loop Until i = n + 1
+
+            i = 0
+            soma_x1 = 0
+            soma_x2 = 0
+            soma_y = 0
+            Do
+                soma_x1 = soma_x1 + Vx1(i)
+                soma_x2 = soma_x2 + Vx2(i)
+                soma_y = soma_y + Vy(i)
+                i = i + 1
+            Loop Until i = n + 1
+
+            i = 0
+            Do
+                Vx1(i) = Vx1(i) / soma_x1
+                Vx2(i) = Vx2(i) / soma_x2
+                Vy(i) = Vy(i) / soma_y
+                i = i + 1
+            Loop Until i = n + 1
+
+            Vant = 0.0#
+            L1ant = 0.0#
+            L2ant = 0.0#
+
+            ecount = 0
+
+            L1 = L1est
+            L2 = L2est
+
+            WriteDebugInfo("TV Flash [GM-3P]: Iteration #" & ecount & ", VF = " & V & ", L1 = " & L1 & ", P = " & P)
+
+            Do
+
+                CFL1 = proppack.DW_CalcFugCoeff(Vx1, T, P, State.Liquid)
+                CFL2 = proppack.DW_CalcFugCoeff(Vx2, T, P, State.Liquid)
+                CFV = proppack.DW_CalcFugCoeff(Vy, T, P, State.Vapor)
+
+                i = 0
+                Do
+                    If Vz(i) <> 0 Then Ki1(i) = CFL1(i) / CFV(i)
+                    If Vz(i) <> 0 Then Ki2(i) = CFL2(i) / CFV(i)
+                    i = i + 1
+                Loop Until i = n + 1
+
+                i = 0
+                Dim Vx1ant(n), Vx2ant(n), Vyant(n)
+                Do
+                    Vx1ant(i) = Vx1(i)
+                    Vx2ant(i) = Vx2(i)
+                    Vyant(i) = Vy(i)
+                    b1(i) = 1 - Ki1(i) ^ -1
+                    b2(i) = 1 - Ki2(i) ^ -1
+                    Vy(i) = Vz(i) / (1 - b1(i) * L1 - b2(i) * L2)
+                    Vx1(i) = Vy(i) / Ki1(i)
+                    Vx2(i) = Vy(i) / Ki2(i)
+                    i = i + 1
+                Loop Until i = n + 1
+
+                i = 0
+                soma_x1 = 0
+                soma_x2 = 0
+                soma_y = 0
+                Do
+                    soma_x1 = soma_x1 + Vx1(i)
+                    soma_x2 = soma_x2 + Vx2(i)
+                    soma_y = soma_y + Vy(i)
+                    i = i + 1
+                Loop Until i = n + 1
+
+                i = 0
+                Do
+                    Vx1(i) = Vx1(i) / soma_x1
+                    Vx2(i) = Vx2(i) / soma_x2
+                    Vy(i) = Vy(i) / soma_y
+                    i = i + 1
+                Loop Until i = n + 1
+
+                Dim e1 = 0.0#
+                Dim e2 = 0.0#
+                Dim e3 = 0.0#
+                Dim e4 = 0.0#
+                i = 0
+                Do
+                    e1 = e1 + (Vx1(i) - Vx1ant(i))
+                    e4 = e4 + (Vx2(i) - Vx2ant(i))
+                    e2 = e2 + (Vy(i) - Vyant(i))
+                    i = i + 1
+                Loop Until i = n + 1
+                e3 = (T - Tant) + (L1 - L1ant) + (L2 - L2ant)
+
+                If (Math.Abs(e1) + Math.Abs(e4) + Math.Abs(e3) + Math.Abs(e2) + Math.Abs(L1ant - L1) + Math.Abs(L2ant - L2)) < etol Then
+
+                    Exit Do
+
+                ElseIf Double.IsNaN(Math.Abs(e1) + Math.Abs(e4) + Math.Abs(e2)) Then
+
+                    Throw New Exception(DTL.App.GetLocalString("PropPack_FlashTPVapFracError"))
+
+                Else
+
+                    Ki12 = PP.DW_CalcKvalue(Vx1, Vy, T, P + 100)
+                    Ki22 = PP.DW_CalcKvalue(Vx2, Vy, T, P + 100)
+
+                    For i = 0 To n
+                        db1dP(i) = ((1 - Ki12(i) ^ -1) - (1 - Ki1(i) ^ -1)) / 100
+                        db2dP(i) = ((1 - Ki22(i) ^ -1) - (1 - Ki2(i) ^ -1)) / 100
+                    Next
+
+                    Dim F1 = 0.0#, F2 = 0.0#
+                    Dim dF1dP = 0.0#, dF1dL2 = 0.0#, dF2dP = 0.0#, dF2dL2 = 0.0#, dF1db1(n), dF1db2(n), dF2db1(n), dF2db2(n) As Double
+                    Dim dP, dL2 As Double
+                    i = 0
+                    Do
+                        F1 = F1 + b1(i) * Vz(i) / (1 - b1(i) * L1 - b2(i) * L2)
+                        F2 = F2 + b2(i) * Vz(i) / (1 - b1(i) * L1 - b2(i) * L2)
+                        dF1db1(i) = -Vz(i) * (b2(i) * L2) / (b1(i) * L1 + b2(i) * L2 - 1) ^ 2
+                        dF1db2(i) = b1(i) * Vz(i) * L2 / (b1(i) * L1 + b2(i) * L2 - 1) ^ 2
+                        dF2db1(i) = b2(i) * Vz(i) * L1 / (b2(i) * L2 + b1(i) * L1 - 1) ^ 2
+                        dF2db2(i) = -Vz(i) * (b1(i) * L1) / (b2(i) * L2 + b1(i) * L1 - 1) ^ 2
+                        dF1dL2 = dF1dL2 + b1(i) * Vz(i) * (-b2(i)) / (1 - b1(i) * L1 - b2(i) * L2) ^ 2
+                        dF2dL2 = dF2dL2 + b2(i) * Vz(i) * (-b2(i)) / (1 - b1(i) * L1 - b2(i) * L2) ^ 2
+                        dF1dP = dF1dP + dF1db1(i) * db1dP(i) + dF1db2(i) * db2dP(i)
+                        dF2dP = dF2dP + dF2db1(i) * db1dP(i) + dF2db2(i) * db2dP(i)
+                        i = i + 1
+                    Loop Until i = n + 1
+
+                    If Abs(F1) + Abs(F2) < etol Then Exit Do
+
+                    Dim MA As Mapack.Matrix = New Mapack.Matrix(2, 2)
+                    Dim MB As Mapack.Matrix = New Mapack.Matrix(2, 1)
+                    Dim MX As Mapack.Matrix = New Mapack.Matrix(1, 2)
+
+                    MA(0, 0) = dF1dP
+                    MA(0, 1) = dF1dL2
+                    MA(1, 0) = dF2dP
+                    MA(1, 1) = dF2dL2
+                    MB(0, 0) = -F1
+                    MB(1, 0) = -F2
+
+                    MX = MA.Solve(MB)
+                    dP = MX(0, 0)
+                    dL2 = MX(1, 0)
+
+                    L2ant = L2
+                    L1ant = L1
+                    Pant = P
+
+                    P += -dP * 0.3
+                    L2 += -dL2 * 0.3
+
+                    If L2 < 0.0# Then L2 = 0.0#
+                    If L2 > 1.0# - V Then L2 = 1.0# - V
+
+                    L1 = 1 - V - L2
+
+                    If V = 0.0# Then
+                        'switch to simple LLE flash procedure.
+                        Dim slle As New SimpleLLE() With {.InitialEstimatesForPhase1 = Vx1EST, .InitialEstimatesForPhase2 = Vx2EST, .UseInitialEstimatesForPhase1 = True, .UseInitialEstimatesForPhase2 = True}
+                        Dim result As Object = slle.Flash_PT(Vz, P, T, PP)
+                        L1 = result(0)
+                        'V = result(1)
+                        L2 = result(5)
+                        Vx1 = result(2)
+                        'Vy = result(3)
+                        Vx2 = result(6)
+                        Exit Do
+                    End If
+
+                End If
+
+                If ecount > maxit_e Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt"))
+
+                ecount += 1
+
+                WriteDebugInfo("TV Flash [GM-3P]: Iteration #" & ecount & ", VF = " & V & ", L1 = " & L1 & ", P = " & P)
+
+            Loop
+
+out:        Return New Object() {L1, V, Vx1, Vy, P, ecount, Ki1, L2, Vx2, 0.0#, PP.RET_NullVector}
 
         End Function
 
@@ -1520,7 +1887,7 @@ out:        Return result
 
         Private Function FunctionValue(ByVal x() As Double) As Double
 
-
+            Dim i As Integer
 
             Dim pval As Double = 0.0#
             Dim fcv(n), fcl(n), fcl2(n) As Double
@@ -1543,7 +1910,7 @@ out:        Return result
                         If My.MyApplication._EnableParallelProcessing Then
                             My.MyApplication.IsRunningParallelTasks = True
                             If My.MyApplication._EnableGPUProcessing Then
-                                My.MyApplication.gpu.EnableMultithreading()
+                                'My.MyApplication.gpu.EnableMultithreading()
                             End If
                             Try
                                 Dim task1 As Task = New Task(Sub()
@@ -1556,14 +1923,12 @@ out:        Return result
                                 task2.Start()
                                 Task.WaitAll(task1, task2)
                             Catch ae As AggregateException
-                                For Each ex As Exception In ae.InnerExceptions
-                                    Throw ex
-                                Next
+                                Throw ae.Flatten().InnerException
                             Finally
-                                If My.MyApplication._EnableGPUProcessing Then
-                                    My.MyApplication.gpu.DisableMultithreading()
-                                    My.MyApplication.gpu.FreeAll()
-                                End If
+                                'If My.MyApplication._EnableGPUProcessing Then
+                                '    My.MyApplication.gpu.DisableMultithreading()
+                                '    My.MyApplication.gpu.FreeAll()
+                                'End If
                             End Try
                             My.MyApplication.IsRunningParallelTasks = False
                         Else
@@ -1580,7 +1945,7 @@ out:        Return result
 
                         Gm = Gv + Gl1
 
-                        Console.WriteLine("[GM] V = " & Format(V, "N4") & ", L = " & Format(L, "N4") & " / GE = " & Format(Gm * 8.314 * Tf, "N2") & " kJ/kmol")
+                        WriteDebugInfo("[GM] V = " & Format(V, "N4") & ", L = " & Format(L, "N4") & " / GE = " & Format(Gm * 8.314 * Tf, "N2") & " kJ/kmol")
 
                     Else
 
@@ -1618,7 +1983,7 @@ out:        Return result
                         If My.MyApplication._EnableParallelProcessing Then
                             My.MyApplication.IsRunningParallelTasks = True
                             If My.MyApplication._EnableGPUProcessing Then
-                                My.MyApplication.gpu.EnableMultithreading()
+                                'My.MyApplication.gpu.EnableMultithreading()
                             End If
                             Try
                                 Dim task1 As Task = New Task(Sub()
@@ -1635,14 +2000,12 @@ out:        Return result
                                 task3.Start()
                                 Task.WaitAll(task1, task2, task3)
                             Catch ae As AggregateException
-                                For Each ex As Exception In ae.InnerExceptions
-                                    Throw ex
-                                Next
+                                Throw ae.Flatten().InnerException
                             Finally
-                                If My.MyApplication._EnableGPUProcessing Then
-                                    My.MyApplication.gpu.DisableMultithreading()
-                                    My.MyApplication.gpu.FreeAll()
-                                End If
+                                ' If My.MyApplication._EnableGPUProcessing Then
+                                'My.MyApplication.gpu.DisableMultithreading()
+                                '  My.MyApplication.gpu.FreeAll()
+                                ' End If
                             End Try
                             My.MyApplication.IsRunningParallelTasks = False
                         Else
@@ -1662,7 +2025,7 @@ out:        Return result
 
                         Gm = Gv + Gl1 + Gl2 + pval
 
-                        Console.WriteLine("[GM] V = " & Format(V / 1000, "N4") & ", L1 = " & Format(L1 / 1000, "N4") & ", L2 = " & Format(L2 / 1000, "N4") & " / GE = " & Format(Gm * 8.314 * Tf / 1000, "N2") & " kJ/kmol")
+                        WriteDebugInfo("[GM] V = " & Format(V / 1000, "N4") & ", L1 = " & Format(L1 / 1000, "N4") & ", L2 = " & Format(L2 / 1000, "N4") & " / GE = " & Format(Gm * 8.314 * Tf / 1000, "N2") & " kJ/kmol")
 
                     End If
 
@@ -1719,7 +2082,7 @@ out:        Return result
                     If My.MyApplication._EnableParallelProcessing Then
                         My.MyApplication.IsRunningParallelTasks = True
                         If My.MyApplication._EnableGPUProcessing Then
-                            My.MyApplication.gpu.EnableMultithreading()
+                            'My.MyApplication.gpu.EnableMultithreading()
                         End If
                         Try
                             Dim task1 As Task = New Task(Sub()
@@ -1736,14 +2099,12 @@ out:        Return result
                             task3.Start()
                             Task.WaitAll(task1, task2, task3)
                         Catch ae As AggregateException
-                            For Each ex As Exception In ae.InnerExceptions
-                                Throw ex
-                            Next
+                            Throw ae.Flatten().InnerException
                         Finally
-                            If My.MyApplication._EnableGPUProcessing Then
-                                My.MyApplication.gpu.DisableMultithreading()
-                                My.MyApplication.gpu.FreeAll()
-                            End If
+                            'If My.MyApplication._EnableGPUProcessing Then
+                            '    My.MyApplication.gpu.DisableMultithreading()
+                            '    My.MyApplication.gpu.FreeAll()
+                            'End If
                         End Try
                         My.MyApplication.IsRunningParallelTasks = False
                     Else
@@ -1798,7 +2159,7 @@ out:        Return result
                         If My.MyApplication._EnableParallelProcessing Then
                             My.MyApplication.IsRunningParallelTasks = True
                             If My.MyApplication._EnableGPUProcessing Then
-                                My.MyApplication.gpu.EnableMultithreading()
+                                ' My.MyApplication.gpu.EnableMultithreading()
                             End If
                             Try
                                 Dim task1 As Task = New Task(Sub()
@@ -1811,14 +2172,12 @@ out:        Return result
                                 task2.Start()
                                 Task.WaitAll(task1, task2)
                             Catch ae As AggregateException
-                                For Each ex As Exception In ae.InnerExceptions
-                                    Throw ex
-                                Next
+                                Throw ae.Flatten().InnerException
                             Finally
-                                If My.MyApplication._EnableGPUProcessing Then
-                                    My.MyApplication.gpu.DisableMultithreading()
-                                    My.MyApplication.gpu.FreeAll()
-                                End If
+                                'If My.MyApplication._EnableGPUProcessing Then
+                                '    My.MyApplication.gpu.DisableMultithreading()
+                                '    My.MyApplication.gpu.FreeAll()
+                                'End If
                             End Try
                             My.MyApplication.IsRunningParallelTasks = False
                         Else
@@ -1865,7 +2224,7 @@ out:        Return result
                         If My.MyApplication._EnableParallelProcessing Then
                             My.MyApplication.IsRunningParallelTasks = True
                             If My.MyApplication._EnableGPUProcessing Then
-                                My.MyApplication.gpu.EnableMultithreading()
+                                'My.MyApplication.gpu.EnableMultithreading()
                             End If
                             Try
                                 Dim task1 As Task = New Task(Sub()
@@ -1882,14 +2241,12 @@ out:        Return result
                                 task3.Start()
                                 Task.WaitAll(task1, task2, task3)
                             Catch ae As AggregateException
-                                For Each ex As Exception In ae.InnerExceptions
-                                    Throw ex
-                                Next
+                                Throw ae.Flatten().InnerException
                             Finally
-                                If My.MyApplication._EnableGPUProcessing Then
-                                    My.MyApplication.gpu.DisableMultithreading()
-                                    My.MyApplication.gpu.FreeAll()
-                                End If
+                                'If My.MyApplication._EnableGPUProcessing Then
+                                '    My.MyApplication.gpu.DisableMultithreading()
+                                '    My.MyApplication.gpu.FreeAll()
+                                'End If
                             End Try
                             My.MyApplication.IsRunningParallelTasks = False
                         Else
@@ -1958,7 +2315,7 @@ out:        Return result
                     If My.MyApplication._EnableParallelProcessing Then
                         My.MyApplication.IsRunningParallelTasks = True
                         If My.MyApplication._EnableGPUProcessing Then
-                            My.MyApplication.gpu.EnableMultithreading()
+                            'My.MyApplication.gpu.EnableMultithreading()
                         End If
                         Try
                             Dim task1 As Task = New Task(Sub()
@@ -1975,14 +2332,12 @@ out:        Return result
                             task3.Start()
                             Task.WaitAll(task1, task2, task3)
                         Catch ae As AggregateException
-                            For Each ex As Exception In ae.InnerExceptions
-                                Throw ex
-                            Next
+                            Throw ae.Flatten().InnerException
                         Finally
-                            If My.MyApplication._EnableGPUProcessing Then
-                                My.MyApplication.gpu.DisableMultithreading()
-                                My.MyApplication.gpu.FreeAll()
-                            End If
+                            'If My.MyApplication._EnableGPUProcessing Then
+                            '    My.MyApplication.gpu.DisableMultithreading()
+                            '    My.MyApplication.gpu.FreeAll()
+                            'End If
                         End Try
                         My.MyApplication.IsRunningParallelTasks = False
                     Else
@@ -2016,7 +2371,7 @@ out:        Return result
 
         Private Function FunctionHessian(ByVal x() As Double) As Double()
 
-            Dim epsilon As Double = 0.01
+            Dim epsilon As Double = 0.001
 
             Dim f2() As Double = Nothing
             Dim f3() As Double = Nothing
@@ -2024,8 +2379,8 @@ out:        Return result
             Dim m As Integer
 
             m = 0
-            For i = 0 To x.Length - 1
-                For j = 0 To x.Length - 1
+            For i As Integer = 0 To x.Length - 1
+                For j As Integer = 0 To x.Length - 1
                     If i <> j Then
                         x2(j) = x(j)
                         x3(j) = x(j)
@@ -2037,7 +2392,7 @@ out:        Return result
                 If My.MyApplication._EnableParallelProcessing Then
                     My.MyApplication.IsRunningParallelTasks = True
                     If My.MyApplication._EnableGPUProcessing Then
-                        My.MyApplication.gpu.EnableMultithreading()
+                        ' My.MyApplication.gpu.EnableMultithreading()
                     End If
                     Try
                         Dim task1 As Task = New Task(Sub()
@@ -2050,22 +2405,20 @@ out:        Return result
                         task2.Start()
                         Task.WaitAll(task1, task2)
                     Catch ae As AggregateException
-                        For Each ex As Exception In ae.InnerExceptions
-                            Throw ex
-                        Next
+                        Throw ae.Flatten().InnerException
                     Finally
-                        If My.MyApplication._EnableGPUProcessing Then
-                            My.MyApplication.gpu.DisableMultithreading()
-                            My.MyApplication.gpu.FreeAll()
-                        End If
+                        'If My.MyApplication._EnableGPUProcessing Then
+                        '    My.MyApplication.gpu.DisableMultithreading()
+                        '    My.MyApplication.gpu.FreeAll()
+                        'End If
                     End Try
                     My.MyApplication.IsRunningParallelTasks = False
                 Else
                     f2 = FunctionGradient(x2)
                     f3 = FunctionGradient(x3)
                 End If
-                For k = 0 To x.Length - 1
-                    h(m) = (f2(k) - f3(k)) / (x2(i) - x3(i))
+                For k2 As Integer = 0 To x.Length - 1
+                    h(m) = (f2(k2) - f3(k)) / (x2(i) - x3(i))
                     If Double.IsNaN(h(m)) Then h(m) = 0.0#
                     m += 1
                 Next
@@ -2083,28 +2436,28 @@ out:        Return result
             Return True
         End Function
 
-        Public Function eval_grad_f(ByVal n As Integer, ByVal x As Double(), ByVal new_x As Boolean, ByVal grad_f As Double()) As Boolean
+        Public Function eval_grad_f(ByVal n As Integer, ByVal x As Double(), ByVal new_x As Boolean, ByRef grad_f As Double()) As Boolean
             Dim g As Double() = FunctionGradient(x)
             grad_f = g
             Return True
         End Function
 
-        Public Function eval_g(ByVal n As Integer, ByVal x As Double(), ByVal new_x As Boolean, ByVal m As Integer, ByVal g As Double()) As Boolean
-            For i = 0 To m - 1
+        Public Function eval_g(ByVal n As Integer, ByVal x As Double(), ByVal new_x As Boolean, ByVal m As Integer, ByRef g As Double()) As Boolean
+            For i As Integer = 0 To m - 1
                 g(i) = fi(i) * F - x(i) - x(i + m)
             Next
             Return True
         End Function
 
-        Public Function eval_jac_g(ByVal n As Integer, ByVal x As Double(), ByVal new_x As Boolean, ByVal m As Integer, ByVal nele_jac As Integer, ByVal iRow As Integer(), _
-         ByVal jCol As Integer(), ByVal values As Double()) As Boolean
+        Public Function eval_jac_g(ByVal n As Integer, ByVal x As Double(), ByVal new_x As Boolean, ByVal m As Integer, ByVal nele_jac As Integer, ByRef iRow As Integer(), _
+         ByRef jCol As Integer(), ByRef values As Double()) As Boolean
 
             If values Is Nothing Then
 
                 Dim row(nele_jac - 1), col(nele_jac - 1) As Integer
 
                 k = 0
-                For i = 0 To m - 1
+                For i As Integer = 0 To m - 1
                     row(i) = i
                     row(i + m) = i
                     col(i) = i
@@ -2118,7 +2471,7 @@ out:        Return result
 
                 Dim res(nele_jac - 1) As Double
 
-                For i = 0 To nele_jac - 1
+                For i As Integer = 0 To nele_jac - 1
                     res(i) = -1
                 Next
 
@@ -2129,7 +2482,7 @@ out:        Return result
         End Function
 
         Public Function eval_h(ByVal n As Integer, ByVal x As Double(), ByVal new_x As Boolean, ByVal obj_factor As Double, ByVal m As Integer, ByVal lambda As Double(), _
-         ByVal new_lambda As Boolean, ByVal nele_hess As Integer, ByVal iRow As Integer(), ByVal jCol As Integer(), ByVal values As Double()) As Boolean
+         ByVal new_lambda As Boolean, ByVal nele_hess As Integer, ByRef iRow As Integer(), ByRef jCol As Integer(), ByRef values As Double()) As Boolean
 
             If values Is Nothing Then
 

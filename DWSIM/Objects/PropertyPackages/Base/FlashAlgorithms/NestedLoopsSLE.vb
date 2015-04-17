@@ -1,7 +1,7 @@
 '    DWSIM Nested Loops Flash Algorithms for Solid-Liquid Equilibria (SLE)
 '    Copyright 2013 Daniel Wagner O. de Medeiros
 '
-'    This file is part of DTL.
+'    This file is part of DWSIM.
 '
 '    DWSIM is free software: you can redistribute it and/or modify
 '    it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@
 '    GNU General Public License for more details.
 '
 '    You should have received a copy of the GNU General Public License
-'    along with DTL.  If not, see <http://www.gnu.org/licenses/>.
+'    along with DWSIM.  If not, see <http://www.gnu.org/licenses/>.
 
 Imports System.Math
 Imports DTL.DTL.SimulationObjects
@@ -128,7 +128,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
             ecount = 0
             Dim convergiu = 0
-            Dim F = 0
+            Dim F = 0.0#
 
             Do
 
@@ -201,7 +201,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                     Lant = L
 
                     F = 0.0#
-                    Dim dF = 0
+                    Dim dF = 0.0#
                     i = 0
                     Do
                         If Vz(i) > 0 Then
@@ -239,10 +239,10 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
                 ecount += 1
 
-                If Double.IsNaN(L) Then Throw New Exception("Error calculating the vapor fraction.")
+                If Double.IsNaN(L) Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashTPVapFracError"))
                 If ecount > maxit_e Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt2"))
 
-                Console.WriteLine("PT Flash [NL-SLE]: Iteration #" & ecount & ", LF = " & L)
+                WriteDebugInfo("PT Flash [NL-SLE]: Iteration #" & ecount & ", LF = " & L)
 
 
 
@@ -252,7 +252,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
             dt = d2 - d1
 
-            Console.WriteLine("PT Flash [NL-SLE]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms. Error function value: " & F)
+            WriteDebugInfo("PT Flash [NL-SLE]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms. Error function value: " & F)
 
 out:        Return New Object() {L, V, Vx, Vy, ecount, 0.0#, PP.RET_NullVector, S, Vs}
 
@@ -371,8 +371,8 @@ out:        Return New Object() {L, V, Vx, Vy, ecount, 0.0#, PP.RET_NullVector, 
 
                 If errfunc <= etol Then Exit Do
 
-                If Double.IsNaN(S) Then Throw New Exception("Error calculation solids mole fraction.")
-                If ecount > maxit_e Then Throw New Exception("The flash algorithm reached the maximum number of external iterations.")
+                If Double.IsNaN(S) Then Throw New Exception(DTL.App.GetLocalString("PP_FlashTPSolidFracError"))
+                If ecount > maxit_e Then Throw New Exception(DTL.App.GetLocalString("PP_FlashMaxIt2"))
 
                 ecount += 1
 
@@ -386,7 +386,7 @@ out:        Return New Object() {L, V, Vx, Vy, ecount, 0.0#, PP.RET_NullVector, 
 
             dt = d2 - d1
 
-            Console.WriteLine("PT Flash [NL-SLE]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms. Error function value: " & errfunc)
+            WriteDebugInfo("PT Flash [NL-SLE]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms. Error function value: " & errfunc)
 
 out:        Return New Object() {L, V, Vxl, Vxv, ecount, 0.0#, PP.RET_NullVector, S, Vxs}
 
@@ -430,7 +430,7 @@ out:        Return New Object() {L, V, Vxl, Vxv, ecount, 0.0#, PP.RET_NullVector
 
             Dim bo As New BrentOpt.Brent
             bo.DefineFuncDelegate(AddressOf Herror)
-            Console.WriteLine("PH Flash: Starting calculation for " & Tinf & " <= T <= " & Tsup)
+            WriteDebugInfo("PH Flash: Starting calculation for " & Tinf & " <= T <= " & Tsup)
 
             Dim fx, fx2, dfdx, x1 As Double
 
@@ -473,7 +473,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 100, tolEXT, maxitEXT, {P, Vz, PP})
 
             dt = d2 - d1
 
-            Console.WriteLine("PH Flash [NL-SLE]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms.")
+            WriteDebugInfo("PH Flash [NL-SLE]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms.")
 
             Return New Object() {L, V, Vx, Vy, T, ecount, Ki, 0.0#, PP.RET_NullVector, S, Vs}
 
@@ -518,7 +518,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 100, tolEXT, maxitEXT, {P, Vz, PP})
             If Tinf < 100 Then Tinf = 100
             Dim bo As New BrentOpt.Brent
             bo.DefineFuncDelegate(AddressOf Serror)
-            Console.WriteLine("PS Flash: Starting calculation for " & Tinf & " <= T <= " & Tsup)
+            WriteDebugInfo("PS Flash: Starting calculation for " & Tinf & " <= T <= " & Tsup)
 
             Dim fx, fx2, dfdx, x1 As Double
 
@@ -559,7 +559,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
 
             dt = d2 - d1
 
-            Console.WriteLine("PS Flash [NL-SLE]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms.")
+            WriteDebugInfo("PS Flash [NL-SLE]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms.")
 
             Return New Object() {L, V, Vx, Vy, T, ecount, Ki, 0.0#, PP.RET_NullVector, Ss, Vs}
 
@@ -575,7 +575,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
 
             dt = d2 - d1
 
-            Console.WriteLine("TV Flash [NL-SLE]: Converged in " & 0 & " iterations. Time taken: " & dt.TotalMilliseconds & " ms.")
+            WriteDebugInfo("TV Flash [NL-SLE]: Converged in " & 0 & " iterations. Time taken: " & dt.TotalMilliseconds & " ms.")
 
             Return New Object() {0.0#, 0.0#, PP.RET_NullVector, PP.RET_NullVector, 0, 0, PP.RET_NullVector, 0.0#, PP.RET_NullVector}
 
@@ -593,7 +593,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
 
             Dim tmp As Object
             tmp = Me.Flash_PT(Vz, P, T, pp)
-            Dim L, V, S, Vx(), Vy(), Vs() As Double
+            Dim L, V, S, Vx(), Vy(), Vs(), _Hv, _Hl, _Hs As Double
 
             Dim n = UBound(Vz)
 
@@ -604,22 +604,22 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
             Vy = tmp(3)
             Vs = tmp(8)
 
-            Hv = 0
-            Hl = 0
-            Hs = 0
+            _Hv = 0
+            _Hl = 0
+            _Hs = 0
 
             Dim mmg, mml, mms As Double
-            If V > 0 Then Hv = pp.DW_CalcEnthalpy(Vy, T, P, State.Vapor)
-            If L > 0 Then Hl = pp.DW_CalcEnthalpy(Vx, T, P, State.Liquid)
-            If S > 0 Then Hs = pp.DW_CalcSolidEnthalpy(T, Vs, CompoundProperties)
+            If V > 0 Then _Hv = pp.DW_CalcEnthalpy(Vy, T, P, State.Vapor)
+            If L > 0 Then _Hl = pp.DW_CalcEnthalpy(Vx, T, P, State.Liquid)
+            If S > 0 Then _Hs = pp.DW_CalcSolidEnthalpy(T, Vs, CompoundProperties)
             mmg = pp.AUX_MMM(Vy)
             mml = pp.AUX_MMM(Vx)
             mms = pp.AUX_MMM(Vs)
 
-            Dim herr As Double = Hf - (mmg * V / (mmg * V + mml * L + mms * S)) * Hv - (mml * L / (mmg * V + mml * L + mms * S)) * Hl - (mms * S / (mmg * V + mml * L + mms * S)) * Hs
+            Dim herr As Double = Hf - (mmg * V / (mmg * V + mml * L + mms * S)) * _Hv - (mml * L / (mmg * V + mml * L + mms * S)) * _Hl - (mms * S / (mmg * V + mml * L + mms * S)) * _Hs
             OBJ_FUNC_PH_FLASH = herr
 
-            Console.WriteLine("PH Flash [NL]: Current T = " & T & ", Current H Error = " & herr)
+            WriteDebugInfo("PH Flash [NL-SLE]: Current T = " & T & ", Current H Error = " & herr)
 
         End Function
 
@@ -627,7 +627,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
 
             Dim tmp As Object
             tmp = Me.Flash_PT(Vz, P, T, pp)
-            Dim L, V, Ssf, Vx(), Vy(), Vs() As Double
+            Dim L, V, Ssf, Vx(), Vy(), Vs(), _Sv, _Sl, _Ss As Double
 
             Dim n = UBound(Vz)
 
@@ -638,22 +638,22 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
             Vy = tmp(3)
             Vs = tmp(8)
 
-            Sv = 0
-            Sl = 0
-            Ss = 0
+            _Sv = 0
+            _Sl = 0
+            _Ss = 0
             Dim mmg, mml, mms As Double
 
-            If V > 0 Then Sv = pp.DW_CalcEntropy(Vy, T, P, State.Vapor)
-            If L > 0 Then Sl = pp.DW_CalcEntropy(Vx, T, P, State.Liquid)
-            If Ssf > 0 Then Ss = pp.DW_CalcSolidEnthalpy(T, Vs, CompoundProperties) / (T - 298.15)
+            If V > 0 Then _Sv = pp.DW_CalcEntropy(Vy, T, P, State.Vapor)
+            If L > 0 Then _Sl = pp.DW_CalcEntropy(Vx, T, P, State.Liquid)
+            If Ssf > 0 Then _Ss = pp.DW_CalcSolidEnthalpy(T, Vs, CompoundProperties) / (T - 298.15)
             mmg = pp.AUX_MMM(Vy)
             mml = pp.AUX_MMM(Vx)
             mms = pp.AUX_MMM(Vs)
 
-            Dim serr As Double = Sf - (mmg * V / (mmg * V + mml * L + mms * Ssf)) * Sv - (mml * L / (mmg * V + mml * L + mms * Ssf)) * Sl - (mms * Ssf / (mmg * V + mml * L + mms * Ssf)) * Ss
+            Dim serr As Double = Sf - (mmg * V / (mmg * V + mml * L + mms * Ssf)) * _Sv - (mml * L / (mmg * V + mml * L + mms * Ssf)) * _Sl - (mms * Ssf / (mmg * V + mml * L + mms * Ssf)) * _Ss
             OBJ_FUNC_PS_FLASH = serr
 
-            Console.WriteLine("PS Flash [NL-SLE]: Current T = " & T & ", Current S Error = " & serr)
+            WriteDebugInfo("PS Flash [NL-SLE]: Current T = " & T & ", Current S Error = " & serr)
 
         End Function
 
@@ -897,7 +897,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
                 'If T < Tmin Then T = Tmin
                 'If T > Tmax Then T = Tmax
 
-                Console.WriteLine("PV Flash [NL-SLE]: Iteration #" & ecount & ", T = " & T & ", LF = " & L)
+                WriteDebugInfo("PV Flash [NL-SLE]: Iteration #" & ecount & ", T = " & T & ", LF = " & L)
 
 
 
@@ -907,7 +907,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
 
             dt = d2 - d1
 
-            Console.WriteLine("PV Flash [NL-SLE]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms.")
+            WriteDebugInfo("PV Flash [NL-SLE]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms.")
 
             Return New Object() {L, V, Vx, PP.RET_NullVector, T, ecount, Ki, 0.0#, PP.RET_NullVector, S, Vs}
 
@@ -1045,7 +1045,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
 
             dt = d2 - d1
 
-            Console.WriteLine("PV Flash [NL-SLE]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms.")
+            WriteDebugInfo("PV Flash [NL-SLE]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms.")
 
             Return New Object() {result(0), result(1), result(2), result(3), T, ecount, PP.RET_NullVector, 0.0#, PP.RET_NullVector, result(7), result(8)}
 

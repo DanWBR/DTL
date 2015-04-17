@@ -1,7 +1,7 @@
 '    Simplified LLE Flash Algorithm
-'    Copyright 2013 Daniel Wagner O. de Medeiros
+'    Copyright 2013-2014 Daniel Wagner O. de Medeiros
 '
-'    This file is part of DTL.
+'    This file is part of DWSIM.
 '
 '    DWSIM is free software: you can redistribute it and/or modify
 '    it under the terms of the GNU General Public License as published by
@@ -14,13 +14,14 @@
 '    GNU General Public License for more details.
 '
 '    You should have received a copy of the GNU General Public License
-'    along with DTL.  If not, see <http://www.gnu.org/licenses/>.
+'    along with DWSIM.  If not, see <http://www.gnu.org/licenses/>.
 
 Imports System.Math
 Imports DTL.DTL.SimulationObjects
 Imports DTL.DTL.MathEx
 Imports DTL.DTL.MathEx.Common
 Imports System.Threading.Tasks
+Imports System.Linq
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
@@ -43,13 +44,14 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
         Public Overrides Function Flash_PT(ByVal Vz As Double(), ByVal P As Double, ByVal T As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
 
-            Dim i, n, ecount As Integer
+            Dim i, j, n, ecount As Integer
             n = UBound(Vz)
 
-            Dim Vx1(n), Vx2(n), Vn1(n), Vn2(n), Ki(n), fi1(n), fi2(n), gamma1(n), gamma2(n) As Double
+            Dim Vx1(n), Vx2(n), Vy(n), Vn1(n), Vn2(n), Ki(n), fi1(n), fi2(n), gamma1(n), gamma2(n), Vp(n) As Double
+            Dim Vx1_ant(n), Vx2_ant(n) As Double
             Dim d1, d2 As Date, dt As TimeSpan
-            Dim L1, L2, V As Double
-
+            Dim L1, L2, V, S As Double
+            Dim e1, e2 As Double
             d1 = Date.Now
 
             etol = CDbl(PP.Parameters("PP_PTFELT"))
@@ -57,38 +59,69 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
             itol = CDbl(PP.Parameters("PP_PTFILT"))
             maxit_i = CInt(PP.Parameters("PP_PTFMII"))
 
-            'Calculate Ki`s
-
-            Dim minn As Double = Vz(0)
-            For i = 0 To n
-                If Vz(i) <> 0.0# And Vz(i) < minn Then minn = Vz(i)
-            Next
-
-            L2 = minn / 2
-            L1 = 1 - L2
+            If UseInitialEstimatesForPhase1 And UseInitialEstimatesForPhase2 Then
+                L1 = 0
+                L2 = 0
+                For i = 0 To n
+                    If Vz(i) > 0 Then
+                        j += 1
+                        If InitialEstimatesForPhase1(i) = InitialEstimatesForPhase2(i) Then
+                            L1 += 0.5
+                        Else
+                            L1 += (Vz(i) - InitialEstimatesForPhase2(i)) / (InitialEstimatesForPhase1(i) - InitialEstimatesForPhase2(i))
+                        End If
+                    End If
+                Next
+                L1 = L1 / j
+                If L1 > 0.99 Then L1 = 0.99
+                If L1 < 0.01 Then L1 = 0.01
+                L2 = 1 - L1
+            Else
+                Dim minn As Double = Vz(0)
+                j = 0
+                For i = 0 To n
+                    If Vz(i) > 0 And Vz(i) < minn Then
+                        j = i
+                        minn = Vz(i)
+                    End If
+                Next
+                For i = 0 To n
+                    If Vz(i) = minn Then
+                        Vn1(i) = Vz(i) * 0.05
+                        Vn2(i) = Vz(i) * 0.95
+                    Else
+                        Vn1(i) = Vz(i) * 0.95
+                        Vn2(i) = Vz(i) * 0.05
+                    End If
+                Next
+                L1 = Vn1.Sum
+                L2 = Vn2.Sum
+            End If
 
             If UseInitialEstimatesForPhase1 Then
                 For i = 0 To n
-                    Vn1(i) = L1 * InitialEstimatesForPhase1(i)
-                Next
-            Else
-                For i = 0 To n
-                    Vn1(i) = Vz(i) * (1 - L2)
+                    If Vz(i) > 0 Then Vn1(i) = L1 * InitialEstimatesForPhase1(i)
                 Next
             End If
 
             If UseInitialEstimatesForPhase2 Then
                 For i = 0 To n
-                    Vn2(i) = L2 * InitialEstimatesForPhase2(i)
-                Next
-            Else
-                For i = 0 To n
-                    Vn2(i) = Vz(i) * (1 - L1)
+                    If Vz(i) > 0 Then Vn2(i) = L2 * InitialEstimatesForPhase2(i)
                 Next
             End If
 
-            L1 = Sum(Vn1)
-            L2 = Sum(Vn2)
+            'renormalise Vn's
+            S = Vn1.Sum() + Vn2.Sum()
+            For i = 0 To n
+                Vn1(i) /= S
+                Vn2(i) /= S
+            Next
+
+            'calculate vapour pressures
+            For i = 0 To n
+                Vp(i) = PP.AUX_PVAPi(i, T)
+            Next
+
 
             Dim err As Double = 0.0#
             Dim err_ant As Double = 0.0#
@@ -96,6 +129,8 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
             ecount = 0
 
             Do
+                Vx1_ant = Vx1.Clone
+                Vx2_ant = Vx2.Clone
 
                 For i = 0 To n
                     Vx1(i) = Vn1(i) / L1
@@ -106,65 +141,70 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                 fi2 = PP.DW_CalcFugCoeff(Vx2, T, P, State.Liquid)
 
                 For i = 0 To n
-                    gamma1(i) = P / PP.AUX_PVAPi(i, T) * fi1(i)
-                    gamma2(i) = P / PP.AUX_PVAPi(i, T) * fi2(i)
+                    gamma1(i) = P / Vp(i) * fi1(i)
+                    gamma2(i) = P / Vp(i) * fi2(i)
                 Next
 
                 err_ant = err
                 err = 0.0#
+                e1 = 0
+                e2 = 0
+                S = 0
                 For i = 0 To n
-                    err += Vx1(i) * gamma1(i) - Vx2(i) * gamma2(i)
+                    err += Abs(Vx1(i) * gamma1(i) - Vx2(i) * gamma2(i))
+                    e1 += Abs(Vx1(i) - Vx1_ant(i))
+                    e2 += Abs(Vx2(i) - Vx2_ant(i))
+                    S += Abs(Vx1(i) - Vx2(i))
                 Next
+
 
                 If Double.IsNaN(err) Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashError"))
 
-                If ecount > 0 And Abs(err) < 0.000001 Then Exit Do
+                If ecount > 0 And (Abs(err) < 0.000001 Or L1 < 0.0001 Or L2 < 0.0001 Or S < 0.0001) Then Exit Do
 
                 For i = 0 To n
                     Vn1(i) = Vz(i) / (1 + gamma1(i) * L2 / (gamma2(i) * L1))
+                    Vn2(i) = Vz(i) - Vn1(i)
                 Next
 
-                L1 = 0
-                L2 = 0
-                For i = 0 To n
-                    L1 += Vn1(i)
-                    L2 += Vn2(i)
-                Next
-
-                For i = 0 To n
-                    Vn2(i) = Vn1(i) * L2 * gamma1(i) / (L1 * gamma2(i))
-                Next
+                L1 = Vn1.Sum
+                L2 = Vn2.Sum
 
                 ecount += 1
 
-                If ecount > 10000 Then Throw New Exception("The flash algorithm reached the maximum number of external iterations.")
+                If ecount > 10000 Then Throw New Exception(DTL.App.GetLocalString("Nmeromximodeiteraesa3"))
 
             Loop
 
-            d2 = Date.Now
+out:        d2 = Date.Now
 
             dt = d2 - d1
 
-            Console.WriteLine("PT Flash [SimpleLLE]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms. Error function value: " & err)
+            WriteDebugInfo("PT Flash [SimpleLLE]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms. Error function value: " & err)
 
-out:
-
-            'order liquid phases by mixture NBP
-
-            Dim VNBP = PP.RET_VTB()
-            Dim nbp1 As Double = 0
-            Dim nbp2 As Double = 0
-
-            For i = 0 To n
-                nbp1 += Vx1(i) * VNBP(i)
-                nbp2 += Vx2(i) * VNBP(i)
-            Next
-
-            If nbp1 >= nbp2 Then
-                Return New Object() {L1, V, Vx1, PP.RET_NullVector, ecount, L2, Vx2, 0.0#, PP.RET_NullVector, gamma1, gamma2}
+            If L1 < 0.0001 Or L2 < 0.0001 Or S < 0.0001 Then
+                'merge phases - both phases are identical
+                Return New Object() {1, V, Vz, PP.RET_NullVector, ecount, 0, Vx2, 0.0#, PP.RET_NullVector, gamma1, gamma2}
             Else
-                Return New Object() {L2, V, Vx2, PP.RET_NullVector, ecount, L1, Vx1, 0.0#, PP.RET_NullVector, gamma1, gamma2}
+                'order liquid phases by mixture NBP
+                Dim VNBP = PP.RET_VTB()
+                Dim nbp1 As Double = 0
+                Dim nbp2 As Double = 0
+
+                For i = 0 To n
+                    nbp1 += Vx1(i) * VNBP(i)
+                    nbp2 += Vx2(i) * VNBP(i)
+                Next
+
+                If nbp1 >= nbp2 Then
+                    Return New Object() {L1, V, Vx1, PP.RET_NullVector, ecount, L2, Vx2, 0.0#, PP.RET_NullVector, gamma1, gamma2}
+                Else
+                    Return New Object() {L2, V, Vx2, PP.RET_NullVector, ecount, L1, Vx1, 0.0#, PP.RET_NullVector, gamma1, gamma2}
+                End If
             End If
+
+
+
 
 
         End Function
@@ -209,7 +249,7 @@ out:
 
             Dim bo As New BrentOpt.Brent
             bo.DefineFuncDelegate(AddressOf Herror)
-            Console.WriteLine("PH Flash: Starting calculation for " & Tinf & " <= T <= " & Tsup)
+            WriteDebugInfo("PH Flash: Starting calculation for " & Tinf & " <= T <= " & Tsup)
 
             Dim fx, fx2, dfdx, x1 As Double
 
@@ -220,6 +260,9 @@ out:
             Do
                 If My.MyApplication._EnableParallelProcessing Then
                     My.MyApplication.IsRunningParallelTasks = True
+                    If My.MyApplication._EnableGPUProcessing Then
+                        ' My.MyApplication.gpu.EnableMultithreading()
+                    End If
                     Try
                         Dim task1 As Task = New Task(Sub()
                                                          fx = Herror(x1, {P, Vz, PP})
@@ -231,9 +274,12 @@ out:
                         task2.Start()
                         Task.WaitAll(task1, task2)
                     Catch ae As AggregateException
-                        For Each ex As Exception In ae.InnerExceptions
-                            Throw
-                        Next
+                        Throw ae.Flatten().InnerException
+                    Finally
+                        'If My.MyApplication._EnableGPUProcessing Then
+                        '    My.MyApplication.gpu.DisableMultithreading()
+                        '    My.MyApplication.gpu.FreeAll()
+                        'End If
                     End Try
                     My.MyApplication.IsRunningParallelTasks = False
                 Else
@@ -270,7 +316,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
 
             dt = d2 - d1
 
-            Console.WriteLine("PH Flash [SimpleLLE]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms.")
+            WriteDebugInfo("PH Flash [SimpleLLE]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms.")
 
             Return New Object() {L, V, Vx, Vy, T, ecount, Ki, 0.0#, PP.RET_NullVector, 0.0#, PP.RET_NullVector}
 
@@ -315,7 +361,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
             If Tinf < 100 Then Tinf = 100
             Dim bo As New BrentOpt.Brent
             bo.DefineFuncDelegate(AddressOf Serror)
-            Console.WriteLine("PS Flash: Starting calculation for " & Tinf & " <= T <= " & Tsup)
+            WriteDebugInfo("PS Flash: Starting calculation for " & Tinf & " <= T <= " & Tsup)
 
             Dim fx, fx2, dfdx, x1 As Double
 
@@ -337,9 +383,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
                         task2.Start()
                         Task.WaitAll(task1, task2)
                     Catch ae As AggregateException
-                        For Each ex As Exception In ae.InnerExceptions
-                            Throw
-                        Next
+                        Throw ae.Flatten().InnerException
                     End Try
                     My.MyApplication.IsRunningParallelTasks = False
                 Else
@@ -374,7 +418,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
 
             dt = d2 - d1
 
-            Console.WriteLine("PS Flash [SimpleLLE]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms.")
+            WriteDebugInfo("PS Flash [SimpleLLE]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms.")
 
             Return New Object() {L, V, Vx, Vy, T, ecount, Ki, 0.0#, PP.RET_NullVector, 0.0#, PP.RET_NullVector}
 
@@ -588,7 +632,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
                         P = P - fval / dFdP
                     End If
 
-                    Console.WriteLine("TV Flash [SimpleLLE]: Iteration #" & ecount & ", P = " & P & ", VF = " & V)
+                    WriteDebugInfo("TV Flash [SimpleLLE]: Iteration #" & ecount & ", P = " & P & ", VF = " & V)
 
 
 
@@ -692,7 +736,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
                         P = P - fval / dFdP
                     End If
 
-                    Console.WriteLine("TV Flash [SimpleLLE]: Iteration #" & ecount & ", P = " & P & ", VF = " & V)
+                    WriteDebugInfo("TV Flash [SimpleLLE]: Iteration #" & ecount & ", P = " & P & ", VF = " & V)
 
 
 
@@ -704,7 +748,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
 
             dt = d2 - d1
 
-            Console.WriteLine("TV Flash [SimpleLLE]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms.")
+            WriteDebugInfo("TV Flash [SimpleLLE]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms.")
 
             Return New Object() {L, V, Vx, Vy, P, ecount, Ki, 0.0#, PP.RET_NullVector, 0.0#, PP.RET_NullVector}
 
@@ -913,7 +957,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
                     If T < Tmin Then T = Tmin
                     If T > Tmax Then T = Tmax
 
-                    Console.WriteLine("PV Flash [SimpleLLE]: Iteration #" & ecount & ", T = " & T & ", VF = " & V)
+                    WriteDebugInfo("PV Flash [SimpleLLE]: Iteration #" & ecount & ", T = " & T & ", VF = " & V)
 
 
 
@@ -1015,7 +1059,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
                     If T < Tmin Then T = Tmin
                     If T > Tmax Then T = Tmax
 
-                    Console.WriteLine("PV Flash [SimpleLLE]: Iteration #" & ecount & ", T = " & T & ", VF = " & V)
+                    WriteDebugInfo("PV Flash [SimpleLLE]: Iteration #" & ecount & ", T = " & T & ", VF = " & V)
 
 
 
@@ -1027,7 +1071,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
 
             dt = d2 - d1
 
-            Console.WriteLine("PV Flash [SimpleLLE]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms.")
+            WriteDebugInfo("PV Flash [SimpleLLE]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms.")
 
             Return New Object() {L, V, Vx, Vy, T, ecount, Ki, 0.0#, PP.RET_NullVector, 0.0#, PP.RET_NullVector}
 
@@ -1037,7 +1081,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
 
             Dim tmp As Object
             tmp = Me.Flash_PT(Vz, P, T, pp)
-            Dim L, V, Vx(), Vy() As Double
+            Dim L, V, Vx(), Vy(), _Hv, _Hl As Double
 
             Dim n = UBound(Vz)
 
@@ -1046,26 +1090,26 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
             Vx = tmp(2)
             Vy = tmp(3)
 
-            Hv = 0
-            Hl = 0
+            _Hv = 0
+            _Hl = 0
 
             Dim mmg, mml As Double
-            If V > 0 Then Hv = pp.DW_CalcEnthalpy(Vy, T, P, State.Vapor)
-            If L > 0 Then Hl = pp.DW_CalcEnthalpy(Vx, T, P, State.Liquid)
+            If V > 0 Then _Hv = pp.DW_CalcEnthalpy(Vy, T, P, State.Vapor)
+            If L > 0 Then _Hl = pp.DW_CalcEnthalpy(Vx, T, P, State.Liquid)
             mmg = pp.AUX_MMM(Vy)
             mml = pp.AUX_MMM(Vx)
 
-            Dim herr As Double = Hf - (mmg * V / (mmg * V + mml * L)) * Hv - (mml * L / (mmg * V + mml * L)) * Hl
+            Dim herr As Double = Hf - (mmg * V / (mmg * V + mml * L)) * _Hv - (mml * L / (mmg * V + mml * L)) * _Hl
             OBJ_FUNC_PH_FLASH = herr
 
-            Console.WriteLine("PH Flash [SimpleLLE]: Current T = " & T & ", Current H Error = " & herr)
+            WriteDebugInfo("PH Flash [SimpleLLE]: Current T = " & T & ", Current H Error = " & herr)
 
         End Function
 
         Function OBJ_FUNC_PS_FLASH(ByVal T As Double, ByVal S As Double, ByVal P As Double, ByVal Vz As Object, ByVal pp As PropertyPackage) As Object
 
             Dim tmp = Me.Flash_PT(Vz, P, T, pp)
-            Dim L, V, Vx(), Vy() As Double
+            Dim L, V, Vx(), Vy(), _Sv, _Sl As Double
 
             Dim n = UBound(Vz)
 
@@ -1074,19 +1118,19 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
             Vx = tmp(2)
             Vy = tmp(3)
 
-            Sv = 0
-            Sl = 0
+            _Sv = 0
+            _Sl = 0
             Dim mmg, mml As Double
 
-            If V > 0 Then Sv = pp.DW_CalcEntropy(Vy, T, P, State.Vapor)
-            If L > 0 Then Sl = pp.DW_CalcEntropy(Vx, T, P, State.Liquid)
+            If V > 0 Then _Sv = pp.DW_CalcEntropy(Vy, T, P, State.Vapor)
+            If L > 0 Then _Sl = pp.DW_CalcEntropy(Vx, T, P, State.Liquid)
             mmg = pp.AUX_MMM(Vy)
             mml = pp.AUX_MMM(Vx)
 
-            Dim serr As Double = Sf - (mmg * V / (mmg * V + mml * L)) * Sv - (mml * L / (mmg * V + mml * L)) * Sl
+            Dim serr As Double = Sf - (mmg * V / (mmg * V + mml * L)) * _Sv - (mml * L / (mmg * V + mml * L)) * _Sl
             OBJ_FUNC_PS_FLASH = serr
 
-            Console.WriteLine("PS Flash [SimpleLLE]: Current T = " & T & ", Current S Error = " & serr)
+            WriteDebugInfo("PS Flash [SimpleLLE]: Current T = " & T & ", Current S Error = " & serr)
 
         End Function
 

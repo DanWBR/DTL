@@ -21,7 +21,7 @@
     <ApplicationIcon>
     </ApplicationIcon>
     <TargetZone>LocalIntranet</TargetZone>
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>DTL.snk</AssemblyOriginatorKeyFile>
     <OptionStrict>Off</OptionStrict>
     <OptionCompare>Binary</OptionCompare>
@@ -119,6 +119,9 @@
     <WarningsAsErrors>
     </WarningsAsErrors>
   </PropertyGroup>
+  <PropertyGroup>
+    <OptionInfer>On</OptionInfer>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Cudafy.NET">
       <HintPath>References\Cudafy.NET.dll</HintPath>
@@ -168,6 +171,7 @@
     <Compile Include="Objects\Classes\Math\LM.vb" />
     <Compile Include="Objects\Classes\Math\MatrixOps.vb" />
     <Compile Include="Objects\Classes\Math\SysLin.vb" />
+    <Compile Include="Objects\Classes\Shared\ExtensionMethods.vb" />
     <Compile Include="Objects\PropertyPackages\Base\FlashAlgorithms\Base.vb" />
     <Compile Include="Objects\PropertyPackages\Base\FlashAlgorithms\BostonBrittInsideOut.vb" />
     <Compile Include="Objects\PropertyPackages\Base\FlashAlgorithms\BostonFournierInsideOut3P.vb" />
@@ -175,6 +179,7 @@
     <Compile Include="Objects\PropertyPackages\Base\FlashAlgorithms\NestedLoops.vb" />
     <Compile Include="Objects\PropertyPackages\Base\FlashAlgorithms\NestedLoops3P.vb" />
     <Compile Include="Objects\PropertyPackages\Base\FlashAlgorithms\NestedLoops3PV2.vb" />
+    <Compile Include="Objects\PropertyPackages\Base\FlashAlgorithms\NestedLoops3PV3.vb" />
     <Compile Include="Objects\PropertyPackages\Base\FlashAlgorithms\NestedLoopsImmiscible.vb" />
     <Compile Include="Objects\PropertyPackages\Base\FlashAlgorithms\NestedLoopsSLE.vb" />
     <Compile Include="Objects\PropertyPackages\Base\FlashAlgorithms\SimpleLLE.vb" />
@@ -186,6 +191,8 @@
     <Compile Include="Objects\PropertyPackages\GraysonStreed\Helper Classes\GS.vb" />
     <Compile Include="Objects\PropertyPackages\LeeKeslerPlocker\Helper Classes\LKP.vb" />
     <Compile Include="Objects\PropertyPackages\LeeKeslerPlocker\LKPPropertyPackage.vb" />
+    <Compile Include="Objects\PropertyPackages\NIST-MODFAC\Helper Classes\NISTMFAC.vb" />
+    <Compile Include="Objects\PropertyPackages\NIST-MODFAC\NISTMFACPropertyPackage.vb" />
     <Compile Include="Objects\PropertyPackages\PengRobinson\Helper Classes\PR.vb" />
     <Compile Include="Objects\PropertyPackages\PRSV2\PRSV2-VL.vb" />
     <Compile Include="Objects\PropertyPackages\PRSV2\PRSV2.vb" />
@@ -336,6 +343,11 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="bin\x86\Release\data\Henry.txt" />
+    <EmbeddedResource Include="bin\x86\Release\data\NIST-MODFAC_IP.txt" />
+    <EmbeddedResource Include="bin\x86\Release\data\NIST-MODFAC_RiQi.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

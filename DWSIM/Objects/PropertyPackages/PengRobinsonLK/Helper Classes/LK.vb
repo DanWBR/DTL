@@ -1,7 +1,7 @@
-﻿'    Peng-Robinson Lee-Kesler Property Package 
+'    Peng-Robinson Lee-Kesler Property Package 
 '    Copyright 2008 Daniel Wagner O. de Medeiros
 '
-'    This file is part of DTL.
+'    This file is part of DWSIM.
 '
 '    DWSIM is free software: you can redistribute it and/or modify
 '    it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@
 '    GNU General Public License for more details.
 '
 '    You should have received a copy of the GNU General Public License
-'    along with DTL.  If not, see <http://www.gnu.org/licenses/>.
+'    along with DWSIM.  If not, see <http://www.gnu.org/licenses/>.
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
@@ -104,7 +104,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Loop Until i = n + 1
 
             i = 0
-            Dim MMm = 0
+            Dim MMm = 0.0#
             Do
                 MMm += Vz(i) * VMM(i)
                 i += 1
@@ -122,7 +122,11 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
             If DHres = 0 Then Throw New Exception("Erro no cálculo da entalpia [LK].")
 
-            H_LK_MIX = Hid + DHres / MMm '/ 1000
+            If MathEx.Common.Sum(Vz) = 0.0# Then
+                H_LK_MIX = 0.0#
+            Else
+                H_LK_MIX = Hid + DHres / MMm '/ 1000
+            End If
 
         End Function
 
@@ -148,7 +152,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Loop Until i = n + 1
 
             i = 0
-            Dim MMm = 0
+            Dim MMm = 0.0#
             Do
                 MMm += Vz(i) * VMM(i)
                 i += 1
@@ -163,7 +167,12 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
             Dim DSres = R * Me.S_LK(TIPO, T / Tcm, P, Pcm, wm)
 
-            S_LK_MIX = Sid + DSres / MMm '/ 1000
+
+            If MathEx.Common.Sum(Vz) = 0.0# Then
+                S_LK_MIX = 0.0#
+            Else
+                S_LK_MIX = Sid + DSres / MMm '/ 1000
+            End If
 
         End Function
 
@@ -189,7 +198,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             C = c1 - c2 / Tr + c3 / Tr ^ 3
             D = d1 + d2 / Tr
 
-            Vr = Me.ESTIMAR_Vr(TIPO, Pr, Tr, B, C, D, c4, beta, gamma)
+            Vr = Me.ESTIMAR_Vr2(TIPO, Pr, Tr, B, C, D, c4, beta, gamma)
             zs = Pr * Vr / Tr
 
             b1 = 0.2026579
@@ -209,7 +218,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             C = c1 - c2 / Tr + c3 / Tr ^ 3
             D = d1 + d2 / Tr
 
-            Vr = Me.ESTIMAR_Vr(TIPO, Pr, Tr, B, C, D, c4, beta, gamma)
+            Vr = Me.ESTIMAR_Vr2(TIPO, Pr, Tr, B, C, D, c4, beta, gamma)
 
             zh = Pr * Vr / Tr
 
@@ -351,7 +360,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             fi_ant2 = 0
             fi_ant = 0
             fi = 0
-            If TIPO = "L" Then Vr = 0.05 Else Vr = Tr / Pr * 0.3
+            If TIPO = "L" Then Vr = 0.05 Else Vr = 1.0# ' Tr / Pr * 0.3
             Do
                 fi_ant2 = fi_ant
                 fi_ant = fi
@@ -590,13 +599,13 @@ Final3:
             Loop Until i = n + 1
 
             i = 0
-            Dim MMm = 0
+            Dim MMm = 0.0#
             Do
                 MMm += Vz(i) * VMM(i)
                 i += 1
             Loop Until i = n + 1
 
-            Dim Cpm_ig = 0
+            Dim Cpm_ig = 0.0#
             i = 0
             Do
                 Cpm_ig += Vzmass(i) * VCpig(i) * MMm

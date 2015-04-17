@@ -22,6 +22,7 @@ Namespace My
 
         Public Shared _EnableGPUProcessing As Boolean = False
         Public Shared _EnableParallelProcessing As Boolean = False
+        Public Shared _DebugLevel As Integer = 0
 
         Public Shared gpu As Cudafy.Host.GPGPU
         Public Shared gpumod As CudafyModule

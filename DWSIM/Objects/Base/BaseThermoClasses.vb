@@ -884,6 +884,7 @@ Namespace DTL.ClassesBasicasTermodinamica
         Public HVap_B As Double
         Public HVap_C As Double
         Public HVap_D As Double
+        Public HVap_E As Double
         Public HVap_TMIN As Double
         Public HVap_TMAX As Double
         Public UNIQUAC_R As Double
@@ -891,6 +892,7 @@ Namespace DTL.ClassesBasicasTermodinamica
 
         Public UNIFACGroups As UNIFACGroupCollection
         Public MODFACGroups As UNIFACGroupCollection
+        Public NISTMODFACGroups As UNIFACGroupCollection
         Public Elements As New ElementCollection
 
         Public VaporPressureEquation As String = ""
@@ -985,6 +987,7 @@ Namespace DTL.ClassesBasicasTermodinamica
         Public Sub New()
             UNIFACGroups = New UNIFACGroupCollection
             MODFACGroups = New UNIFACGroupCollection
+            NISTMODFACGroups = New UNIFACGroupCollection
         End Sub
 
 

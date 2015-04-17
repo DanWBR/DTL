@@ -25,6 +25,12 @@ Namespace DTL
 
     <System.Serializable()> Public Class App
 
+        Public Shared Sub WriteToConsole(text As String, minlevel As Integer)
+
+            If My.MyApplication._DebugLevel >= minlevel Then Console.WriteLine(text)
+
+        End Sub
+
         Public Shared Function GetLocalString(ByVal id As String) As String
             Return id
         End Function
@@ -81,30 +87,28 @@ Namespace DTL
                         Case eLanguage.Cuda
                             My.MyApplication.gpumod = CudafyModule.TryDeserialize("cudacode.cdfy")
                         Case eLanguage.OpenCL
-                            My.MyApplication.gpumod = CudafyModule.TryDeserialize("openclcode.cdfy")
+                            'My.MyApplication.gpumod = CudafyModule.TryDeserialize("openclcode.cdfy")
                     End Select
                     If My.MyApplication.gpumod Is Nothing OrElse Not My.MyApplication.gpumod.TryVerifyChecksums() Then
                         Select Case CudafyTarget
                             Case eLanguage.Cuda
                                 Dim cp As New Cudafy.CompileProperties()
                                 With cp
-                                    .Architecture = eArchitecture.sm_13
+                                    .Architecture = eArchitecture.sm_20
                                     .CompileMode = eCudafyCompileMode.Default
-                                    .Platform = ePlatform.All
+                                    .Platform = ePlatform.x86
                                     .WorkingDirectory = My.Computer.FileSystem.SpecialDirectories.Temp
                                     'CUDA SDK v5.0 path
-                                    .CompilerPath = "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v5.5\bin\nvcc.exe"
-                                    .IncludeDirectoryPath = "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v5.5\include"
+                                    .CompilerPath = "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v5.0\bin\nvcc.exe"
+                                    .IncludeDirectoryPath = "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v5.0\include"
                                 End With
                                 My.MyApplication.gpumod = CudafyTranslator.Cudafy(cp, GetType(DTL.SimulationObjects.PropertyPackages.Auxiliary.LeeKeslerPlocker), _
-                                            GetType(DTL.SimulationObjects.PropertyPackages.ThermoPlugs.PR), _
-                                            GetType(DTL.SimulationObjects.PropertyPackages.Auxiliary.Unifac))
+                                            GetType(DTL.SimulationObjects.PropertyPackages.ThermoPlugs.PR))
                                 My.MyApplication.gpumod.Serialize("cudacode.cdfy")
                             Case eLanguage.OpenCL
                                 My.MyApplication.gpumod = CudafyTranslator.Cudafy(GetType(DTL.SimulationObjects.PropertyPackages.Auxiliary.LeeKeslerPlocker), _
-                                           GetType(DTL.SimulationObjects.PropertyPackages.ThermoPlugs.PR), _
-                                           GetType(DTL.SimulationObjects.PropertyPackages.Auxiliary.Unifac))
-                                My.MyApplication.gpumod.Serialize("openclcode.cdfy")
+                                           GetType(DTL.SimulationObjects.PropertyPackages.ThermoPlugs.PR))
+                                'My.MyApplication.gpumod.Serialize("openclcode.cdfy")
                         End Select
                     End If
                 End If

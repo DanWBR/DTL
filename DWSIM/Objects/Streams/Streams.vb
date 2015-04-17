@@ -4037,6 +4037,10 @@ Namespace DTL.SimulationObjects.Streams
 
 #End Region
 
+        Function Flowsheet() As Object
+            Throw New NotImplementedException
+        End Function
+
     End Class
 
 End Namespace

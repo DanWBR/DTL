@@ -1,7 +1,7 @@
 ﻿'    UNIFAC Property Package 
 '    Copyright 2008-2011 Daniel Wagner O. de Medeiros
 '
-'    This file is part of DTL.
+'    This file is part of DWSIM.
 '
 '    DWSIM is free software: you can redistribute it and/or modify
 '    it under the terms of the GNU General Public License as published by
@@ -14,12 +14,11 @@
 '    GNU General Public License for more details.
 '
 '    You should have received a copy of the GNU General Public License
-'    along with DTL.  If not, see <http://www.gnu.org/licenses/>.
+'    along with DWSIM.  If not, see <http://www.gnu.org/licenses/>.
 
 Imports Microsoft.VisualBasic.FileIO
-Imports Cudafy
-Imports Cudafy.Translator
-Imports Cudafy.Host
+Imports DTL.DTL.MathEx
+Imports System.Linq
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
@@ -30,6 +29,297 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
         Sub New()
 
             UnifGroups = New UnifacGroups
+
+        End Sub
+
+        Function ID2Group(ByVal id As Integer) As String
+
+            For Each group As UnifacGroup In Me.UnifGroups.Groups.Values
+                If group.Secondary_Group = id Then Return group.GroupName
+            Next
+
+            Return ""
+
+        End Function
+
+        Function Group2ID(ByVal groupname As String) As String
+
+            For Each group As UnifacGroup In Me.UnifGroups.Groups.Values
+                If group.GroupName = groupname Then
+                    Return group.Secondary_Group
+                End If
+            Next
+
+            Return 0
+
+        End Function
+
+        Function GAMMA_MR(ByVal T As Double, ByVal Vx As Double(), ByVal VQ As Double(), ByVal VR As Double(), ByVal VEKI As List(Of Dictionary(Of Integer, Double))) As Double()
+
+            CheckParameters(VEKI)
+
+            Dim i, m, k As Integer
+
+            Dim n = UBound(Vx)
+
+            Dim Vgammac(n), Vgammar(n), Vgamma(n) As Double
+            Dim Q(n), R(n), j(n), L(n), val As Double
+
+            Dim teta, s As New Dictionary(Of Integer, Double)
+            Dim beta As New List(Of Dictionary(Of Integer, Double))
+
+            i = 0
+            For Each item In VEKI
+                beta.Add(New Dictionary(Of Integer, Double))
+                For Each item2 In VEKI
+                    For Each item3 In item2
+                        If Not beta(i).ContainsKey(item3.Key) Then beta(i).Add(item3.Key, 0.0#)
+                    Next
+                Next
+                i += 1
+            Next
+
+            Dim ids As Integer() = beta(0).Keys.ToArray
+
+            Dim n2 As Integer = ids.Length - 1
+
+            For i = 0 To n
+                For m = 0 To n2
+                    For k = 0 To n2
+                        If VEKI(i).ContainsKey(ids(k)) Then beta(i)(ids(m)) += VEKI(i)(ids(k)) * TAU(ids(k), ids(m), T)
+                    Next
+                Next
+            Next
+
+            i = 0
+            For Each item In VEKI
+                For Each item2 In item
+                    For Each item3 In item
+                    Next
+                Next
+                i += 1
+            Next
+
+            Dim soma_xq = 0.0#
+            i = 0
+            Do
+                Q(i) = VQ(i)
+                soma_xq = soma_xq + Vx(i) * Q(i)
+                i = i + 1
+            Loop Until i = n + 1
+
+            i = 0
+            For Each item In VEKI
+                For Each item2 In item
+                    val = Vx(i) * Q(i) * VEKI(i)(item2.Key) / soma_xq
+                    If Not teta.ContainsKey(item2.Key) Then teta.Add(item2.Key, val) Else teta(item2.Key) += val
+                Next
+                i += 1
+            Next
+
+            For Each item In teta
+                For Each item2 In teta
+                    val = teta(item2.Key) * TAU(item2.Key, item.Key, T)
+                    If Not s.ContainsKey(item.Key) Then s.Add(item.Key, val) Else s(item.Key) += val
+                Next
+            Next
+
+            Dim soma_xr = 0.0#
+            i = 0
+            Do
+                R(i) = VR(i)
+                soma_xr = soma_xr + Vx(i) * R(i)
+                i = i + 1
+            Loop Until i = n + 1
+
+            i = 0
+            Do
+                j(i) = R(i) / soma_xr
+                L(i) = Q(i) / soma_xq
+                Vgammac(i) = 1 - j(i) + Math.Log(j(i)) - 5 * Q(i) * (1 - j(i) / L(i) + Math.Log(j(i) / L(i)))
+                k = 0
+                Dim tmpsum = 0.0#
+                For Each item2 In teta
+                    If VEKI(i).ContainsKey(item2.Key) Then
+                        tmpsum += item2.Value * beta(i)(item2.Key) / s(item2.Key) - VEKI(i)(item2.Key) * Math.Log(beta(i)(item2.Key) / s(item2.Key))
+                    Else
+                        tmpsum += item2.Value * beta(i)(item2.Key) / s(item2.Key)
+                    End If
+                Next
+                Vgammar(i) = Q(i) * (1 - tmpsum)
+                Vgamma(i) = Math.Exp(Vgammac(i) + Vgammar(i))
+                If Vgamma(i) = 0 Then Vgamma(i) = 0.000001
+                i = i + 1
+            Loop Until i = n + 1
+
+            Return Vgamma
+
+        End Function
+
+        Sub CheckParameters(ByVal VEKI)
+
+            Dim ids As New ArrayList
+
+            For Each item In VEKI
+                For Each item2 In item
+                    If item(item2.Key) <> 0.0# And Not ids.Contains(item2.Key) Then ids.Add(item2.Key)
+                Next
+            Next
+
+            For Each id1 As Integer In ids
+                For Each id2 As Integer In ids
+                    If id1 <> id2 Then
+                        Dim g1, g2 As Integer
+                        g1 = Me.UnifGroups.Groups(id1).PrimaryGroup
+                        g2 = Me.UnifGroups.Groups(id2).PrimaryGroup
+                        If Me.UnifGroups.InteracParam.ContainsKey(g1) Then
+                            If Not Me.UnifGroups.InteracParam(g1).ContainsKey(g2) Then
+                                If Me.UnifGroups.InteracParam.ContainsKey(g2) Then
+                                    If Not Me.UnifGroups.InteracParam(g2).ContainsKey(g1) Then
+                                        Throw New Exception("UNIFAC Error: Could not find interaction parameter for groups " & Me.UnifGroups.Groups(id1 + 1).GroupName & " / " & _
+                                                            Me.UnifGroups.Groups(id2 + 1).GroupName & ". Activity coefficient calculation will give you inconsistent results for this system.")
+                                    End If
+                                End If
+                            End If
+                        Else
+                            If Me.UnifGroups.InteracParam.ContainsKey(g2) Then
+                                If Not Me.UnifGroups.InteracParam(g2).ContainsKey(g1) Then
+                                    Throw New Exception("UNIFAC Error: Could not find interaction parameter for groups " & Me.UnifGroups.Groups(id1 + 1).GroupName & " / " & _
+                                                        Me.UnifGroups.Groups(id2 + 1).GroupName & ". Activity coefficient calculation will give you inconsistent results for this system.")
+                                End If
+                            Else
+                                Throw New Exception("UNIFAC Error: Could not find interaction parameter for groups " & Me.UnifGroups.Groups(id1 + 1).GroupName & " / " & _
+                                                    Me.UnifGroups.Groups(id2 + 1).GroupName & ". Activity coefficient calculation will give you inconsistent results for this system.")
+                            End If
+                        End If
+                    End If
+                Next
+            Next
+
+        End Sub
+
+        Function TAU(ByVal group_1, ByVal group_2, ByVal T)
+
+            Dim g1, g2 As Integer
+            Dim res As Double
+            g1 = Me.UnifGroups.Groups(group_1).PrimaryGroup
+            g2 = Me.UnifGroups.Groups(group_2).PrimaryGroup
+
+            If Me.UnifGroups.InteracParam.ContainsKey(g1) Then
+                If Me.UnifGroups.InteracParam(g1).ContainsKey(g2) Then
+                    res = Me.UnifGroups.InteracParam(g1)(g2)
+                Else
+                    res = 0
+                End If
+            Else
+                res = 0
+            End If
+
+            Return Math.Exp(-res / T)
+
+        End Function
+
+        Function RET_Ri(ByVal VN As Dictionary(Of Integer, Double)) As Double
+
+            Dim res As Double
+            For Each kvp In VN
+                res += Me.UnifGroups.Groups(kvp.Key).R * VN(kvp.Key)
+            Next
+
+            Return res
+
+        End Function
+
+        Function RET_Qi(ByVal VN As Dictionary(Of Integer, Double)) As Double
+
+            Dim res As Double
+            For Each kvp In VN
+                res += Me.UnifGroups.Groups(kvp.Key).Q * VN(kvp.Key)
+            Next
+
+            Return res
+
+        End Function
+
+        Function RET_EKI(ByVal VN As Dictionary(Of Integer, Double), ByVal Q As Double) As Dictionary(Of Integer, Double)
+
+            Dim res As New Dictionary(Of Integer, Double)
+            For Each kvp In VN
+                res.Add(kvp.Key, Me.UnifGroups.Groups(kvp.Key).Q * VN(kvp.Key) / Q)
+            Next
+
+            Return res
+
+        End Function
+
+        Function RET_VN(ByVal cp As DTL.ClassesBasicasTermodinamica.ConstantProperties) As Dictionary(Of Integer, Double)
+
+            Dim res As New Dictionary(Of Integer, Double)
+            For Each s As String In cp.UNIFACGroups.Collection.Keys
+                res.Add(s, cp.UNIFACGroups.Collection(s))
+            Next
+
+            Return res
+
+        End Function
+
+        Function DLNGAMMA_DT(ByVal T As Double, ByVal Vx As Array, ByVal VQ As Double(), ByVal VR As Double(), ByVal VEKI As List(Of Dictionary(Of Integer, Double))) As Array
+
+            Dim gamma1, gamma2 As Double()
+
+            Dim epsilon As Double = 0.001
+
+            gamma1 = GAMMA_MR(T, Vx, VQ, VR, VEKI)
+            gamma2 = GAMMA_MR(T + epsilon, Vx, VQ, VR, VEKI)
+
+            Dim dgamma(gamma1.Length - 1) As Double
+
+            For i As Integer = 0 To Vx.Length - 1
+                dgamma(i) = (gamma2(i) - gamma1(i)) / (epsilon)
+            Next
+
+            Return dgamma
+
+        End Function
+
+        Function HEX_MIX(ByVal T As Double, ByVal Vx As Array, ByVal VQ As Double(), ByVal VR As Double(), ByVal VEKI As List(Of Dictionary(Of Integer, Double))) As Double
+
+            Dim dgamma As Double() = DLNGAMMA_DT(T, Vx, VQ, VR, VEKI)
+
+            Dim hex As Double = 0.0#
+
+            For i As Integer = 0 To Vx.Length - 1
+                hex += -8.314 * T ^ 2 * Vx(i) * dgamma(i)
+            Next
+
+            Return hex 'kJ/kmol
+
+        End Function
+
+        Function CPEX_MIX(ByVal T As Double, ByVal Vx As Array, ByVal VQ As Double(), ByVal VR As Double(), ByVal VEKI As List(Of Dictionary(Of Integer, Double))) As Double
+
+            Dim hex1, hex2, cpex As Double
+
+            Dim epsilon As Double = 0.001
+
+            hex1 = HEX_MIX(T, Vx, VQ, VR, VEKI)
+            hex2 = HEX_MIX(T + epsilon, Vx, VQ, VR, VEKI)
+
+            cpex = (hex2 - hex1) / epsilon
+
+            Return cpex 'kJ/kmol.K
+
+        End Function
+
+    End Class
+
+    <System.Serializable()> Public Class UnifacLL
+
+        Public UnifGroups As UnifacGroupsLL
+
+        Sub New()
+
+            UnifGroups = New UnifacGroupsLL
 
         End Sub
 
@@ -84,7 +374,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                 i = i + 1
             Loop Until i = n + 1
 
-            Dim soma_xq = 0
+            Dim soma_xq = 0.0#
             i = 0
             Do
                 Q(i) = VQ(i)
@@ -113,7 +403,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                 k = k + 1
             Loop Until k = n2 + 1
 
-            Dim soma_xr = 0
+            Dim soma_xr = 0.0#
             i = 0
             Do
                 R(i) = VR(i)
@@ -127,7 +417,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                 L(i) = Q(i) / soma_xq
                 Vgammac(i) = 1 - j(i) + Math.Log(j(i)) - 5 * Q(i) * (1 - j(i) / L(i) + Math.Log(j(i) / L(i)))
                 k = 0
-                Dim tmpsum = 0
+                Dim tmpsum = 0.0#
                 Do
                     tmpsum = tmpsum + teta(k) * beta(i, k) / s(k) - VEKI(i, k) * Math.Log(beta(i, k) / s(k))
                     k = k + 1
@@ -144,185 +434,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         End Function
 
-        Function GAMMA_MR(ByVal T As Double, ByVal Vx As Double(), ByVal VQ As Double(), ByVal VR As Double(), ByVal VEKI As Double(,))
-
-            If My.MyApplication._EnableGPUProcessing Then
-                Return GAMMA_MR_GPU(T, Vx, VQ, VR, VEKI)
-            Else
-                Return GAMMA_MR_CPU(T, Vx, VQ, VR, VEKI)
-            End If
-
-        End Function
-
-        Private Sub unifac_gpu_func(n As Integer, n2 As Integer, beta As Double(,), VTAU As Double(,), VEKI As Double(,), T As Double, Vx As Double(), s As Double(), teta As Double(), VQ As Double(), VR As Double(), Vgamma As Double())
-
-            Dim sum1(n), sum2(n), soma_xq, soma_xr As Double
-
-            Dim gpu As GPGPU = My.MyApplication.gpu
-
-            If gpu.IsMultithreadingEnabled Then gpu.Lock()
-
-            ' allocate the memory on the GPU
-            Dim dev_beta As Double(,) = gpu.Allocate(Of Double)(beta)
-            Dim dev_VEKI As Double(,) = gpu.Allocate(Of Double)(VEKI)
-            Dim dev_VTAU As Double(,) = gpu.Allocate(Of Double)(VTAU)
-            Dim dev_sum1 As Double() = gpu.Allocate(Of Double)(sum1)
-            Dim dev_sum2 As Double() = gpu.Allocate(Of Double)(sum2)
-            Dim dev_Vx As Double() = gpu.Allocate(Of Double)(Vx)
-            Dim dev_VQ As Double() = gpu.Allocate(Of Double)(VQ)
-            Dim dev_VR As Double() = gpu.Allocate(Of Double)(VR)
-            Dim dev_s As Double() = gpu.Allocate(Of Double)(s)
-            Dim dev_teta As Double() = gpu.Allocate(Of Double)(teta)
-            Dim dev_Vgamma As Double() = gpu.Allocate(Of Double)(Vgamma)
-
-            ' copy the arrays to the GPU
-            gpu.CopyToDevice(beta, dev_beta)
-            gpu.CopyToDevice(VEKI, dev_VEKI)
-            gpu.CopyToDevice(VTAU, dev_VTAU)
-            gpu.CopyToDevice(sum1, dev_sum1)
-            gpu.CopyToDevice(sum2, dev_sum2)
-            gpu.CopyToDevice(Vx, dev_Vx)
-            gpu.CopyToDevice(VQ, dev_VQ)
-            gpu.CopyToDevice(VR, dev_VR)
-            gpu.CopyToDevice(s, dev_s)
-            gpu.CopyToDevice(teta, dev_teta)
-            gpu.CopyToDevice(Vgamma, dev_Vgamma)
-
-            ' launch subs
-            gpu.Launch(New dim3(n + 1, n2 + 1), 1).unifac_gpu_sum1(dev_beta, dev_VEKI, dev_VTAU, T)
-            gpu.Launch(n + 1, 1).unifac_gpu_sum2(dev_sum1, dev_Vx, dev_VQ)
-            gpu.CopyFromDevice(dev_sum1, sum1)
-            soma_xq = MathEx.Common.Sum(sum1)
-            gpu.Launch(n2 + 1, 1).unifac_gpu_sum3(dev_Vx, dev_teta, dev_VQ, dev_VEKI, soma_xq)
-            gpu.Launch(n2 + 1, 1).unifac_gpu_sum4(dev_s, dev_teta, dev_VQ, dev_VTAU)
-            gpu.Launch(n + 1, 1).unifac_gpu_sum5(dev_sum2, dev_Vx, dev_VR)
-            gpu.CopyFromDevice(dev_sum2, sum2)
-            soma_xr = MathEx.Common.Sum(sum2)
-            gpu.Launch(n + 1, 1).unifac_gpu_sum6(dev_Vgamma, dev_s, dev_VR, dev_VQ, dev_teta, dev_beta, dev_VEKI, soma_xq, soma_xr, n, n2)
-
-            ' copy the arrays back from the GPU to the CPU
-            gpu.CopyFromDevice(dev_s, s)
-            gpu.CopyFromDevice(dev_teta, teta)
-            gpu.CopyFromDevice(dev_Vgamma, Vgamma)
-
-            ' free the memory allocated on the GPU
-            gpu.Free(dev_beta)
-            gpu.Free(dev_VEKI)
-            gpu.Free(dev_VTAU)
-            gpu.Free(dev_sum1)
-            gpu.Free(dev_sum2)
-            gpu.Free(dev_Vx)
-            gpu.Free(dev_VQ)
-            gpu.Free(dev_VR)
-            gpu.Free(dev_s)
-            gpu.Free(dev_teta)
-            gpu.Free(dev_Vgamma)
-
-            If gpu.IsMultithreadingEnabled Then gpu.Unlock()
-
-        End Sub
-
-        <Cudafy.Cudafy()> Private Shared Sub unifac_gpu_sum1(thread As Cudafy.GThread, beta As Double(,), VEKI As Double(,), VTAU As Double(,), T As Double)
-
-            Dim i As Integer = thread.blockIdx.x
-            Dim k As Integer = thread.blockIdx.y
-            Dim m As Integer
-            Dim n As Integer = beta.GetLength(0)
-            Dim n2 As Integer = VEKI.GetLength(1)
-
-            beta(i, k) = 0
-            m = 0
-            Do
-                beta(i, k) = beta(i, k) + VEKI(i, m) * VTAU(m, k)
-                m = m + 1
-            Loop Until m = n2
-
-        End Sub
-
-        <Cudafy.Cudafy()> Private Shared Sub unifac_gpu_sum2(thread As Cudafy.GThread, sum1 As Double(), Vx As Double(), VQ As Double())
-
-            Dim i As Integer = thread.blockIdx.x
-
-            sum1(i) = Vx(i) * VQ(i)
-
-        End Sub
-
-        <Cudafy.Cudafy()> Private Shared Sub unifac_gpu_sum3(thread As Cudafy.GThread, Vx As Double(), teta As Double(), Q As Double(), VEKI As Double(,), soma_xq As Double)
-
-            Dim k As Integer = thread.blockIdx.x
-            Dim n As Integer = Vx.GetLength(0)
-
-            Dim i As Integer = 0
-            Do
-                teta(k) = teta(k) + Vx(i) * Q(i) * VEKI(i, k)
-                i = i + 1
-            Loop Until i = n
-            teta(k) = teta(k) / soma_xq
-
-        End Sub
-
-        <Cudafy.Cudafy()> Private Shared Sub unifac_gpu_sum4(thread As Cudafy.GThread, s As Double(), teta As Double(), Q As Double(), VTAU As Double(,))
-
-            Dim k As Integer = thread.blockIdx.x
-            Dim n2 As Integer = VTAU.GetLength(1)
-            Dim m As Integer
-
-            s(k) = 0.0#
-            m = 0
-            Do
-                s(k) = s(k) + teta(m) * VTAU(m, k)
-                m = m + 1
-            Loop Until m = n2
-
-        End Sub
-
-        <Cudafy.Cudafy()> Private Shared Sub unifac_gpu_sum5(thread As Cudafy.GThread, sum2 As Double(), Vx As Double(), VR As Double())
-
-            Dim i As Integer = thread.blockIdx.x
-
-            sum2(i) = Vx(i) * VR(i)
-
-        End Sub
-
-        <Cudafy.Cudafy()> Private Shared Sub unifac_gpu_sum6(thread As Cudafy.GThread, Vgamma As Double(), s As Double(), VR As Double(), VQ As Double(), teta As Double(), beta As Double(,), VEKI As Double(,), soma_xq As Double, soma_xr As Double, n As Integer, n2 As Integer)
-
-            Dim i As Integer = thread.blockIdx.x
-            Dim k As Integer = 0
-            Dim tmpsum As Double = 0
-            Do
-                tmpsum = tmpsum + teta(k) * beta(i, k) / s(k) - VEKI(i, k) * Math.Log(beta(i, k) / s(k))
-                k = k + 1
-            Loop Until k = n2 + 1
-            Vgamma(i) = Math.Exp(1 - VR(i) / soma_xr + Math.Log(VR(i) / soma_xr) - 5 * VQ(i) * (1 - VR(i) / soma_xr / (VQ(i) / soma_xq) + Math.Log((VR(i) / soma_xr) / (VQ(i) / soma_xq))) + VQ(i) * (1 - tmpsum))
-
-        End Sub
-
-        Function GAMMA_MR_GPU(ByVal T As Double, ByVal Vx As Double(), ByVal VQ As Double(), ByVal VR As Double(), ByVal VEKI As Double(,))
-
-            CheckParameters(VEKI)
-
-            Dim k, m As Integer
-
-            Dim n As Integer = UBound(Vx)
-            Dim n2 As Integer = UBound(VEKI, 2)
-
-            Dim teta(n2), s(n2) As Double
-            Dim beta(n, n2), Vgammac(n), Vgammar(n), Vgamma(n), b(n, n2), VTAU(n2, n2) As Double
-            Dim Q(n), R(n), j(n), L(n) As Double
-
-            For k = 0 To n2
-                For m = 0 To n2
-                    VTAU(m, k) = TAU(m, k, T)
-                Next
-            Next
-
-            unifac_gpu_func(n, n2, beta, VTAU, VEKI, T, Vx, s, teta, VQ, VR, Vgamma)
-
-            Return Vgamma
-
-        End Function
-
-        Function GAMMA_MR_CPU(ByVal T, ByVal Vx, ByVal VQ, ByVal VR, ByVal VEKI)
+        Function GAMMA_MR(ByVal T, ByVal Vx, ByVal VQ, ByVal VR, ByVal VEKI)
 
             CheckParameters(VEKI)
 
@@ -342,11 +454,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                     beta(i, k) = 0
                     m = 0
                     Do
-                        If VEKI(i, m) <> 0.0# And Not Double.IsNaN(VEKI(i, m)) Then
-                            beta(i, k) = beta(i, k) + VEKI(i, m) * TAU(m, k, T)
-                        Else
-
-                        End If
+                        beta(i, k) = beta(i, k) + VEKI(i, m) * TAU(m, k, T)
                         m = m + 1
                     Loop Until m = n2 + 1
                     k = k + 1
@@ -354,7 +462,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                 i = i + 1
             Loop Until i = n + 1
 
-            Dim soma_xq = 0
+            Dim soma_xq = 0.0#
             i = 0
             Do
                 Q(i) = VQ(i)
@@ -377,13 +485,13 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Do
                 m = 0
                 Do
-                    If teta(m) <> 0.0# And Not Double.IsNaN(teta(m)) Then s(k) = s(k) + teta(m) * TAU(m, k, T)
+                    s(k) = s(k) + teta(m) * TAU(m, k, T)
                     m = m + 1
                 Loop Until m = n2 + 1
                 k = k + 1
             Loop Until k = n2 + 1
 
-            Dim soma_xr = 0
+            Dim soma_xr = 0.0#
             i = 0
             Do
                 R(i) = VR(i)
@@ -397,7 +505,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                 L(i) = Q(i) / soma_xq
                 Vgammac(i) = 1 - j(i) + Math.Log(j(i)) - 5 * Q(i) * (1 - j(i) / L(i) + Math.Log(j(i) / L(i)))
                 k = 0
-                Dim tmpsum = 0
+                Dim tmpsum = 0.0#
                 Do
                     tmpsum = tmpsum + teta(k) * beta(i, k) / s(k) - VEKI(i, k) * Math.Log(beta(i, k) / s(k))
                     k = k + 1
@@ -414,16 +522,11 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         Sub CheckParameters(ByVal VEKI)
 
-            Dim i, j As Integer
-
-            Dim n1 = UBound(VEKI, 1)
-            Dim n2 = UBound(VEKI, 2)
-
             Dim ids As New ArrayList
 
-            For i = 0 To n1
-                For j = 0 To n2
-                    If VEKI(i, j) <> 0.0# And Not ids.Contains(j) Then ids.Add(j)
+            For Each item In VEKI
+                For Each item2 In item
+                    If item(item2.Key) <> 0.0# And Not ids.Contains(item2.Key) Then ids.Add(item2.Key)
                 Next
             Next
 
@@ -431,8 +534,8 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                 For Each id2 As Integer In ids
                     If id1 <> id2 Then
                         Dim g1, g2 As Integer
-                        g1 = Me.UnifGroups.Groups(id1 + 1).PrimaryGroup
-                        g2 = Me.UnifGroups.Groups(id2 + 1).PrimaryGroup
+                        g1 = Me.UnifGroups.Groups(id1).PrimaryGroup
+                        g2 = Me.UnifGroups.Groups(id2).PrimaryGroup
                         If Me.UnifGroups.InteracParam.ContainsKey(g1) Then
                             If Not Me.UnifGroups.InteracParam(g1).ContainsKey(g2) Then
                                 If Me.UnifGroups.InteracParam.ContainsKey(g2) Then
@@ -480,13 +583,14 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         End Function
 
-        Function RET_Ri(ByVal VN As Object) As Double
+
+        Function RET_Ri(ByVal VN As Dictionary(Of Integer, Double)) As Double
 
             Dim i As Integer = 0
             Dim res As Double
 
-            For Each group As UnifacGroup In Me.UnifGroups.Groups.Values
-                res += group.R * VN(i)
+            For Each kvp In VN
+                res += Me.UnifGroups.Groups(kvp.Key).R * VN(kvp.Key)
                 i += 1
             Next
 
@@ -494,13 +598,13 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         End Function
 
-        Function RET_Qi(ByVal VN As Object) As Double
+        Function RET_Qi(ByVal VN As Dictionary(Of Integer, Double)) As Double
 
             Dim i As Integer = 0
             Dim res As Double
 
-            For Each group As UnifacGroup In Me.UnifGroups.Groups.Values
-                res += group.Q * VN(i)
+            For Each kvp In VN
+                res += Me.UnifGroups.Groups(kvp.Key).Q * VN(kvp.Key)
                 i += 1
             Next
 
@@ -508,509 +612,86 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         End Function
 
-        Function RET_EKI(ByVal VN As Object, ByVal Q As Double) As Object
+        Function RET_EKI(ByVal VN As Dictionary(Of Integer, Double), ByVal Q As Double) As Dictionary(Of Integer, Double)
 
             Dim i As Integer = 0
-            Dim res As New ArrayList
+            Dim res As New Dictionary(Of Integer, Double)
 
-            For Each group As UnifacGroup In Me.UnifGroups.Groups.Values
-                If Q <> 0 Then res.Add(group.Q * VN(i) / Q) Else res.Add(0.0#)
+            For Each kvp In VN
+                res.Add(kvp.Key, Me.UnifGroups.Groups(kvp.Key).Q * VN(kvp.Key) / Q)
                 i += 1
             Next
 
-            Return res.ToArray(Type.GetType("System.Double"))
+            Return res
 
         End Function
 
-        Function RET_VN(ByVal cp As DTL.ClassesBasicasTermodinamica.ConstantProperties)
+        Function RET_VN(ByVal cp As DTL.ClassesBasicasTermodinamica.ConstantProperties) As Dictionary(Of Integer, Double)
 
             Dim i As Integer = 0
-            Dim res As New ArrayList
+            Dim res As New Dictionary(Of Integer, Double)
             Dim added As Boolean = False
 
             res.Clear()
 
             For Each group As UnifacGroup In Me.UnifGroups.Groups.Values
-                For Each s As String In cp.UNIFACGroups.Collection.Keys
-                    If s = group.GroupName Then
-                        res.Add(cp.UNIFACGroups.Collection(s))
-                        added = True
+                For Each s As String In cp.MODFACGroups.Collection.Keys
+                    If s = group.Secondary_Group Then
+                        res.Add(group.Secondary_Group, cp.MODFACGroups.Collection(s))
                         Exit For
                     End If
                 Next
-                If Not added Then res.Add(0)
-                added = False
-            Next
-
-            Return res.ToArray
-
-        End Function
-
-    End Class
-
-    <System.Serializable()> Public Class UnifacLL
-
-        Public UnifGroups As UnifacGroupsLL
-
-        Sub New()
-
-            UnifGroups = New UnifacGroupsLL
-
-        End Sub
-
-        Function ID2Group(ByVal id As Integer) As String
-
-            For Each group As UnifacGroup In Me.UnifGroups.Groups.Values
-                If group.Secondary_Group = id Then Return group.GroupName
-            Next
-
-            Return ""
-
-        End Function
-
-        Function Group2ID(ByVal groupname As String) As String
-
-            For Each group As UnifacGroup In Me.UnifGroups.Groups.Values
-                If group.GroupName = groupname Then
-                    Return group.Secondary_Group
-                End If
-            Next
-
-            Return 0
-
-        End Function
-
-        Function GAMMA(ByVal T, ByVal Vx, ByVal VQ, ByVal VR, ByVal VEKI, ByVal index)
-
-            Dim Q(), R(), j(), L()
-            Dim i, k, m As Integer
-
-            Dim n = UBound(Vx)
-            Dim n2 = UBound(VEKI, 2)
-
-            Dim beta(,), teta(n2), s(n2), Vgammac(), Vgammar(), Vgamma(), b(,)
-            ReDim Preserve beta(n, n2), Vgammac(n), Vgammar(n), Vgamma(n), b(n, n2)
-            ReDim Q(n), R(n), j(n), L(n)
-
-            i = 0
-            Do
-                k = 0
-                Do
-                    beta(i, k) = 0
-                    m = 0
-                    Do
-                        beta(i, k) = beta(i, k) + VEKI(i, m) * TAU(m, k, T)
-                        m = m + 1
-                    Loop Until m = n2 + 1
-                    k = k + 1
-                Loop Until k = n2 + 1
-                i = i + 1
-            Loop Until i = n + 1
-
-            Dim soma_xq = 0
-            i = 0
-            Do
-                Q(i) = VQ(i)
-                soma_xq = soma_xq + Vx(i) * Q(i)
-                i = i + 1
-            Loop Until i = n + 1
-
-            k = 0
-            Do
-                i = 0
-                Do
-                    teta(k) = teta(k) + Vx(i) * Q(i) * VEKI(i, k)
-                    i = i + 1
-                Loop Until i = n + 1
-                teta(k) = teta(k) / soma_xq
-                k = k + 1
-            Loop Until k = n2 + 1
-
-            k = 0
-            Do
-                m = 0
-                Do
-                    s(k) = s(k) + teta(m) * TAU(m, k, T)
-                    m = m + 1
-                Loop Until m = n2 + 1
-                k = k + 1
-            Loop Until k = n2 + 1
-
-            Dim soma_xr = 0
-            i = 0
-            Do
-                R(i) = VR(i)
-                soma_xr = soma_xr + Vx(i) * R(i)
-                i = i + 1
-            Loop Until i = n + 1
-
-            i = 0
-            Do
-                j(i) = R(i) / soma_xr
-                L(i) = Q(i) / soma_xq
-                Vgammac(i) = 1 - j(i) + Math.Log(j(i)) - 5 * Q(i) * (1 - j(i) / L(i) + Math.Log(j(i) / L(i)))
-                k = 0
-                Dim tmpsum = 0
-                Do
-                    tmpsum = tmpsum + teta(k) * beta(i, k) / s(k) - VEKI(i, k) * Math.Log(beta(i, k) / s(k))
-                    k = k + 1
-                Loop Until k = n2 + 1
-                Vgammar(i) = Q(i) * (1 - tmpsum)
-                Vgamma(i) = Math.Exp(Vgammac(i) + Vgammar(i))
-                If Vgamma(i) = 0 Then Vgamma(i) = 0.000001
-                i = i + 1
-            Loop Until i = n + 1
-
-            i = 1
-            k = 1
-            GAMMA = Vgamma(index)
-
-        End Function
-
-        Function GAMMA_DINF(ByVal T, ByVal Vx, ByVal VQ, ByVal VR, ByVal VEKI, ByVal index)
-
-            Dim Q(), R(), j(), L()
-            Dim i, k, m As Integer
-
-            Dim n = UBound(Vx)
-            Dim n2 = UBound(VEKI, 2)
-
-            Dim beta(,), teta(n2), s(n2), Vgammac(), Vgammar(), Vgamma(), b(,)
-            ReDim beta(n, n2), Vgammac(n), Vgammar(n), Vgamma(n), b(n, n2)
-            ReDim Q(n), R(n), j(n), L(n)
-
-            i = 0
-            Do
-                k = 0
-                Do
-                    m = 0
-                    Do
-                        beta(i, k) = beta(i, k) + VEKI(i, m) * TAU(m, k, T)
-                        m = m + 1
-                    Loop Until m = n2 + 1
-                    k = k + 1
-                Loop Until k = n2 + 1
-                i = i + 1
-            Loop Until i = n + 1
-
-            Dim soma_xq = 0
-            i = 0
-            Dim Vxid_ant = Vx(index)
-            Do
-                Q(i) = VQ(i)
-                If i <> index Then
-                    Vx(i) = Vx(i) + Vxid_ant / (n - 1)
-                End If
-                Vx(index) = 0.0000000001
-                soma_xq = soma_xq + Vx(i) * Q(i)
-                i = i + 1
-            Loop Until i = n + 1
-
-            k = 0
-            Do
-                i = 0
-                Do
-                    teta(k) = teta(k) + Vx(i) * Q(i) * VEKI(i, k)
-                    i = i + 1
-                Loop Until i = n + 1
-                teta(k) = teta(k) / soma_xq
-                k = k + 1
-            Loop Until k = n2 + 1
-
-            k = 0
-            Do
-                m = 0
-                Do
-                    s(k) = s(k) + teta(m) * TAU(m, k, T)
-                    m = m + 1
-                Loop Until m = n2 + 1
-                k = k + 1
-            Loop Until k = n2 + 1
-
-            Dim soma_xr = 0
-            i = 0
-            Do
-                R(i) = VR(i)
-                soma_xr = soma_xr + Vx(i) * R(i)
-                i = i + 1
-            Loop Until i = n + 1
-
-            i = 0
-            Do
-                j(i) = R(i) / soma_xr
-                L(i) = Q(i) / soma_xq
-                Vgammac(i) = 1 - j(i) + Math.Log(j(i)) - 5 * Q(i) * (1 - j(i) / L(i) + Math.Log(j(i) / L(i)))
-                k = 0
-                Dim tmpsum = 0
-                Do
-                    tmpsum = tmpsum + teta(k) * beta(i, k) / s(k) - VEKI(i, k) * Math.Log(beta(i, k) / s(k))
-                    k = k + 1
-                Loop Until k = n2 + 1
-                Vgammar(i) = Q(i) * (1 - tmpsum)
-                Vgamma(i) = Math.Exp(Vgammac(i) + Vgammar(i))
-                If Vgamma(i) = 0 Then Vgamma(i) = 0.000001
-                i = i + 1
-            Loop Until i = n + 1
-
-            GAMMA_DINF = Vgamma(index)
-
-        End Function
-
-        Function GAMMA_MR(ByVal T, ByVal Vx, ByVal VQ, ByVal VR, ByVal VEKI)
-            Dim i, k, m As Integer
-
-            Dim n = UBound(Vx)
-            Dim n2 = UBound(VEKI, 2)
-
-            Dim teta(n2), s(n2) As Double
-            Dim beta(n, n2), Vgammac(n), Vgammar(n), Vgamma(n), b(n, n2) As Double
-            Dim Q(n), R(n), j(n), L(n) As Double
-
-            i = 0
-            Do
-                k = 0
-                Do
-                    beta(i, k) = 0
-                    m = 0
-                    Do
-                        beta(i, k) = beta(i, k) + VEKI(i, m) * TAU(m, k, T)
-                        m = m + 1
-                    Loop Until m = n2 + 1
-                    k = k + 1
-                Loop Until k = n2 + 1
-                i = i + 1
-            Loop Until i = n + 1
-
-            Dim soma_xq = 0
-            i = 0
-            Do
-                Q(i) = VQ(i)
-                soma_xq = soma_xq + Vx(i) * Q(i)
-                i = i + 1
-            Loop Until i = n + 1
-
-            k = 0
-            Do
-                i = 0
-                Do
-                    teta(k) = teta(k) + Vx(i) * Q(i) * VEKI(i, k)
-                    i = i + 1
-                Loop Until i = n + 1
-                teta(k) = teta(k) / soma_xq
-                k = k + 1
-            Loop Until k = n2 + 1
-
-            k = 0
-            Do
-                m = 0
-                Do
-                    s(k) = s(k) + teta(m) * TAU(m, k, T)
-                    m = m + 1
-                Loop Until m = n2 + 1
-                k = k + 1
-            Loop Until k = n2 + 1
-
-            Dim soma_xr = 0
-            i = 0
-            Do
-                R(i) = VR(i)
-                soma_xr = soma_xr + Vx(i) * R(i)
-                i = i + 1
-            Loop Until i = n + 1
-
-            i = 0
-            Do
-                j(i) = R(i) / soma_xr
-                L(i) = Q(i) / soma_xq
-                Vgammac(i) = 1 - j(i) + Math.Log(j(i)) - 5 * Q(i) * (1 - j(i) / L(i) + Math.Log(j(i) / L(i)))
-                k = 0
-                Dim tmpsum = 0
-                Do
-                    tmpsum = tmpsum + teta(k) * beta(i, k) / s(k) - VEKI(i, k) * Math.Log(beta(i, k) / s(k))
-                    k = k + 1
-                Loop Until k = n2 + 1
-                Vgammar(i) = Q(i) * (1 - tmpsum)
-                Vgamma(i) = Math.Exp(Vgammac(i) + Vgammar(i))
-                If Vgamma(i) = 0 Then Vgamma(i) = 0.000001
-                i = i + 1
-            Loop Until i = n + 1
-
-            Return Vgamma
-
-        End Function
-
-        Function GAMMA_DINF_MR(ByVal T, ByVal Vx, ByVal VQ, ByVal VR, ByVal VEKI, ByVal index)
-
-            Dim i, k, m As Integer
-
-            Dim n = UBound(Vx)
-            Dim n2 = UBound(VEKI, 2)
-
-            Dim teta(n2), s(n2) As Double
-            Dim beta(n, n2), Vgammac(n), Vgammar(n), Vgamma(n), b(n, n2) As Double
-            Dim Q(n), R(n), j(n), L(n) As Double
-
-            i = 0
-            Do
-                k = 0
-                Do
-                    m = 0
-                    Do
-                        beta(i, k) = beta(i, k) + VEKI(i, m) * TAU(m, k, T)
-                        m = m + 1
-                    Loop Until m = n2 + 1
-                    k = k + 1
-                Loop Until k = n2 + 1
-                i = i + 1
-            Loop Until i = n + 1
-
-            Dim soma_xq = 0
-            i = 0
-            Dim Vxid_ant = Vx(index)
-            Do
-                Q(i) = VQ(i)
-                If i <> index Then
-                    Vx(i) = Vx(i) + Vxid_ant / (n - 1)
-                End If
-                Vx(index) = 0.0000000001
-                soma_xq = soma_xq + Vx(i) * Q(i)
-                i = i + 1
-            Loop Until i = n + 1
-
-            k = 0
-            Do
-                i = 0
-                Do
-                    teta(k) = teta(k) + Vx(i) * Q(i) * VEKI(i, k)
-                    i = i + 1
-                Loop Until i = n + 1
-                teta(k) = teta(k) / soma_xq
-                k = k + 1
-            Loop Until k = n2 + 1
-
-            k = 0
-            Do
-                m = 0
-                Do
-                    s(k) = s(k) + teta(m) * TAU(m, k, T)
-                    m = m + 1
-                Loop Until m = n2 + 1
-                k = k + 1
-            Loop Until k = n2 + 1
-
-            Dim soma_xr = 0
-            i = 0
-            Do
-                R(i) = VR(i)
-                soma_xr = soma_xr + Vx(i) * R(i)
-                i = i + 1
-            Loop Until i = n + 1
-
-            i = 0
-            Do
-                j(i) = R(i) / soma_xr
-                L(i) = Q(i) / soma_xq
-                Vgammac(i) = 1 - j(i) + Math.Log(j(i)) - 5 * Q(i) * (1 - j(i) / L(i) + Math.Log(j(i) / L(i)))
-                k = 0
-                Dim tmpsum = 0
-                Do
-                    tmpsum = tmpsum + teta(k) * beta(i, k) / s(k) - VEKI(i, k) * Math.Log(beta(i, k) / s(k))
-                    k = k + 1
-                Loop Until k = n2 + 1
-                Vgammar(i) = Q(i) * (1 - tmpsum)
-                Vgamma(i) = Math.Exp(Vgammac(i) + Vgammar(i))
-                If Vgamma(i) = 0 Then Vgamma(i) = 0.000001
-                i = i + 1
-            Loop Until i = n + 1
-
-            Return Vgamma
-
-        End Function
-
-        Function TAU(ByVal group_1, ByVal group_2, ByVal T)
-
-            Dim g1, g2 As Integer
-            Dim res As Double
-            g1 = Me.UnifGroups.Groups(group_1 + 1).PrimaryGroup
-            g2 = Me.UnifGroups.Groups(group_2 + 1).PrimaryGroup
-
-            If Me.UnifGroups.InteracParam.ContainsKey(g1) Then
-                If Me.UnifGroups.InteracParam(g1).ContainsKey(g2) Then
-                    res = Me.UnifGroups.InteracParam(g1)(g2)
-                Else
-                    res = 0
-                End If
-            Else
-                res = 0
-            End If
-
-            Return Math.Exp(-res / T)
-
-        End Function
-
-        Function RET_Ri(ByVal VN As Object) As Double
-
-            Dim i As Integer = 0
-            Dim res As Double
-
-            For Each group As UnifacGroup In Me.UnifGroups.Groups.Values
-                res += group.R * VN(i)
-                i += 1
             Next
 
             Return res
 
         End Function
 
-        Function RET_Qi(ByVal VN As Object) As Double
+        Function DLNGAMMA_DT(ByVal T As Double, ByVal Vx As Array, ByVal VQ As Double(), ByVal VR As Double(), ByVal VEKI As List(Of Dictionary(Of Integer, Double))) As Array
 
-            Dim i As Integer = 0
-            Dim res As Double
+            Dim gamma1, gamma2 As Double()
 
-            For Each group As UnifacGroup In Me.UnifGroups.Groups.Values
-                res += group.Q * VN(i)
-                i += 1
+            Dim epsilon As Double = 0.001
+
+            gamma1 = GAMMA_MR(T, Vx, VQ, VR, VEKI)
+            gamma2 = GAMMA_MR(T + epsilon, Vx, VQ, VR, VEKI)
+
+            Dim dgamma(gamma1.Length - 1) As Double
+
+            For i As Integer = 0 To Vx.Length - 1
+                dgamma(i) = (gamma2(i) - gamma1(i)) / (epsilon)
             Next
 
-            Return res
+            Return dgamma
 
         End Function
 
-        Function RET_EKI(ByVal VN As Object, ByVal Q As Double) As Object
+        Function HEX_MIX(ByVal T As Double, ByVal Vx As Array, ByVal VQ As Double(), ByVal VR As Double(), ByVal VEKI As List(Of Dictionary(Of Integer, Double))) As Double
 
-            Dim i As Integer = 0
-            Dim res As New ArrayList
+            Dim dgamma As Double() = DLNGAMMA_DT(T, Vx, VQ, VR, VEKI)
 
-            For Each group As UnifacGroup In Me.UnifGroups.Groups.Values
-                If Q <> 0 Then res.Add(group.Q * VN(i) / Q) Else res.Add(0.0#)
-                i += 1
+            Dim hex As Double = 0.0#
+
+            For i As Integer = 0 To Vx.Length - 1
+                hex += -8.314 * T ^ 2 * Vx(i) * dgamma(i)
             Next
 
-            Return res.ToArray(Type.GetType("System.Double"))
+            Return hex 'kJ/kmol
 
         End Function
 
-        Function RET_VN(ByVal cp As DTL.ClassesBasicasTermodinamica.ConstantProperties)
+        Function CPEX_MIX(ByVal T As Double, ByVal Vx As Array, ByVal VQ As Double(), ByVal VR As Double(), ByVal VEKI As List(Of Dictionary(Of Integer, Double))) As Double
 
-            Dim i As Integer = 0
-            Dim res As New ArrayList
-            Dim added As Boolean = False
+            Dim hex1, hex2, cpex As Double
 
-            res.Clear()
+            Dim epsilon As Double = 0.001
 
-            For Each group As UnifacGroup In Me.UnifGroups.Groups.Values
-                For Each s As String In cp.UNIFACGroups.Collection.Keys
-                    If s = group.GroupName Then
-                        res.Add(cp.UNIFACGroups.Collection(s))
-                        added = True
-                        Exit For
-                    End If
-                Next
-                If Not added Then res.Add(0)
-                added = False
-            Next
+            hex1 = HEX_MIX(T, Vx, VQ, VR, VEKI)
+            hex2 = HEX_MIX(T + epsilon, Vx, VQ, VR, VEKI)
 
-            Return res.ToArray
+            cpex = (hex2 - hex1) / epsilon
+
+            Return cpex 'kJ/kmol.K
 
         End Function
 
@@ -1040,7 +721,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                         fields = parser.ReadFields()
                         While Not parser.EndOfData
                             fields = parser.ReadFields()
-                            Me.Groups.Add(fields(1), New UnifacGroup(fields(3), fields(0), fields(1), Double.Parse(fields(4), cult), Double.Parse(fields(5), cult)))
+                            Me.Groups.Add(fields(1), New UnifacGroup(fields(2), fields(3), fields(0), fields(1), Double.Parse(fields(4), cult), Double.Parse(fields(5), cult)))
                         End While
                     End Using
                 End Using
@@ -1079,9 +760,6 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                 End Using
             End Using
 
-
-
-
         End Sub
 
         Public ReadOnly Property Groups() As System.Collections.Generic.Dictionary(Of Integer, UnifacGroup)
@@ -1116,7 +794,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                         fields = parser.ReadFields()
                         While Not parser.EndOfData
                             fields = parser.ReadFields()
-                            Me.Groups.Add(fields(1), New UnifacGroup(fields(3), fields(0), fields(1), Double.Parse(fields(4), cult), Double.Parse(fields(5), cult)))
+                            Me.Groups.Add(fields(1), New UnifacGroup(fields(2), fields(3), fields(0), fields(1), Double.Parse(fields(4), cult), Double.Parse(fields(5), cult)))
                         End While
                     End Using
                 End Using
@@ -1166,6 +844,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
     <System.Serializable()> Public Class UnifacGroup
 
+        Protected m_primarygroupname As String
         Protected m_groupname As String
 
         Protected m_main_group As Integer
@@ -1173,7 +852,14 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         Protected m_r As Double
         Protected m_q As Double
-
+        Public Property PrimGroupName() As String
+            Get
+                Return m_primarygroupname
+            End Get
+            Set(ByVal value As String)
+                m_primarygroupname = value
+            End Set
+        End Property
         Public Property GroupName() As String
             Get
                 Return m_groupname
@@ -1219,7 +905,8 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             End Set
         End Property
 
-        Sub New(ByVal Nome As String, ByVal PrimGroup As String, ByVal SecGroup As String, ByVal R As Double, ByVal Q As Double)
+        Sub New(ByVal MainGroupName As String, ByVal Nome As String, ByVal PrimGroup As String, ByVal SecGroup As String, ByVal R As Double, ByVal Q As Double)
+            Me.PrimGroupName = MainGroupName
             Me.GroupName = Nome
             Me.PrimaryGroup = PrimGroup
             Me.Secondary_Group = SecGroup

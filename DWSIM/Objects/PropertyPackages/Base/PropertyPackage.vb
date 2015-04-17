@@ -32,6 +32,7 @@ Imports CAPEOPEN110
 Imports System.Runtime.InteropServices
 Imports System.Threading.Tasks
 Imports DTL.DTL.MathEx
+Imports Microsoft.VisualBasic.FileIO
 
 Namespace DTL.SimulationObjects.PropertyPackages
 
@@ -97,6 +98,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
         SimpleLLE = 9
         NestedLoopsSLE_SS = 10
         NestedLoops3PV2 = 11
+        NestedLoops3PV3 = 12
     End Enum
 
     Public Enum Parameter
@@ -138,6 +140,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
         Public Const ClassId As String = ""
 
         Private m_props As New DTL.SimulationObjects.PropertyPackages.Auxiliary.PROPS
+        Public m_Henry As New System.Collections.Generic.Dictionary(Of String, HenryParam)
 
         Private m_ms As DTL.SimulationObjects.Streams.MaterialStream = Nothing
         Private m_ss As New System.Collections.Generic.List(Of String)
@@ -154,14 +157,14 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
         Public _packagetype As PackageType
 
-        Public _brio3 As New Auxiliary.FlashAlgorithms.BostonFournierInsideOut3P
-        Public _bbio As New Auxiliary.FlashAlgorithms.BostonBrittInsideOut
-        Public _dwdf As New Auxiliary.FlashAlgorithms.DWSIMDefault
-        Public _nl3 As New Auxiliary.FlashAlgorithms.NestedLoops3P
-        Public _nl3v2 As New Auxiliary.FlashAlgorithms.NestedLoops3PV2
-        Public _nlsle As New Auxiliary.FlashAlgorithms.NestedLoopsSLE
-        Public _nli As New Auxiliary.FlashAlgorithms.NestedLoopsImmiscible
-        Public _gm3 As New Auxiliary.FlashAlgorithms.GibbsMinimization3P
+        <System.NonSerialized()> Public _brio3 As Auxiliary.FlashAlgorithms.BostonFournierInsideOut3P
+        <System.NonSerialized()> Public _bbio As Auxiliary.FlashAlgorithms.BostonBrittInsideOut
+        <System.NonSerialized()> Public _dwdf As Auxiliary.FlashAlgorithms.DWSIMDefault
+        <System.NonSerialized()> Public _gm3 As Auxiliary.FlashAlgorithms.GibbsMinimization3P
+        <System.NonSerialized()> Public _nl3 As Auxiliary.FlashAlgorithms.NestedLoops3PV3
+        <System.NonSerialized()> Public _nlsle As Auxiliary.FlashAlgorithms.NestedLoopsSLE
+        <System.NonSerialized()> Public _nli As Auxiliary.FlashAlgorithms.NestedLoopsImmiscible
+        <System.NonSerialized()> Public _simplelle As Auxiliary.FlashAlgorithms.SimpleLLE
 
         Public _ioquick As Boolean = True
         Public _tpseverity As Integer = 0
@@ -170,6 +173,8 @@ Namespace DTL.SimulationObjects.PropertyPackages
         Public _phasemappings As New Dictionary(Of String, PhaseInfo)
 
         Private LoopVarF, LoopVarX As Double, LoopVarState As State
+
+        Public Property ForceNewFlashAlgorithmInstance As Boolean = False
 
         <System.NonSerialized()> Private _como As Object 'CAPE-OPEN Material Object
 
@@ -216,6 +221,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
                 .Add("PP_RIG_BUB_DEW_FLASH_INIT", 0)
                 .Add("PP_IDEAL_MIXRULE_LIQDENS", 0)
                 .Add("PP_FLASHALGORITHM", 2)
+                .Add("PP_FLASHALGORITHMFASTMODE", 1)
                 .Add("PP_USEEXPLIQDENS", 0)
                 .Add("PP_USEEXPLIQTHERMALCOND", 1)
             End With
@@ -371,56 +377,103 @@ Namespace DTL.SimulationObjects.PropertyPackages
                 End If
                 Select Case FlashAlgorithm
                     Case FlashMethod.DWSIMDefault
-                        If _dwdf Is Nothing Then _dwdf = New Auxiliary.FlashAlgorithms.DWSIMDefault
-                        If My.MyApplication.IsRunningParallelTasks Then Return New Auxiliary.FlashAlgorithms.DWSIMDefault Else Return _dwdf
+                        If My.MyApplication.IsRunningParallelTasks Or ForceNewFlashAlgorithmInstance Then
+                            Return New Auxiliary.FlashAlgorithms.DWSIMDefault
+                        Else
+                            If _dwdf Is Nothing Then _dwdf = New Auxiliary.FlashAlgorithms.DWSIMDefault
+                            Return _dwdf
+                        End If
                     Case FlashMethod.InsideOut
-                        If _bbio Is Nothing Then _bbio = New Auxiliary.FlashAlgorithms.BostonBrittInsideOut
-                        If My.MyApplication.IsRunningParallelTasks Then Return New Auxiliary.FlashAlgorithms.BostonBrittInsideOut Else Return _bbio
+                        If My.MyApplication.IsRunningParallelTasks Or ForceNewFlashAlgorithmInstance Then
+                            Return New Auxiliary.FlashAlgorithms.BostonBrittInsideOut
+                        Else
+                            If _bbio Is Nothing Then _bbio = New Auxiliary.FlashAlgorithms.BostonBrittInsideOut
+                            Return _bbio
+                        End If
                     Case FlashMethod.InsideOut3P
-                        If _brio3 Is Nothing Then _brio3 = New Auxiliary.FlashAlgorithms.BostonFournierInsideOut3P
-                        If My.MyApplication.IsRunningParallelTasks Then Return New Auxiliary.FlashAlgorithms.BostonFournierInsideOut3P Else Return _brio3
+                        If My.MyApplication.IsRunningParallelTasks Or ForceNewFlashAlgorithmInstance Then
+                            Return New Auxiliary.FlashAlgorithms.BostonFournierInsideOut3P With
+                                                        {.StabSearchCompIDs = _tpcompids, .StabSearchSeverity = _tpseverity}
+                        Else
+                            If _brio3 Is Nothing Then _brio3 = New Auxiliary.FlashAlgorithms.BostonFournierInsideOut3P With
+                                {.StabSearchCompIDs = _tpcompids, .StabSearchSeverity = _tpseverity}
+                            Return _brio3
+                        End If
                     Case FlashMethod.GibbsMin2P
-                        If _gm3 Is Nothing Then _gm3 = New Auxiliary.FlashAlgorithms.GibbsMinimization3P
-                        _gm3.ForceTwoPhaseOnly = True
-                        If My.MyApplication.IsRunningParallelTasks Then Return New Auxiliary.FlashAlgorithms.GibbsMinimization3P With {.ForceTwoPhaseOnly = True} Else Return _gm3
+                        If My.MyApplication.IsRunningParallelTasks Or ForceNewFlashAlgorithmInstance Then
+                            Return New Auxiliary.FlashAlgorithms.GibbsMinimization3P With
+                                                        {.ForceTwoPhaseOnly = True}
+                        Else
+                            If _gm3 Is Nothing Then _gm3 = New Auxiliary.FlashAlgorithms.GibbsMinimization3P With {.ForceTwoPhaseOnly = True}
+                            Return _gm3
+                        End If
                     Case FlashMethod.GibbsMin3P
-                        If _gm3 Is Nothing Then _gm3 = New Auxiliary.FlashAlgorithms.GibbsMinimization3P
-                        _gm3.ForceTwoPhaseOnly = False
-                        If My.MyApplication.IsRunningParallelTasks Then Return New Auxiliary.FlashAlgorithms.GibbsMinimization3P With {.ForceTwoPhaseOnly = False} Else Return _gm3
-                    Case FlashMethod.NestedLoops3P
-                        If _nl3 Is Nothing Then _nl3 = New Auxiliary.FlashAlgorithms.NestedLoops3P
-                        If My.MyApplication.IsRunningParallelTasks Then Return New Auxiliary.FlashAlgorithms.NestedLoops3P Else Return _nl3
-                    Case FlashMethod.NestedLoops3PV2
-                        If _nl3v2 Is Nothing Then _nl3v2 = New Auxiliary.FlashAlgorithms.NestedLoops3PV2
-                        If My.MyApplication.IsRunningParallelTasks Then Return New Auxiliary.FlashAlgorithms.NestedLoops3P Else Return _nl3v2
+                        If My.MyApplication.IsRunningParallelTasks Or ForceNewFlashAlgorithmInstance Then
+                            Return New Auxiliary.FlashAlgorithms.GibbsMinimization3P With
+                                                        {.ForceTwoPhaseOnly = False, .StabSearchCompIDs = _tpcompids, .StabSearchSeverity = _tpseverity}
+                        Else
+                            If _gm3 Is Nothing Then _gm3 = New Auxiliary.FlashAlgorithms.GibbsMinimization3P With
+                                {.ForceTwoPhaseOnly = False, .StabSearchCompIDs = _tpcompids, .StabSearchSeverity = _tpseverity}
+                            Return _gm3
+                        End If
+                    Case FlashMethod.NestedLoops3P, FlashMethod.NestedLoops3PV2, FlashMethod.NestedLoops3PV3
+                        If My.MyApplication.IsRunningParallelTasks Or ForceNewFlashAlgorithmInstance Then
+                            Return New Auxiliary.FlashAlgorithms.NestedLoops3P With
+                                                        {.StabSearchCompIDs = _tpcompids, .StabSearchSeverity = _tpseverity}
+                        Else
+                            If _nl3 Is Nothing Then _nl3 = New Auxiliary.FlashAlgorithms.NestedLoops3PV3 With
+                                {.StabSearchCompIDs = _tpcompids, .StabSearchSeverity = _tpseverity}
+                            Return _nl3
+                        End If
                     Case FlashMethod.NestedLoopsSLE
-                        If _nlsle Is Nothing Then _nlsle = New Auxiliary.FlashAlgorithms.NestedLoopsSLE
                         Dim constprops As New List(Of ConstantProperties)
                         For Each su As Substancia In Me.CurrentMaterialStream.Fases(0).Componentes.Values
                             constprops.Add(su.ConstantProperties)
                         Next
-                        _nlsle.CompoundProperties = constprops
-                        If My.MyApplication.IsRunningParallelTasks Then Return New Auxiliary.FlashAlgorithms.NestedLoopsSLE With {.CompoundProperties = constprops} Else Return _nlsle
+                        If My.MyApplication.IsRunningParallelTasks Or ForceNewFlashAlgorithmInstance Then
+                            Return New Auxiliary.FlashAlgorithms.NestedLoopsSLE With {.CompoundProperties = constprops}
+                        Else
+                            If _nlsle Is Nothing Then _nlsle = New Auxiliary.FlashAlgorithms.NestedLoopsSLE With {.CompoundProperties = constprops}
+                            Return _nlsle
+                        End If
                     Case FlashMethod.NestedLoopsSLE_SS
-                        If _nlsle Is Nothing Then _nlsle = New Auxiliary.FlashAlgorithms.NestedLoopsSLE With {.SolidSolution = True}
                         Dim constprops As New List(Of ConstantProperties)
                         For Each su As Substancia In Me.CurrentMaterialStream.Fases(0).Componentes.Values
                             constprops.Add(su.ConstantProperties)
                         Next
-                        _nlsle.CompoundProperties = constprops
-                        If My.MyApplication.IsRunningParallelTasks Then Return New Auxiliary.FlashAlgorithms.NestedLoopsSLE With {.CompoundProperties = constprops, .SolidSolution = True} Else Return _nlsle
+                        If My.MyApplication.IsRunningParallelTasks Or ForceNewFlashAlgorithmInstance Then
+                            Return New Auxiliary.FlashAlgorithms.NestedLoopsSLE With {.CompoundProperties = constprops, .SolidSolution = True}
+                        Else
+                            If _nlsle Is Nothing Then _nlsle = New Auxiliary.FlashAlgorithms.NestedLoopsSLE With {.CompoundProperties = constprops, .SolidSolution = True}
+                            Return _nlsle
+                        End If
                     Case FlashMethod.NestedLoopsImmiscible
-                        If _nli Is Nothing Then _nli = New Auxiliary.FlashAlgorithms.NestedLoopsImmiscible
                         Dim constprops As New List(Of ConstantProperties)
                         For Each su As Substancia In Me.CurrentMaterialStream.Fases(0).Componentes.Values
                             constprops.Add(su.ConstantProperties)
                         Next
-                        _nli.CompoundProperties = constprops
-                        If My.MyApplication.IsRunningParallelTasks Then Return New Auxiliary.FlashAlgorithms.NestedLoopsImmiscible With {.CompoundProperties = constprops} Else Return _nli
+                        If My.MyApplication.IsRunningParallelTasks Or ForceNewFlashAlgorithmInstance Then
+                            Return New Auxiliary.FlashAlgorithms.NestedLoopsImmiscible With
+                                                        {.CompoundProperties = constprops, .StabSearchCompIDs = _tpcompids, .StabSearchSeverity = _tpseverity}
+                        Else
+                            If _nli Is Nothing Then _nli = New Auxiliary.FlashAlgorithms.NestedLoopsImmiscible With
+                            {.CompoundProperties = constprops, .StabSearchCompIDs = _tpcompids, .StabSearchSeverity = _tpseverity}
+                            Return _nli
+                        End If
+                    Case FlashMethod.SimpleLLE
+                        If My.MyApplication.IsRunningParallelTasks Or ForceNewFlashAlgorithmInstance Then
+                            Return New Auxiliary.FlashAlgorithms.SimpleLLE
+                        Else
+                            If _simplelle Is Nothing Then _simplelle = New Auxiliary.FlashAlgorithms.SimpleLLE
+                            Return _simplelle
+                        End If
                     Case Else
-                        If _dwdf Is Nothing Then _dwdf = New Auxiliary.FlashAlgorithms.DWSIMDefault
-                        If My.MyApplication.IsRunningParallelTasks Then Return New Auxiliary.FlashAlgorithms.DWSIMDefault Else Return _dwdf
-                        Return _dwdf
+                        If My.MyApplication.IsRunningParallelTasks Or ForceNewFlashAlgorithmInstance Then
+                            Return New Auxiliary.FlashAlgorithms.DWSIMDefault
+                        Else
+                            If _dwdf Is Nothing Then _dwdf = New Auxiliary.FlashAlgorithms.DWSIMDefault
+                            Return _dwdf
+                        End If
                 End Select
             End Get
         End Property
@@ -848,7 +901,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
         ''' <param name="st">Mixture state (Liquid or Vapor)</param>
         ''' <returns>A vector of doubles containing fugacity coefficients for the components in the mixture.</returns>
         ''' <remarks>The composition vector must follow the same sequence as the components which were added in the material stream.</remarks>
-        Public MustOverride Function DW_CalcFugCoeff(ByVal Vx As Array, ByVal T As Double, ByVal P As Double, ByVal st As State) As Object
+        Public MustOverride Function DW_CalcFugCoeff(ByVal Vx As Array, ByVal T As Double, ByVal P As Double, ByVal st As State) As Double()
 
         Public MustOverride Function SupportsComponent(ByVal comp As DTL.ClassesBasicasTermodinamica.ConstantProperties) As Boolean
 
@@ -1165,21 +1218,16 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
             Me.CurrentMaterialStream.AtEquilibrium = False
 
-            Try
-                If Me._brio3 Is Nothing Then Me._brio3 = New Auxiliary.FlashAlgorithms.BostonFournierInsideOut3P
-                If Me._nl3 Is Nothing Then Me._nl3 = New Auxiliary.FlashAlgorithms.NestedLoops3P
-                If Me._nl3v2 Is Nothing Then Me._nl3v2 = New Auxiliary.FlashAlgorithms.NestedLoops3PV2
-                If Me._nli Is Nothing Then Me._nli = New Auxiliary.FlashAlgorithms.NestedLoopsImmiscible
-                Me._brio3.StabSearchCompIDs = _tpcompids
-                Me._brio3.StabSearchSeverity = _tpseverity
-                Me._nl3.StabSearchCompIDs = _tpcompids
-                Me._nl3.StabSearchSeverity = _tpseverity
-                Me._nl3v2.StabSearchCompIDs = _tpcompids
-                Me._nl3v2.StabSearchSeverity = _tpseverity
-                Me._nli.StabSearchCompIDs = _tpcompids
-                Me._nli.StabSearchSeverity = _tpseverity
-            Catch ex As Exception
-            End Try
+            If Not My.Application.CAPEOPENMode Then
+                Try
+                    Me._tpseverity = Me.CurrentMaterialStream.Flowsheet.Options.ThreePhaseFlashStabTestSeverity
+                    Me._tpcompids = Me.CurrentMaterialStream.Flowsheet.Options.ThreePhaseFlashStabTestCompIds
+                Catch ex As Exception
+                    Me._tpseverity = 0
+                    Me._tpcompids = New String() {}
+                Finally
+                End Try
+            End If
 
             Dim P, T, H, S, xv, xl, xl2, xs As Double
             Dim result As Object = Nothing
@@ -1223,7 +1271,8 @@ Namespace DTL.SimulationObjects.PropertyPackages
                             Dim dge As Double = 0
 
                             If Not My.Application.CAPEOPENMode Then
-                                If Not Me.FlashAlgorithm = FlashMethod.NestedLoopsSLE _
+                                If Me.CurrentMaterialStream.Flowsheet.Options.ValidateEquilibriumCalc _
+                                And Not Me.FlashAlgorithm = FlashMethod.NestedLoopsSLE _
                                 And Not Me.FlashAlgorithm = FlashMethod.NestedLoopsSLE_SS Then
 
                                     ige = Me.DW_CalcGibbsEnergy(RET_VMOL(Fase.Mixture), T, P)
@@ -1243,32 +1292,60 @@ Namespace DTL.SimulationObjects.PropertyPackages
                             Dim Vx2 = result(6)
                             Dim Vs = result(8)
 
-                            If Me.ComponentName.Contains("SRK") Or Me.ComponentName.Contains("PR") Then
-                                If Not Me.AUX_IS_SINGLECOMP(Fase.Mixture) Then
-                                    Dim newphase, eos As String
-                                    If Me.ComponentName.Contains("SRK") Then eos = "SRK" Else eos = "PR"
-                                    If xv = 1.0# Or xl = 1.0# Then
-                                        If xv = 1.0# Then
-                                            'newphase = Auxiliary.FlashAlgorithms.FlashAlgorithm.IdentifyPhase(Vy, P, T, Me, eos)
-                                            'If newphase = "L" Then
-                                            '    xv = 0.0#
-                                            '    xl = 1.0#
-                                            '    Vx = Vy
-                                            'End If
-                                        Else
-                                            newphase = Auxiliary.FlashAlgorithms.FlashAlgorithm.IdentifyPhase(Vx, P, T, Me, eos)
-                                            If newphase = "V" Then
-                                                xv = 1.0#
-                                                xl = 0.0#
-                                                Vy = Vx
+                            If Not My.Application.CAPEOPENMode Then
+
+                                'identify phase
+                                If Me.CurrentMaterialStream.Flowsheet.Options.UsePhaseIdentificationAlgorithm Then
+                                    If Me.ComponentName.Contains("SRK") Or Me.ComponentName.Contains("PR") Then
+                                        If Not Me.AUX_IS_SINGLECOMP(Fase.Mixture) Then
+                                            Dim newphase, eos As String
+                                            If Me.ComponentName.Contains("SRK") Then eos = "SRK" Else eos = "PR"
+                                            If xv = 1.0# Or xl = 1.0# Then
+                                                If xv = 1.0# Then
+                                                    newphase = Auxiliary.FlashAlgorithms.FlashAlgorithm.IdentifyPhase(Vy, P, T, Me, eos)
+                                                    If newphase = "L" Then
+                                                        xv = 0.0#
+                                                        xl = 1.0#
+                                                        Vx = Vy
+                                                    End If
+                                                Else
+                                                    newphase = Auxiliary.FlashAlgorithms.FlashAlgorithm.IdentifyPhase(Vx, P, T, Me, eos)
+                                                    If newphase = "V" Then
+                                                        xv = 1.0#
+                                                        xl = 0.0#
+                                                        Vy = Vx
+                                                    End If
+                                                End If
+                                            Else
+                                                If xl2 = 0.0# Then
+                                                    newphase = Auxiliary.FlashAlgorithms.FlashAlgorithm.IdentifyPhase(Vy, P, T, Me, eos)
+                                                    If newphase = "L" Then
+                                                        xl2 = xv
+                                                        xv = 0.0#
+                                                        Vx2 = Vy
+                                                    End If
+                                                    newphase = Auxiliary.FlashAlgorithms.FlashAlgorithm.IdentifyPhase(Vx, P, T, Me, eos)
+                                                    If newphase = "V" Then
+                                                        xv = 1.0#
+                                                        xl = 0.0#
+                                                        xl2 = 0.0#
+                                                        Vy = RET_VMOL(Fase.Mixture)
+                                                    End If
+                                                ElseIf xv = 0.0# Then
+                                                    newphase = Auxiliary.FlashAlgorithms.FlashAlgorithm.IdentifyPhase(Vx2, P, T, Me, eos)
+                                                    If newphase = "V" Then
+                                                        xv = xl2
+                                                        xl2 = 0.0#
+                                                        Vy = Vx2
+                                                    End If
+                                                End If
                                             End If
                                         End If
                                     End If
                                 End If
-                            End If
 
-                            If Not My.Application.CAPEOPENMode Then
-                                If Not Me.FlashAlgorithm = FlashMethod.NestedLoopsSLE _
+                                If Me.CurrentMaterialStream.Flowsheet.Options.ValidateEquilibriumCalc _
+                                And Not Me.FlashAlgorithm = FlashMethod.NestedLoopsSLE _
                                 And Not Me.FlashAlgorithm = FlashMethod.NestedLoopsSLE_SS Then
 
                                     fge = xl * Me.DW_CalcGibbsEnergy(Vx, T, P)
@@ -1277,13 +1354,14 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
                                     dge = fge - ige
 
-                                    Dim dgtol As Double = 0.01
+                                    Dim dgtol As Double = Me.CurrentMaterialStream.Flowsheet.Options.FlashValidationDGETolerancePct
 
                                     If dge > 0.0# And Math.Abs(dge / ige * 100) > Math.Abs(dgtol) Then
                                         Throw New Exception(DTL.App.GetLocalString("InvalidFlashResult") & "(DGE = " & dge & " kJ/kg, " & Format(dge / ige * 100, "0.00") & "%)")
                                     End If
 
                                 End If
+
                             End If
 
                             'do a density calculation check to order liquid phases from lighter to heavier
@@ -1294,14 +1372,18 @@ Namespace DTL.SimulationObjects.PropertyPackages
                                 Vx = result(6)
                                 Vx2 = result(2)
                             ElseIf xl2 <> 0.0# And xl <> 0.0# Then
-                                Dim dens1, dens2 As Double
+                                Dim dens1, dens2, xl0, xl20, Vx0(), Vx20() As Double
                                 dens1 = Me.AUX_LIQDENS(T, Vx, P, 0, False)
                                 dens2 = Me.AUX_LIQDENS(T, Vx2, P, 0, False)
                                 If dens2 < dens1 Then
-                                    xl = result(5)
-                                    xl2 = result(0)
-                                    Vx = result(6)
-                                    Vx2 = result(2)
+                                    xl0 = xl
+                                    xl20 = xl2
+                                    Vx0 = Vx
+                                    Vx20 = Vx2
+                                    xl = xl20
+                                    xl2 = xl0
+                                    Vx = Vx20
+                                    Vx2 = Vx0
                                 End If
                             End If
 
@@ -1416,6 +1498,8 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
                             T = Me.CurrentMaterialStream.Fases(0).SPMProperties.temperature.GetValueOrDefault
                             P = Me.CurrentMaterialStream.Fases(0).SPMProperties.pressure.GetValueOrDefault
+
+                            If Double.IsNaN(P) Or Double.IsInfinity(P) Then P = 0.0#
 
                             Dim Vx, Vx2, Vy As Double()
 
@@ -1532,8 +1616,9 @@ Namespace DTL.SimulationObjects.PropertyPackages
                             P = Me.CurrentMaterialStream.Fases(0).SPMProperties.pressure.GetValueOrDefault
 
                             If Double.IsNaN(H) Or Double.IsInfinity(H) Then H = Me.CurrentMaterialStream.Fases(0).SPMProperties.molar_enthalpy.GetValueOrDefault / Me.CurrentMaterialStream.Fases(0).SPMProperties.molecularWeight.GetValueOrDefault
+                            If Double.IsNaN(T) Or Double.IsInfinity(T) Then T = 0.0#
 
-                            If Me.AUX_IS_SINGLECOMP(Fase.Mixture) Then
+                            If Me.AUX_IS_SINGLECOMP(Fase.Mixture) And Me.ComponentName <> "FPROPS" Then
 
                                 Dim brentsolverT As New BrentOpt.Brent
                                 brentsolverT.DefineFuncDelegate(AddressOf EnthalpyTx)
@@ -1561,16 +1646,25 @@ Namespace DTL.SimulationObjects.PropertyPackages
                                 Else
                                     xv = (H - hl) / (hv - hl)
                                 End If
-                                S = xv * sv + (1 - xv) * sl
+                                If Tsat > Me.AUX_TCM(Fase.Mixture) Then
+                                    xv = 1.0#
+                                    LoopVarState = State.Vapor
+                                End If
+                                xl = 1 - xv
 
                                 If xv <> 0.0# And xv <> 1.0# Then
                                     T = Tsat
+                                    S = xv * sv + (1 - xv) * sl
                                 Else
                                     LoopVarF = H
                                     LoopVarX = P
-                                    T = brentsolverT.BrentOpt(273.15, 623.15, 20, 0.0001, 1000, Nothing)
+                                    T = brentsolverT.BrentOpt(Me.AUX_TFM(Fase.Mixture), 2000, 20, 0.0001, 1000, Nothing)
+                                    If xv = 0.0# Then
+                                        S = Me.DW_CalcEntropy(vz, T, P, State.Liquid)
+                                    Else
+                                        S = Me.DW_CalcEntropy(vz, T, P, State.Vapor)
+                                    End If
                                 End If
-                                xl = 1 - xv
 
                                 If T <= Me.AUX_TFM(Fase.Mixture) Then
 
@@ -1747,10 +1841,10 @@ redirect:                       result = Me.FlashBase.Flash_PH(RET_VMOL(Fase.Mix
 
                             If Double.IsNaN(S) Or Double.IsInfinity(S) Then S = Me.CurrentMaterialStream.Fases(0).SPMProperties.molar_entropy.GetValueOrDefault / Me.CurrentMaterialStream.Fases(0).SPMProperties.molecularWeight.GetValueOrDefault
 
-                            If Me.AUX_IS_SINGLECOMP(Fase.Mixture) And Me.ComponentName <> "FPROPS" Then
+                            If Me.AUX_IS_SINGLECOMP(Fase.Mixture) And Me.ComponentName <> "FPROPS" And Me.ComponentName <> "CoolProp" Then
 
                                 Dim brentsolverT As New BrentOpt.Brent
-                                brentsolverT.DefineFuncDelegate(AddressOf EnthalpyTx)
+                                brentsolverT.DefineFuncDelegate(AddressOf EntropyTx)
 
                                 Dim hl, hv, sl, sv, Tsat As Double
                                 Dim vz As Object = Me.RET_VMOL(Fase.Mixture)
@@ -1775,16 +1869,25 @@ redirect:                       result = Me.FlashBase.Flash_PH(RET_VMOL(Fase.Mix
                                 Else
                                     xv = (S - sl) / (sv - sl)
                                 End If
-                                H = xv * hv + (1 - xv) * hl
+                                If Tsat > Me.AUX_TCM(Fase.Mixture) Then
+                                    xv = 1.0#
+                                    LoopVarState = State.Vapor
+                                End If
+                                xl = 1 - xv
 
                                 If xv <> 0.0# And xv <> 1.0# Then
                                     T = Tsat
+                                    H = xv * hv + (1 - xv) * hl
                                 Else
-                                    LoopVarF = H
+                                    LoopVarF = S
                                     LoopVarX = P
-                                    T = brentsolverT.BrentOpt(273.15, 623.15, 20, 0.0001, 1000, Nothing)
+                                    T = brentsolverT.BrentOpt(Me.AUX_TFM(Fase.Mixture), 2000, 20, 0.0001, 1000, Nothing)
+                                    If xv = 0.0# Then
+                                        H = Me.DW_CalcEnthalpy(vz, T, P, State.Liquid)
+                                    Else
+                                        H = Me.DW_CalcEnthalpy(vz, T, P, State.Vapor)
+                                    End If
                                 End If
-                                xl = 1 - xv
 
                                 Me.CurrentMaterialStream.Fases(3).SPMProperties.molarfraction = xl
                                 Me.CurrentMaterialStream.Fases(2).SPMProperties.molarfraction = xv
@@ -1908,6 +2011,8 @@ redirect2:                      result = Me.FlashBase.Flash_PS(RET_VMOL(Fase.Mix
                             T = Me.CurrentMaterialStream.Fases(0).SPMProperties.temperature.GetValueOrDefault
                             P = Me.CurrentMaterialStream.Fases(0).SPMProperties.pressure.GetValueOrDefault
 
+                            If Double.IsNaN(T) Or Double.IsInfinity(T) Then T = 0.0#
+
                             Dim Vx, Vx2, Vy As Double()
 
                             If Me.AUX_IS_SINGLECOMP(Fase.Mixture) Then
@@ -2006,7 +2111,6 @@ redirect2:                      result = Me.FlashBase.Flash_PS(RET_VMOL(Fase.Mix
 
                             H = HM
 
-
                             If xl <> 0 Then SL = Me.DW_CalcEntropy(Vx, T, P, State.Liquid)
                             If xl2 <> 0 Then SL2 = Me.DW_CalcEntropy(Vx2, T, P, State.Liquid)
                             If xv <> 0 Then SV = Me.DW_CalcEntropy(Vy, T, P, State.Vapor)
@@ -2018,22 +2122,24 @@ redirect2:                      result = Me.FlashBase.Flash_PS(RET_VMOL(Fase.Mix
 
             End Select
 
-            Dim summf As Double = 0, sumwf As Double = 0
-            For Each pi As PhaseInfo In Me.PhaseMappings.Values
-                If Not pi.PhaseLabel = "Disabled" Then
-                    summf += Me.CurrentMaterialStream.Fases(pi.DWPhaseIndex).SPMProperties.molarfraction.GetValueOrDefault
-                    sumwf += Me.CurrentMaterialStream.Fases(pi.DWPhaseIndex).SPMProperties.massfraction.GetValueOrDefault
-                End If
-            Next
-            If Abs(summf - 1) > 0.000001 Then
+            If My.Application.CAPEOPENMode Then
+                Dim summf As Double = 0, sumwf As Double = 0
                 For Each pi As PhaseInfo In Me.PhaseMappings.Values
                     If Not pi.PhaseLabel = "Disabled" Then
-                        If Not Me.CurrentMaterialStream.Fases(pi.DWPhaseIndex).SPMProperties.molarfraction.HasValue Then
-                            Me.CurrentMaterialStream.Fases(pi.DWPhaseIndex).SPMProperties.molarfraction = 1 - summf
-                            Me.CurrentMaterialStream.Fases(pi.DWPhaseIndex).SPMProperties.massfraction = 1 - sumwf
-                        End If
+                        summf += Me.CurrentMaterialStream.Fases(pi.DWPhaseIndex).SPMProperties.molarfraction.GetValueOrDefault
+                        sumwf += Me.CurrentMaterialStream.Fases(pi.DWPhaseIndex).SPMProperties.massfraction.GetValueOrDefault
                     End If
                 Next
+                If Abs(summf - 1) > 0.0001 Then
+                    For Each pi As PhaseInfo In Me.PhaseMappings.Values
+                        If Not pi.PhaseLabel = "Disabled" Then
+                            If Not Me.CurrentMaterialStream.Fases(pi.DWPhaseIndex).SPMProperties.molarfraction.HasValue Then
+                                Me.CurrentMaterialStream.Fases(pi.DWPhaseIndex).SPMProperties.molarfraction = 1 - summf
+                                Me.CurrentMaterialStream.Fases(pi.DWPhaseIndex).SPMProperties.massfraction = 1 - sumwf
+                            End If
+                        End If
+                    Next
+                End If
             End If
 
             With Me.CurrentMaterialStream
@@ -2062,6 +2168,21 @@ redirect2:                      result = Me.FlashBase.Flash_PS(RET_VMOL(Fase.Mix
             Return er
 
         End Function
+
+        Private Function EntropyTx(ByVal x As Double, ByVal otherargs As Object) As Double
+
+            Dim er As Double = LoopVarF - Me.DW_CalcEntropy(Me.RET_VMOL(Fase.Mixture), x, LoopVarX, LoopVarState)
+            Return er
+
+        End Function
+
+        Private Function EntropyPx(ByVal x As Double, ByVal otherargs As Object) As Double
+
+            Dim er As Double = LoopVarF - Me.DW_CalcEntropy(Me.RET_VMOL(Fase.Mixture), LoopVarX, x, LoopVarState)
+            Return er
+
+        End Function
+
 
         Public MustOverride Sub DW_CalcVazaoMolar()
 
@@ -2698,6 +2819,27 @@ redirect2:                      result = Me.FlashBase.Flash_PS(RET_VMOL(Fase.Mix
 
         End Function
 
+        Public Function AUX_KHenry(ByVal CompName As String, ByVal T As Double) As Double
+
+            Dim KHx As Double
+            Dim MW As Double = 18 'mol weight of water [g/mol]
+            Dim DW As Double = 996 'density of water at 298.15 K [Kg/m3]
+            Dim KHCP As Double = 0.0000064 'nitrogen [mol/m3/Pa]
+            Dim C As Double = 1600 'nitrogen
+            Dim CAS As String
+
+            CAS = Me.CurrentMaterialStream.Fases(0).Componentes(CompName).ConstantProperties.CAS_Number
+
+            If m_Henry.ContainsKey(CAS) Then
+                KHCP = m_Henry(CAS).KHcp
+                C = m_Henry(CAS).C
+            End If
+            KHx = 1 / (KHCP * MW / DW / 1000 * Exp(C * (1 / T - 1 / 298.15)))
+
+            Return KHx '[Pa]
+
+        End Function
+
         Public Function AUX_PVAPi(ByVal sub1 As String, ByVal T As Double)
 
             If Me.CurrentMaterialStream.Fases(0).Componentes(sub1).ConstantProperties.IsPF = 1 Then
@@ -3038,44 +3180,6 @@ Final3:
 Final3:
 
             Return bbb
-
-        End Function
-
-        Public Function AUX_HVAPi(ByVal sub1 As String, ByVal T As Double)
-
-            Dim A, B, C, D, Tr, result As Double
-            A = Me.CurrentMaterialStream.Fases(0).Componentes(sub1).ConstantProperties.HVap_A
-            B = Me.CurrentMaterialStream.Fases(0).Componentes(sub1).ConstantProperties.HVap_B
-            C = Me.CurrentMaterialStream.Fases(0).Componentes(sub1).ConstantProperties.HVap_C
-            D = Me.CurrentMaterialStream.Fases(0).Componentes(sub1).ConstantProperties.HVap_D
-
-            Tr = T / Me.CurrentMaterialStream.Fases(0).Componentes(sub1).ConstantProperties.Critical_Temperature
-
-            If Me.CurrentMaterialStream.Fases(0).Componentes(sub1).ConstantProperties.OriginalDB = "DWSIM" Or _
-                                Me.CurrentMaterialStream.Fases(0).Componentes(sub1).ConstantProperties.OriginalDB = "" Then
-                If Me.CurrentMaterialStream.Fases(0).Componentes(sub1).ConstantProperties.IsHYPO = 1 Or _
-                Me.CurrentMaterialStream.Fases(0).Componentes(sub1).ConstantProperties.IsPF = 1 Then
-                    Dim tr1 As Double
-                    tr1 = Me.CurrentMaterialStream.Fases(0).Componentes(sub1).ConstantProperties.Normal_Boiling_Point / Me.CurrentMaterialStream.Fases(0).Componentes(sub1).ConstantProperties.Critical_Temperature
-                    result = Me.CurrentMaterialStream.Fases(0).Componentes(sub1).ConstantProperties.HVap_A * ((1 - Tr) / (1 - tr1)) ^ 0.375
-                    Return result 'kJ/kg
-                Else
-                    result = A * (1 - Tr) ^ (B + C * Tr + D * Tr ^ 2)
-                    Return result / Me.CurrentMaterialStream.Fases(0).Componentes(sub1).ConstantProperties.Molar_Weight / 1000 'kJ/kg
-                End If
-            ElseIf Me.CurrentMaterialStream.Fases(0).Componentes(sub1).ConstantProperties.OriginalDB = "CheResources" Or _
-            Me.CurrentMaterialStream.Fases(0).Componentes(sub1).ConstantProperties.OriginalDB = "User" Then
-                Dim tr1 As Double
-                tr1 = Me.CurrentMaterialStream.Fases(0).Componentes(sub1).ConstantProperties.Normal_Boiling_Point / Me.CurrentMaterialStream.Fases(0).Componentes(sub1).ConstantProperties.Critical_Temperature
-                result = Me.CurrentMaterialStream.Fases(0).Componentes(sub1).ConstantProperties.HVap_A * ((1 - Tr) / (1 - tr1)) ^ 0.375
-                Return result 'kJ/kg
-            ElseIf Me.CurrentMaterialStream.Fases(0).Componentes(sub1).ConstantProperties.OriginalDB = "ChemSep" Then
-                Dim eqno As String = Me.CurrentMaterialStream.Fases(0).Componentes(sub1).ConstantProperties.VaporizationEnthalpyEquation
-                result = Me.CalcCSTDepProp(eqno, A, B, C, D, 0, T, T / Tr) / Me.CurrentMaterialStream.Fases(0).Componentes(sub1).ConstantProperties.Molar_Weight / 1000 'kJ/kg
-                Return result
-            Else
-                Return 0
-            End If
 
         End Function
 
@@ -3914,6 +4018,43 @@ Final3:
 
         End Function
 
+        Public Function AUX_INT_CPDTi_L(ByVal T1 As Double, ByVal T2 As Double, ByVal subst As String) As Double
+
+            Dim deltaT As Double = (T2 - T1) / 10
+            Dim Ti, Tc As Double
+            Dim i As Integer = 0
+            Dim integral As Double = 0
+
+            Ti = T1 + deltaT / 2
+            Tc = Me.CurrentMaterialStream.Fases(0).Componentes(subst).ConstantProperties.Critical_Temperature
+            For i = 0 To 9
+                If Ti > Tc Then
+                    integral += Me.AUX_CPi(subst, Ti) * deltaT
+                Else
+                    integral += Me.AUX_LIQ_Cpi(Me.CurrentMaterialStream.Fases(0).Componentes(subst).ConstantProperties, Ti) * deltaT
+                End If
+
+                Ti += deltaT
+            Next
+
+            Return integral 'KJ/Kg
+
+        End Function
+
+        Public Function AUX_INT_CPDTm_L(ByVal T1 As Double, ByVal T2 As Double, ByVal Vw As Object)
+
+            Dim val As Double
+            Dim i As Integer = 0
+            Dim subst As DTL.ClassesBasicasTermodinamica.Substancia
+            For Each subst In Me.CurrentMaterialStream.Fases(0).Componentes.Values
+                val += Vw(i) * Me.AUX_INT_CPDTi_L(T1, T2, subst.Nome)
+                i += 1
+            Next
+
+            Return val
+
+        End Function
+
         Public Function AUX_INT_CPDT_Tm(ByVal T1 As Double, ByVal T2 As Double, ByVal fase As Fase)
 
             Dim val As Double
@@ -4342,6 +4483,58 @@ Final3:
 
         End Function
 
+
+        Public Function RET_HVAPM(ByVal Vxw As Array, ByVal T As Double) As Double
+
+            Dim val As Double = 0.0#
+            Dim i As Integer
+            Dim n As Integer = Me.CurrentMaterialStream.Fases(0).Componentes.Count - 1
+
+            i = 0
+            For Each subst As Substancia In Me.CurrentMaterialStream.Fases(0).Componentes.Values
+                val += Vxw(i) * Me.AUX_HVAPi(subst.Nome, T)
+                i += 1
+            Next
+
+            Return val
+
+        End Function
+
+        Public Function AUX_HVAPi(ByVal sub1 As String, ByVal T As Double)
+
+            Dim A, B, C, D, E, Tr, result As Double
+            A = Me.CurrentMaterialStream.Fases(0).Componentes(sub1).ConstantProperties.HVap_A
+            B = Me.CurrentMaterialStream.Fases(0).Componentes(sub1).ConstantProperties.HVap_B
+            C = Me.CurrentMaterialStream.Fases(0).Componentes(sub1).ConstantProperties.HVap_C
+            D = Me.CurrentMaterialStream.Fases(0).Componentes(sub1).ConstantProperties.HVap_D
+            E = Me.CurrentMaterialStream.Fases(0).Componentes(sub1).ConstantProperties.HVap_E
+
+            Tr = T / Me.CurrentMaterialStream.Fases(0).Componentes(sub1).ConstantProperties.Critical_Temperature
+
+            If Tr >= 1 Then Return 0.0#
+
+            If Me.CurrentMaterialStream.Fases(0).Componentes(sub1).ConstantProperties.OriginalDB = "DWSIM" Or _
+                                Me.CurrentMaterialStream.Fases(0).Componentes(sub1).ConstantProperties.OriginalDB = "" Then
+                If Me.CurrentMaterialStream.Fases(0).Componentes(sub1).ConstantProperties.IsHYPO = 1 Or _
+                Me.CurrentMaterialStream.Fases(0).Componentes(sub1).ConstantProperties.IsPF = 1 Then
+                    Dim tr1 As Double
+                    tr1 = Me.CurrentMaterialStream.Fases(0).Componentes(sub1).ConstantProperties.Normal_Boiling_Point / Me.CurrentMaterialStream.Fases(0).Componentes(sub1).ConstantProperties.Critical_Temperature
+                    result = Me.CurrentMaterialStream.Fases(0).Componentes(sub1).ConstantProperties.HVap_A * ((1 - Tr) / (1 - tr1)) ^ 0.375
+                    Return result 'kJ/kg
+                Else
+                    result = A * (1 - Tr) ^ (B + C * Tr + D * Tr ^ 2)
+                    Return result / Me.CurrentMaterialStream.Fases(0).Componentes(sub1).ConstantProperties.Molar_Weight / 1000 'kJ/kg
+                End If
+            ElseIf Me.CurrentMaterialStream.Fases(0).Componentes(sub1).ConstantProperties.OriginalDB = "ChemSep" Then
+                Dim eqno As String = Me.CurrentMaterialStream.Fases(0).Componentes(sub1).ConstantProperties.VaporizationEnthalpyEquation
+                result = Me.CalcCSTDepProp(eqno, A, B, C, D, E, T, T / Tr) / Me.CurrentMaterialStream.Fases(0).Componentes(sub1).ConstantProperties.Molar_Weight / 1000 'kJ/kg
+                Return result
+            Else
+                Return 0.0#
+            End If
+
+        End Function
+
         Public Function RET_Hid(ByVal T1 As Double, ByVal T2 As Double, ByVal fase As Fase) As Double
 
             Dim val As Double
@@ -4364,25 +4557,34 @@ Final3:
 
         End Function
 
+
         Public Function RET_Hid(ByVal T1 As Double, ByVal T2 As Double, ByVal Vz As Object) As Double
 
-            Dim val As Double
-            'Dim subst As DTL.ClassesBasicasTermodinamica.Substancia
+            Return Me.AUX_INT_CPDTm(T1, T2, Me.AUX_CONVERT_MOL_TO_MASS(Vz))
 
-            Dim i As Integer = 0
+        End Function
 
-            'For Each subst In Me.CurrentMaterialStream.Fases(0).Componentes.Values
-            '    val += Me.AUX_CONVERT_MOL_TO_MASS(Vz)(i) * subst.ConstantProperties.Enthalpy_of_Formation_25C
-            '    i = i + 1
-            'Next
+        Public Function RET_Hid_L(ByVal T1 As Double, ByVal T2 As Double, ByVal Vz As Object) As Double
 
-            Return Me.AUX_INT_CPDTm(T1, T2, Me.AUX_CONVERT_MOL_TO_MASS(Vz)) + val
+            Return Me.AUX_INT_CPDTm_L(T1, T2, Me.AUX_CONVERT_MOL_TO_MASS(Vz))
+
+        End Function
+
+        Public Function RET_Sid_L(ByVal T1 As Double, ByVal T2 As Double, ByVal Vz As Object) As Double
+
+            Return Me.RET_Hid_L(T1, T2, Vz) / T2
 
         End Function
 
         Public Function RET_Hid_i(ByVal T1 As Double, ByVal T2 As Double, ByVal id As String) As Double
 
             Return Me.AUX_INT_CPDTi(T1, T2, id)
+
+        End Function
+
+        Public Function RET_Hid_i_L(ByVal T1 As Double, ByVal T2 As Double, ByVal id As String) As Double
+
+            Return Me.AUX_INT_CPDTi_L(T1, T2, id)
 
         End Function
 
@@ -7154,6 +7356,24 @@ Final3:
             Me.m_props = New DTL.SimulationObjects.PropertyPackages.Auxiliary.PROPS
             ConfigParameters()
 
+            'load Henry Coefficients
+       
+            Using stream As IO.Stream = New IO.MemoryStream(My.Resources.Henry)
+                Using reader As TextReader = New IO.StreamReader(stream)
+                    reader.ReadLine()
+                    reader.ReadLine()
+                    Dim line As String = ""
+                    While line = reader.ReadLine() <> Nothing
+                        Dim HP As New HenryParam
+                        HP.Component = line.Split(";")(1)
+                        HP.CAS = line.Split(";")(2)
+                        HP.KHcp = Val(line.Split(";")(3))
+                        HP.C = Val(line.Split(";")(4))
+                        m_Henry.Add(HP.CAS, HP)
+                    End While
+                End Using
+            End Using
+
         End Sub
 
         ''' <summary>
@@ -7428,6 +7648,13 @@ Final3:
             mSource.Write(buffer, count, IntPtr.Zero)
         End Sub
 
+    End Class
+
+    <System.Serializable()> Public Class HenryParam
+        Public Component As String
+        Public CAS As String
+        Public KHcp As Double
+        Public C As Double
     End Class
 
 End Namespace

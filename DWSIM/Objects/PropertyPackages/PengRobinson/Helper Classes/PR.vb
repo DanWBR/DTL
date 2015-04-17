@@ -1,20 +1,20 @@
 '    Peng-Robinson Property Package 
 '    Copyright 2008-2014 Daniel Wagner O. de Medeiros
 '
-'    This file is part of DTL.
+'    This file is part of DWSIM.
 '
-'    DTL is free software: you can redistribute it and/or modify
+'    DWSIM is free software: you can redistribute it and/or modify
 '    it under the terms of the GNU General Public License as published by
 '    the Free Software Foundation, either version 3 of the License, or
 '    (at your option) any later version.
 '
-'    DTL is distributed in the hope that it will be useful,
+'    DWSIM is distributed in the hope that it will be useful,
 '    but WITHOUT ANY WARRANTY; without even the implied warranty of
 '    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 '    GNU General Public License for more details.
 '
 '    You should have received a copy of the GNU General Public License
-'    along with DTL.  If not, see <http://www.gnu.org/licenses/>.
+'    along with DWSIM.  If not, see <http://www.gnu.org/licenses/>.
 
 Imports DTL.DTL.MathEx
 Imports Cudafy
@@ -107,7 +107,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
 
             Dim aux1 = -R / 2 * (0.45724 / T) ^ 0.5
             i = 0
-            Dim aux2 = 0
+            Dim aux2 = 0.0#
             Do
                 j = 0
                 Do
@@ -124,6 +124,8 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
         End Function
 
         Shared Function ZtoMinG(ByVal Z_ As Array, ByVal T As Double, ByVal P As Double, ByVal Vz As Array, ByVal VKij As Object, ByVal VTc As Array, ByVal VPc As Array, ByVal Vw As Array) As Object
+
+            DTL.App.WriteToConsole("PR min-G root finder (Z) for T = " & T & " K, P = " & P & " Pa and Z = " & DirectCast(Z_, Object()).ToArrayString, 3)
 
             Dim S, H, Z As Double
 
@@ -170,7 +172,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
             Loop Until i = n + 1
 
             i = 0
-            Dim am = 0
+            Dim am = 0.0#
             Do
                 j = 0
                 Do
@@ -181,7 +183,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
             Loop Until i = n + 1
 
             i = 0
-            Dim bm = 0
+            Dim bm = 0.0#
             Do
                 bm = bm + Vz(i) * bi(i)
                 i = i + 1
@@ -199,7 +201,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
 
                 Dim aux1 = -R / 2 * (0.45724 / T) ^ 0.5
                 i = 0
-                Dim aux2 = 0
+                Dim aux2 = 0.0#
                 Do
                     j = 0
                     Do
@@ -239,6 +241,8 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
                 l = l + 1
 
             Next
+
+            DTL.App.WriteToConsole("Result: Min-G Z Index = " & k, 3)
 
             Return New Object() {k, G(k)}
 
@@ -594,7 +598,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
             Loop Until i = n + 1
 
             i = 0
-            Dim aml = 0
+            Dim aml = 0.0#
             Do
                 j = 0
                 Do
@@ -606,7 +610,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
             Loop Until i = n + 1
 
             i = 0
-            Dim bml = 0
+            Dim bml = 0.0#
             Do
                 bml = bml + Vx(i) * bi(i)
                 i = i + 1
@@ -621,8 +625,8 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
             coeff(3) = 1
 
             Dim temp1 = Poly_Roots(coeff)
-            Dim tv = 0
-            Dim ZV, tv2
+            Dim tv = 0.0#
+            Dim ZV, tv2 As Double
 
             Dim result As New ArrayList
 
@@ -819,7 +823,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
             Loop Until i = n + 1
 
             i = 0
-            Dim am = 0
+            Dim am = 0.0#
             Do
                 j = 0
                 Do
@@ -830,7 +834,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
             Loop Until i = n + 1
 
             i = 0
-            Dim bm = 0
+            Dim bm = 0.0#
             Do
                 bm = bm + Vz(i) * bi(i)
                 i = i + 1
@@ -923,7 +927,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
 
             Dim aux1 = -R / 2 * (0.45724 / T) ^ 0.5
             i = 0
-            Dim aux2 = 0
+            Dim aux2 = 0.0#
             Do
                 j = 0
                 Do
@@ -991,7 +995,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
             Loop Until i = n + 1
 
             i = 0
-            Dim am = 0
+            Dim am = 0.0#
             Do
                 j = 0
                 Do
@@ -1002,7 +1006,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
             Loop Until i = n + 1
 
             i = 0
-            Dim bm = 0
+            Dim bm = 0.0#
             Do
                 bm = bm + Vz(i) * bi(i)
                 i = i + 1
@@ -1095,7 +1099,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
 
             Dim aux1 = -R / 2 * (0.45724 / T) ^ 0.5
             i = 0
-            Dim aux2 = 0
+            Dim aux2 = 0.0#
             Do
                 j = 0
                 Do
@@ -1163,7 +1167,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
             Loop Until i = n + 1
 
             i = 0
-            Dim am = 0
+            Dim am = 0.0#
             Do
                 j = 0
                 Do
@@ -1174,7 +1178,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
             Loop Until i = n + 1
 
             i = 0
-            Dim bm = 0
+            Dim bm = 0.0#
             Do
                 bm = bm + Vz(i) * bi(i)
                 i = i + 1
@@ -1267,7 +1271,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
 
             Dim aux1 = -R / 2 * (0.45724 / T) ^ 0.5
             i = 0
-            Dim aux2 = 0
+            Dim aux2 = 0.0#
             Do
                 j = 0
                 Do
@@ -1335,7 +1339,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
             Loop Until i = n + 1
 
             i = 0
-            Dim am = 0
+            Dim am = 0.0#
             Do
                 j = 0
                 Do
@@ -1346,7 +1350,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
             Loop Until i = n + 1
 
             i = 0
-            Dim bm = 0
+            Dim bm = 0.0#
             Do
                 bm = bm + Vz(i) * bi(i)
                 i = i + 1
@@ -1439,7 +1443,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
 
             Dim aux1 = -R / 2 * (0.45724 / T) ^ 0.5
             i = 0
-            Dim aux2 = 0
+            Dim aux2 = 0.0#
             Do
                 j = 0
                 Do
@@ -1506,7 +1510,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
             Loop Until i = n + 1
 
             i = 0
-            Dim aml = 0
+            Dim aml = 0.0#
             Do
                 j = 0
                 Do
@@ -1517,7 +1521,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
             Loop Until i = n + 1
 
             i = 0
-            Dim bml = 0
+            Dim bml = 0.0#
             Do
                 bml = bml + Vx(i) * bi(i)
                 i = i + 1
@@ -1640,7 +1644,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
         ''' <remarks>This procedure is based on the paper: 
         ''' Mathias, P. M., Boston, J. F. and Watanasiri, S. (1984), 
         ''' Effective utilization of equations of state for thermodynamic properties in process simulation. 
-        ''' AIChE J., 30: 182–186. doi: 10.1002/aic.690300203</remarks>
+        ''' AIChE J., 30: 182â€“186. doi: 10.1002/aic.690300203</remarks>
         Public Shared Function CheckRoot(Z As Double, a As Double, b As Double, P As Double, T As Double, phaselabel As String) As Double()
 
             If a * b = 0.0# Then Return New Double() {Z, P}

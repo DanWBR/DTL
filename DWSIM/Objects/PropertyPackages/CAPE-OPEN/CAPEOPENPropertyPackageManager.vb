@@ -48,6 +48,9 @@ Friend Class CAPEOPENPropertyPackageManager
             Case "Modified UNIFAC (Dortmund)"
                 pp = New MODFACPropertyPackage(True)
                 pp.ComponentDescription = DTL.App.GetLocalString("DescMUPP")
+            Case "Modified UNIFAC (NIST)"
+                pp = New NISTMFACPropertyPackage(True)
+                pp.ComponentDescription = DTL.App.GetLocalString("DescNUPP")
             Case "Chao-Seader"
                 pp = New ChaoSeaderPropertyPackage(True)
                 pp.ComponentDescription = DTL.App.GetLocalString("DescCSLKPP")
@@ -72,7 +75,7 @@ Friend Class CAPEOPENPropertyPackageManager
 
     Public Function GetPropertyPackageList() As Object Implements ICapeThermoPropertyPackageManager.GetPropertyPackageList
         Return New String() {"Peng-Robinson (PR)", "Peng-Robinson-Stryjek-Vera 2 (PRSV2-M)", "Peng-Robinson-Stryjek-Vera 2 (PRSV2-VL)", "Soave-Redlich-Kwong (SRK)", "Peng-Robinson / Lee-Kesler (PR/LK)", _
-                             "UNIFAC", "UNIFAC-LL", "Modified UNIFAC (Dortmund)", "NRTL", "UNIQUAC", _
+                             "UNIFAC", "UNIFAC-LL", "Modified UNIFAC (Dortmund)", "Modified UNIFAC (NIST)", "NRTL", "UNIQUAC", _
                             "Chao-Seader", "Grayson-Streed", "Lee-Kesler-Plöcker", "Raoult's Law", "IAPWS-IF97 Steam Tables"}
     End Function
 

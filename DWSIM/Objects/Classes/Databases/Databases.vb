@@ -15,7 +15,7 @@
 '    You should have received a copy of the GNU General Public License
 '    along with DWSIM.  If not, see <http://www.gnu.org/licenses/>.
 '
-'    Imports DWSIM.SimulationObjects
+'    Imports DTL.SimulationObjects
 
 Imports FileHelpers
 Imports System.Xml
@@ -227,6 +227,8 @@ Namespace DTL.Databases
                                         cp.HVap_C = Double.Parse(node3.Attributes("value").Value, nf)
                                     Case "D"
                                         cp.HVap_D = Double.Parse(node3.Attributes("value").Value, nf)
+                                    Case "E"
+                                        cp.HVap_E = Double.Parse(node3.Attributes("value").Value, nf)
                                     Case "Tmin"
                                         cp.HVap_TMIN = Double.Parse(node3.Attributes("value").Value, nf)
                                     Case "Tmax"
@@ -461,6 +463,10 @@ Namespace DTL.Databases
                                             cp.MODFACGroups.Collection.Add(modf.ID2Group(Integer.Parse(node3.Attributes("id").Value)), Integer.Parse(node3.Attributes("value").Value))
                                         End If
                                 End Select
+                            Next
+                            If cp.NISTMODFACGroups.Collection Is Nothing Then cp.NISTMODFACGroups.Collection = New SortedList
+                            For Each sg As String In cp.MODFACGroups.Collection.Keys
+                                cp.NISTMODFACGroups.Collection.Add(sg, cp.MODFACGroups.Collection(sg))
                             Next
                     End Select
                 Next

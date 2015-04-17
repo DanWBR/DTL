@@ -1,5 +1,9 @@
-'    Modified UNIFAC (Dortmund) Property Package 
-'    Copyright 2008 Daniel Wagner O. de Medeiros
+﻿'    Modified UNIFAC (NIST) Property Package 
+'    Copyright 2015 Daniel Wagner O. de Medeiros
+'    Copyright 2015 Gregor Reichert
+'
+'    Based on the paper entitled "New modified UNIFAC parameters using critically 
+'    evaluated phase equilibrium data", http://dx.doi.org/10.1016/j.fluid.2014.12.042
 '
 '    This file is part of DWSIM.
 '
@@ -21,15 +25,16 @@ Imports System.Linq
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
-    <System.Serializable()> Public Class Modfac
+    <System.Serializable()> Public Class NISTMFAC
 
-        Public ModfGroups As ModfacGroups
+        Public Shadows ModfGroups As NistModfacGroups
 
         Sub New()
 
-            ModfGroups = New ModfacGroups
+            ModfGroups = New NistModfacGroups
 
         End Sub
+
 
         Function ID2Group(ByVal id As Integer) As String
 
@@ -179,7 +184,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                             If Not Me.ModfGroups.InteracParam_aij(g1).ContainsKey(g2) Then
                                 If Me.ModfGroups.InteracParam_aij.ContainsKey(g2) Then
                                     If Not Me.ModfGroups.InteracParam_aij(g2).ContainsKey(g1) And g2 <> g1 Then
-                                        Throw New Exception("MODFAC Error: Could not find interaction parameter for groups " & Me.ModfGroups.Groups(id1 + 1).GroupName & " / " & _
+                                        Throw New Exception("NIST-MODFAC Error: Could not find interaction parameter for groups " & Me.ModfGroups.Groups(id1 + 1).GroupName & " / " & _
                                                             Me.ModfGroups.Groups(id2 + 1).GroupName & ". Activity coefficient calculation will give you inconsistent results for this system.")
                                     End If
                                 End If
@@ -187,11 +192,11 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                         Else
                             If Me.ModfGroups.InteracParam_aij.ContainsKey(g2) Then
                                 If Not Me.ModfGroups.InteracParam_aij(g2).ContainsKey(g1) And g2 <> g1 Then
-                                    Throw New Exception("MODFAC Error: Could not find interaction parameter for groups " & Me.ModfGroups.Groups(id1 + 1).GroupName & " / " & _
+                                    Throw New Exception("NIST-MODFAC Error: Could not find interaction parameter for groups " & Me.ModfGroups.Groups(id1 + 1).GroupName & " / " & _
                                                         Me.ModfGroups.Groups(id2 + 1).GroupName & ". Activity coefficient calculation will give you inconsistent results for this system.")
                                 End If
                             Else
-                                Throw New Exception("MODFAC Error: Could not find interaction parameter for groups " & Me.ModfGroups.Groups(id1 + 1).GroupName & " / " & _
+                                Throw New Exception("NIST-MODFAC Error: Could not find interaction parameter for groups " & Me.ModfGroups.Groups(id1 + 1).GroupName & " / " & _
                                                     Me.ModfGroups.Groups(id2 + 1).GroupName & ". Activity coefficient calculation will give you inconsistent results for this system.")
                             End If
                         End If
@@ -216,7 +221,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                     Else
                         If Me.ModfGroups.InteracParam_aij.ContainsKey(g2) Then
                             If Me.ModfGroups.InteracParam_aij(g2).ContainsKey(g1) Then
-                                res = Me.ModfGroups.InteracParam_aji(g2)(g1) + Me.ModfGroups.InteracParam_bji(g2)(g1) * T + Me.ModfGroups.InteracParam_cji(g2)(g1) * T ^ 2
+                                res = Me.ModfGroups.InteracParam_aij(g2)(g1) + Me.ModfGroups.InteracParam_bij(g2)(g1) * T + Me.ModfGroups.InteracParam_cij(g2)(g1) * T ^ 2
                             Else
                                 res = 0.0#
                             End If
@@ -226,7 +231,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                     End If
                 ElseIf Me.ModfGroups.InteracParam_aij.ContainsKey(g2) Then
                     If Me.ModfGroups.InteracParam_aij(g2).ContainsKey(g1) Then
-                        res = Me.ModfGroups.InteracParam_aji(g2)(g1) + Me.ModfGroups.InteracParam_bji(g2)(g1) * T + Me.ModfGroups.InteracParam_cji(g2)(g1) * T ^ 2
+                        res = Me.ModfGroups.InteracParam_aij(g2)(g1) + Me.ModfGroups.InteracParam_bij(g2)(g1) * T + Me.ModfGroups.InteracParam_cij(g2)(g1) * T ^ 2
                     Else
                         res = 0.0#
                     End If
@@ -246,7 +251,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Dim i As Integer = 0
             Dim res As Double
 
-            For Each kvp In VN
+            For Each kvp As KeyValuePair(Of Integer, Double) In VN
                 res += Me.ModfGroups.Groups(kvp.Key).R * VN(kvp.Key)
                 i += 1
             Next
@@ -260,7 +265,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Dim i As Integer = 0
             Dim res As Double
 
-            For Each kvp In VN
+            For Each kvp As KeyValuePair(Of Integer, Double) In VN
                 res += Me.ModfGroups.Groups(kvp.Key).Q * VN(kvp.Key)
                 i += 1
             Next
@@ -274,7 +279,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Dim i As Integer = 0
             Dim res As New Dictionary(Of Integer, Double)
 
-            For Each kvp In VN
+            For Each kvp As KeyValuePair(Of Integer, Double) In VN
                 res.Add(kvp.Key, Me.ModfGroups.Groups(kvp.Key).Q * VN(kvp.Key) / Q)
                 i += 1
             Next
@@ -292,12 +297,21 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             res.Clear()
 
             For Each group As ModfacGroup In Me.ModfGroups.Groups.Values
-                For Each s As String In cp.MODFACGroups.Collection.Keys
-                    If s = group.Secondary_Group Then
-                        res.Add(group.Secondary_Group, cp.MODFACGroups.Collection(s))
-                        Exit For
-                    End If
-                Next
+                If cp.NISTMODFACGroups.Collection.Count > 0 Then
+                    For Each s As String In cp.NISTMODFACGroups.Collection.Keys
+                        If s = group.Secondary_Group Then
+                            res.Add(group.Secondary_Group, cp.NISTMODFACGroups.Collection(s))
+                            Exit For
+                        End If
+                    Next
+                Else
+                    For Each s As String In cp.MODFACGroups.Collection.Keys
+                        If s = group.Secondary_Group Then
+                            res.Add(group.Secondary_Group, cp.MODFACGroups.Collection(s))
+                            Exit For
+                        End If
+                    Next
+                End If
             Next
 
             Return res
@@ -354,62 +368,56 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
     End Class
 
-    <System.Serializable()> Public Class ModfacGroups
+    <System.Serializable()> Public Class NistModfacGroups
 
         Public InteracParam_aij As System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))
         Public InteracParam_bij As System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))
         Public InteracParam_cij As System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))
-        Public InteracParam_aji As System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))
-        Public InteracParam_bji As System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))
-        Public InteracParam_cji As System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))
 
-        Protected m_groups As System.Collections.Generic.SortedDictionary(Of Integer, ModfacGroup)
+        Protected m_groups As System.Collections.Generic.Dictionary(Of Integer, ModfacGroup)
 
         Sub New()
 
             Dim pathsep = System.IO.Path.DirectorySeparatorChar
 
-            m_groups = New System.Collections.Generic.SortedDictionary(Of Integer, ModfacGroup)
+            m_groups = New System.Collections.Generic.Dictionary(Of Integer, ModfacGroup)
             InteracParam_aij = New System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))
             InteracParam_bij = New System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))
             InteracParam_cij = New System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))
-            InteracParam_aji = New System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))
-            InteracParam_bji = New System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))
-            InteracParam_cji = New System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))
 
             Dim cult As Globalization.CultureInfo = New Globalization.CultureInfo("en-US")
-
             Dim fields As String()
-            Dim delimiter As String = ";"
-            Using stream As IO.Stream = New IO.MemoryStream(My.Resources.modfac)
+            Dim delimiter As String = vbTab
+            Dim maingroup As Integer = 1
+            Dim mainname As String = ""
+
+            Using stream As IO.Stream = New IO.MemoryStream(My.Resources.NIST_MODFAC_RiQi)
                 Using reader As New IO.StreamReader(stream)
                     Using parser As New TextFieldParser(reader)
-                            parser.SetDelimiters(delimiter)
+                        parser.SetDelimiters(delimiter)
+                        parser.ReadLine()
+                        parser.ReadLine()
+                        Dim i As Integer = 1
+                        parser.SetDelimiters(delimiter)
+                        While Not parser.EndOfData
                             fields = parser.ReadFields()
-                            While Not parser.EndOfData
-                                fields = parser.ReadFields()
-                                Me.Groups.Add(fields(3), New ModfacGroup(fields(2), fields(1), fields(0), fields(3), Double.Parse(fields(4), cult), Double.Parse(fields(5), cult)))
-                            End While
-                        End Using
+                            If fields(0).StartsWith("(") Then
+                                maingroup = fields(0).Split(")")(0).Substring(1)
+                                mainname = fields(0).Trim().Split(")")(1).Trim
+                            Else
+                                'Me.Groups.Add(i, New ModfacGroup(fields(1), mainname, maingroup, fields(0), Double.Parse(fields(3), cult), Double.Parse(fields(2), cult)))
+                                Me.Groups.Add(fields(0), New ModfacGroup(fields(1), mainname, maingroup, fields(0), Double.Parse(fields(2), cult), Double.Parse(fields(3), cult)))
+                                i += 1
+                            End If
+                        End While
                     End Using
                 End Using
+            End Using
 
-            Using stream As IO.Stream = New IO.MemoryStream(My.Resources.modfac_ip)
+            Using stream As IO.Stream = New IO.MemoryStream(My.Resources.NIST_MODFAC_IP)
                 Using reader As New IO.StreamReader(stream)
                     Using parser As New TextFieldParser(reader)
-                        delimiter = " "
                         parser.SetDelimiters(delimiter)
-                        fields = parser.ReadFields()
-                        fields = parser.ReadFields()
-                        fields = parser.ReadFields()
-                        fields = parser.ReadFields()
-                        fields = parser.ReadFields()
-                        fields = parser.ReadFields()
-                        fields = parser.ReadFields()
-                        fields = parser.ReadFields()
-                        fields = parser.ReadFields()
-                        fields = parser.ReadFields()
-                        fields = parser.ReadFields()
                         fields = parser.ReadFields()
                         While Not parser.EndOfData
                             fields = parser.ReadFields()
@@ -419,28 +427,16 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                                 Me.InteracParam_bij.Add(fields(0), New System.Collections.Generic.Dictionary(Of Integer, Double))
                                 Me.InteracParam_bij(fields(0)).Add(fields(1), Double.Parse(fields(3), cult))
                                 Me.InteracParam_cij.Add(fields(0), New System.Collections.Generic.Dictionary(Of Integer, Double))
-                                Me.InteracParam_cij(fields(0)).Add(fields(1), Double.Parse(fields(4), cult))
-                                Me.InteracParam_aji.Add(fields(0), New System.Collections.Generic.Dictionary(Of Integer, Double))
-                                Me.InteracParam_aji(fields(0)).Add(fields(1), Double.Parse(fields(5), cult))
-                                Me.InteracParam_bji.Add(fields(0), New System.Collections.Generic.Dictionary(Of Integer, Double))
-                                Me.InteracParam_bji(fields(0)).Add(fields(1), Double.Parse(fields(6), cult))
-                                Me.InteracParam_cji.Add(fields(0), New System.Collections.Generic.Dictionary(Of Integer, Double))
-                                Me.InteracParam_cji(fields(0)).Add(fields(1), Double.Parse(fields(7), cult))
+                                Me.InteracParam_cij(fields(0)).Add(fields(1), Double.Parse(fields(4), cult) / 1000)
                             Else
                                 If Not Me.InteracParam_aij(fields(0)).ContainsKey(fields(1)) Then
                                     Me.InteracParam_aij(fields(0)).Add(fields(1), Double.Parse(fields(2), cult))
                                     Me.InteracParam_bij(fields(0)).Add(fields(1), Double.Parse(fields(3), cult))
-                                    Me.InteracParam_cij(fields(0)).Add(fields(1), Double.Parse(fields(4), cult))
-                                    Me.InteracParam_aji(fields(0)).Add(fields(1), Double.Parse(fields(5), cult))
-                                    Me.InteracParam_bji(fields(0)).Add(fields(1), Double.Parse(fields(6), cult))
-                                    Me.InteracParam_cji(fields(0)).Add(fields(1), Double.Parse(fields(7), cult))
+                                    Me.InteracParam_cij(fields(0)).Add(fields(1), Double.Parse(fields(4), cult) / 1000)
                                 Else
                                     Me.InteracParam_aij(fields(0))(fields(1)) = Double.Parse(fields(2), cult)
                                     Me.InteracParam_bij(fields(0))(fields(1)) = Double.Parse(fields(3), cult)
-                                    Me.InteracParam_cij(fields(0))(fields(1)) = Double.Parse(fields(4), cult)
-                                    Me.InteracParam_aji(fields(0))(fields(1)) = Double.Parse(fields(5), cult)
-                                    Me.InteracParam_bji(fields(0))(fields(1)) = Double.Parse(fields(6), cult)
-                                    Me.InteracParam_cji(fields(0))(fields(1)) = Double.Parse(fields(7), cult)
+                                    Me.InteracParam_cij(fields(0))(fields(1)) = Double.Parse(fields(4), cult) / 1000
                                 End If
                             End If
                         End While
@@ -450,91 +446,11 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         End Sub
 
-        Public ReadOnly Property Groups() As System.Collections.Generic.SortedDictionary(Of Integer, ModfacGroup)
+        Public ReadOnly Property Groups() As System.Collections.Generic.Dictionary(Of Integer, ModfacGroup)
             Get
                 Return m_groups
             End Get
         End Property
-
-    End Class
-
-    <System.Serializable()> Public Class ModfacGroup
-
-        Protected m_groupname As String
-        Protected m_maingroupname As String
-
-        Protected m_main_group As Integer
-        Protected m_secondary_group As Integer
-
-        Protected m_r As Double
-        Protected m_q As Double
-
-        Public Property MainGroupName() As String
-            Get
-                Return m_maingroupname
-            End Get
-            Set(ByVal value As String)
-                m_maingroupname = value
-            End Set
-        End Property
-
-
-        Public Property GroupName() As String
-            Get
-                Return m_groupname
-            End Get
-            Set(ByVal value As String)
-                m_groupname = value
-            End Set
-        End Property
-
-        Public Property PrimaryGroup() As String
-            Get
-                Return m_main_group
-            End Get
-            Set(ByVal value As String)
-                m_main_group = value
-            End Set
-        End Property
-
-        Public Property Secondary_Group() As String
-            Get
-                Return m_secondary_group
-            End Get
-            Set(ByVal value As String)
-                m_secondary_group = value
-            End Set
-        End Property
-
-        Public Property R() As Double
-            Get
-                Return m_r
-            End Get
-            Set(ByVal value As Double)
-                m_r = value
-            End Set
-        End Property
-
-        Public Property Q() As Double
-            Get
-                Return m_q
-            End Get
-            Set(ByVal value As Double)
-                m_q = value
-            End Set
-        End Property
-
-        Sub New(ByVal Name As String, ByVal MainName As String, ByVal PrimGroup As String, ByVal SecGroup As String, ByVal R As Double, ByVal Q As Double)
-            Me.GroupName = Name
-            Me.MainGroupName = MainName
-            Me.PrimaryGroup = PrimGroup
-            Me.Secondary_Group = SecGroup
-            Me.R = R
-            Me.Q = Q
-        End Sub
-
-        Sub New()
-        End Sub
 
     End Class
 

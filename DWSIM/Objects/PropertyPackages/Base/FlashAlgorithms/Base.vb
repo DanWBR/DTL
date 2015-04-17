@@ -1,7 +1,7 @@
-﻿'    Flash Algorithm Abstract Base Class
-'    Copyright 2010 Daniel Wagner O. de Medeiros
+'    Flash Algorithm Abstract Base Class
+'    Copyright 2010-2014 Daniel Wagner O. de Medeiros
 '
-'    This file is part of DTL.
+'    This file is part of DWSIM.
 '
 '    DWSIM is free software: you can redistribute it and/or modify
 '    it under the terms of the GNU General Public License as published by
@@ -14,10 +14,11 @@
 '    GNU General Public License for more details.
 '
 '    You should have received a copy of the GNU General Public License
-'    along with DTL.  If not, see <http://www.gnu.org/licenses/>.
+'    along with DWSIM.  If not, see <http://www.gnu.org/licenses/>.
 
 Imports System.Math
 Imports System.Threading.Tasks
+Imports DTL.DTL.SimulationObjects.PropertyPackages.ThermoPlugs
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
@@ -27,14 +28,21 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
     ''' <remarks></remarks>
     <System.Serializable()> Public MustInherit Class FlashAlgorithm
 
-        Public StabSearchSeverity As Integer = 0
-        Public StabSearchCompIDs As String() = New String() {}
+        Public Property StabSearchSeverity As Integer = 0
+        Public Property StabSearchCompIDs As String() = New String() {}
 
         Private _P As Double, _Vz, _Vx1est, _Vx2est As Double(), _pp As PropertyPackage
 
         Sub New()
 
         End Sub
+
+        Public Sub WriteDebugInfo(text As String)
+
+            DTL.App.WriteToConsole(text, 1)
+
+        End Sub
+
 
         Public MustOverride Function Flash_PT(ByVal Vz As Double(), ByVal P As Double, ByVal T As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
 
@@ -134,11 +142,14 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
         Public Function StabTest(ByVal T As Double, ByVal P As Double, ByVal Vz As Array, ByVal pp As PropertyPackage, Optional ByVal VzArray(,) As Double = Nothing, Optional ByVal searchseverity As Integer = 0)
 
+            WriteDebugInfo("Starting Liquid Phase Stability Test @ T = " & T & " K & P = " & P & " Pa for the following trial phases:")
+
             Dim i, j, c, n, o, l, nt, maxits As Integer
             n = UBound(Vz)
             nt = UBound(VzArray, 1)
 
             Dim Y, K As Double(,), tol As Double
+            Dim fcv(n), fcl(n) As Double
 
             Select Case searchseverity
                 Case 0
@@ -156,9 +167,14 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
             End Select
 
             For i = 0 To nt
+                Dim text As String = "{"
                 For j = 0 To n
                     Y(i, j) = VzArray(i, j)
+                    text += VzArray(i, j).ToString & vbTab
                 Next
+                text.TrimEnd(New Char() {vbTab})
+                text += "}"
+                WriteDebugInfo(text)
             Next
 
             ReDim K(0, n)
@@ -167,56 +183,48 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
             Dim h(n), lnfi_z(n), Y_ant(m, n) As Double
 
-            Dim gl, hl, sl, gv, hv, sv As Double
+            Dim gl, gv As Double
 
             If My.MyApplication._EnableParallelProcessing Then
                 My.MyApplication.IsRunningParallelTasks = True
                 If My.MyApplication._EnableGPUProcessing Then
-                    My.MyApplication.gpu.EnableMultithreading()
+                    'My.MyApplication.gpu.EnableMultithreading()
                 End If
                 Try
                     Dim task1 As Task = New Task(Sub()
-                                                     hl = pp.DW_CalcEnthalpy(Vz, T, P, State.Liquid)
+                                                     fcv = pp.DW_CalcFugCoeff(Vz, T, P, State.Vapor)
                                                  End Sub)
                     Dim task2 As Task = New Task(Sub()
-                                                     sl = pp.DW_CalcEntropy(Vz, T, P, State.Liquid)
-                                                 End Sub)
-                    Dim task3 As Task = New Task(Sub()
-                                                     hv = pp.DW_CalcEnthalpy(Vz, T, P, State.Vapor)
-                                                 End Sub)
-                    Dim task4 As Task = New Task(Sub()
-                                                     sv = pp.DW_CalcEntropy(Vz, T, P, State.Vapor)
+                                                     fcl = pp.DW_CalcFugCoeff(Vz, T, P, State.Liquid)
                                                  End Sub)
                     task1.Start()
                     task2.Start()
-                    task3.Start()
-                    task4.Start()
-                    Task.WaitAll(task1, task2, task3, task4)
+                    Task.WaitAll(task1, task2)
                 Catch ae As AggregateException
-                    For Each ex As Exception In ae.InnerExceptions
-                        Throw ex
-                    Next
+                    Throw ae.Flatten().InnerException
                 Finally
-                    If My.MyApplication._EnableGPUProcessing Then
-                        My.MyApplication.gpu.DisableMultithreading()
-                        My.MyApplication.gpu.FreeAll()
-                    End If
+                    'If My.MyApplication._EnableGPUProcessing Then
+                    '    My.MyApplication.gpu.DisableMultithreading()
+                    '    My.MyApplication.gpu.FreeAll()
+                    'End If
                 End Try
                 My.MyApplication.IsRunningParallelTasks = False
             Else
-                hl = pp.DW_CalcEnthalpy(Vz, T, P, State.Liquid)
-                sl = pp.DW_CalcEntropy(Vz, T, P, State.Liquid)
-                hv = pp.DW_CalcEnthalpy(Vz, T, P, State.Vapor)
-                sv = pp.DW_CalcEntropy(Vz, T, P, State.Vapor)
+                fcv = pp.DW_CalcFugCoeff(Vz, T, P, State.Vapor)
+                fcl = pp.DW_CalcFugCoeff(Vz, T, P, State.Liquid)
             End If
 
-            gl = hl - T * sl
-            gv = hv - T * sv
+            gv = 0.0#
+            gl = 0.0#
+            For i = 0 To n
+                If Vz(i) <> 0.0# Then gv += Vz(i) * Log(fcv(i) * Vz(i))
+                If Vz(i) <> 0.0# Then gl += Vz(i) * Log(fcl(i) * Vz(i))
+            Next
 
             If gl <= gv Then
-                lnfi_z = pp.DW_CalcFugCoeff(Vz, T, P, State.Liquid)
+                lnfi_z = fcl
             Else
-                lnfi_z = pp.DW_CalcFugCoeff(Vz, T, P, State.Vapor)
+                lnfi_z = fcv
             End If
 
             For i = 0 To n
@@ -244,7 +252,11 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                     Loop Until i = n + 1
                     i = 0
                     Do
-                        Y(nt + 1, i) = sum0(i) / UBound(VzArray, 1)
+                        If Vz(i) <> 0.0# Then
+                            Y(nt + 1, i) = sum0(i) / UBound(VzArray, 1)
+                        Else
+                            Y(n + 1, i) = 0.0#
+                        End If
                         i = i + 1
                     Loop Until i = n + 1
                 End If
@@ -262,15 +274,23 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                     Loop Until i = n + 1
                     i = 0
                     Do
-                        Y(nt + 1, i) = sum0(i) / UBound(VzArray, 1)
-                        Y(nt + 2, i) = Exp(h(i))
+                        If Vz(i) <> 0.0# Then
+                            Y(nt + 1, i) = sum0(i) / UBound(VzArray, 1)
+                            Y(nt + 2, i) = Exp(h(i))
+                        Else
+                            Y(n + 1, i) = 0.0#
+                        End If
                         i = i + 1
                     Loop Until i = n + 1
                 End If
             Else
                 i = 0
                 Do
-                    Y(n + 1, i) = Exp(h(i))
+                    If Vz(i) <> 0.0# Then
+                        Y(n + 1, i) = Exp(h(i))
+                    Else
+                        Y(n + 1, i) = 0.0#
+                    End If
                     i = i + 1
                 Loop Until i = n + 1
             End If
@@ -303,51 +323,43 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                         If My.MyApplication._EnableParallelProcessing Then
                             My.MyApplication.IsRunningParallelTasks = True
                             If My.MyApplication._EnableGPUProcessing Then
-                                My.MyApplication.gpu.EnableMultithreading()
+                                '   My.MyApplication.gpu.EnableMultithreading()
                             End If
                             Try
                                 Dim task1 As Task = New Task(Sub()
-                                                                 hl = pp.DW_CalcEnthalpy(currcomp, T, P, State.Liquid)
+                                                                 fcv = pp.DW_CalcFugCoeff(currcomp, T, P, State.Vapor)
                                                              End Sub)
                                 Dim task2 As Task = New Task(Sub()
-                                                                 sl = pp.DW_CalcEntropy(currcomp, T, P, State.Liquid)
-                                                             End Sub)
-                                Dim task3 As Task = New Task(Sub()
-                                                                 hv = pp.DW_CalcEnthalpy(currcomp, T, P, State.Vapor)
-                                                             End Sub)
-                                Dim task4 As Task = New Task(Sub()
-                                                                 sv = pp.DW_CalcEntropy(currcomp, T, P, State.Vapor)
+                                                                 fcl = pp.DW_CalcFugCoeff(currcomp, T, P, State.Liquid)
                                                              End Sub)
                                 task1.Start()
                                 task2.Start()
-                                task3.Start()
-                                task4.Start()
-                                Task.WaitAll(task1, task2, task3, task4)
+                                Task.WaitAll(task1, task2)
                             Catch ae As AggregateException
-                                For Each ex As Exception In ae.InnerExceptions
-                                    Throw ex
-                                Next
-                            Finally
-                                If My.MyApplication._EnableGPUProcessing Then
-                                    My.MyApplication.gpu.DisableMultithreading()
-                                    My.MyApplication.gpu.FreeAll()
-                                End If
+                                Throw ae.Flatten().InnerException
+                                'Finally
+                                '    If My.MyApplication._EnableGPUProcessing Then
+                                '        My.MyApplication.gpu.DisableMultithreading()
+                                '        My.MyApplication.gpu.FreeAll()
+                                '    End If
                             End Try
                             My.MyApplication.IsRunningParallelTasks = False
                         Else
-                            hl = pp.DW_CalcEnthalpy(currcomp, T, P, State.Liquid)
-                            sl = pp.DW_CalcEntropy(currcomp, T, P, State.Liquid)
-                            hv = pp.DW_CalcEnthalpy(currcomp, T, P, State.Vapor)
-                            sv = pp.DW_CalcEntropy(currcomp, T, P, State.Vapor)
+                            fcv = pp.DW_CalcFugCoeff(currcomp, T, P, State.Vapor)
+                            fcl = pp.DW_CalcFugCoeff(currcomp, T, P, State.Liquid)
                         End If
 
-                        gl = hl - T * sl
-                        gv = hv - T * sv
+                        gv = 0.0#
+                        gl = 0.0#
+                        For j = 0 To n
+                            If currcomp(j) <> 0.0# Then gv += currcomp(j) * Log(fcv(j) * currcomp(j))
+                            If currcomp(j) <> 0.0# Then gl += currcomp(j) * Log(fcl(j) * currcomp(j))
+                        Next
 
                         If gl <= gv Then
-                            tmpfug = pp.DW_CalcFugCoeff(currcomp, T, P, State.Liquid)
+                            tmpfug = fcl
                         Else
-                            tmpfug = pp.DW_CalcFugCoeff(currcomp, T, P, State.Vapor)
+                            tmpfug = fcv
                         End If
 
                         j = 0
@@ -420,7 +432,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
                 c = c + 1
 
-                If c > maxits Then Throw New Exception("Stability Test: Maximum Iterations Reached.")
+                If c > maxits Then Throw New Exception("Liquid Phase Stability Test: Maximum Iterations Reached.")
 
             Loop Until finish = True
 
@@ -504,11 +516,20 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
                 'normalize initial estimates
 
+                WriteDebugInfo("Liquid Phase Stability Test finished. Phase is NOT stable. Initial estimates for incipient liquid phase composition:")
+
+                For i = 0 To nt
+                    For j = 0 To n
+                        Y(i, j) = VzArray(i, j)
+                    Next
+                Next
+
                 Dim inest(m - l, n) As Double
                 i = 0
                 l = 0
                 Do
                     If Not excidx.Contains(i) Then
+                        Dim text As String = "{"
                         j = 0
                         sum2 = 0
                         Do
@@ -518,8 +539,12 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                         j = 0
                         Do
                             inest(l, j) = Y(i, j) / sum2
+                            text += inest(l, j).ToString & vbTab
                             j = j + 1
                         Loop Until j = n + 1
+                        text.TrimEnd(New Char() {vbTab})
+                        text += "}"
+                        WriteDebugInfo(text)
                         l = l + 1
                     End If
                     i = i + 1
@@ -529,12 +554,13 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
                 'the phase is stable
 
+                WriteDebugInfo("Liquid Phase Stability Test finished. Phase is stable.")
+
                 isStable = True
                 Return New Object() {isStable, Nothing}
             End If
 
         End Function
-
 
         ''' <summary>
         ''' This algorithm returns the state of a fluid given its composition and system conditions.
@@ -553,19 +579,38 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
         ''' Keywords: Phase identification; Multiphase equilibria; Process simulators</remarks>
         Public Shared Function IdentifyPhase(Vx As Double(), P As Double, T As Double, pp As PropertyPackage, ByVal eos As String) As String
 
-            Dim TAU, Tinv As Double, newphase As String, tmp As Double()
+            Dim PIP, Tinv As Double, newphase As String, tmp As Double()
 
-            tmp = CalcTAU(Vx, P, T, pp, eos)
+            tmp = CalcPIP(Vx, P, T, pp, eos)
 
-            TAU = tmp(0)
+            PIP = tmp(0)
             Tinv = tmp(1)
 
             If Tinv < 500 Then
-                Dim fx, dfdx As Double
+                Dim fx, fx2, dfdx As Double
                 Dim i As Integer = 0
                 Do
-                    fx = 1 - CalcTAU(Vx, P, Tinv, pp, eos)(0)
-                    dfdx = (fx - (1 - CalcTAU(Vx, P, Tinv - 1, pp, eos)(0)))
+                    If My.MyApplication._EnableParallelProcessing Then
+                        My.MyApplication.IsRunningParallelTasks = True
+                        Try
+                            Dim task1 As Task = New Task(Sub()
+                                                             fx = 1 - CalcPIP(Vx, P, Tinv, pp, eos)(0)
+                                                         End Sub)
+                            Dim task2 As Task = New Task(Sub()
+                                                             fx2 = 1 - CalcPIP(Vx, P, Tinv - 1, pp, eos)(0)
+                                                         End Sub)
+                            task1.Start()
+                            task2.Start()
+                            Task.WaitAll(task1, task2)
+                        Catch ae As AggregateException
+                            Throw ae.Flatten().InnerException
+                        End Try
+                        My.MyApplication.IsRunningParallelTasks = False
+                    Else
+                        fx = 1 - CalcPIP(Vx, P, Tinv, pp, eos)(0)
+                        fx2 = 1 - CalcPIP(Vx, P, Tinv - 1, pp, eos)(0)
+                    End If
+                    dfdx = (fx - fx2)
                     Tinv = Tinv - fx / dfdx
                     i += 1
                 Loop Until Math.Abs(fx) < 0.000001 Or i = 25
@@ -574,9 +619,9 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
             If Double.IsNaN(Tinv) Or Double.IsInfinity(Tinv) Then Tinv = 2000
 
             If T > Tinv Then
-                If TAU > 1 Then newphase = "V" Else newphase = "L"
+                If PIP > 1 Then newphase = "V" Else newphase = "L"
             Else
-                If TAU > 1 Then newphase = "L" Else newphase = "V"
+                If PIP > 1 Then newphase = "L" Else newphase = "V"
             End If
 
             Return newphase
@@ -584,7 +629,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
         End Function
 
         ''' <summary>
-        ''' This algorithm returns the TAU parameter for a fluid given its composition and system conditions.
+        ''' This algorithm returns the Phase Identification (PI) parameter for a fluid given its composition and system conditions.
         ''' </summary>
         ''' <param name="Vx">Vector of mole fractions</param>
         ''' <param name="P">Pressure in Pa</param>
@@ -598,7 +643,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
         ''' 25 February 2011, Pages 225-233, ISSN 0378-3812, http://dx.doi.org/10.1016/j.fluid.2010.12.001.
         ''' (http://www.sciencedirect.com/science/article/pii/S0378381210005935)
         ''' Keywords: Phase identification; Multiphase equilibria; Process simulators</remarks>
-        Private Shared Function CalcTAU(Vx As Double(), P As Double, T As Double, pp As PropertyPackage, ByVal eos As String) As Double()
+        Private Shared Function CalcPIP(Vx As Double(), P As Double, T As Double, pp As PropertyPackage, ByVal eos As String) As Double()
 
             Dim g1, g2, g3, g4, g5, g6, t1, t2, v, a, b, dadT, R As Double, tmp As Double()
 
@@ -633,15 +678,38 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
             d2Pdv2 = 2 * R * T * g1 ^ 3 - 2 * a * g6 * (g2 ^ 2 + g6 + g3 ^ 2)
             dPdv = -R * T * g1 ^ 2 + a * g4 * g6
 
-            Dim TAU As Double
+            Dim PIP As Double
 
-            TAU = v * (d2PdvdT / dPdT - d2Pdv2 / dPdv)
+            PIP = v * (d2PdvdT / dPdT - d2Pdv2 / dPdv)
 
             Dim Tinv As Double
 
             Tinv = 2 * a * (v - b) ^ 2 / (R * b * v ^ 2)
 
-            Return New Double() {TAU, Tinv}
+            Return New Double() {PIP, Tinv}
+
+        End Function
+
+        Public Shared Function CalcPIPressure(Vx As Double(), Pest As Double, T As Double, pp As PropertyPackage, ByVal eos As String) As String
+
+            Dim P, PIP As Double
+
+            Dim brent As New MathEx.BrentOpt.Brent
+            brent.DefineFuncDelegate(AddressOf PIPressureF)
+
+            P = brent.BrentOpt(101325, Pest, 100, 0.001, 1000, New Object() {Vx, T, pp, eos})
+
+            PIP = CalcPIP(Vx, P, T, pp, eos)(0)
+
+            If P < 0 Or Abs(P - Pest) <= (Pest - 101325) / 1000 Then P = 0.0#
+
+            Return P
+
+        End Function
+
+        Private Shared Function PIPressureF(x As Double, otherargs As Object)
+
+            Return 1 - CalcPIP(otherargs(0), x, otherargs(1), otherargs(2), otherargs(3))(0)
 
         End Function
 

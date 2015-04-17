@@ -1,7 +1,7 @@
 ﻿'    Peng-Robinson Property Package 
 '    Copyright 2008 Daniel Wagner O. de Medeiros
 '
-'    This file is part of DTL.
+'    This file is part of DWSIM.
 '
 '    DWSIM is free software: you can redistribute it and/or modify
 '    it under the terms of the GNU General Public License as published by
@@ -14,9 +14,9 @@
 '    GNU General Public License for more details.
 '
 '    You should have received a copy of the GNU General Public License
-'    along with DTL.  If not, see <http://www.gnu.org/licenses/>.
+'    along with DWSIM.  If not, see <http://www.gnu.org/licenses/>.
 Imports FileHelpers
-Imports System.Reflection
+Imports System.Linq
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
@@ -121,11 +121,11 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Loop Until i = n + 1
 
             i = 0
-            Dim Vcm = 0
-            Dim wm = 0
-            Dim Zcm = 0
-            Dim MMm = 0
-            Dim ZRam = 0
+            Dim Vcm = 0.0#
+            Dim wm = 0.0#
+            Dim Zcm = 0.0#
+            Dim MMm = 0.0#
+            Dim ZRam = 0.0#
             Do
                 If Vz(i) <> 0 Then
                     Vcm += Vz(i) * Vc(i)
@@ -138,7 +138,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Loop Until i = n + 1
 
             i = 0
-            Dim Tcm = 0
+            Dim Tcm = 0.0#
             Do
                 j = 0
                 Do
@@ -150,7 +150,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
             Dim Pcm = Zcm * R * Tcm / (Vcm)
 
-            Dim V = 0
+            Dim V = 0.0#
             If TIPO = "L" Then
 
                 V = (Z_PR(T, P, Vz, VKij, VTc, VPc, Vw, "L") * R * T / P) * 1000 ' m3/kgmol
@@ -201,6 +201,9 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         Function Z_PR(ByVal T, ByVal P, ByVal Vx, ByVal VKij, ByVal VTc, ByVal VPc, ByVal Vw, ByVal TIPO)
 
+            DTL.App.WriteToConsole("PR cubic equation root finder (Z) for T = " & T & " K, P = " & P & " Pa and Phase = " & TIPO, 3)
+            DTL.App.WriteToConsole("Mole fractions: " & DirectCast(Vx, Double()).ToArrayString, 3)
+
             Dim ai(), bi(), aml2(), amv2() As Double
             Dim n, R, coeff(3), tmp() As Double
             Dim Tc(), Pc(), W(), alpha(), Vant(0, 4), m(), a(,), b(,), Tr() As Double
@@ -248,7 +251,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Loop Until i = n + 1
 
             i = 0
-            Dim aml = 0
+            Dim aml = 0.0#
             Do
                 j = 0
                 Do
@@ -260,7 +263,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Loop Until i = n + 1
 
             i = 0
-            Dim bml = 0
+            Dim bml = 0.0#
             Do
                 bml = bml + Vx(i) * bi(i)
                 i = i + 1
@@ -275,8 +278,8 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             coeff(3) = 1
 
             Dim temp1 = Poly_Roots(coeff)
-            Dim tv = 0
-            Dim ZV, tv2
+            Dim tv = 0.0#
+            Dim ZV, tv2 As Double
 
             If Not IsNumeric(temp1) Then
 
@@ -336,6 +339,8 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                 Z_PR = temp1(2, 0)
             End If
 
+            DTL.App.WriteToConsole("Result: Z = " & Z_PR, 3)
+
         End Function
 
         Function H_PR(ByVal TIPO As String, ByVal T As Double, ByVal P As Double, ByVal Tc As Double, ByVal Pc As Double, ByVal w As Double, ByVal MM As Double, Optional ByVal ZRa As Double = 0) As Double
@@ -371,7 +376,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             coeff(3) = 1
 
             Dim temp1 = Poly_Roots(coeff)
-            Dim tv = 0
+            Dim tv = 0.0#
 
             If temp1(0, 0) > temp1(1, 0) Then
                 tv = temp1(1, 0)
@@ -389,7 +394,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                 temp1(1, 0) = tv
             End If
 
-            Dim Z = 0
+            Dim Z = 0.0#
 
             If TIPO = "L" Then
                 Z = temp1(0, 0)
@@ -397,7 +402,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                 Z = temp1(2, 0)
             End If
 
-            Dim V = 0
+            Dim V = 0.0#
             If TIPO = "L" Then
 
                 V = (Z * R * T / P) ' m3/mol
@@ -417,6 +422,166 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
         End Function
 
         Function H_PR_MIX(ByVal TIPO As String, ByVal T As Double, ByVal P As Double, ByVal Vz As Object, ByVal VKij As Object, ByVal VTc As Object, ByVal VPc As Object, ByVal Vw As Object, ByVal VMM As Object, ByVal Hid As Double) As Double
+
+            Dim H As Double = 0.0#
+            'If My.Settings.EnableGPUProcessing Then
+            '    H = H_PR_MIX_GPU(TIPO, T, P, Vz, VKij, VTc, VPc, Vw, VMM, Hid)
+            'Else
+            H = H_PR_MIX_CPU(TIPO, T, P, Vz, VKij, VTc, VPc, Vw, VMM, Hid)
+            'End If
+
+            Return H
+
+        End Function
+
+        Function H_PR_MIX_GPU(ByVal TIPO As String, ByVal T As Double, ByVal P As Double, ByVal Vz As Object, ByVal VKij As Object, ByVal VTc As Object, ByVal VPc As Object, ByVal Vw As Object, ByVal VMM As Object, ByVal Hid As Double) As Double
+
+            Dim ai(), bi(), ci(), am, bm As Double
+            Dim n, R As Double
+            Dim Tc(), Pc(), Vc(), w(), Zc(), alpha(), m(), a(,), b(,), Z, Tr() As Double
+            Dim i, j, dadT
+
+            n = UBound(Vz)
+
+            ReDim ai(n), bi(n), ci(n), a(n, n), b(n, n)
+            ReDim Tc(n), Pc(n), Vc(n), Zc(n), w(n), alpha(n), m(n), Tr(n)
+
+            R = 8.314
+
+            i = 0
+            Do
+                Tc(i) = VTc(i)
+                Tr(i) = T / Tc(i)
+                Pc(i) = VPc(i)
+                w(i) = Vw(i)
+                i = i + 1
+            Loop Until i = n + 1
+
+            i = 0
+            Dim MMm = 0.0#
+            Do
+                MMm += Vz(i) * VMM(i)
+                i += 1
+            Loop Until i = n + 1
+
+            Dim aml_temp(n), aml2_temp(n), bml_temp(n) As Double
+
+            ThermoPlugs.PR.pr_gpu_func(n, Vz, VKij, Tc, Pc, w, T, alpha, ai, bi, a, aml_temp, bml_temp, aml2_temp)
+
+            am = aml_temp.Sum()
+            bm = bml_temp.Sum()
+
+            Dim AG1 = am * P / (R * T) ^ 2
+            Dim BG1 = bm * P / (R * T)
+
+            Dim coeff(3) As Double
+
+            coeff(0) = -AG1 * BG1 + BG1 ^ 2 + BG1 ^ 3
+            coeff(1) = AG1 - 3 * BG1 ^ 2 - 2 * BG1
+            coeff(2) = BG1 - 1
+            coeff(3) = 1
+
+            Dim temp1 = Poly_Roots(coeff)
+            Dim tv
+            Dim tv2
+
+            If Not IsNumeric(temp1) Then
+
+                If temp1(0, 0) > temp1(1, 0) Then
+                    tv = temp1(1, 0)
+                    tv2 = temp1(1, 1)
+                    temp1(1, 0) = temp1(0, 0)
+                    temp1(0, 0) = tv
+                    temp1(1, 1) = temp1(0, 1)
+                    temp1(0, 1) = tv2
+                End If
+                If temp1(0, 0) > temp1(2, 0) Then
+                    tv = temp1(2, 0)
+                    temp1(2, 0) = temp1(0, 0)
+                    temp1(0, 0) = tv
+                    tv2 = temp1(2, 1)
+                    temp1(2, 1) = temp1(0, 1)
+                    temp1(0, 1) = tv2
+                End If
+                If temp1(1, 0) > temp1(2, 0) Then
+                    tv = temp1(2, 0)
+                    temp1(2, 0) = temp1(1, 0)
+                    temp1(1, 0) = tv
+                    tv2 = temp1(2, 1)
+                    temp1(2, 1) = temp1(1, 1)
+                    temp1(1, 1) = tv2
+                End If
+
+                If TIPO = "L" Then
+                    Z = temp1(0, 0)
+                    If temp1(0, 1) <> 0 Then
+                        Z = temp1(1, 0)
+                        If temp1(1, 1) <> 0 Then
+                            Z = temp1(2, 0)
+                        End If
+                    End If
+                    If Z < 0 Then Z = temp1(1, 0)
+                ElseIf TIPO = "V" Then
+                    Z = temp1(2, 0)
+                    If temp1(2, 1) <> 0 Then
+                        Z = temp1(1, 0)
+                        If temp1(1, 1) <> 0 Then
+                            Z = temp1(0, 0)
+                        End If
+                    End If
+                End If
+
+            Else
+
+                Dim findZV, dfdz, zant As Double
+                If TIPO = "V" Then Z = 1 Else Z = 0.05
+                Do
+                    findZV = coeff(3) * Z ^ 3 + coeff(2) * Z ^ 2 + coeff(1) * Z + coeff(0)
+                    dfdz = 3 * coeff(3) * Z ^ 2 + 2 * coeff(2) * Z + coeff(1)
+                    zant = Z
+                    Z = Z - findZV / dfdz
+                    If Z < 0 Then Z = 1
+                Loop Until Math.Abs(findZV) < 0.0001 Or Double.IsNaN(Z)
+
+
+            End If
+
+            Dim V = (Z * R * T / P) ' m3/mol
+
+            Dim tmp1 = MMm / V / 1000
+
+            Dim aux1 = -R / 2 * (0.45724 / T) ^ 0.5
+            i = 0
+            Dim aux2 = 0.0#
+            Do
+                j = 0
+                Do
+                    aux2 += Vz(i) * Vz(j) * (1 - VKij(i, j)) * ((0.37464 + 1.54226 * w(i) - 0.26992 * w(i) ^ 2) * (ai(i) * Tc(j) / Pc(j)) ^ 0.5 + (0.37464 + 1.54226 * w(i) - 0.26992 * w(i) ^ 2) * (ai(j) * Tc(i) / Pc(i)) ^ 0.5)
+                    j = j + 1
+                Loop Until j = n + 1
+                i = i + 1
+            Loop Until i = n + 1
+
+            dadT = aux1 * aux2
+
+            Dim uu, ww As Double
+            uu = 2
+            ww = -1
+
+            Dim DAres = am / (bm * (uu ^ 2 - 4 * ww) ^ 0.5) * Math.Log((2 * Z + BG1 * (uu - (uu ^ 2 - 4 * ww) ^ 0.5)) / (2 * Z + BG1 * (uu + (uu ^ 2 - 4 * ww) ^ 0.5))) - R * T * Math.Log((Z - BG1) / Z) - R * T * Math.Log(Z)
+            Dim V0 As Double = R * 298.15 / 101325
+            Dim DSres = R * Math.Log((Z - BG1) / Z) + R * Math.Log(Z) - 1 / (8 ^ 0.5 * bm) * dadT * Math.Log((2 * Z + BG1 * (2 - 8 ^ 0.5)) / (2 * Z + BG1 * (2 + 8 ^ 0.5)))
+            Dim DHres = DAres + T * (DSres) + R * T * (Z - 1)
+
+            If MathEx.Common.Sum(Vz) = 0.0# Then
+                Return 0.0#
+            Else
+                Return Hid + DHres / MMm '/ 1000
+            End If
+
+        End Function
+
+        Function H_PR_MIX_CPU(ByVal TIPO As String, ByVal T As Double, ByVal P As Double, ByVal Vz As Object, ByVal VKij As Object, ByVal VTc As Object, ByVal VPc As Object, ByVal Vw As Object, ByVal VMM As Object, ByVal Hid As Double) As Double
 
             Dim ai(), bi(), ci() As Double
             Dim n, R As Double
@@ -440,7 +605,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Loop Until i = n + 1
 
             i = 0
-            Dim MMm = 0
+            Dim MMm = 0.0#
             Do
                 MMm += Vz(i) * VMM(i)
                 i += 1
@@ -466,7 +631,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Loop Until i = n + 1
 
             i = 0
-            Dim am = 0
+            Dim am = 0.0#
             Do
                 j = 0
                 Do
@@ -477,7 +642,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Loop Until i = n + 1
 
             i = 0
-            Dim bm = 0
+            Dim bm = 0.0#
             Do
                 bm = bm + Vz(i) * bi(i)
                 i = i + 1
@@ -564,7 +729,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
             Dim aux1 = -R / 2 * (0.45724 / T) ^ 0.5
             i = 0
-            Dim aux2 = 0
+            Dim aux2 = 0.0#
             Do
                 j = 0
                 Do
@@ -585,7 +750,11 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Dim DSres = R * Math.Log((Z - BG1) / Z) + R * Math.Log(Z) - 1 / (8 ^ 0.5 * bm) * dadT * Math.Log((2 * Z + BG1 * (2 - 8 ^ 0.5)) / (2 * Z + BG1 * (2 + 8 ^ 0.5)))
             Dim DHres = DAres + T * (DSres) + R * T * (Z - 1)
 
-            H_PR_MIX = Hid + DHres / MMm '/ 1000
+            If MathEx.Common.Sum(Vz) = 0.0# Then
+                Return 0.0#
+            Else
+                Return Hid + DHres / MMm '/ 1000
+            End If
 
         End Function
 
@@ -613,7 +782,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Loop Until i = n + 1
 
             i = 0
-            Dim MMm = 0
+            Dim MMm = 0.0#
             Do
                 MMm += Vz(i) * VMM(i)
                 i += 1
@@ -639,7 +808,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Loop Until i = n + 1
 
             i = 0
-            Dim am = 0
+            Dim am = 0.0#
             Do
                 j = 0
                 Do
@@ -650,7 +819,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Loop Until i = n + 1
 
             i = 0
-            Dim bm = 0
+            Dim bm = 0.0#
             Do
                 bm = bm + Vz(i) * bi(i)
                 i = i + 1
@@ -669,8 +838,8 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             coeff(3) = 1
 
             Dim temp1 = Poly_Roots(coeff)
-            Dim tv = 0
-            Dim tv2 = 0
+            Dim tv = 0.0#
+            Dim tv2 = 0.0#
             If Not IsNumeric(temp1) Then
 
                 If temp1(0, 0) > temp1(1, 0) Then
@@ -736,7 +905,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
             Dim aux1 = -R / 2 * (0.45724 / T) ^ 0.5
             i = 0
-            Dim aux2 = 0
+            Dim aux2 = 0.0#
             Do
                 j = 0
                 Do
@@ -752,7 +921,11 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             'Dim DSres = R * Math.Log((Z - BG1) / Z) + R * Math.Log(V / V0) - 1 / (8 ^ 0.5 * bm) * dadT * Math.Log((2 * Z + BG1 * (2 - 8 ^ 0.5)) / (2 * Z + BG1 * (2 + 8 ^ 0.5)))
             Dim DSres = R * Math.Log((Z - BG1) / Z) + R * Math.Log(Z) - 1 / (8 ^ 0.5 * bm) * dadT * Math.Log((2 * Z + BG1 * (2 - 8 ^ 0.5)) / (2 * Z + BG1 * (2 + 8 ^ 0.5)))
 
-            S_PR_MIX = Sid + DSres / MMm '/ 1000
+            If MathEx.Common.Sum(Vz) = 0.0# Then
+                S_PR_MIX = 0.0#
+            Else
+                S_PR_MIX = Sid + DSres / MMm '/ 1000
+            End If
 
         End Function
 
@@ -974,7 +1147,7 @@ Final3:
                 coeff(3) = 1
 
                 Dim temp1 = Poly_Roots(coeff)
-                Dim tv = 0
+                Dim tv = 0.0#
                 Dim tv2
 
                 If Not IsNumeric(temp1) Then
@@ -1169,7 +1342,7 @@ Final3:
             coeff(3) = 1
 
             Dim temp1 = Poly_Roots(coeff)
-            Dim tv = 0
+            Dim tv = 0.0#
             Dim tv2
 
             If Not IsNumeric(temp1) Then
@@ -1240,16 +1413,7 @@ Final3:
                     2 * aml * rho * (1 + 2 * bml * rho - (bml * rho) ^ 2) ^ -1
 
             If TIPO = "L" Then
-                'Dim C0, C1 As Double
-                'rho_lim = Me.ESTIMAR_RhoLim(aml, bml, T, P)
-                'P_lim = R * T * rho_lim / (1 - rho_lim * bml) - aml * rho_lim ^ 2 / (1 + 2 * bml * rho_lim - (rho_lim * bml) ^ 2)
-                'C1 = (rho - 0.7 * rho_mc) * dPdrho
-                'C0 = P_lim - C1 * Math.Log(rho_lim - 0.7 * rho_mc)
-                'rho_calc = Math.Exp((P - C0) / C1) + 0.7 * rho_mc
-                'Pcalc = R * T * rho_calc / (1 - rho_calc * bml) - aml * rho_calc ^ 2 / (1 + 2 * bml * rho_calc - (rho_calc * bml) ^ 2)
-                'Zcalc = P / (rho_calc * R * T)
                 Zcalc = ZV
-                ' CALCULO DO COEFICIENTE DE FUGACIDADE DA FASE LIQUIDA
                 i = 0
                 Do
                     t1 = bi(i) * (Zcalc - 1) / bml
@@ -1263,17 +1427,7 @@ Final3:
                 Loop Until i = n + 1
                 Return LN_CF
             Else
-                'Dim aa, bb As Double
-                'rho_lim = Me.ESTIMAR_RhoLim(aml, bml, T, P)
-                'P_lim = R * T * rho_lim / (1 - rho_lim * bml) - aml * rho_lim ^ 2 / (1 + 2 * bml * rho_lim - (rho_lim * bml) ^ 2)
-                'rho_x = (rho_lim + rho_mc) / 2
-                'bb = 1 / P_lim * (1 / (rho_lim * (1 - rho_lim / rho_x)))
-                'aa = -bb / rho_x
-                'rho_calc = (1 / P + bb) / aa
-                'Pcalc = R * T * rho_calc / (1 - rho_calc * bml) - aml * rho_calc ^ 2 / (1 + 2 * bml * rho_calc - (rho_calc * bml) ^ 2)
-                'Zcalc = P / (rho_calc * R * T)
                 Zcalc = ZV
-                ' CALCULO DO COEFICIENTE DE FUGACIDADE DA FASE VAPOR
                 i = 0
                 Do
                     t1 = bi(i) * (Zcalc - 1) / bml

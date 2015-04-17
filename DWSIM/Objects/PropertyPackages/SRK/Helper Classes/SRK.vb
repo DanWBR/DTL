@@ -1,7 +1,7 @@
 ﻿'    SRK Property Package 
 '    Copyright 2008 Daniel Wagner O. de Medeiros
 '
-'    This file is part of DTL.
+'    This file is part of DWSIM.
 '
 '    DWSIM is free software: you can redistribute it and/or modify
 '    it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@
 '    GNU General Public License for more details.
 '
 '    You should have received a copy of the GNU General Public License
-'    along with DTL.  If not, see <http://www.gnu.org/licenses/>.
+'    along with DWSIM.  If not, see <http://www.gnu.org/licenses/>.
 Imports FileHelpers
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
@@ -72,6 +72,12 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             fh1 = Nothing
         End Sub
 
+        Function bi(ByVal omega As Double, ByVal Tc As Double, ByVal Pc As Double) As Double
+
+            Return omega * 8.314 * Tc / Pc
+
+        End Function
+
         Function Zc1(ByVal w As Double) As Double
 
             Zc1 = 0.291 - 0.08 * w
@@ -79,6 +85,9 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
         End Function
 
         Function Z_SRK(ByVal T, ByVal P, ByVal Vx, ByVal VKij, ByVal VTc, ByVal VPc, ByVal Vw, ByVal TIPO)
+
+            DTL.App.WriteToConsole("SRK cubic equation root finder (Z) for T = " & T & " K, P = " & P & " Pa and Phase = " & TIPO, 3)
+            DTL.App.WriteToConsole("Mole fractions: " & DirectCast(Vx, Double()).ToArrayString, 3)
 
             Dim ai(), bi(), aml2(), amv2() As Double
             Dim n, R, coeff(3), tmp() As Double
@@ -127,7 +136,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Loop Until i = n + 1
 
             i = 0
-            Dim aml = 0
+            Dim aml = 0.0#
             Do
                 j = 0
                 Do
@@ -139,7 +148,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Loop Until i = n + 1
 
             i = 0
-            Dim bml = 0
+            Dim bml = 0.0#
             Do
                 bml = bml + Vx(i) * bi(i)
                 i = i + 1
@@ -154,7 +163,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             coeff(3) = 1
 
             Dim temp1 = Poly_Roots(coeff)
-            Dim tv = 0
+            Dim tv = 0.0#
             Dim ZV, tv2
 
             If Not IsNumeric(temp1) Then
@@ -215,6 +224,8 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                 Z_SRK = temp1(2, 0)
             End If
 
+            DTL.App.WriteToConsole("Result: Z = " & Z_SRK, 3)
+
         End Function
 
         Function H_SRK_MIX(ByVal TIPO As String, ByVal T As Double, ByVal P As Double, ByVal Vz As Object, ByVal VKij As Object, ByVal VTc As Object, ByVal VPc As Object, ByVal Vw As Object, ByVal VMM As Object, ByVal Hid As Double) As Double
@@ -241,7 +252,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Loop Until i = n + 1
 
             i = 0
-            Dim MMm = 0
+            Dim MMm = 0.0#
             Do
                 MMm += Vz(i) * VMM(i)
                 i += 1
@@ -267,7 +278,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Loop Until i = n + 1
 
             i = 0
-            Dim am = 0
+            Dim am = 0.0#
             Do
                 j = 0
                 Do
@@ -278,7 +289,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Loop Until i = n + 1
 
             i = 0
-            Dim bm = 0
+            Dim bm = 0.0#
             Do
                 bm = bm + Vz(i) * bi(i)
                 i = i + 1
@@ -365,7 +376,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
             Dim aux1 = -R / 2 * (0.42748 / T) ^ 0.5
             i = 0
-            Dim aux2 = 0
+            Dim aux2 = 0.0#
             Do
                 j = 0
                 Do
@@ -386,7 +397,11 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Dim DSres = R * Math.Log((Z - BG1) / Z) + R * Math.Log(Z) - 1 / ((uu ^ 2 - 4 * ww) ^ 0.5 * bm) * dadT * Math.Log((2 * Z + BG1 * (uu - (uu ^ 2 - 4 * ww) ^ 0.5)) / (2 * Z + BG1 * (uu + (uu ^ 2 - 4 * ww) ^ 0.5)))
             Dim DHres = DAres + T * (DSres) + R * T * (Z - 1)
 
-            H_SRK_MIX = Hid + DHres / MMm '/ 1000
+            If MathEx.Common.Sum(Vz) = 0.0# Then
+                H_SRK_MIX = 0.0#
+            Else
+                H_SRK_MIX = Hid + DHres / MMm '/ 1000
+            End If
 
         End Function
 
@@ -414,7 +429,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Loop Until i = n + 1
 
             i = 0
-            Dim MMm = 0
+            Dim MMm = 0.0#
             Do
                 MMm += Vz(i) * VMM(i)
                 i += 1
@@ -440,7 +455,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Loop Until i = n + 1
 
             i = 0
-            Dim am = 0
+            Dim am = 0.0#
             Do
                 j = 0
                 Do
@@ -451,7 +466,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Loop Until i = n + 1
 
             i = 0
-            Dim bm = 0
+            Dim bm = 0.0#
             Do
                 bm = bm + Vz(i) * bi(i)
                 i = i + 1
@@ -470,8 +485,8 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             coeff(3) = 1
 
             Dim temp1 = Poly_Roots(coeff)
-            Dim tv = 0
-            Dim tv2 = 0
+            Dim tv = 0.0#
+            Dim tv2 = 0.0#
             If Not IsNumeric(temp1) Then
 
                 If temp1(0, 0) > temp1(1, 0) Then
@@ -537,7 +552,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
             Dim aux1 = -R / 2 * (0.42748 / T) ^ 0.5
             i = 0
-            Dim aux2 = 0
+            Dim aux2 = 0.0#
             Do
                 j = 0
                 Do
@@ -557,7 +572,11 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             'Dim DSres = R * Math.Log((Z - BG1) / Z) + R * Math.Log(V * 101325 / (R * 298.15)) - 1 / ((uu ^ 2 - 4 * ww) ^ 0.5 * bm) * dadT * Math.Log((2 * Z + BG1 * (uu - (uu ^ 2 - 4 * ww) ^ 0.5)) / (2 * Z + BG1 * (uu + (uu ^ 2 - 4 * ww) ^ 0.5)))
             Dim DSres = R * Math.Log((Z - BG1) / Z) + R * Math.Log(Z) - 1 / ((uu ^ 2 - 4 * ww) ^ 0.5 * bm) * dadT * Math.Log((2 * Z + BG1 * (uu - (uu ^ 2 - 4 * ww) ^ 0.5)) / (2 * Z + BG1 * (uu + (uu ^ 2 - 4 * ww) ^ 0.5)))
 
-            S_SRK_MIX = Sid + DSres / MMm '/ 1000
+            If MathEx.Common.Sum(Vz) = 0.0# Then
+                S_SRK_MIX = 0.0#
+            Else
+                S_SRK_MIX = Sid + DSres / MMm '/ 1000
+            End If
 
         End Function
 
@@ -594,7 +613,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Loop Until i = n + 1
 
             i = 0
-            Dim MMm = 0
+            Dim MMm = 0.0#
             Do
                 MMm += Vz(i) * VMM(i)
                 i += 1
@@ -620,7 +639,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Loop Until i = n + 1
 
             i = 0
-            Dim am = 0
+            Dim am = 0.0#
             Do
                 j = 0
                 Do
@@ -631,7 +650,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Loop Until i = n + 1
 
             i = 0
-            Dim bm = 0
+            Dim bm = 0.0#
             Do
                 bm = bm + Vz(i) * bi(i)
                 i = i + 1
@@ -728,7 +747,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
             Dim aux1 = -R / 2 * (0.45724 / T) ^ 0.5
             i = 0
-            Dim aux2 = 0
+            Dim aux2 = 0.0#
             Do
                 j = 0
                 Do
@@ -755,7 +774,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
             Dim Int_d2P_dT2_V_dV = -d2adt2 * Math.Log((-(2 ^ 0.5) * bm + bm + V) / ((2 ^ 0.5) * bm + bm + V)) / (8 ^ 0.5 * bm)
 
-            Dim Cpm_ig = 0
+            Dim Cpm_ig = 0.0#
             i = 0
             Do
                 Cpm_ig += Vzmass(i) * VCpig(i) * MMm
@@ -1049,7 +1068,7 @@ Final3:
                 coeff(3) = 1
 
                 Dim temp1 = Poly_Roots(coeff)
-                Dim tv = 0
+                Dim tv = 0.0#
                 Dim tv2
 
                 If Not IsNumeric(temp1) Then
@@ -1243,7 +1262,7 @@ Final3:
             coeff(3) = 1
 
             Dim temp1 = Poly_Roots(coeff)
-            Dim tv = 0
+            Dim tv = 0.0#
             Dim tv2
 
             If Not IsNumeric(temp1) Then

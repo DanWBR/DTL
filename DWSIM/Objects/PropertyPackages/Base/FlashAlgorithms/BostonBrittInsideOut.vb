@@ -1,26 +1,27 @@
-﻿'    Boston-Britt Inside-Out Flash Algorithms
+'    Boston-Britt Inside-Out Flash Algorithms
 '    Copyright 2010-2014 Daniel Wagner O. de Medeiros
 '
-'    This file is part of DTL.
+'    This file is part of DWSIM.
 '
-'    DTL is free software: you can redistribute it and/or modify
+'    DWSIM is free software: you can redistribute it and/or modify
 '    it under the terms of the GNU General Public License as published by
 '    the Free Software Foundation, either version 3 of the License, or
 '    (at your option) any later version.
 '
-'    DTL is distributed in the hope that it will be useful,
+'    DWSIM is distributed in the hope that it will be useful,
 '    but WITHOUT ANY WARRANTY; without even the implied warranty of
 '    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 '    GNU General Public License for more details.
 '
 '    You should have received a copy of the GNU General Public License
-'    along with DTL.  If not, see <http://www.gnu.org/licenses/>.
+'    along with DWSIM.  If not, see <http://www.gnu.org/licenses/>.
 
 Imports System.Math
 Imports DTL.DTL.SimulationObjects
 Imports DTL.DTL.MathEx
 Imports DTL.DTL.MathEx.Common
 Imports System.Threading.Tasks
+Imports System.Linq
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
@@ -28,7 +29,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
         Inherits FlashAlgorithm
 
-        Dim i, j, k, n, ecount As Integer
+        Dim n, ecount As Integer
         Dim etol As Double = 0.000001
         Dim itol As Double = 0.000001
         Dim maxit_i As Integer = 100
@@ -46,6 +47,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
         Public Overrides Function Flash_PT(ByVal Vz As Double(), ByVal P As Double, ByVal T As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
 
             Dim d1, d2 As Date, dt As TimeSpan
+            Dim i, j As Integer
 
             d1 = Date.Now
 
@@ -107,7 +109,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
             i = 0
             Px = 0
             Do
-                Px = Px + (Vz(i) / Vp(i))
+                If Vp(i) <> 0.0# Then Px = Px + (Vz(i) / Vp(i))
                 i = i + 1
             Loop Until i = n + 1
             Px = 1 / Px
@@ -138,7 +140,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                 End If
             End If
 
-             Dim Vmin, Vmax As Double
+            Dim Vmin, Vmax As Double
             Vmin = 1.0#
             Vmax = 0.0#
             For i = 0 To n
@@ -147,6 +149,8 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
             Next
 
             If Vmin < 0.0# Then Vmin = 0.0#
+            If Vmin = 1.0# Then Vmin = 0.0#
+            If Vmax = 0.0# Then Vmax = 1.0#
             If Vmax > 1.0# Then Vmax = 1.0#
 
             V = (Vmin + Vmax) / 2
@@ -158,7 +162,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
             If g > 0 Then Vmin = V Else Vmax = V
 
-            V = (Vmin + Vmax) / 2
+            V = Vmin + (Vmax - Vmin) / 4
 
             L = 1 - V
 
@@ -223,36 +227,12 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                 '--------------------------------------------------------------
                 ' STEPS 2, 3, 4, 5, 6, 7 and 8 - Calculate R and Energy Balance
                 '--------------------------------------------------------------
-                'Rant = R
-                'R = Kb * V / (Kb * V + Kb0 * L)
 
                 Dim fr As Double
                 bo2.DefineFuncDelegate(AddressOf TPErrorFunc)
                 Rant = R
-                fr = bo2.brentoptimize(0.0#, 1.0#, 0.0000000001, R)
+                fr = bo2.brentoptimize(0.0#, 1.0#, 0.00000001, R)
 
-                'Dim fr, dfr, R0, R1 As Double
-                'Dim icount As Integer = 0
-
-                'Do
-                '    R0 = R
-                '    If R > 0.99 Then
-                '        R1 = R - 0.01
-                '        fr = Me.TPErrorFunc(R0)
-                '        dfr = (fr - Me.TPErrorFunc(R1)) / 0.01
-                '    Else
-                '        R1 = R + 0.01
-                '        fr = Me.TPErrorFunc(R0)
-                '        dfr = (fr - Me.TPErrorFunc(R1)) / -0.01
-                '    End If
-                '    R0 = R
-                '    R = R - fr / dfr
-                '    If R < 0.0# Then R = 0.0#
-                '    If R > 1.0# Then R = 1.0#
-                '    icount += 1
-                'Loop Until Abs(fr) < itol Or icount > maxit_i
-
-                'If icount > maxit_i Then R = Rant
                 If ecount > 0 Then
                     If Rant = 0.0# And R = 1.0# Then R = 0.0#
                     If Rant = 1.0# And R = 0.0# Then R = 1.0#
@@ -343,7 +323,9 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                 If Double.IsNaN(V) Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashTPVapFracError"))
                 If ecount > maxit_e Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt2"))
 
-                Console.WriteLine("PT Flash [IO]: Iteration #" & ecount & ", VF = " & V)
+                WriteDebugInfo("PT Flash [IO]: Iteration #" & ecount & ", VF = " & V)
+
+
 
             Loop Until AbsSum(fx) < etol
 
@@ -351,7 +333,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
             dt = d2 - d1
 
-            Console.WriteLine("PT Flash [IO]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms. Error function value: " & AbsSum(fx))
+            WriteDebugInfo("PT Flash [IO]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms. Error function value: " & AbsSum(fx))
 
 out:        Return New Object() {L, V, Vx, Vy, ecount, 0.0#, Vx, 0.0#, PP.RET_NullVector}
 
@@ -359,7 +341,14 @@ out:        Return New Object() {L, V, Vx, Vy, ecount, 0.0#, Vx, 0.0#, PP.RET_Nu
 
         Public Overrides Function Flash_PH(ByVal Vz As Double(), ByVal P As Double, ByVal H As Double, ByVal Tref As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
 
+            If PP.Parameters.ContainsKey("PP_ENTH_CP_CALC_METHOD") Then
+                If PP.Parameters("PP_ENTH_CP_CALC_METHOD") = 1 Then
+                    Throw New Exception("Inside-Out PH Flash doesn't work with 'Ideal' Enthalpy/Cp calculation mode enabled. Please change it to 'Lee-Kesler' or 'Excess', or use another Flash Algorithm.")
+                End If
+            End If
+
             Dim d1, d2 As Date, dt As TimeSpan
+            Dim i, j As Integer
 
             d1 = Date.Now
 
@@ -434,7 +423,7 @@ out:        Return New Object() {L, V, Vx, Vy, ecount, 0.0#, Vx, 0.0#, PP.RET_Nu
             i = 0
             Px = 0
             Do
-                Px = Px + (Vz(i) / Vp(i))
+                If Vp(i) <> 0.0# Then Px = Px + (Vz(i) / Vp(i))
                 i = i + 1
             Loop Until i = n + 1
             Px = 1 / Px
@@ -541,16 +530,12 @@ out:        Return New Object() {L, V, Vx, Vy, ecount, 0.0#, Vx, 0.0#, PP.RET_Nu
                     task2.Start()
                     Task.WaitAll(task1, task2)
                 Catch ae As AggregateException
-                    For Each ex As Exception In ae.InnerExceptions
-                        Throw
-                    Next
+                    Throw ae.Flatten().InnerException
                 End Try
                 My.MyApplication.IsRunningParallelTasks = False
             Else
                 DHv1 = PP.DW_CalcEnthalpyDeparture(Vy, T, P, PropertyPackages.State.Vapor) * PP.AUX_MMM(Vy) / 1000
                 DHv2 = PP.DW_CalcEnthalpyDeparture(Vy, Tref, P, PropertyPackages.State.Vapor) * PP.AUX_MMM(Vy) / 1000
-                C = DHv2
-                D = (DHv1 - C) / (T - Tref)
                 If T < DTL.MathEx.Common.Max(VTc, Vz) Then
                     DHl1 = PP.DW_CalcEnthalpyDeparture(Vx, T, P, PropertyPackages.State.Liquid) * PP.AUX_MMM(Vx) / 1000
                     DHl2 = PP.DW_CalcEnthalpyDeparture(Vx, Tref, P, PropertyPackages.State.Liquid) * PP.AUX_MMM(Vx) / 1000
@@ -578,29 +563,14 @@ restart:    Do
                 '--------------------------------------------------------------
 
                 Rant = R
-                Tant = T
 
-                Dim dfr, R0, R1 As Double
-                Dim icount As Integer = 0
+                bo2.DefineFuncDelegate(AddressOf EnergyBalanceAbs)
+                fr = bo2.brentoptimize(0.0#, 1.0#, 0.00000001, R)
 
-                Do
-                    R0 = R
-                    If R > 0.99 Then
-                        R1 = R - 0.0001
-                        fr = Me.EnergyBalance(R0)
-                        dfr = (fr - Me.EnergyBalance(R1)) / 0.0001
-                    Else
-                        R1 = R + 0.0001
-                        fr = Me.EnergyBalance(R0)
-                        dfr = (fr - Me.EnergyBalance(R1)) / -0.0001
-                    End If
-                    R0 = R
-                    If Abs(fr) < itol Then Exit Do
-                    R += -0.3 * fr / dfr
-                    If R < 0 Then R = 0
-                    If R > 1 Then R = 1
-                    icount += 1
-                Loop Until icount > maxit_i Or R = 0 Or R = 1 'Or Abs(R - R0) < 0.000001
+                If ecount > 0 Then
+                    If Rant = 0.0# And R = 1.0# Then R = 0.0#
+                    If Rant = 1.0# And R = 0.0# Then R = 1.0#
+                End If
 
                 Me.EnergyBalance(R)
 
@@ -649,9 +619,7 @@ restart:    Do
                         task2.Start()
                         Task.WaitAll(task1, task2)
                     Catch ae As AggregateException
-                        For Each ex As Exception In ae.InnerExceptions
-                            Throw
-                        Next
+                        Throw ae.Flatten().InnerException
                     End Try
                     My.MyApplication.IsRunningParallelTasks = False
                 Else
@@ -722,7 +690,8 @@ restart:    Do
                 refx(n + 6) = Fc
 
                 err = 0
-                If Not PP._ioquick Then err = bo3.brentoptimize(0, 2, 0.0001, alpha)
+
+                If PP.Parameters("PP_FLASHALGORITHMFASTMODE") = 0 Then err = bo3.brentoptimize(0, 2, 0.0001, alpha)
 
                 For i = 0 To n
                     ui(i) = ui(i) + alpha * dx(i)
@@ -741,10 +710,10 @@ restart:    Do
                     Throw New Exception(DTL.App.GetLocalString("PropPack_FlashError"))
                 End If
 
-                Console.WriteLine("PH Flash [IO]: Iteration #" & ecount & ", T = " & T)
-                Console.WriteLine("PH Flash [IO]: Iteration #" & ecount & ", VF = " & V)
-                Console.WriteLine("PH Flash [IO]: Iteration #" & ecount & ", H error = " & fr)
-                Console.WriteLine("PH Flash [IO]: Iteration #" & ecount & ", Damping Factor = " & alpha)
+                WriteDebugInfo("PH Flash [IO]: Iteration #" & ecount & ", T = " & T)
+                WriteDebugInfo("PH Flash [IO]: Iteration #" & ecount & ", VF = " & V)
+                WriteDebugInfo("PH Flash [IO]: Iteration #" & ecount & ", H error = " & fr)
+                WriteDebugInfo("PH Flash [IO]: Iteration #" & ecount & ", Damping Factor = " & alpha)
 
 
 
@@ -794,7 +763,7 @@ restart:    Do
 
             dt = d2 - d1
 
-            Console.WriteLine("PH Flash [IO]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms. Error function value: " & AbsSum(fx))
+            WriteDebugInfo("PH Flash [IO]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms. Error function value: " & AbsSum(fx))
 
             Return New Object() {L, V, Vx, Vy, T, ecount, Ki, 0.0#, PP.RET_NullVector, 0.0#, PP.RET_NullVector}
 
@@ -803,6 +772,7 @@ restart:    Do
         Public Overrides Function Flash_PS(ByVal Vz As Double(), ByVal P As Double, ByVal S As Double, ByVal Tref As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
 
             Dim d1, d2 As Date, dt As TimeSpan
+            Dim i, j As Integer
 
             d1 = Date.Now
 
@@ -877,7 +847,7 @@ restart:    Do
             i = 0
             Px = 0
             Do
-                Px = Px + (Vz(i) / Vp(i))
+                If Vp(i) <> 0.0# Then Px = Px + (Vz(i) / Vp(i))
                 i = i + 1
             Loop Until i = n + 1
             Px = 1 / Px
@@ -985,9 +955,7 @@ restart:    Do
                     task2.Start()
                     Task.WaitAll(task1, task2)
                 Catch ae As AggregateException
-                    For Each ex As Exception In ae.InnerExceptions
-                        Throw
-                    Next
+                    Throw ae.Flatten().InnerException
                 End Try
                 My.MyApplication.IsRunningParallelTasks = False
             Else
@@ -1022,30 +990,9 @@ restart:    Do
                 '--------------------------------------------------------------
 
                 Rant = R
-                Tant = T
 
-
-                Dim dfr, R0, R1 As Double
-                Dim icount As Integer = 0
-
-                Do
-                    R0 = R
-                    If R > 0.999 Then
-                        R1 = R - 0.001
-                        fr = Me.EntropyBalance(R0)
-                        dfr = (fr - Me.EntropyBalance(R1)) / 0.001
-                    Else
-                        R1 = R + 0.001
-                        fr = Me.EntropyBalance(R0)
-                        dfr = (fr - Me.EntropyBalance(R1)) / -0.001
-                    End If
-                    R0 = R
-                    If Abs(fr) < itol Then Exit Do
-                    R += -0.3 * fr / dfr
-                    If R < 0 Then R = 0
-                    If R > 1 Then R = 1
-                    icount += 1
-                Loop Until icount > maxit_i Or R = 0 Or R = 1 'Or Abs(R - R0) < 0.000001
+                bo2.DefineFuncDelegate(AddressOf EntropyBalanceAbs)
+                fr = bo2.brentoptimize(0.0#, 1.0#, 0.0001, R)
 
                 Me.EntropyBalance(R)
 
@@ -1090,9 +1037,7 @@ restart:    Do
                         task2.Start()
                         Task.WaitAll(task1, task2)
                     Catch ae As AggregateException
-                        For Each ex As Exception In ae.InnerExceptions
-                            Throw
-                        Next
+                        Throw ae.Flatten().InnerException
                     End Try
                     My.MyApplication.IsRunningParallelTasks = False
                 Else
@@ -1163,7 +1108,7 @@ restart:    Do
                 refx(n + 6) = Fc
 
                 err = 0
-                If Not PP._ioquick Then err = bo3.brentoptimize(0, 2, 0.0001, alpha)
+                If PP.Parameters("PP_FLASHALGORITHMFASTMODE") = 0 Then err = bo3.brentoptimize(0, 2, 0.0001, alpha)
 
                 For i = 0 To n
                     ui(i) = ui(i) + alpha * dx(i)
@@ -1180,10 +1125,10 @@ restart:    Do
                 If ecount > maxit_e Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt"))
                 If Double.IsNaN(AbsSum(fx)) Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashError"))
 
-                Console.WriteLine("PS Flash [IO]: Iteration #" & ecount & ", T = " & T)
-                Console.WriteLine("PS Flash [IO]: Iteration #" & ecount & ", VF = " & V)
-                Console.WriteLine("PS Flash [IO]: Iteration #" & ecount & ", H error = " & fr)
-                Console.WriteLine("PS Flash [IO]: Iteration #" & ecount & ", Damping Factor = " & alpha)
+                WriteDebugInfo("PS Flash [IO]: Iteration #" & ecount & ", T = " & T)
+                WriteDebugInfo("PS Flash [IO]: Iteration #" & ecount & ", VF = " & V)
+                WriteDebugInfo("PS Flash [IO]: Iteration #" & ecount & ", H error = " & fr)
+                WriteDebugInfo("PS Flash [IO]: Iteration #" & ecount & ", Damping Factor = " & alpha)
 
 
 
@@ -1233,7 +1178,7 @@ restart:    Do
 
             dt = d2 - d1
 
-            Console.WriteLine("PS Flash [IO]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms. Error function value: " & AbsSum(fx))
+            WriteDebugInfo("PS Flash [IO]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms. Error function value: " & AbsSum(fx))
 
             Return New Object() {L, V, Vx, Vy, T, ecount, Ki, 0.0#, PP.RET_NullVector, 0.0#, PP.RET_NullVector}
 
@@ -1242,6 +1187,7 @@ restart:    Do
         Public Overrides Function Flash_PV(ByVal Vz As Double(), ByVal P As Double, ByVal V As Double, ByVal Tref As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
 
             Dim d1, d2 As Date, dt As TimeSpan
+            Dim i, j As Integer
 
             d1 = Date.Now
 
@@ -1295,9 +1241,11 @@ restart:    Do
                 i = 0
                 T = 0
                 Do
-                    T += Vz(i) * PP.AUX_TSATi(P, i)
-                    Vp(i) = PP.AUX_PVAPi(Vn(i), T)
-                    Ki(i) = Vp(i) / P
+                    If Vz(i) > 0 Then
+                        T += Vz(i) * PP.AUX_TSATi(P, i)
+                        Vp(i) = PP.AUX_PVAPi(Vn(i), T)
+                        Ki(i) = Vp(i) / P
+                    End If
                     i += 1
                 Loop Until i = n + 1
                 Vx = Vz
@@ -1486,7 +1434,7 @@ restart:    Do
                 refx(n + 2) = Bc
 
                 err = 0
-                If Not PP._ioquick Then err = bo2.brentoptimize(0, 2, 0.0001, alpha)
+                If PP.Parameters("PP_FLASHALGORITHMFASTMODE") = 0 Then err = bo2.brentoptimize(0, 2, 0.0001, alpha)
 
                 For i = 0 To n
                     ui(i) = ui(i) + alpha * dx(i)
@@ -1509,8 +1457,8 @@ restart:    Do
                     Throw New Exception(DTL.App.GetLocalString("PropPack_FlashError"))
                 End If
 
-                Console.WriteLine("PV Flash [IO]: Iteration #" & ecount & ", T = " & T & ", VF = " & V)
-                Console.WriteLine("PV Flash [IO]: Iteration #" & ecount & ", Damping Factor = " & alpha)
+                WriteDebugInfo("PV Flash [IO]: Iteration #" & ecount & ", T = " & T & ", VF = " & V)
+                WriteDebugInfo("PV Flash [IO]: Iteration #" & ecount & ", Damping Factor = " & alpha)
 
 
 
@@ -1522,7 +1470,7 @@ final:      d2 = Date.Now
 
             If PP.AUX_CheckTrivial(Ki) Then Throw New Exception("PV Flash [IO]: Invalid result: converged to the trivial solution (T = " & T & " ).")
 
-            Console.WriteLine("PV Flash [IO]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms. Error function value: " & AbsSum(fx))
+            WriteDebugInfo("PV Flash [IO]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms. Error function value: " & AbsSum(fx))
 
             Return New Object() {L, V, Vx, Vy, T, ecount, Ki, 0.0#, PP.RET_NullVector, 0.0#, PP.RET_NullVector}
 
@@ -1531,6 +1479,7 @@ final:      d2 = Date.Now
         Public Overrides Function Flash_TV(ByVal Vz As Double(), ByVal T As Double, ByVal V As Double, ByVal Pref As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
 
             Dim d1, d2 As Date, dt As TimeSpan
+            Dim i, j As Integer
 
             d1 = Date.Now
 
@@ -1578,7 +1527,9 @@ final:      d2 = Date.Now
                 i = 0
                 P = 0
                 Do
+                    Vp(i) = PP.AUX_PVAPi(Vn(i), T)
                     P += Vz(i) * Vp(i)
+                    Ki(i) = Vz(i)
                     i += 1
                 Loop Until i = n + 1
                 Vx = Vz
@@ -1771,7 +1722,7 @@ final:      d2 = Date.Now
                 refx(n + 2) = Bc
 
                 err = 0
-                If Not PP._ioquick Then err = bo2.brentoptimize(0, 2, 0.0001, alpha)
+                If PP.Parameters("PP_FLASHALGORITHMFASTMODE") = 0 Then err = bo2.brentoptimize(0, 2, 0.0001, alpha)
 
                 For i = 0 To n
                     ui(i) = ui(i) + alpha * dx(i)
@@ -1784,8 +1735,8 @@ final:      d2 = Date.Now
                 If ecount > maxit_e Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt"))
                 If Double.IsNaN(AbsSum(fx)) Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashError"))
 
-                Console.WriteLine("TV Flash [IO]: Iteration #" & ecount & ", P = " & P & ", VF = " & V)
-                Console.WriteLine("TV Flash [IO]: Iteration #" & ecount & ", Damping Factor = " & alpha)
+                WriteDebugInfo("TV Flash [IO]: Iteration #" & ecount & ", P = " & P & ", VF = " & V)
+                WriteDebugInfo("TV Flash [IO]: Iteration #" & ecount & ", Damping Factor = " & alpha)
 
 
 
@@ -1797,13 +1748,15 @@ final:      d2 = Date.Now
 
             If PP.AUX_CheckTrivial(Ki) Then Throw New Exception("TV Flash [IO]: Invalid result: converged to the trivial solution (P = " & P & " ).")
 
-            Console.WriteLine("TV Flash [IO]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms. Error function value: " & AbsSum(fx))
+            WriteDebugInfo("TV Flash [IO]: Converged in " & ecount & " iterations. Time taken: " & dt.TotalMilliseconds & " ms. Error function value: " & AbsSum(fx))
 
             Return New Object() {L, V, Vx, Vy, P, ecount, Ki, 0.0#, PP.RET_NullVector, 0.0#, PP.RET_NullVector}
 
         End Function
 
         Private Function LiquidFractionBalance(ByVal R As Double) As Double
+
+            Dim i As Integer
 
             For i = 0 To n
                 pi(i) = fi(i) / (1 - R + Kb0 * R * Exp(ui(i)))
@@ -1844,6 +1797,8 @@ final:      d2 = Date.Now
 
         Private Function LiquidFractionBalanceP(ByVal R As Double) As Double
 
+            Dim i As Integer
+
             For i = 0 To n
                 pi(i) = fi(i) / (1 - R + Kb0 * R * Exp(ui(i)))
             Next
@@ -1878,6 +1833,8 @@ final:      d2 = Date.Now
 
         Private Function EnergyBalance(ByVal R As Double) As Double
 
+            Dim i As Integer
+
             For i = 0 To n
                 pi(i) = fi(i) / (1 - R + Kb0 * R * Exp(ui(i)))
             Next
@@ -1895,8 +1852,8 @@ final:      d2 = Date.Now
             T = 1 / T_ + (Log(Kb) - A) / B
             T = 1 / T
 
-            If T < Tmin Then T = Tmin
-            If T > Tmax Then T = Tmax
+            'If T < Tmin Then T = Tmin
+            'If T > Tmax Then T = Tmax
 
             For i = 0 To n
                 Vx(i) = pi(i) / sumpi
@@ -1924,6 +1881,8 @@ final:      d2 = Date.Now
 
         Private Function EnergyBalanceAbs(ByVal R As Double) As Double
 
+            Dim i As Integer
+
             For i = 0 To n
                 pi(i) = fi(i) / (1 - R + Kb0 * R * Exp(ui(i)))
             Next
@@ -1941,8 +1900,8 @@ final:      d2 = Date.Now
             T = 1 / T_ + (Log(Kb) - A) / B
             T = 1 / T
 
-            If T < Tmin Then T = Tmin
-            If T > Tmax Then T = Tmax
+            'If T < Tmin Then T = Tmin
+            'If T > Tmax Then T = Tmax
 
             For i = 0 To n
                 Vx(i) = pi(i) / sumpi
@@ -1955,13 +1914,13 @@ final:      d2 = Date.Now
             DHv = C + D * (T - T0)
             DHl = E + F * (T - T0)
 
-            Dim sumzihv0i As Double = 0
+            If Double.IsNaN(DHl) Then DHl = 0
 
-            For i = 0 To n
-                sumzihv0i += fi(i) * proppack.AUX_INT_CPDTi(298.15, T, Vn(i)) * proppack.AUX_MMM(fi) / 1000
-            Next
+            Hvid = proppack.RET_Hid(298.15, T, Vy) * proppack.AUX_MMM(Vy) / 1000
+            Hlid = proppack.RET_Hid(298.15, T, Vx) * proppack.AUX_MMM(Vx) / 1000
 
-            Dim eberror As Double = L * (DHv - DHl) - sumzihv0i - DHv + Hf / 1000
+            Dim eberror As Double = Hf / 1000 - L * (DHl + Hlid) - V * (DHv + Hvid)
+
 
 
             Return Abs(eberror)
@@ -1978,9 +1937,9 @@ final:      d2 = Date.Now
 
             balerror = Hf - HL
 
-            Console.WriteLine("PH Flash [IO]: Iteration #" & ecount & ", T = " & T)
-            Console.WriteLine("PH Flash [IO]: Iteration #" & ecount & ", VF = 0 (SP)")
-            Console.WriteLine("PH Flash [IO]: Iteration #" & ecount & ", H error = " & balerror)
+            WriteDebugInfo("PH Flash [IO]: Iteration #" & ecount & ", T = " & T)
+            WriteDebugInfo("PH Flash [IO]: Iteration #" & ecount & ", VF = 0 (SP)")
+            WriteDebugInfo("PH Flash [IO]: Iteration #" & ecount & ", H error = " & balerror)
 
             Return balerror
 
@@ -1997,9 +1956,9 @@ final:      d2 = Date.Now
 
             balerror = Hf - HV
 
-            Console.WriteLine("PH Flash [IO]: Iteration #" & ecount & ", T = " & T)
-            Console.WriteLine("PH Flash [IO]: Iteration #" & ecount & ", VF = 1 (SP)")
-            Console.WriteLine("PH Flash [IO]: Iteration #" & ecount & ", H error = " & balerror)
+            WriteDebugInfo("PH Flash [IO]: Iteration #" & ecount & ", T = " & T)
+            WriteDebugInfo("PH Flash [IO]: Iteration #" & ecount & ", VF = 1 (SP)")
+            WriteDebugInfo("PH Flash [IO]: Iteration #" & ecount & ", H error = " & balerror)
 
             Return balerror
 
@@ -2007,6 +1966,8 @@ final:      d2 = Date.Now
         End Function
 
         Private Function EntropyBalance(ByVal R As Double) As Double
+
+            Dim i As Integer
 
             For i = 0 To n
                 pi(i) = fi(i) / (1 - R + Kb0 * R * Exp(ui(i)))
@@ -2025,8 +1986,8 @@ final:      d2 = Date.Now
             T = 1 / T_ + (Log(Kb) - A) / B
             T = 1 / T
 
-            If T < Tmin Then T = Tmin
-            If T > Tmax Then T = Tmax
+            'If T < Tmin Then T = Tmin
+            'If T > Tmax Then T = Tmax
 
             For i = 0 To n
                 Vx(i) = pi(i) / sumpi
@@ -2051,6 +2012,8 @@ final:      d2 = Date.Now
 
         Private Function EntropyBalanceAbs(ByVal R As Double) As Double
 
+            Dim i As Integer
+
             For i = 0 To n
                 pi(i) = fi(i) / (1 - R + Kb0 * R * Exp(ui(i)))
             Next
@@ -2068,8 +2031,8 @@ final:      d2 = Date.Now
             T = 1 / T_ + (Log(Kb) - A) / B
             T = 1 / T
 
-            If T < Tmin Then T = Tmin
-            If T > Tmax Then T = Tmax
+            'If T < Tmin Then T = Tmin
+            'If T > Tmax Then T = Tmax
 
             For i = 0 To n
                 Vx(i) = pi(i) / sumpi
@@ -2102,9 +2065,9 @@ final:      d2 = Date.Now
 
             balerror = Sf - SL
 
-            Console.WriteLine("PS Flash [IO]: Iteration #" & ecount & ", T = " & T)
-            Console.WriteLine("PS Flash [IO]: Iteration #" & ecount & ", VF = 0 (SP)")
-            Console.WriteLine("PS Flash [IO]: Iteration #" & ecount & ", S error = " & balerror)
+            WriteDebugInfo("PS Flash [IO]: Iteration #" & ecount & ", T = " & T)
+            WriteDebugInfo("PS Flash [IO]: Iteration #" & ecount & ", VF = 0 (SP)")
+            WriteDebugInfo("PS Flash [IO]: Iteration #" & ecount & ", S error = " & balerror)
 
             Return balerror
 
@@ -2121,9 +2084,9 @@ final:      d2 = Date.Now
 
             balerror = Sf - SV
 
-            Console.WriteLine("PS Flash [IO]: Iteration #" & ecount & ", T = " & T)
-            Console.WriteLine("PS Flash [IO]: Iteration #" & ecount & ", VF = 1 (SP)")
-            Console.WriteLine("PS Flash [IO]: Iteration #" & ecount & ", S error = " & balerror)
+            WriteDebugInfo("PS Flash [IO]: Iteration #" & ecount & ", T = " & T)
+            WriteDebugInfo("PS Flash [IO]: Iteration #" & ecount & ", VF = 1 (SP)")
+            WriteDebugInfo("PS Flash [IO]: Iteration #" & ecount & ", S error = " & balerror)
 
             Return balerror
 
@@ -2147,7 +2110,7 @@ final:      d2 = Date.Now
 
         Private Function CalcKbj2(ByVal K() As Double, ByVal K2() As Double, ByVal T1 As Double, ByVal T2 As Double) As Double
 
-            Dim i As Integer
+            Dim i, j As Integer
             Dim n As Integer = UBound(K) - 1
 
             Dim Kbj1 As Object
@@ -2188,6 +2151,8 @@ final:      d2 = Date.Now
 
         Private Function TPErrorFunc(ByVal Rt As Double) As Double
 
+            Dim i As Integer
+
             For i = 0 To n
                 pi(i) = fi(i) / (1 - Rt + Kb0 * Rt * Exp(ui(i)))
             Next
@@ -2206,13 +2171,11 @@ final:      d2 = Date.Now
             Next
 
             L = (1 - Rt) * sumpi
-
-            If L > 1.0# Then L = 1.0#
-            If L < 0.0# Then L = 0.0#
-
             V = 1 - L
 
             Dim eberror As Double = sumpi / sumeuipi - 1
+
+
 
             Return eberror ^ 2
 
@@ -2228,7 +2191,7 @@ final:      d2 = Date.Now
                 errors(i) = (refx(i) - (currx(i) + alpha * tmpdx(i))) ^ 2
             Next
 
-            Return Common.Sum(errors)
+            Return errors.Sum()
 
         End Function
 
