@@ -131,6 +131,17 @@ Namespace Thermodynamics
 
         End Sub
 
+        ''' <summary>
+        ''' Sets the debug level, which controls the amount of information which is written to the screen.
+        ''' </summary>
+        ''' <param name="level">Debug level: 0 = none, 1 = low, 2 = medium, 3 = high</param>
+        ''' <remarks></remarks>
+        <System.Runtime.InteropServices.DispId(38)> Public Sub SetDebugLevel(level As Integer)
+
+            My.MyApplication._DebugLevel = level
+
+        End Sub
+
         Private Sub TransferComps(ByRef pp As PropertyPackage)
 
             pp._availablecomps = _availablecomps

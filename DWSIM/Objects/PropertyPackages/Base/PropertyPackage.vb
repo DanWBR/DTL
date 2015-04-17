@@ -114,6 +114,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
         PTFlash_Maximum_Number_Of_Internal_Iterations = 9
         PTFlash_External_Loop_Tolerance = 10
         PTFlash_Internal_Loop_Tolerance = 11
+        FlashAlgorithmFastMode = 12
     End Enum
 
 #End Region
@@ -259,6 +260,8 @@ Namespace DTL.SimulationObjects.PropertyPackages
                     Me.Parameters("PP_PTFMEI") = value
                 Case Parameter.PTFlash_Maximum_Number_Of_Internal_Iterations
                     Me.Parameters("PP_PTFMII") = value
+                Case Parameter.FlashAlgorithmFastMode
+                    Me.Parameters("PP_FLASHALGORITHMFASTMODE") = value
             End Select
         End Sub
 
