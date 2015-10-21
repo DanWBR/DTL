@@ -1262,13 +1262,6 @@ Namespace DTL.SimulationObjects.PropertyPackages
                             Dim fge As Double = 0
                             Dim dge As Double = 0
 
-                            If Not Me.FlashAlgorithm = FlashMethod.NestedLoopsSLE _
-                            And Not Me.FlashAlgorithm = FlashMethod.NestedLoopsSLE_SS Then
-
-                                ige = Me.DW_CalcGibbsEnergy(RET_VMOL(Fase.Mixture), T, P)
-
-                            End If
-                           
                             result = Me.FlashBase.Flash_PT(RET_VMOL(Fase.Mixture), P, T, Me)
 
                             xl = result(0)
@@ -1327,23 +1320,6 @@ Namespace DTL.SimulationObjects.PropertyPackages
                                         End If
                                     End If
                                 End If
-                            End If
-
-                            If Not Me.FlashAlgorithm = FlashMethod.NestedLoopsSLE _
-                            And Not Me.FlashAlgorithm = FlashMethod.NestedLoopsSLE_SS Then
-
-                                fge = xl * Me.DW_CalcGibbsEnergy(Vx, T, P)
-                                fge += xl2 * Me.DW_CalcGibbsEnergy(Vx2, T, P)
-                                fge += xv * Me.DW_CalcGibbsEnergy(Vy, T, P)
-
-                                dge = fge - ige
-
-                                Dim dgtol As Double = 0.01
-
-                                If dge > 0.0# And Math.Abs(dge / ige * 100) > Math.Abs(dgtol) Then
-                                    Throw New Exception(DTL.App.GetLocalString("InvalidFlashResult") & "(DGE = " & dge & " kJ/kg, " & Format(dge / ige * 100, "0.00") & "%)")
-                                End If
-
                             End If
 
                             'do a density calculation check to order liquid phases from lighter to heavier
