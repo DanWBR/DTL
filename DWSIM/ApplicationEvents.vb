@@ -20,6 +20,8 @@ Namespace My
         Public CAPEOPENMode As Boolean = False
         Public Shared IsRunningParallelTasks As Boolean = False
 
+        Public Shared UseSIMDExtensions As Boolean = False
+
         Public Shared _EnableGPUProcessing As Boolean = False
         Public Shared _EnableParallelProcessing As Boolean = False
         Public Shared _DebugLevel As Integer = 0

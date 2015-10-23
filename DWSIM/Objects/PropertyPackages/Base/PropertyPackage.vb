@@ -66,6 +66,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
         V
         U
         VAP
+        SF
 
     End Enum
 
@@ -86,19 +87,16 @@ Namespace DTL.SimulationObjects.PropertyPackages
     End Enum
 
     Public Enum FlashMethod
-        GlobalSetting = 2
-        DWSIMDefault = 0
-        InsideOut = 1
-        InsideOut3P = 3
-        GibbsMin2P = 4
-        GibbsMin3P = 5
-        NestedLoops3P = 6
+        NestedLoops = 0
+        NestedLoops3P = 1
+        NestedLoopsImmiscible = 2
+        InsideOut = 3
+        InsideOut3P = 4
+        GibbsMin2P = 5
+        GibbsMin3P = 6
         NestedLoopsSLE = 7
-        NestedLoopsImmiscible = 8
+        NestedLoopsSLE_SS = 8
         SimpleLLE = 9
-        NestedLoopsSLE_SS = 10
-        NestedLoops3PV2 = 11
-        NestedLoops3PV3 = 12
     End Enum
 
     Public Enum Parameter
@@ -379,7 +377,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
                     Me.FlashAlgorithm = Me.Parameters("PP_FLASHALGORITHM")
                 End If
                 Select Case FlashAlgorithm
-                    Case FlashMethod.DWSIMDefault
+                    Case FlashMethod.NestedLoops
                         If My.MyApplication.IsRunningParallelTasks Or ForceNewFlashAlgorithmInstance Then
                             Return New Auxiliary.FlashAlgorithms.DWSIMDefault
                         Else
@@ -419,7 +417,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
                                 {.ForceTwoPhaseOnly = False, .StabSearchCompIDs = _tpcompids, .StabSearchSeverity = _tpseverity}
                             Return _gm3
                         End If
-                    Case FlashMethod.NestedLoops3P, FlashMethod.NestedLoops3PV2, FlashMethod.NestedLoops3PV3
+                    Case FlashMethod.NestedLoops3P
                         If My.MyApplication.IsRunningParallelTasks Or ForceNewFlashAlgorithmInstance Then
                             Return New Auxiliary.FlashAlgorithms.NestedLoops3P With
                                                         {.StabSearchCompIDs = _tpcompids, .StabSearchSeverity = _tpseverity}
@@ -2141,6 +2139,18 @@ redirect2:                      result = Me.FlashBase.Flash_PS(RET_VMOL(Fase.Mix
 #End Region
 
 #Region "   Commmon Functions"
+
+        Public Function DW_GetConstantProperties() As List(Of ConstantProperties)
+
+            Dim constprops As New List(Of ConstantProperties)
+
+            For Each su As Substancia In Me.CurrentMaterialStream.Fases(0).Componentes.Values
+                constprops.Add(su.ConstantProperties)
+            Next
+
+            Return constprops
+
+        End Function
 
         Public Overloads Sub DW_CalcKvalue()
 

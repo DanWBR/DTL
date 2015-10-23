@@ -140,6 +140,10 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="Yeppp.CLR.Bundle, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Yeppp.CLR.Bundle.1.0.1-prerelease\lib\net20\Yeppp.CLR.Bundle.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Import Include="Microsoft.VisualBasic" />
@@ -182,6 +186,7 @@
     <Compile Include="Objects\PropertyPackages\Base\FlashAlgorithms\NestedLoops3PV3.vb" />
     <Compile Include="Objects\PropertyPackages\Base\FlashAlgorithms\NestedLoopsImmiscible.vb" />
     <Compile Include="Objects\PropertyPackages\Base\FlashAlgorithms\NestedLoopsSLE.vb" />
+    <Compile Include="Objects\PropertyPackages\Base\FlashAlgorithms\PointF.vb" />
     <Compile Include="Objects\PropertyPackages\Base\FlashAlgorithms\SimpleLLE.vb" />
     <Compile Include="Objects\PropertyPackages\Base\MichelsenBase.vb" />
     <Compile Include="Objects\PropertyPackages\CAPE-OPEN\CAPEOPENPropertyPackageManager.vb" />
@@ -228,7 +233,6 @@
     <Compile Include="Objects\Classes\Shared\Shared Functions.vb" />
     <Compile Include="Objects\PropertyPackages\PengRobinsonLK\Helper Classes\LK.vb" />
     <Compile Include="Objects\PropertyPackages\PengRobinsonLK\PRLK.vb" />
-    <Compile Include="Objects\PropertyPackages\Base\MATRIX.vb" />
     <Compile Include="Objects\PropertyPackages\Base\MATRIX2.vb" />
     <Compile Include="Objects\PropertyPackages\PengRobinson\Helper Classes\PENGROB.vb" />
     <Compile Include="Objects\PropertyPackages\Base\PROPS.vb" />
@@ -258,6 +262,7 @@
       <CustomToolNamespace>My</CustomToolNamespace>
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

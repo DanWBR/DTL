@@ -77,7 +77,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
         Public Overrides Function Flash_PT(ByVal Vz() As Double, ByVal P As Double, ByVal T As Double, ByVal PP As PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi() As Double = Nothing) As Object
 
-            Dim i, j As Integer
+            Dim i, j, k As Integer
 
             Dim d1, d2 As Date, dt As TimeSpan
 
@@ -1091,7 +1091,7 @@ out:        Return result
 
         Public Overrides Function Flash_TV(ByVal Vz As Double(), ByVal T As Double, ByVal V As Double, ByVal Pref As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
 
-            Dim i, j As Integer
+            Dim i, j, k As Integer
 
             Dim d1, d2 As Date, dt As TimeSpan
 
@@ -1212,7 +1212,7 @@ out:        Return result
 
         Public Overrides Function Flash_PV(ByVal Vz As Double(), ByVal P As Double, ByVal V As Double, ByVal Tref As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
 
-            Dim i, j As Integer
+            Dim i, j, k As Integer
 
             Dim d1, d2 As Date, dt As TimeSpan
 
@@ -2376,7 +2376,7 @@ out:        Return New Object() {L1, V, Vx1, Vy, P, ecount, Ki1, L2, Vx2, 0.0#, 
             Dim f2() As Double = Nothing
             Dim f3() As Double = Nothing
             Dim h((x.Length) * (x.Length) - 1), x2(x.Length - 1), x3(x.Length - 1) As Double
-            Dim m As Integer
+            Dim m, k As Integer
 
             m = 0
             For i As Integer = 0 To x.Length - 1
@@ -2451,6 +2451,8 @@ out:        Return New Object() {L1, V, Vx1, Vy, P, ecount, Ki1, L2, Vx2, 0.0#, 
 
         Public Function eval_jac_g(ByVal n As Integer, ByVal x As Double(), ByVal new_x As Boolean, ByVal m As Integer, ByVal nele_jac As Integer, ByRef iRow As Integer(), _
          ByRef jCol As Integer(), ByRef values As Double()) As Boolean
+
+            Dim k As Integer
 
             If values Is Nothing Then
 

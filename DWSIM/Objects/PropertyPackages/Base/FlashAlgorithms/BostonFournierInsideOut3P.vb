@@ -46,7 +46,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
         Public Overrides Function Flash_PT(ByVal Vz() As Double, ByVal P As Double, ByVal T As Double, ByVal PP As PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi() As Double = Nothing) As Object
 
             Dim d1, d2 As Date, dt As TimeSpan
-            Dim i, j As Integer
+            Dim i, j, k As Integer
 
             Dim nt As Integer = Me.StabSearchCompIDs.Length - 1
             Dim nc As Integer = UBound(Vz)
@@ -204,7 +204,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
         Public Overrides Function Flash_PH(ByVal Vz() As Double, ByVal P As Double, ByVal H As Double, ByVal Tref As Double, ByVal PP As PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi() As Double = Nothing) As Object
 
             Dim d1, d2 As Date, dt As TimeSpan
-            Dim i, j As Integer
+            Dim i, j, k As Integer
 
             d1 = Date.Now
 
@@ -341,7 +341,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
         Public Overrides Function Flash_PS(ByVal Vz() As Double, ByVal P As Double, ByVal S As Double, ByVal Tref As Double, ByVal PP As PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi() As Double = Nothing) As Object
 
             Dim d1, d2 As Date, dt As TimeSpan
-            Dim i, j As Integer
+            Dim i, j, k As Integer
 
             d1 = Date.Now
 
@@ -478,7 +478,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
         Public Overrides Function Flash_TV(ByVal Vz() As Double, ByVal T As Double, ByVal V As Double, ByVal Pref As Double, ByVal PP As PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi() As Double = Nothing) As Object
 
             Dim d1, d2 As Date, dt As TimeSpan
-            Dim i, j As Integer
+            Dim i, j, k As Integer
 
             d1 = Date.Now
 
@@ -597,7 +597,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
         Public Overrides Function Flash_PV(ByVal Vz() As Double, ByVal P As Double, ByVal V As Double, ByVal Tref As Double, ByVal PP As PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi() As Double = Nothing) As Object
 
             Dim d1, d2 As Date, dt As TimeSpan
-            Dim i, j As Integer
+            Dim i, j, k As Integer
 
             d1 = Date.Now
 

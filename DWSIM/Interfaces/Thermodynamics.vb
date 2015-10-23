@@ -21,6 +21,7 @@ Imports DTL.DTL.SimulationObjects.PropertyPackages
 Imports DTL.DTL.ClassesBasicasTermodinamica
 Imports CapeOpen = CAPEOPEN110
 Imports CAPEOPEN110
+Imports DTL.DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
 Namespace Thermodynamics
 
@@ -140,6 +141,22 @@ Namespace Thermodynamics
 
             My.MyApplication._DebugLevel = level
 
+        End Sub
+
+        ''' <summary>
+        ''' Activates CPU-accelerated SIMD vector operations.
+        ''' </summary>
+        ''' <remarks>This uses the routines implemented in the Yeppp! (http://www.yeppp.info) library, which must be in the same directory as DTL's.</remarks>
+        <System.Runtime.InteropServices.DispId(40)> Public Sub EnableSIMDExtensions()
+            My.MyApplication.UseSIMDExtensions = True
+        End Sub
+
+        ''' <summary>
+        ''' Deactivates CPU-accelerated SIMD vector operations.
+        ''' </summary>
+        ''' <remarks>This uses the routines implemented in the Yeppp! (http://www.yeppp.info) library, which must be in the same directory as DTL's.</remarks>
+        <System.Runtime.InteropServices.DispId(41)> Public Sub DisableSIMDExtensions()
+            My.MyApplication.UseSIMDExtensions = False
         End Sub
 
         Private Sub TransferComps(ByRef pp As PropertyPackage)
@@ -1302,17 +1319,6 @@ Namespace Thermodynamics
             pp.SetMaterial(ms)
 
             pp.FlashAlgorithm = flashalg
-
-            Select Case flashalg
-                Case 1
-                    pp.FlashAlgorithm = PropertyPackages.FlashMethod.DWSIMDefault
-                Case 2
-                    pp.FlashAlgorithm = PropertyPackages.FlashMethod.InsideOut
-                Case 3
-                    pp.FlashAlgorithm = PropertyPackages.FlashMethod.InsideOut3P
-                Case 6
-                    pp.FlashAlgorithm = PropertyPackages.FlashMethod.NestedLoops3P
-            End Select
 
             pp._ioquick = False
             pp._tpseverity = 2
@@ -2522,6 +2528,105 @@ Namespace Thermodynamics
             Return New InteractionParameter() With {.Comp1 = Compound1, .Comp2 = Compound2, .Model = Model, .Parameters = pars}
 
         End Function
+
+        Public Enum FlashCalculationType
+            PressureTemperature = 0
+            PressureEnthalpy = 1
+            PressureEntropy = 2
+            TemperatureEnthalpy = 3
+            TemperatureEntropy = 4
+            PressureVaporFraction = 5
+            TemperatureVaporFraction = 6
+            PressureSolidFraction = 7
+            TemperatureSolidFraction = 8
+        End Enum
+
+        ''' <summary>
+        ''' Calculates Phase Equilibria for a given mixture at specified conditions.
+        ''' </summary>
+        ''' <param name="flashtype">The type of the flash algorithm to calculate</param>
+        ''' <param name="flashalg">The flash algorithm to use</param>
+        ''' <param name="val1">Value of the first flash state specification (P in Pa, T in K, H in kJ/kg, S in kJ/[kg.K], VAP/SF in mole fraction from 0 to 1)</param>
+        ''' <param name="val2">Value of the second flash state specification (P in Pa, T in K, H in kJ/kg, S in kJ/[kg.K], VAP/SF in mole fraction from 0 to 1)</param>
+        ''' <param name="pp">Property Package instance</param>
+        ''' <param name="compounds">Compound names</param>
+        ''' <param name="molefractions">Vector of mixture mole fractions</param>
+        ''' <param name="initialKval">Vector containing initial estimates for the K-values (set to 'Nothing' (VB) or 'null' (C#) if none).</param>
+        ''' <param name="initialestimate">Initial estimate for Temperature (K) or Pressure (Pa), whichever will be calculated</param>
+        ''' <param name="ip1">Interaction Parameters Set #1.</param>
+        ''' <param name="ip2">Interaction Parameters Set #2.</param>
+        ''' <param name="ip3">Interaction Parameters Set #3.</param>
+        ''' <param name="ip4">Interaction Parameters Set #4.</param>
+        ''' <returns>A FlashCalculationResult instance with the results of the calculations</returns>
+        ''' <remarks>This function must be used instead of the older type-specific flash functions.
+        ''' Check if the 'ResultException' property of the result object is nothing/null before proceeding.</remarks>
+        <System.Runtime.InteropServices.DispId(39)> Public Function CalcEquilibrium(flashtype As FlashCalculationType,
+                                                                                           flashalg As FlashMethod, _
+                                                                                           val1 As Double, val2 As Double,
+                                                                                           pp As PropertyPackage,
+                                                                                           compounds As String(),
+                                                                                           molefractions As Double(),
+                                                                                           initialKval As Double(),
+                                                                                           initialestimate As Double, _
+                                                                                           Optional ByVal ip1 As Object = Nothing, _
+                                                                                           Optional ByVal ip2 As Object = Nothing, _
+                                                                                           Optional ByVal ip3 As Object = Nothing, _
+                                                                                           Optional ByVal ip4 As Object = Nothing) As FlashCalculationResult
+
+            TransferComps(pp)
+
+            SetIP(pp.ComponentName, pp, compounds, ip1, ip2, ip3, ip4)
+
+            Dim ms As New Streams.MaterialStream("", "")
+
+            For Each phase As DTL.ClassesBasicasTermodinamica.Fase In ms.Fases.Values
+                For Each c As String In compounds
+                    phase.Componentes.Add(c, New DTL.ClassesBasicasTermodinamica.Substancia(c, ""))
+                    phase.Componentes(c).ConstantProperties = pp._availablecomps(c)
+                Next
+            Next
+
+            For Each c As String In compounds
+                Dim tmpcomp As ConstantProperties = pp._availablecomps(c)
+                If Not pp._selectedcomps.ContainsKey(c) Then pp._selectedcomps.Add(c, tmpcomp)
+            Next
+
+            ms.SetOverallComposition(molefractions)
+
+            ms._pp = pp
+            pp.SetMaterial(ms)
+
+            pp.FlashAlgorithm = flashalg
+
+            Dim results As New FlashCalculationResult
+
+            Select Case flashtype
+                Case FlashCalculationType.PressureTemperature
+                    results = pp.FlashBase.CalculateEquilibrium(FlashSpec.P, FlashSpec.T, val1, val2, pp, molefractions, initialKval, initialestimate)
+                Case FlashCalculationType.PressureEnthalpy
+                    results = pp.FlashBase.CalculateEquilibrium(FlashSpec.P, FlashSpec.H, val1, val2, pp, molefractions, initialKval, initialestimate)
+                Case FlashCalculationType.PressureEntropy
+                    results = pp.FlashBase.CalculateEquilibrium(FlashSpec.P, FlashSpec.S, val1, val2, pp, molefractions, initialKval, initialestimate)
+                Case FlashCalculationType.PressureVaporFraction
+                    results = pp.FlashBase.CalculateEquilibrium(FlashSpec.P, FlashSpec.VAP, val1, val2, pp, molefractions, initialKval, initialestimate)
+                Case FlashCalculationType.TemperatureVaporFraction
+                    results = pp.FlashBase.CalculateEquilibrium(FlashSpec.T, FlashSpec.VAP, val1, val2, pp, molefractions, initialKval, initialestimate)
+                Case FlashCalculationType.TemperatureEnthalpy
+                    results.ResultException = New NotImplementedException("Flash type not yet supported.")
+                Case FlashCalculationType.TemperatureEntropy
+                    results.ResultException = New NotImplementedException("Flash type not yet supported.")
+                Case FlashCalculationType.PressureSolidFraction
+                    results = pp.FlashBase.CalculateEquilibrium(FlashSpec.P, FlashSpec.SF, val1, val2, pp, molefractions, initialKval, initialestimate)
+                Case FlashCalculationType.TemperatureSolidFraction
+                    results.ResultException = New NotImplementedException("Flash type not yet supported.")
+                Case Else
+                    results.ResultException = New NotImplementedException("Flash type not yet supported.")
+            End Select
+
+            Return results
+
+        End Function
+
 
     End Class
 

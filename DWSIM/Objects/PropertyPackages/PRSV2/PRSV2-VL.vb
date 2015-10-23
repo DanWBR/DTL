@@ -316,7 +316,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
             R = 8.314
 
-            Dim i, j As Integer
+            Dim i, j, k As Integer
             i = 0
             Do
                 Tc(i) = VTc(i)
@@ -966,7 +966,7 @@ Final3:
 
             R = 8.314
 
-            Dim i, j As Integer
+            Dim i, j, k As Integer
             i = 0
             Do
                 Tc(i) = VTc(i)
