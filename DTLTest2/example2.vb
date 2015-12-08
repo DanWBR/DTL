@@ -1,5 +1,4 @@
 ﻿Imports DTL.DTL.SimulationObjects.PropertyPackages
-Imports System.Linq
 
 Module example2
 
@@ -37,7 +36,7 @@ Module example2
         'do a three-phase flash calculation using the new generic function
 
         Dim result As Auxiliary.FlashAlgorithms.FlashCalculationResult = dtlc.CalcEquilibrium(DTL.Thermodynamics.Calculator.FlashCalculationType.PressureTemperature,
-                                                                        FlashMethod.NestedLoops3P, P * 101325, T + 273.15, prpp, compounds, molefractions, Nothing, 0)
+                                                                        6, P * 101325, T + 273.15, prpp, compounds, molefractions, Nothing, 0)
 
         'display the results
 

@@ -123,15 +123,12 @@
     <OptionInfer>On</OptionInfer>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Cudafy.NET">
-      <HintPath>References\Cudafy.NET.dll</HintPath>
-    </Reference>
     <Reference Include="Cureos.Numerics">
       <HintPath>References\Cureos.Numerics.dll</HintPath>
     </Reference>
-    <Reference Include="FileHelpers, Version=1.6.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>References\FileHelpers.dll</HintPath>
+    <Reference Include="FileHelpers, Version=3.1.5.0, Culture=neutral, PublicKeyToken=3e0c08d59cc3d657, processorArchitecture=MSIL">
+      <HintPath>..\packages\FileHelpers.3.1.5\lib\net40\FileHelpers.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Mapack, Version=1.0.9.0, Culture=neutral">
       <SpecificVersion>False</SpecificVersion>

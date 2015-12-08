@@ -86,19 +86,6 @@ Namespace DTL.SimulationObjects.PropertyPackages
         CAPEOPEN = 6
     End Enum
 
-    Public Enum FlashMethod
-        NestedLoops = 0
-        NestedLoops3P = 1
-        NestedLoopsImmiscible = 2
-        InsideOut = 3
-        InsideOut3P = 4
-        GibbsMin2P = 5
-        GibbsMin3P = 6
-        NestedLoopsSLE = 7
-        NestedLoopsSLE_SS = 8
-        SimpleLLE = 9
-    End Enum
-
     Public Enum Parameter
         PHFlash_Internal_Loop_Tolerance = 0
         PSFlash_Internal_Loop_Tolerance = 1
@@ -152,7 +139,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
         Private m_ip As DataTable
 
-        Private _flashalgorithm As FlashMethod
+        Private _flashalgorithm As Integer
 
         Public _packagetype As PackageType
 
@@ -353,11 +340,11 @@ Namespace DTL.SimulationObjects.PropertyPackages
         ''' <value></value>
         ''' <returns>A FlashMethod value with information about the selected flash algorithm.</returns>
         ''' <remarks></remarks>
-        Public Property FlashAlgorithm() As FlashMethod
+        Public Property FlashAlgorithm() As Integer
             Get
                 Return _flashalgorithm
             End Get
-            Set(ByVal value As FlashMethod)
+            Set(ByVal value As Integer)
                 _flashalgorithm = value
             End Set
         End Property
@@ -376,22 +363,23 @@ Namespace DTL.SimulationObjects.PropertyPackages
                     End If
                     Me.FlashAlgorithm = Me.Parameters("PP_FLASHALGORITHM")
                 End If
+                '2 = Global Def., 0 = NL VLE, 1 = IO VLE, 3 = IO VLLE, 4 = Gibbs VLE, 5 = Gibbs VLLE, 6 = NL VLLE, 7 = NL SLE, 8 = NL Immisc., 9 = Simple LLE
                 Select Case FlashAlgorithm
-                    Case FlashMethod.NestedLoops
+                    Case 0, 2
                         If My.MyApplication.IsRunningParallelTasks Or ForceNewFlashAlgorithmInstance Then
                             Return New Auxiliary.FlashAlgorithms.DWSIMDefault
                         Else
                             If _dwdf Is Nothing Then _dwdf = New Auxiliary.FlashAlgorithms.DWSIMDefault
                             Return _dwdf
                         End If
-                    Case FlashMethod.InsideOut
+                    Case 1
                         If My.MyApplication.IsRunningParallelTasks Or ForceNewFlashAlgorithmInstance Then
                             Return New Auxiliary.FlashAlgorithms.BostonBrittInsideOut
                         Else
                             If _bbio Is Nothing Then _bbio = New Auxiliary.FlashAlgorithms.BostonBrittInsideOut
                             Return _bbio
                         End If
-                    Case FlashMethod.InsideOut3P
+                    Case 3
                         If My.MyApplication.IsRunningParallelTasks Or ForceNewFlashAlgorithmInstance Then
                             Return New Auxiliary.FlashAlgorithms.BostonFournierInsideOut3P With
                                                         {.StabSearchCompIDs = _tpcompids, .StabSearchSeverity = _tpseverity}
@@ -400,7 +388,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
                                 {.StabSearchCompIDs = _tpcompids, .StabSearchSeverity = _tpseverity}
                             Return _brio3
                         End If
-                    Case FlashMethod.GibbsMin2P
+                    Case 4
                         If My.MyApplication.IsRunningParallelTasks Or ForceNewFlashAlgorithmInstance Then
                             Return New Auxiliary.FlashAlgorithms.GibbsMinimization3P With
                                                         {.ForceTwoPhaseOnly = True}
@@ -408,7 +396,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
                             If _gm3 Is Nothing Then _gm3 = New Auxiliary.FlashAlgorithms.GibbsMinimization3P With {.ForceTwoPhaseOnly = True}
                             Return _gm3
                         End If
-                    Case FlashMethod.GibbsMin3P
+                    Case 5
                         If My.MyApplication.IsRunningParallelTasks Or ForceNewFlashAlgorithmInstance Then
                             Return New Auxiliary.FlashAlgorithms.GibbsMinimization3P With
                                                         {.ForceTwoPhaseOnly = False, .StabSearchCompIDs = _tpcompids, .StabSearchSeverity = _tpseverity}
@@ -417,7 +405,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
                                 {.ForceTwoPhaseOnly = False, .StabSearchCompIDs = _tpcompids, .StabSearchSeverity = _tpseverity}
                             Return _gm3
                         End If
-                    Case FlashMethod.NestedLoops3P
+                    Case 6
                         If My.MyApplication.IsRunningParallelTasks Or ForceNewFlashAlgorithmInstance Then
                             Return New Auxiliary.FlashAlgorithms.NestedLoops3P With
                                                         {.StabSearchCompIDs = _tpcompids, .StabSearchSeverity = _tpseverity}
@@ -426,18 +414,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
                                 {.StabSearchCompIDs = _tpcompids, .StabSearchSeverity = _tpseverity}
                             Return _nl3
                         End If
-                    Case FlashMethod.NestedLoopsSLE
-                        Dim constprops As New List(Of ConstantProperties)
-                        For Each su As Substancia In Me.CurrentMaterialStream.Fases(0).Componentes.Values
-                            constprops.Add(su.ConstantProperties)
-                        Next
-                        If My.MyApplication.IsRunningParallelTasks Or ForceNewFlashAlgorithmInstance Then
-                            Return New Auxiliary.FlashAlgorithms.NestedLoopsSLE With {.CompoundProperties = constprops}
-                        Else
-                            If _nlsle Is Nothing Then _nlsle = New Auxiliary.FlashAlgorithms.NestedLoopsSLE With {.CompoundProperties = constprops}
-                            Return _nlsle
-                        End If
-                    Case FlashMethod.NestedLoopsSLE_SS
+                    Case 7
                         Dim constprops As New List(Of ConstantProperties)
                         For Each su As Substancia In Me.CurrentMaterialStream.Fases(0).Componentes.Values
                             constprops.Add(su.ConstantProperties)
@@ -448,7 +425,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
                             If _nlsle Is Nothing Then _nlsle = New Auxiliary.FlashAlgorithms.NestedLoopsSLE With {.CompoundProperties = constprops, .SolidSolution = True}
                             Return _nlsle
                         End If
-                    Case FlashMethod.NestedLoopsImmiscible
+                    Case 8
                         Dim constprops As New List(Of ConstantProperties)
                         For Each su As Substancia In Me.CurrentMaterialStream.Fases(0).Componentes.Values
                             constprops.Add(su.ConstantProperties)
@@ -461,7 +438,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
                             {.CompoundProperties = constprops, .StabSearchCompIDs = _tpcompids, .StabSearchSeverity = _tpseverity}
                             Return _nli
                         End If
-                    Case FlashMethod.SimpleLLE
+                    Case 9
                         If My.MyApplication.IsRunningParallelTasks Or ForceNewFlashAlgorithmInstance Then
                             Return New Auxiliary.FlashAlgorithms.SimpleLLE
                         Else
@@ -692,40 +669,20 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
             If My.MyApplication._EnableParallelProcessing Then
                 My.MyApplication.IsRunningParallelTasks = True
-                If My.MyApplication._EnableGPUProcessing Then
-                    If Not My.MyApplication.gpu.IsMultithreadingEnabled Then
-                        My.MyApplication.gpu.EnableMultithreading()
-                    Else
-                        alreadymt = True
-                    End If
-                End If
-                Try
-                    Dim task1 As Task = New Task(Sub()
-                                                     fugliq = Me.DW_CalcFugCoeff(Vx, T, P, State.Liquid)
-                                                 End Sub)
-                    Dim task2 As Task = New Task(Sub()
-                                                     If type = "LV" Then
-                                                         fugvap = Me.DW_CalcFugCoeff(Vy, T, P, State.Vapor)
-                                                     Else ' LL
-                                                         fugvap = Me.DW_CalcFugCoeff(Vy, T, P, State.Liquid)
-                                                     End If
-                                                 End Sub)
+                Dim task1 As Task = New Task(Sub()
+                                                 fugliq = Me.DW_CalcFugCoeff(Vx, T, P, State.Liquid)
+                                             End Sub)
+                Dim task2 As Task = New Task(Sub()
+                                                 If type = "LV" Then
+                                                     fugvap = Me.DW_CalcFugCoeff(Vy, T, P, State.Vapor)
+                                                 Else ' LL
+                                                     fugvap = Me.DW_CalcFugCoeff(Vy, T, P, State.Liquid)
+                                                 End If
+                                             End Sub)
 
-                    task1.Start()
-                    task2.Start()
-                    Task.WaitAll(task1, task2)
-                Catch ae As AggregateException
-                    For Each ex As Exception In ae.InnerExceptions
-                        Throw ex
-                    Next
-                Finally
-                    If My.MyApplication._EnableGPUProcessing Then
-                        If Not alreadymt Then
-                            My.MyApplication.gpu.DisableMultithreading()
-                            My.MyApplication.gpu.FreeAll()
-                        End If
-                    End If
-                End Try
+                task1.Start()
+                task2.Start()
+                Task.WaitAll(task1, task2)
                 My.MyApplication.IsRunningParallelTasks = False
             Else
                 fugliq = Me.DW_CalcFugCoeff(Vx, T, P, State.Liquid)

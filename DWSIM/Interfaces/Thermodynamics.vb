@@ -91,48 +91,6 @@ Namespace Thermodynamics
         End Sub
 
         ''' <summary>
-        ''' Enables GPU parallel processing for some tasks. A call to 'InitComputeDevice' is required after this one.
-        ''' </summary>
-        ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(5)> Sub EnableGPUProcessing()
-
-            My.MyApplication._EnableGPUProcessing = True
-
-        End Sub
-
-        ''' <summary>
-        ''' Disables GPU parallel processing.
-        ''' </summary>
-        ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(6)> Sub DisableGPUProcessing()
-
-            My.MyApplication._EnableGPUProcessing = False
-
-        End Sub
-
-        ''' <summary>
-        ''' Initializes the Compute (GPU) device with the default settings (language = OpenCL, first device on the list).
-        ''' </summary>
-        ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(7)> Sub InitComputeDevice()
-
-            DTL.App.InitComputeDevice()
-
-        End Sub
-
-        ''' <summary>
-        ''' Initializes the Compute (GPU) device.
-        ''' </summary>
-        ''' <param name="CudafyTarget">Target language for calculations (CUDA = 0, OpenCL = 1).</param>
-        ''' <param name="DeviceID">ID of the compute device. Defaults to the first device on the system (DeviceID = 0).</param>
-        ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(8)> Sub InitComputeDevice(ByVal CudafyTarget As Integer, Optional ByVal DeviceID As Integer = 0)
-
-            DTL.App.InitComputeDevice(CudafyTarget, DeviceID)
-
-        End Sub
-
-        ''' <summary>
         ''' Sets the debug level, which controls the amount of information which is written to the screen.
         ''' </summary>
         ''' <param name="level">Debug level: 0 = none, 1 = low, 2 = medium, 3 = high</param>
@@ -2561,7 +2519,7 @@ Namespace Thermodynamics
         ''' <remarks>This function must be used instead of the older type-specific flash functions.
         ''' Check if the 'ResultException' property of the result object is nothing/null before proceeding.</remarks>
         <System.Runtime.InteropServices.DispId(39)> Public Function CalcEquilibrium(flashtype As FlashCalculationType,
-                                                                                           flashalg As FlashMethod, _
+                                                                                           flashalg As Integer, _
                                                                                            val1 As Double, val2 As Double,
                                                                                            pp As PropertyPackage,
                                                                                            compounds As String(),

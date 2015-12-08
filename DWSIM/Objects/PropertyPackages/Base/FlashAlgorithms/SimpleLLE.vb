@@ -260,27 +260,15 @@ out:        d2 = Date.Now
             Do
                 If My.MyApplication._EnableParallelProcessing Then
                     My.MyApplication.IsRunningParallelTasks = True
-                    If My.MyApplication._EnableGPUProcessing Then
-                        ' My.MyApplication.gpu.EnableMultithreading()
-                    End If
-                    Try
-                        Dim task1 As Task = New Task(Sub()
-                                                         fx = Herror(x1, {P, Vz, PP})
-                                                     End Sub)
+                    Dim task1 As Task = New Task(Sub()
+                                                     fx = Herror(x1, {P, Vz, PP})
+                                                 End Sub)
                         Dim task2 As Task = New Task(Sub()
                                                          fx2 = Herror(x1 + 1, {P, Vz, PP})
                                                      End Sub)
                         task1.Start()
                         task2.Start()
                         Task.WaitAll(task1, task2)
-                    Catch ae As AggregateException
-                        Throw ae.Flatten().InnerException
-                    Finally
-                        'If My.MyApplication._EnableGPUProcessing Then
-                        '    My.MyApplication.gpu.DisableMultithreading()
-                        '    My.MyApplication.gpu.FreeAll()
-                        'End If
-                    End Try
                     My.MyApplication.IsRunningParallelTasks = False
                 Else
                     fx = Herror(x1, {P, Vz, PP})

@@ -51,11 +51,6 @@
     <NoWarn>42353,42354,42355</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Cudafy.NET, Version=1.25.4963.10126, Culture=neutral, PublicKeyToken=63a4c9931616906b, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\DWSIM\References\Cudafy.NET.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>

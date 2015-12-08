@@ -340,25 +340,13 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
             If My.MyApplication._EnableParallelProcessing Then
                 My.MyApplication.IsRunningParallelTasks = True
-                If My.MyApplication._EnableGPUProcessing Then
-                    'My.MyApplication.gpu.EnableMultithreading()
-                End If
-                Try
-                    Dim task1 = Task.Factory.StartNew(Sub()
-                                                          fcv = pp.DW_CalcFugCoeff(Vz, T, P, State.Vapor)
-                                                      End Sub)
-                    Dim task2 = Task.Factory.StartNew(Sub()
-                                                          fcl = pp.DW_CalcFugCoeff(Vz, T, P, State.Liquid)
-                                                      End Sub)
-                    Task.WaitAll(task1, task2)
-                Catch ae As AggregateException
-                    Throw ae.Flatten().InnerException
-                Finally
-                    'If My.MyApplication.EnableGPUProcessing Then
-                    '    My.MyApplication.gpu.DisableMultithreading()
-                    '    My.MyApplication.gpu.FreeAll()
-                    'End If
-                End Try
+                Dim task1 = Task.Factory.StartNew(Sub()
+                                                      fcv = pp.DW_CalcFugCoeff(Vz, T, P, State.Vapor)
+                                                  End Sub)
+                Dim task2 = Task.Factory.StartNew(Sub()
+                                                      fcl = pp.DW_CalcFugCoeff(Vz, T, P, State.Liquid)
+                                                  End Sub)
+                Task.WaitAll(task1, task2)
                 My.MyApplication.IsRunningParallelTasks = False
             Else
                 fcv = pp.DW_CalcFugCoeff(Vz, T, P, State.Vapor)
