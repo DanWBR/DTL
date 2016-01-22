@@ -126,9 +126,8 @@
     <Reference Include="Cureos.Numerics">
       <HintPath>References\Cureos.Numerics.dll</HintPath>
     </Reference>
-    <Reference Include="FileHelpers, Version=3.1.5.0, Culture=neutral, PublicKeyToken=3e0c08d59cc3d657, processorArchitecture=MSIL">
-      <HintPath>..\packages\FileHelpers.3.1.5\lib\net40\FileHelpers.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="FileHelpers">
+      <HintPath>References\FileHelpers.dll</HintPath>
     </Reference>
     <Reference Include="Mapack, Version=1.0.9.0, Culture=neutral">
       <SpecificVersion>False</SpecificVersion>
@@ -137,12 +136,12 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="Yeppp.CLR.Bundle, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Yeppp.CLR.Bundle.1.0.1-prerelease\lib\net20\Yeppp.CLR.Bundle.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Yeppp.CLR.Bundle">
+      <HintPath>References\Yeppp.CLR.Bundle.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Import Include="DTL.DTL.ClassesBasicasTermodinamica" />
     <Import Include="Microsoft.VisualBasic" />
     <Import Include="System" />
     <Import Include="System.Collections" />
