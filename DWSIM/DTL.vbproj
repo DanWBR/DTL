@@ -213,7 +213,7 @@
     <Compile Include="Objects\PropertyPackages\Base\PropertyPackage.vb" />
     <Compile Include="Objects\Streams\Streams.vb" />
     <Compile Include="Objects\Base\BaseThermoClasses.vb" />
-    <Compile Include="Objects\Classes\Unit\SistemasDeUnidades.vb" />
+    <Compile Include="Objects\Classes\Unit\UnitsOfMeasure.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
