@@ -5,13 +5,13 @@ Namespace DTL.MathEx.AP
         Public x As Double
         Public y As Double
         Public Sub New(ByVal _x As Double)
-            Me.x = _x
-            Me.y = 0
+            x = _x
+            y = 0
         End Sub
 
         Public Sub New(ByVal _x As Double, ByVal _y As Double)
-            Me.x = _x
-            Me.y = _y
+            x = _x
+            y = _y
         End Sub
 
         Public Shared Widening Operator CType(ByVal _x As Double) As Complex
@@ -63,9 +63,11 @@ Namespace DTL.MathEx.AP
             complex.y = ((-lhs.x + (lhs.y * num)) / num2)
             Return complex
         End Operator
+
     End Structure
 
     Public Class MathEx
+
         ' Methods
         Public Shared Function AbsComplex(ByVal z As Complex) As Double
             Dim num2 As Double = Math.Abs(z.x)
@@ -104,6 +106,7 @@ Namespace DTL.MathEx.AP
         Public Const MaxRealNumber As Double = 1.0E+300
         Public Const MinRealNumber As Double = 1.0E-300
         Private Shared RndObject As Random = New Random
+
     End Class
 
 End Namespace
