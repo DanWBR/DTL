@@ -17,9 +17,7 @@
 '    along with DWSIM.  If not, see <http://www.gnu.org/licenses/>.
 
 Imports System.Math
-Imports DTL.DTL.SimulationObjects
 Imports DTL.DTL.MathEx
-Imports DTL.DTL.MathEx.Common
 Imports System.Threading.Tasks
 Imports System.Linq
 
@@ -142,7 +140,6 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
             If g > 0 Then Vmin = V Else Vmax = V
 
             V = Vmin + (Vmax - Vmin) / 2
-            'V = (P - Pd) / (Pb - Pd)
 
             L = 1 - V
 
@@ -188,20 +185,6 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                 Ki_ant = Ki.Clone
                 Ki = PP.DW_CalcKvalue(Vx, Vy, T, P)
 
-                'i = 0
-                'Do
-                '    If Vz(i) <> 0 Then
-                '        Vy_ant(i) = Vy(i)
-                '        Vx_ant(i) = Vx(i)
-                '        Vy(i) = Vz(i) * Ki(i) / ((Ki(i) - 1) * V + 1)
-                '        Vx(i) = Vy(i) / Ki(i)
-                '    Else
-                '        Vy(i) = 0
-                '        Vx(i) = 0
-                '    End If
-                '    i += 1
-                'Loop Until i = n + 1
-
                 Vy_ant = Vy.Clone
                 Vx_ant = Vx.Clone
 
@@ -230,25 +213,12 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
                     Vant = V
 
-                    'F = 0.0#
-                    'dF = 0.0#
-                    'i = 0
-                    'Do
-                    '    If Vz(i) > 0 Then
-                    '        F = F + Vz(i) * (Ki(i) - 1) / (1 + V * (Ki(i) - 1))
-                    '        dF = dF - Vz(i) * (Ki(i) - 1) ^ 2 / (1 + V * (Ki(i) - 1)) ^ 2
-                    '    End If
-                    '    i = i + 1
-                    'Loop Until i = n + 1
-
                     F = Vz.MultiplyY(Ki.AddConstY(-1).DivideY(Ki.AddConstY(-1).MultiplyConstY(V).AddConstY(1))).SumY
                     dF = Vz.NegateY.MultiplyY(Ki.AddConstY(-1).MultiplyY(Ki.AddConstY(-1)).DivideY(Ki.AddConstY(-1).MultiplyConstY(V).AddConstY(1)).DivideY(Ki.AddConstY(-1).MultiplyConstY(V).AddConstY(1))).SumY
 
                     If Abs(F) < etol / 100 Then Exit Do
 
                     V = -F / dF + Vant
-
-                    'If V >= 1.01 Or V <= -0.01 Then V = -0.1 * F / dF + Vant
 
                 End If
 
@@ -969,7 +939,7 @@ out:        Return New Object() {L, V, Vx, Vy, ecount, 0.0#, PP.RET_NullVector, 
                 Return New Object() {L, V, Vx, Vy, P, 0, Ki, 0.0#, PP.RET_NullVector, 0.0#, PP.RET_NullVector}
             End If
 
-            Dim marcador3, marcador2, marcador As Integer
+            Dim marker3, marker2, marker As Integer
             Dim stmp4_ant, stmp4, Pant, fval As Double
             Dim chk As Boolean = False
 
@@ -977,18 +947,15 @@ out:        Return New Object() {L, V, Vx, Vy, ecount, 0.0#, PP.RET_NullVector, 
 
                 ecount = 0
                 Do
-
-                    marcador3 = 0
+                    marker3 = 0
 
                     Dim cont_int = 0
                     Do
-
-
                         Ki = PP.DW_CalcKvalue(Vx, Vy, T, P)
 
-                        marcador = 0
+                        marker = 0
                         If stmp4_ant <> 0 Then
-                            marcador = 1
+                            marker = 1
                         End If
                         stmp4_ant = stmp4
 
@@ -1024,22 +991,22 @@ out:        Return New Object() {L, V, Vx, Vy, ecount, 0.0#, PP.RET_NullVector, 
                             Loop Until i = n + 1
                         End If
 
-                        marcador2 = 0
-                        If marcador = 1 Then
+                        marker2 = 0
+                        If marker = 1 Then
                             If V = 0 Then
                                 If Abs(Vy(0) - Vy_ant(0)) < itol Then
-                                    marcador2 = 1
+                                    marker2 = 1
                                 End If
                             Else
                                 If Abs(Vx(0) - Vx_ant(0)) < itol Then
-                                    marcador2 = 1
+                                    marker2 = 1
                                 End If
                             End If
                         End If
 
                         cont_int = cont_int + 1
 
-                    Loop Until marcador2 = 1 Or Double.IsNaN(stmp4) Or cont_int > maxit_i
+                    Loop Until marker2 = 1 Or Double.IsNaN(stmp4) Or cont_int > maxit_i
 
                     Dim K1(n), K2(n), dKdP(n) As Double
 
@@ -1315,7 +1282,7 @@ out:        Return New Object() {L, V, Vx, Vy, ecount, 0.0#, PP.RET_NullVector, 
                 Return New Object() {L, V, Vx, Vy, T, 0, Ki, 0.0#, PP.RET_NullVector, 0.0#, PP.RET_NullVector}
             End If
 
-            Dim marcador3, marcador2, marcador As Integer
+            Dim marker3, marker2, marker As Integer
             Dim stmp4_ant, stmp4, Tant, fval As Double
             Dim chk As Boolean = False
 
@@ -1324,16 +1291,16 @@ out:        Return New Object() {L, V, Vx, Vy, ecount, 0.0#, PP.RET_NullVector, 
                 ecount = 0
                 Do
 
-                    marcador3 = 0
+                    marker3 = 0
 
                     Dim cont_int = 0
                     Do
 
                         Ki = PP.DW_CalcKvalue(Vx, Vy, T, P)
 
-                        marcador = 0
+                        marker = 0
                         If stmp4_ant <> 0 Then
-                            marcador = 1
+                            marker = 1
                         End If
                         stmp4_ant = stmp4
 
@@ -1375,22 +1342,22 @@ out:        Return New Object() {L, V, Vx, Vy, ecount, 0.0#, PP.RET_NullVector, 
                             'Loop Until i = n + 1
                         End If
 
-                        marcador2 = 0
-                        If marcador = 1 Then
+                        marker2 = 0
+                        If marker = 1 Then
                             If V = 0 Then
                                 If Abs(Vy(0) - Vy_ant(0)) < itol Then
-                                    marcador2 = 1
+                                    marker2 = 1
                                 End If
                             Else
                                 If Abs(Vx(0) - Vx_ant(0)) < itol Then
-                                    marcador2 = 1
+                                    marker2 = 1
                                 End If
                             End If
                         End If
 
                         cont_int = cont_int + 1
 
-                    Loop Until marcador2 = 1 Or Double.IsNaN(stmp4) Or cont_int > maxit_i
+                    Loop Until marker2 = 1 Or Double.IsNaN(stmp4) Or cont_int > maxit_i
 
                     Dim K1(n), K2(n), dKdT(n) As Double
 

@@ -1234,7 +1234,7 @@ Final:
             Dim n = UBound(Vy)
 
             Dim chk As Boolean = False
-            Dim marcador2 As Integer
+            Dim marker2 As Integer
 
             Dim F As Double
             Dim dKdP(n), dKdPi(n) As Object
@@ -1242,7 +1242,7 @@ Final:
             Dim Vp(n), R, coeff(3) As Double
             Dim i As Integer
             Dim sum_x As Double
-            Dim marcador
+            Dim marker
             Dim stmp4_ant, stmp4, Pant As Double
             stmp4_ant = 0
             stmp4 = 0
@@ -1302,9 +1302,9 @@ Final:
                         i = i + 1
                     Loop Until i = n + 1
 
-                    marcador = 0
+                    marker = 0
                     If stmp4_ant <> 0 Then
-                        marcador = 1
+                        marker = 1
                     End If
                     stmp4_ant = stmp4
 
@@ -1321,10 +1321,10 @@ Final:
                         i = i + 1
                     Loop Until i = n + 1
 
-                    marcador2 = 0
-                    If marcador = 1 Then
+                    marker2 = 0
+                    If marker = 1 Then
                         If Abs(stmp4_ant - stmp4) < m_tolerance Then
-                            marcador2 = 1
+                            marker2 = 1
                         End If
                     End If
 
@@ -1333,7 +1333,7 @@ Final:
                     If cont_int >= m_miti Then Throw New Exception(ErrorCode.MaximumIterationsReached)
                     If Double.IsNaN(stmp4) Then Throw New Exception(ErrorCode.IterationDiverged)
 
-                Loop Until marcador2 = 1
+                Loop Until marker2 = 1
 
                 dKdP = _dKdP(T, P, Vx, Vy, VKij, VTc, VPc, Vw, otherargs)
 
@@ -1396,7 +1396,7 @@ Final:
             Dim n = UBound(Vx)
 
             Dim chk As Boolean = False
-            Dim marcador2 As Integer
+            Dim marker2 As Integer
 
             Dim F As Double
             Dim dKdP(n), dKdPi(n) As Object
@@ -1404,7 +1404,7 @@ Final:
             Dim Vp(n), R, coeff(3), tmp(2, 2) As Double
             Dim i As Integer
             Dim sum_y As Double
-            Dim marcador3, marcador
+            Dim marker3, marker
             Dim stmp4_ant, stmp4, Pant As Double
             stmp4_ant = 0
             stmp4 = 0
@@ -1454,7 +1454,7 @@ Final:
 
                 LN_CFL = thermobase.CalcLnFug(T, P, Vx, VKij, VTc, VPc, Vw, otherargs)
 
-                marcador3 = 0
+                marker3 = 0
 
                 Dim cont_int = 0
                 Do
@@ -1467,9 +1467,9 @@ Final:
                         i = i + 1
                     Loop Until i = n + 1
 
-                    marcador = 0
+                    marker = 0
                     If stmp4_ant <> 0 Then
-                        marcador = 1
+                        marker = 1
                     End If
                     stmp4_ant = stmp4
 
@@ -1487,10 +1487,10 @@ Final:
                         i = i + 1
                     Loop Until i = n + 1
 
-                    marcador2 = 0
-                    If marcador = 1 Then
+                    marker2 = 0
+                    If marker = 1 Then
                         If Abs(stmp4_ant - stmp4) < m_tolerance Then
-                            marcador2 = 1
+                            marker2 = 1
                         End If
                     End If
 
@@ -1499,7 +1499,7 @@ Final:
                     If cont_int >= m_miti Then Throw New Exception(ErrorCode.MaximumIterationsReached)
                     If Double.IsNaN(stmp4) Then Throw New Exception(ErrorCode.IterationDiverged)
 
-                Loop Until marcador2 = 1
+                Loop Until marker2 = 1
 
                 dKdP = _dKdP(T, P, Vx, Vy, VKij, VTc, VPc, Vw, otherargs)
 
@@ -1562,7 +1562,7 @@ Final:
             Dim n = UBound(Vy)
 
             Dim chk As Boolean = False
-            Dim marcador2 As Integer
+            Dim marker2 As Integer
 
             Dim F As Double
             Dim dKdT(n), dKdTi(n) As Object
@@ -1570,7 +1570,7 @@ Final:
             Dim Vp(n) As Double
             Dim i As Integer
             Dim sum_x As Double
-            Dim marcador
+            Dim marker
             Dim stmp4_ant, stmp4, Tant As Double
             stmp4_ant = 0
             stmp4 = 0
@@ -1636,9 +1636,9 @@ Final:
                         i = i + 1
                     Loop Until i = n + 1
 
-                    marcador = 0
+                    marker = 0
                     If stmp4_ant <> 0 Then
-                        marcador = 1
+                        marker = 1
                     End If
                     stmp4_ant = stmp4
 
@@ -1655,10 +1655,10 @@ Final:
                         i = i + 1
                     Loop Until i = n + 1
 
-                    marcador2 = 0
-                    If marcador = 1 Then
+                    marker2 = 0
+                    If marker = 1 Then
                         If Abs(stmp4_ant - stmp4) < m_tolerance Then
-                            marcador2 = 1
+                            marker2 = 1
                         End If
                     End If
 
@@ -1667,7 +1667,7 @@ Final:
                     If cont_int >= m_miti Then Throw New Exception(ErrorCode.MaximumIterationsReached)
                     If Double.IsNaN(stmp4) Then Throw New Exception(ErrorCode.IterationDiverged)
 
-                Loop Until marcador2 = 1
+                Loop Until marker2 = 1
 
                 dKdT = _dKdT(T, P, Vx, Vy, VKij, VTc, VPc, Vw, otherargs)
 
@@ -1730,7 +1730,7 @@ Final:
             Dim n = UBound(Vx)
 
             Dim chk As Boolean = False
-            Dim marcador2 As Integer
+            Dim marker2 As Integer
 
             Dim F As Double
             Dim dKdT(n) As Object
@@ -1739,7 +1739,7 @@ Final:
             Dim Vp(n) As Double
             Dim i As Integer
             Dim sum_y As Double
-            Dim marcador
+            Dim marker
             Dim stmp4_ant, stmp4, Tant As Double
             stmp4_ant = 0
             stmp4 = 0
@@ -1802,9 +1802,9 @@ Final:
                         i = i + 1
                     Loop Until i = n + 1
 
-                    marcador = 0
+                    marker = 0
                     If stmp4_ant <> 0 Then
-                        marcador = 1
+                        marker = 1
                     End If
                     stmp4_ant = stmp4
 
@@ -1821,10 +1821,10 @@ Final:
                         i = i + 1
                     Loop Until i = n + 1
 
-                    marcador2 = 0
-                    If marcador = 1 Then
+                    marker2 = 0
+                    If marker = 1 Then
                         If Abs(stmp4_ant - stmp4) < m_tolerance Then
-                            marcador2 = 1
+                            marker2 = 1
                         End If
                     End If
 
@@ -1833,7 +1833,7 @@ Final:
                     If cont_int >= m_miti Then Throw New Exception(ErrorCode.MaximumIterationsReached)
                     If Double.IsNaN(stmp4) Then Throw New Exception(ErrorCode.IterationDiverged)
 
-                Loop Until marcador2 = 1
+                Loop Until marker2 = 1
 
                 dKdT = _dKdT(T, P, Vx, Vy, VKij, VTc, VPc, Vw)
 
