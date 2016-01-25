@@ -712,7 +712,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
                 Tref = 0
                 Do
                     If L = 0 Then
-                        Tref = MathEx.Common.Min(VTF)
+                        Tref = Common.Min(VTF)
                     Else
                         Tref += Vz(i) * VTF(i)
                     End If
@@ -951,7 +951,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
                 Tref = 0
                 Do
                     If L = 0 Then 'L=0
-                        Tref = MathEx.Common.Min(VTF)
+                        Tref = Common.Min(VTF)
                     Else
                         Tref += Vz(i) * VTF(i)
                     End If

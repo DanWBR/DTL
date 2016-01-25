@@ -2113,7 +2113,7 @@ redirect2:                      result = Me.FlashBase.Flash_PS(RET_VMOL(Phase.Mi
 
             Dim subst As DTL.BaseThermoClasses.Substance
 
-            For Each phase As DTL.BaseThermoClasses.Phase In Me.CurrentMaterialStream.Phases.Values
+            For Each phase As BaseThermoClasses.Phase In Me.CurrentMaterialStream.Phases.Values
                 For Each subst In phase.Components.Values
                     subst.Kvalue = Me.CurrentMaterialStream.Phases(2).Components(subst.Name).MolarFraction.GetValueOrDefault / phase.Components(subst.Name).MolarFraction.GetValueOrDefault
                     subst.lnKvalue = Log(subst.Kvalue)
@@ -2131,7 +2131,7 @@ redirect2:                      result = Me.FlashBase.Flash_PS(RET_VMOL(Phase.Mi
                     Next
                 End With
             Else
-                For Each phase As DTL.BaseThermoClasses.Phase In Me.CurrentMaterialStream.Phases.Values
+                For Each phase As BaseThermoClasses.Phase In Me.CurrentMaterialStream.Phases.Values
                     With phase
                         For Each subs As Substance In .Components.Values
                             subs.MolarFlow = .SPMProperties.molarflow.GetValueOrDefault * subs.MolarFraction.GetValueOrDefault
@@ -2174,7 +2174,7 @@ redirect2:                      result = Me.FlashBase.Flash_PS(RET_VMOL(Phase.Mi
                     Next
                 End With
             Else
-                For Each phase As DTL.BaseThermoClasses.Phase In Me.CurrentMaterialStream.Phases.Values
+                For Each phase As BaseThermoClasses.Phase In Me.CurrentMaterialStream.Phases.Values
                     With phase
                         For Each subs As Substance In .Components.Values
                             subs.MassFlow = .SPMProperties.massflow.GetValueOrDefault * subs.MassFraction.GetValueOrDefault
@@ -2228,7 +2228,7 @@ redirect2:                      result = Me.FlashBase.Flash_PS(RET_VMOL(Phase.Mi
 
                 End With
             Else
-                For Each phase As DTL.BaseThermoClasses.Phase In Me.CurrentMaterialStream.Phases.Values
+                For Each phase As BaseThermoClasses.Phase In Me.CurrentMaterialStream.Phases.Values
                     With phase
 
                         Sum = 0
@@ -3483,7 +3483,7 @@ Final3:
                                 vk(i) = subst.MassFraction / vk(i)
                                 i = i + 1
                             Next
-                            val = 1 / MathEx.Common.Sum(vk)
+                            val = 1 / Common.Sum(vk)
                         Else
                             val = Me.m_props.liq_dens_rackett(T, Me.AUX_Rackett_Tcm(Phase.Liquid), Me.AUX_PCM(Phase.Liquid), Me.AUX_WM(Phase.Liquid), Me.AUX_MMM(Phase.Liquid), Me.AUX_ZRAM(Phase.Liquid), P, Me.AUX_PVAPM(T))
                         End If
@@ -3539,7 +3539,7 @@ Final3:
                                 vk(i) = subst.MassFraction / vk(i)
                                 i = i + 1
                             Next
-                            val = 1 / MathEx.Common.Sum(vk)
+                            val = 1 / Common.Sum(vk)
                         Else
                             val = Me.m_props.liq_dens_rackett(T, Me.AUX_Rackett_Tcm(Phase.Liquid1), Me.AUX_PCM(Phase.Liquid1), Me.AUX_WM(Phase.Liquid1), Me.AUX_MMM(Phase.Liquid1), Me.AUX_ZRAM(Phase.Liquid1), P, Me.AUX_PVAPM(T))
                         End If
@@ -3580,7 +3580,7 @@ Final3:
                                 vk(i) = subst.MassFraction / vk(i)
                                 i = i + 1
                             Next
-                            val = 1 / MathEx.Common.Sum(vk)
+                            val = 1 / Common.Sum(vk)
                         Else
                             val = Me.m_props.liq_dens_rackett(T, Me.AUX_Rackett_Tcm(Phase.Liquid2), Me.AUX_PCM(Phase.Liquid2), Me.AUX_WM(Phase.Liquid2), Me.AUX_MMM(Phase.Liquid2), Me.AUX_ZRAM(Phase.Liquid2), P, Me.AUX_PVAPM(T))
                         End If
@@ -3621,7 +3621,7 @@ Final3:
                                 vk(i) = subst.MassFraction / vk(i)
                                 i = i + 1
                             Next
-                            val = 1 / MathEx.Common.Sum(vk)
+                            val = 1 / Common.Sum(vk)
                         Else
                             val = Me.m_props.liq_dens_rackett(T, Me.AUX_Rackett_Tcm(Phase.Liquid3), Me.AUX_PCM(Phase.Liquid3), Me.AUX_WM(Phase.Liquid3), Me.AUX_MMM(Phase.Liquid3), Me.AUX_ZRAM(Phase.Liquid3), P, Me.AUX_PVAPM(T))
                         End If
@@ -3662,7 +3662,7 @@ Final3:
                                 vk(i) = subst.MassFraction / vk(i)
                                 i = i + 1
                             Next
-                            val = 1 / MathEx.Common.Sum(vk)
+                            val = 1 / Common.Sum(vk)
                         Else
                             val = Me.m_props.liq_dens_rackett(T, Me.AUX_Rackett_Tcm(Phase.Aqueous), Me.AUX_PCM(Phase.Aqueous), Me.AUX_WM(Phase.Aqueous), Me.AUX_MMM(Phase.Aqueous), Me.AUX_ZRAM(Phase.Aqueous), P, Me.AUX_PVAPM(T))
                         End If
@@ -3710,7 +3710,7 @@ Final3:
                 If Not Double.IsNaN(vk(i)) Then vk(i) = Vx(i) / vk(i) Else vk(i) = 0.0#
                 i = i + 1
             Next
-            val = 1 / MathEx.Common.Sum(vk)
+            val = 1 / Common.Sum(vk)
 
             m_pr2 = Nothing
 
@@ -7041,7 +7041,7 @@ Final3:
         Friend Function COMaterialtoDWMaterial(ByVal material As Object) As MaterialStream
 
             Dim ms As New MaterialStream(CType(material, ICapeIdentification).ComponentName, "")
-            For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
+            For Each phase As BaseThermoClasses.Phase In ms.Phases.Values
                 For Each tmpcomp As ConstantProperties In _selectedcomps.Values
                     phase.Components.Add(tmpcomp.Name, New DTL.BaseThermoClasses.Substance(tmpcomp.Name, ""))
                     phase.Components(tmpcomp.Name).ConstantProperties = tmpcomp

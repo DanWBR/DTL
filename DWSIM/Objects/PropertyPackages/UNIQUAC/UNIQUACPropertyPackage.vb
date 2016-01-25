@@ -486,7 +486,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
         Function RET_VQ() As Object
 
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As BaseThermoClasses.Substance
             Dim VQ(Me.CurrentMaterialStream.Phases(0).Components.Count - 1) As Double
             Dim i As Integer = 0
 
@@ -501,7 +501,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
         Function RET_VR() As Object
 
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As BaseThermoClasses.Substance
             Dim VR(Me.CurrentMaterialStream.Phases(0).Components.Count - 1) As Double
             Dim i As Integer = 0
 

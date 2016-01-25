@@ -283,7 +283,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         End Function
 
-        Function RET_VN(ByVal cp As DTL.BaseThermoClasses.ConstantProperties) As Dictionary(Of Integer, Double)
+        Function RET_VN(ByVal cp As BaseThermoClasses.ConstantProperties) As Dictionary(Of Integer, Double)
 
             Dim i As Integer = 0
             Dim res As New Dictionary(Of Integer, Double)

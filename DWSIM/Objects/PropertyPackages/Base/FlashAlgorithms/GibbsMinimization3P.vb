@@ -236,7 +236,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
             'F = 1000.0#
 
-            Dim maxy As Double = MathEx.Common.Max(Vy)
+            Dim maxy As Double = Common.Max(Vy)
             Dim imaxy As Integer = Array.IndexOf(Vy, maxy)
 
             If maxy * V > Vz(imaxy) Then
@@ -325,7 +325,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                             idx(i) = i
                         Else
                             j = 0
-                            For Each subst As DTL.BaseThermoClasses.Substance In PP.CurrentMaterialStream.Phases(0).Components.Values
+                            For Each subst As BaseThermoClasses.Substance In PP.CurrentMaterialStream.Phases(0).Components.Values
                                 If subst.Name = Me.StabSearchCompIDs(i) Then
                                     idx(i) = j
                                     Exit For
@@ -399,7 +399,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                             Dim finalval2(2 * n + 1) As Double
                             Dim glow(n), gup(n), g(n) As Double
 
-                            Dim maxl As Double = MathEx.Common.Max(vx2est)
+                            Dim maxl As Double = Common.Max(vx2est)
                             Dim imaxl As Integer = Array.IndexOf(vx2est, maxl)
 
                             F = 1000.0#
@@ -1119,7 +1119,7 @@ out:        Return result
                         idx(i) = i
                     Else
                         j = 0
-                        For Each subst As DTL.BaseThermoClasses.Substance In PP.CurrentMaterialStream.Phases(0).Components.Values
+                        For Each subst As BaseThermoClasses.Substance In PP.CurrentMaterialStream.Phases(0).Components.Values
                             If subst.Name = Me.StabSearchCompIDs(i) Then
                                 idx(i) = j
                                 Exit For
@@ -1240,7 +1240,7 @@ out:        Return result
                         idx(i) = i
                     Else
                         j = 0
-                        For Each subst As DTL.BaseThermoClasses.Substance In PP.CurrentMaterialStream.Phases(0).Components.Values
+                        For Each subst As BaseThermoClasses.Substance In PP.CurrentMaterialStream.Phases(0).Components.Values
                             If subst.Name = Me.StabSearchCompIDs(i) Then
                                 idx(i) = j
                                 Exit For

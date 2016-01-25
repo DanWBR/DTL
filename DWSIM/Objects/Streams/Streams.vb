@@ -41,7 +41,7 @@ Namespace DTL.SimulationObjects.Streams
         Private _ppid As String = ""
 
         Protected m_compositionbasis As CompBasis = CompBasis.Molar_Fractions
-        Protected m_Phases As New Dictionary(Of String, DTL.BaseThermoClasses.Phase)
+        Protected m_Phases As New Dictionary(Of String, BaseThermoClasses.Phase)
 
         Private _inequilibrium As Boolean = False
 
@@ -109,18 +109,18 @@ Namespace DTL.SimulationObjects.Streams
             Me.m_ComponentName = Name
             Me.m_ComponentDescription = Description
 
-            Me.Phases.Add("0", New DTL.BaseThermoClasses.Phase(App.GetLocalString("Mistura"), ""))
-            Me.Phases.Add("1", New DTL.BaseThermoClasses.Phase(App.GetLocalString("OverallLiquid"), ""))
-            Me.Phases.Add("2", New DTL.BaseThermoClasses.Phase(App.GetLocalString("Vapor"), ""))
-            Me.Phases.Add("3", New DTL.BaseThermoClasses.Phase(App.GetLocalString("Liquid1"), ""))
-            Me.Phases.Add("4", New DTL.BaseThermoClasses.Phase(App.GetLocalString("Liquid2"), ""))
-            Me.Phases.Add("5", New DTL.BaseThermoClasses.Phase(App.GetLocalString("Liquid3"), ""))
-            Me.Phases.Add("6", New DTL.BaseThermoClasses.Phase(App.GetLocalString("Aqueous"), ""))
-            Me.Phases.Add("7", New DTL.BaseThermoClasses.Phase(App.GetLocalString("Solid"), ""))
+            Me.Phases.Add("0", New BaseThermoClasses.Phase(App.GetLocalString("Mistura"), ""))
+            Me.Phases.Add("1", New BaseThermoClasses.Phase(App.GetLocalString("OverallLiquid"), ""))
+            Me.Phases.Add("2", New BaseThermoClasses.Phase(App.GetLocalString("Vapor"), ""))
+            Me.Phases.Add("3", New BaseThermoClasses.Phase(App.GetLocalString("Liquid1"), ""))
+            Me.Phases.Add("4", New BaseThermoClasses.Phase(App.GetLocalString("Liquid2"), ""))
+            Me.Phases.Add("5", New BaseThermoClasses.Phase(App.GetLocalString("Liquid3"), ""))
+            Me.Phases.Add("6", New BaseThermoClasses.Phase(App.GetLocalString("Aqueous"), ""))
+            Me.Phases.Add("7", New BaseThermoClasses.Phase(App.GetLocalString("Solid"), ""))
 
         End Sub
 
-        Public ReadOnly Property Phases() As Dictionary(Of String, DTL.BaseThermoClasses.Phase)
+        Public ReadOnly Property Phases() As Dictionary(Of String, BaseThermoClasses.Phase)
             Get
                 Return m_Phases
             End Get

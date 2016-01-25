@@ -329,7 +329,7 @@ out:
                         idx(i) = i
                     Else
                         j = 0
-                        For Each subst As DTL.BaseThermoClasses.Substance In PP.CurrentMaterialStream.Phases(0).Components.Values
+                        For Each subst As BaseThermoClasses.Substance In PP.CurrentMaterialStream.Phases(0).Components.Values
                             If subst.Name = Me.StabSearchCompIDs(i) Then
                                 idx(i) = j
                                 Exit For
@@ -399,7 +399,7 @@ out:
 
                         Dim vx1e(UBound(Vz)), vx2e(UBound(Vz)) As Double
 
-                        Dim maxl As Double = MathEx.Common.Max(vx2est)
+                        Dim maxl As Double = Common.Max(vx2est)
                         Dim imaxl As Integer = Array.IndexOf(vx2est, maxl)
 
                         F = 1

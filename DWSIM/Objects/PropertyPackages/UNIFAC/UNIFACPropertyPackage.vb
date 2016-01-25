@@ -484,7 +484,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
 #Region "    Auxiliary Functions"
 
-        Function RET_VN(ByVal subst As DTL.BaseThermoClasses.Substance) As Object
+        Function RET_VN(ByVal subst As BaseThermoClasses.Substance) As Object
 
             Return Me.m_uni.RET_VN(subst.ConstantProperties)
 
@@ -492,7 +492,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
         Function RET_VQ() As Object
 
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As BaseThermoClasses.Substance
             Dim VQ(Me.CurrentMaterialStream.Phases(0).Components.Count - 1) As Double
             Dim i As Integer = 0
             Dim sum As Double = 0
@@ -514,7 +514,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
         Function RET_VR() As Object
 
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As BaseThermoClasses.Substance
             Dim VR(Me.CurrentMaterialStream.Phases(0).Components.Count - 1) As Double
             Dim i As Integer = 0
             Dim sum As Double = 0
@@ -536,7 +536,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
         Function RET_VEKI() As Object
 
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As BaseThermoClasses.Substance
             Dim VEKI(Me.CurrentMaterialStream.Phases(0).Components.Count - 1, Me.m_uni.UnifGroups.Groups.Count - 1) As Double
             Dim i As Integer = 0
             Dim sum As Double
