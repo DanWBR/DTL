@@ -17,7 +17,6 @@
 '    along with DWSIM.  If not, see <http://www.gnu.org/licenses/>.
 
 Imports System.Math
-Imports DTL.DTL.SimulationObjects
 Imports DTL.DTL.MathEx
 Imports DTL.DTL.MathEx.Common
 Imports Cureos.Numerics
@@ -264,8 +263,8 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
             Dim obj As Double
             Dim status As IpoptReturnCode
-            Using problem As New Ipopt(initval.Length, lconstr, uconstr, 0, Nothing, Nothing, _
-             0, 0, AddressOf eval_f, AddressOf eval_g, _
+            Using problem As New Ipopt(initval.Length, lconstr, uconstr, 0, Nothing, Nothing,
+             0, 0, AddressOf eval_f, AddressOf eval_g,
              AddressOf eval_grad_f, AddressOf eval_jac_g, AddressOf eval_h)
                 problem.AddOption("tol", etol)
                 problem.AddOption("max_iter", maxit_e)
@@ -306,11 +305,6 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                 ' check if there is a liquid phase
 
                 If result(0) > 0 Then ' we have a liquid phase
-
-                    'If result(1) > 0.01 And n = 1 Then
-                    '    'the liquid phase cannot be unstable when there's also vapor and only two compounds in the system.
-                    '    Return result
-                    'End If
 
                     Dim nt As Integer = Me.StabSearchCompIDs.Length - 1
                     Dim nc As Integer = UBound(Vz)
@@ -1898,7 +1892,7 @@ out:        Return New Object() {L1, V, Vx1, Vy, P, ecount, Ki1, L2, Vx2, 0.0#, 
 
                     If Not ThreePhase Then
 
-                        sum_y = MathEx.Common.Sum(x)
+                        sum_y = Sum(x)
                         V = sum_y
                         L = 1 - sum_y
 
@@ -1912,12 +1906,12 @@ out:        Return New Object() {L1, V, Vx1, Vy, P, ecount, Ki1, L2, Vx2, 0.0#, 
                             Dim task1 As Task = New Task(Sub()
                                                              fcv = proppack.DW_CalcFugCoeff(Vy, Tf, Pf, State.Vapor)
                                                          End Sub)
-                                Dim task2 As Task = New Task(Sub()
-                                                                 fcl = proppack.DW_CalcFugCoeff(Vx1, Tf, Pf, State.Liquid)
-                                                             End Sub)
-                                task1.Start()
-                                task2.Start()
-                                Task.WaitAll(task1, task2)
+                            Dim task2 As Task = New Task(Sub()
+                                                             fcl = proppack.DW_CalcFugCoeff(Vx1, Tf, Pf, State.Liquid)
+                                                         End Sub)
+                            task1.Start()
+                            task2.Start()
+                            Task.WaitAll(task1, task2)
                             My.MyApplication.IsRunningParallelTasks = False
                         Else
                             fcv = proppack.DW_CalcFugCoeff(Vy, Tf, Pf, State.Vapor)
@@ -2060,16 +2054,16 @@ out:        Return New Object() {L1, V, Vx1, Vy, P, ecount, Ki1, L2, Vx2, 0.0#, 
                         Dim task1 As Task = New Task(Sub()
                                                          fcv = proppack.DW_CalcFugCoeff(Vy, Tf, Pf, State.Vapor)
                                                      End Sub)
-                            Dim task2 As Task = New Task(Sub()
-                                                             fcl = proppack.DW_CalcFugCoeff(Vx1, Tf, Pf, State.Liquid)
-                                                         End Sub)
-                            Dim task3 As Task = New Task(Sub()
-                                                             fcl2 = proppack.DW_CalcFugCoeff(Vx2, Tf, Pf, State.Liquid)
-                                                         End Sub)
-                            task1.Start()
-                            task2.Start()
-                            task3.Start()
-                            Task.WaitAll(task1, task2, task3)
+                        Dim task2 As Task = New Task(Sub()
+                                                         fcl = proppack.DW_CalcFugCoeff(Vx1, Tf, Pf, State.Liquid)
+                                                     End Sub)
+                        Dim task3 As Task = New Task(Sub()
+                                                         fcl2 = proppack.DW_CalcFugCoeff(Vx2, Tf, Pf, State.Liquid)
+                                                     End Sub)
+                        task1.Start()
+                        task2.Start()
+                        task3.Start()
+                        Task.WaitAll(task1, task2, task3)
                         My.MyApplication.IsRunningParallelTasks = False
                     Else
                         fcv = proppack.DW_CalcFugCoeff(Vy, Tf, Pf, State.Vapor)
@@ -2111,7 +2105,7 @@ out:        Return New Object() {L1, V, Vx1, Vy, P, ecount, Ki1, L2, Vx2, 0.0#, 
 
                     If Not ThreePhase Then
 
-                        sum_y = MathEx.Common.Sum(x)
+                        sum_y = Sum(x)
                         V = sum_y
                         L = 1 - sum_y
 
@@ -2125,12 +2119,12 @@ out:        Return New Object() {L1, V, Vx1, Vy, P, ecount, Ki1, L2, Vx2, 0.0#, 
                             Dim task1 As Task = New Task(Sub()
                                                              fcv = proppack.DW_CalcFugCoeff(Vy, Tf, Pf, State.Vapor)
                                                          End Sub)
-                                Dim task2 As Task = New Task(Sub()
-                                                                 fcl = proppack.DW_CalcFugCoeff(Vx1, Tf, Pf, State.Liquid)
-                                                             End Sub)
-                                task1.Start()
-                                task2.Start()
-                                Task.WaitAll(task1, task2)
+                            Dim task2 As Task = New Task(Sub()
+                                                             fcl = proppack.DW_CalcFugCoeff(Vx1, Tf, Pf, State.Liquid)
+                                                         End Sub)
+                            task1.Start()
+                            task2.Start()
+                            Task.WaitAll(task1, task2)
                             My.MyApplication.IsRunningParallelTasks = False
                         Else
                             fcv = proppack.DW_CalcFugCoeff(Vy, Tf, Pf, State.Vapor)
@@ -2178,16 +2172,16 @@ out:        Return New Object() {L1, V, Vx1, Vy, P, ecount, Ki1, L2, Vx2, 0.0#, 
                             Dim task1 As Task = New Task(Sub()
                                                              fcv = proppack.DW_CalcFugCoeff(Vy, Tf, Pf, State.Vapor)
                                                          End Sub)
-                                Dim task2 As Task = New Task(Sub()
-                                                                 fcl = proppack.DW_CalcFugCoeff(Vx1, Tf, Pf, State.Liquid)
-                                                             End Sub)
-                                Dim task3 As Task = New Task(Sub()
-                                                                 fcl2 = proppack.DW_CalcFugCoeff(Vx2, Tf, Pf, State.Liquid)
-                                                             End Sub)
-                                task1.Start()
-                                task2.Start()
-                                task3.Start()
-                                Task.WaitAll(task1, task2, task3)
+                            Dim task2 As Task = New Task(Sub()
+                                                             fcl = proppack.DW_CalcFugCoeff(Vx1, Tf, Pf, State.Liquid)
+                                                         End Sub)
+                            Dim task3 As Task = New Task(Sub()
+                                                             fcl2 = proppack.DW_CalcFugCoeff(Vx2, Tf, Pf, State.Liquid)
+                                                         End Sub)
+                            task1.Start()
+                            task2.Start()
+                            task3.Start()
+                            Task.WaitAll(task1, task2, task3)
                             My.MyApplication.IsRunningParallelTasks = False
                         Else
                             fcv = proppack.DW_CalcFugCoeff(Vy, Tf, Pf, State.Vapor)
@@ -2257,16 +2251,16 @@ out:        Return New Object() {L1, V, Vx1, Vy, P, ecount, Ki1, L2, Vx2, 0.0#, 
                         Dim task1 As Task = New Task(Sub()
                                                          fcv = proppack.DW_CalcFugCoeff(Vy, Tf, Pf, State.Vapor)
                                                      End Sub)
-                            Dim task2 As Task = New Task(Sub()
-                                                             fcl = proppack.DW_CalcFugCoeff(Vx1, Tf, Pf, State.Liquid)
-                                                         End Sub)
-                            Dim task3 As Task = New Task(Sub()
-                                                             fcl2 = proppack.DW_CalcFugCoeff(Vx2, Tf, Pf, State.Liquid)
-                                                         End Sub)
-                            task1.Start()
-                            task2.Start()
-                            task3.Start()
-                            Task.WaitAll(task1, task2, task3)
+                        Dim task2 As Task = New Task(Sub()
+                                                         fcl = proppack.DW_CalcFugCoeff(Vx1, Tf, Pf, State.Liquid)
+                                                     End Sub)
+                        Dim task3 As Task = New Task(Sub()
+                                                         fcl2 = proppack.DW_CalcFugCoeff(Vx2, Tf, Pf, State.Liquid)
+                                                     End Sub)
+                        task1.Start()
+                        task2.Start()
+                        task3.Start()
+                        Task.WaitAll(task1, task2, task3)
                         My.MyApplication.IsRunningParallelTasks = False
                     Else
                         fcv = proppack.DW_CalcFugCoeff(Vy, Tf, Pf, State.Vapor)
@@ -2293,7 +2287,6 @@ out:        Return New Object() {L1, V, Vx1, Vy, P, ecount, Ki1, L2, Vx2, 0.0#, 
                     Return g
 
             End Select
-
 
         End Function
 
@@ -2322,12 +2315,12 @@ out:        Return New Object() {L1, V, Vx1, Vy, P, ecount, Ki1, L2, Vx2, 0.0#, 
                     Dim task1 As Task = New Task(Sub()
                                                      f2 = FunctionGradient(x2)
                                                  End Sub)
-                        Dim task2 As Task = New Task(Sub()
-                                                         f3 = FunctionGradient(x3)
-                                                     End Sub)
-                        task1.Start()
-                        task2.Start()
-                        Task.WaitAll(task1, task2)
+                    Dim task2 As Task = New Task(Sub()
+                                                     f3 = FunctionGradient(x3)
+                                                 End Sub)
+                    task1.Start()
+                    task2.Start()
+                    Task.WaitAll(task1, task2)
                     My.MyApplication.IsRunningParallelTasks = False
                 Else
                     f2 = FunctionGradient(x2)
@@ -2365,7 +2358,7 @@ out:        Return New Object() {L1, V, Vx1, Vy, P, ecount, Ki1, L2, Vx2, 0.0#, 
             Return True
         End Function
 
-        Public Function eval_jac_g(ByVal n As Integer, ByVal x As Double(), ByVal new_x As Boolean, ByVal m As Integer, ByVal nele_jac As Integer, ByRef iRow As Integer(), _
+        Public Function eval_jac_g(ByVal n As Integer, ByVal x As Double(), ByVal new_x As Boolean, ByVal m As Integer, ByVal nele_jac As Integer, ByRef iRow As Integer(),
          ByRef jCol As Integer(), ByRef values As Double()) As Boolean
 
             Dim k As Integer
@@ -2398,22 +2391,12 @@ out:        Return New Object() {L1, V, Vx1, Vy, P, ecount, Ki1, L2, Vx2, 0.0#, 
             End If
             Return True
         End Function
-
-        Public Function eval_h(ByVal n As Integer, ByVal x As Double(), ByVal new_x As Boolean, ByVal obj_factor As Double, ByVal m As Integer, ByVal lambda As Double(), _
+        Public Function eval_h(ByVal n As Integer, ByVal x As Double(), ByVal new_x As Boolean, ByVal obj_factor As Double, ByVal m As Integer, ByVal lambda As Double(),
          ByVal new_lambda As Boolean, ByVal nele_hess As Integer, ByRef iRow As Integer(), ByRef jCol As Integer(), ByRef values As Double()) As Boolean
 
             If values Is Nothing Then
 
                 Dim row(nele_hess - 1), col(nele_hess - 1) As Integer
-
-                'k = 0
-                'For i = 0 To n - 1
-                '    For j = 0 To n - 1
-                '        row(k) = i
-                '        col(k) = j
-                '        k += 1
-                '    Next
-                'Next
 
                 iRow = row
                 jCol = col
@@ -2427,16 +2410,14 @@ out:        Return New Object() {L1, V, Vx1, Vy, P, ecount, Ki1, L2, Vx2, 0.0#, 
             Return True
 
         End Function
-
-        Public Function intermediate(ByVal alg_mod As IpoptAlgorithmMode, ByVal iter_count As Integer, ByVal obj_value As Double, _
-                                     ByVal inf_pr As Double, ByVal inf_du As Double, ByVal mu As Double, _
-                                     ByVal d_norm As Double, ByVal regularization_size As Double, ByVal alpha_du As Double, _
+        Public Function intermediate(ByVal alg_mod As IpoptAlgorithmMode, ByVal iter_count As Integer, ByVal obj_value As Double,
+                                     ByVal inf_pr As Double, ByVal inf_du As Double, ByVal mu As Double,
+                                     ByVal d_norm As Double, ByVal regularization_size As Double, ByVal alpha_du As Double,
                                      ByVal alpha_pr As Double, ByVal ls_trials As Integer) As Boolean
             objval0 = objval
             objval = obj_value
             Return True
         End Function
-
     End Class
 
 End Namespace
