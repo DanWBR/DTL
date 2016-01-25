@@ -322,6 +322,7 @@ Error_Handler:
 #End Region
 
 #Region "Multiply Vectors"
+
         '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         ' Multiply two vectors, dimensions should be (3x1)
         ' Function returns the solution or errors due to
@@ -407,9 +408,11 @@ Error_Handler:
             End If
 
         End Function
+
 #End Region
 
 #Region "Transpose of a Matrix"
+
         '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         ' Transpose of a matrix
         ' Function returns the solution or errors
@@ -438,6 +441,7 @@ Error_Handler:
             Err.Raise("5028", , "In order to do this operation values must be assigned to the matrix !!")
 
         End Function
+
 #End Region
 
 #Region "Multiply a matrix or a vector with a scalar quantity"
@@ -472,6 +476,7 @@ Error_Handler:
 #End Region
 
 #Region "Divide a matrix or a vector with a scalar quantity"
+
         '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         ' Divide matrix elements or a vector by a scalar quantity
         ' Function returns the solution or errors
@@ -502,7 +507,6 @@ Error_Handler:
         End Function
 
 #End Region
-
 
 #Region "Print Matrix"
 
@@ -571,6 +575,7 @@ Error_Handler:
 
             Exit Function
         End Function
+
 #End Region
 
     End Class

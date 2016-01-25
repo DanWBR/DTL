@@ -1,6 +1,3 @@
-Imports System
-Imports DTL.DTL.MathEx
-
 Namespace DTL.MathEx.Interpolation
 
     '************************************************************************
@@ -565,7 +562,7 @@ Namespace DTL.MathEx.Interpolation
         '         Copyright 28.05.2007 by Bochkanov Sergey
         '    ************************************************************************
 
-        Public Shared Sub nevilledifferentiation(ByRef x As Double(), ByVal f As Double(), ByVal n As Integer, ByVal t As Double, ByRef p As Double, ByRef dp As Double, _
+        Public Shared Sub nevilledifferentiation(ByRef x As Double(), ByVal f As Double(), ByVal n As Integer, ByVal t As Double, ByRef p As Double, ByRef dp As Double,
          ByRef d2p As Double)
             Dim m As Integer = 0
             Dim i As Integer = 0
