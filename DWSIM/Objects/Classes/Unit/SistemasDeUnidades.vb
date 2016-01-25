@@ -20,7 +20,7 @@ Namespace DTL.UnitsOfMeasure
 
     <System.Serializable()> <Xml.Serialization.XmlRoot(ElementName:="Component")> Public Class Units
 
-        Public nome As String
+        Public Name As String
 
         Public area, distance, time, volume, molar_volume, diameter, thickness, molar_conc, mass_conc, _
                 heat_transf_coeff, force, accel, spec_vol, reac_rate, velocity, foulingfactor As String
@@ -88,7 +88,7 @@ Namespace DTL.UnitsOfMeasure
 
             With Me
 
-                .nome = DTL.App.GetLocalString("SistemaSI")
+                .Name = DTL.App.GetLocalString("SistemaSI")
 
                 .accel = "m2/s"
                 .area = "m2"
@@ -167,7 +167,7 @@ Namespace DTL.UnitsOfMeasure
 
             With Me
 
-                .nome = DTL.App.GetLocalString("Personalizado1BR")
+                .Name = DTL.App.GetLocalString("Personalizado1BR")
 
                 .accel = "m2/s"
                 .area = "m2"
@@ -246,7 +246,7 @@ Namespace DTL.UnitsOfMeasure
 
             With Me
 
-                .nome = DTL.App.GetLocalString("Personalizado2SC")
+                .Name = DTL.App.GetLocalString("Personalizado2SC")
 
                 .accel = "m2/s"
                 .area = "m2"
@@ -325,7 +325,7 @@ Namespace DTL.UnitsOfMeasure
 
             With Me
 
-                .nome = DTL.App.GetLocalString("Personalizado3CNTP")
+                .Name = DTL.App.GetLocalString("Personalizado3CNTP")
 
                 .accel = "m/s2"
                 .area = "m2"
@@ -404,7 +404,7 @@ Namespace DTL.UnitsOfMeasure
 
             With Me
 
-                .nome = DTL.App.GetLocalString("Personalizado4")
+                .Name = DTL.App.GetLocalString("Personalizado4")
 
                 .accel = "m/s2"
                 .area = "m2"
@@ -483,7 +483,7 @@ Namespace DTL.UnitsOfMeasure
 
             With Me
 
-                .nome = DTL.App.GetLocalString("SistemaIngls")
+                .Name = DTL.App.GetLocalString("SistemaIngls")
 
                 .accel = "ft/s2"
                 .area = "ft2"
@@ -562,7 +562,7 @@ Namespace DTL.UnitsOfMeasure
 
             With Me
 
-                .nome = DTL.App.GetLocalString("SistemaCGS")
+                .Name = DTL.App.GetLocalString("SistemaCGS")
 
                 .accel = "cm/s2"
                 .area = "cm2"

@@ -326,7 +326,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                         Else
                             j = 0
                             For Each subst As DTL.BaseThermoClasses.Substance In PP.CurrentMaterialStream.Phases(0).Components.Values
-                                If subst.Nome = Me.StabSearchCompIDs(i) Then
+                                If subst.Name = Me.StabSearchCompIDs(i) Then
                                     idx(i) = j
                                     Exit For
                                 End If
@@ -1120,7 +1120,7 @@ out:        Return result
                     Else
                         j = 0
                         For Each subst As DTL.BaseThermoClasses.Substance In PP.CurrentMaterialStream.Phases(0).Components.Values
-                            If subst.Nome = Me.StabSearchCompIDs(i) Then
+                            If subst.Name = Me.StabSearchCompIDs(i) Then
                                 idx(i) = j
                                 Exit For
                             End If
@@ -1241,7 +1241,7 @@ out:        Return result
                     Else
                         j = 0
                         For Each subst As DTL.BaseThermoClasses.Substance In PP.CurrentMaterialStream.Phases(0).Components.Values
-                            If subst.Nome = Me.StabSearchCompIDs(i) Then
+                            If subst.Name = Me.StabSearchCompIDs(i) Then
                                 idx(i) = j
                                 Exit For
                             End If

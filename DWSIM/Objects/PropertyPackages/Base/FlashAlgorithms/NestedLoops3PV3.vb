@@ -318,7 +318,7 @@ out:
 
                 i = 0
                 For Each subst As DTL.BaseThermoClasses.Substance In PP.CurrentMaterialStream.Phases(0).Components.Values
-                    ff = Array.IndexOf(StabSearchCompIDs, subst.Nome)
+                    ff = Array.IndexOf(StabSearchCompIDs, subst.Name)
                     If ff >= 0 And Vz(i) > 0 And T < subst.ConstantProperties.Critical_Temperature Then nt += 1
                     i += 1
                 Next
@@ -330,7 +330,7 @@ out:
                 i = 0
                 j = 0
                 For Each subst As DTL.BaseThermoClasses.Substance In PP.CurrentMaterialStream.Phases(0).Components.Values
-                    ff = Array.IndexOf(StabSearchCompIDs, subst.Nome)
+                    ff = Array.IndexOf(StabSearchCompIDs, subst.Name)
                     If ff >= 0 And Vz(i) > 0 And T < subst.ConstantProperties.Critical_Temperature Then
                         idx(j) = i
                         j += 1
@@ -1208,7 +1208,7 @@ alt:
 
                 i = 0
                 For Each subst As DTL.BaseThermoClasses.Substance In PP.CurrentMaterialStream.Phases(0).Components.Values
-                    ff = Array.IndexOf(StabSearchCompIDs, subst.Nome)
+                    ff = Array.IndexOf(StabSearchCompIDs, subst.Name)
                     If ff >= 0 And Vz(i) > 0 And T < subst.ConstantProperties.Critical_Temperature Then nt += 1
                     i += 1
                 Next
@@ -1220,7 +1220,7 @@ alt:
                 i = 0
                 j = 0
                 For Each subst As DTL.BaseThermoClasses.Substance In PP.CurrentMaterialStream.Phases(0).Components.Values
-                    ff = Array.IndexOf(StabSearchCompIDs, subst.Nome)
+                    ff = Array.IndexOf(StabSearchCompIDs, subst.Name)
                     If ff >= 0 And Vz(i) > 0 And T < subst.ConstantProperties.Critical_Temperature Then
                         idx(j) = i
                         j += 1
@@ -1329,7 +1329,7 @@ alt:
 
                 i = 0
                 For Each subst As DTL.BaseThermoClasses.Substance In PP.CurrentMaterialStream.Phases(0).Components.Values
-                    ff = Array.IndexOf(StabSearchCompIDs, subst.Nome)
+                    ff = Array.IndexOf(StabSearchCompIDs, subst.Name)
                     If ff >= 0 And Vz(i) > 0 And T < subst.ConstantProperties.Critical_Temperature Then nt += 1
                     i += 1
                 Next
@@ -1341,7 +1341,7 @@ alt:
                 i = 0
                 j = 0
                 For Each subst As DTL.BaseThermoClasses.Substance In PP.CurrentMaterialStream.Phases(0).Components.Values
-                    ff = Array.IndexOf(StabSearchCompIDs, subst.Nome)
+                    ff = Array.IndexOf(StabSearchCompIDs, subst.Name)
                     If ff >= 0 And Vz(i) > 0 And T < subst.ConstantProperties.Critical_Temperature Then
                         idx(j) = i
                         j += 1

@@ -1342,7 +1342,7 @@ Final3:
                 'Pcalc = R * T * rho_calc / (1 - rho_calc * bml) - aml * rho_calc ^ 2 / (1 + 2 * bml * rho_calc - (rho_calc * bml) ^ 2)
                 'Zcalc = P / (rho_calc * R * T)
                 Zcalc = ZV
-                ' CALCULO DO COEFICIENTE DE FUGACIDADE DA FASE LIQUIDA
+                ' CALCULO DO COEFICIENTE DE FUGACIDADE DA Phase LIQUIDA
                 i = 0
                 Do
                     t1 = bi(i) * (Zcalc - 1) / bml
@@ -1365,7 +1365,7 @@ Final3:
                 'Pcalc = R * T * rho_calc / (1 - rho_calc * bml) - aml * rho_calc ^ 2 / (1 + 2 * bml * rho_calc - (rho_calc * bml) ^ 2)
                 'Zcalc = P / (rho_calc * R * T)
                 Zcalc = ZV
-                ' CALCULO DO COEFICIENTE DE FUGACIDADE DA FASE VAPOR
+                ' CALCULO DO COEFICIENTE DE FUGACIDADE DA Phase VAPOR
                 i = 0
                 Do
                     t1 = bi(i) * (Zcalc - 1) / bml
