@@ -432,7 +432,7 @@ Namespace Thermodynamics
 
             Dim ms As New Streams.MaterialStream("", "")
 
-            For Each phase As DTL.BaseThermoClasses.Fase In ms.Phases.Values
+            For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 phase.Components.Add(compound, New DTL.BaseThermoClasses.Substance(compound, ""))
                 phase.Components(compound).ConstantProperties = pp._availablecomps(compound)
             Next
@@ -475,7 +475,7 @@ Namespace Thermodynamics
 
             Dim ms As New Streams.MaterialStream("", "")
 
-            For Each phase As DTL.BaseThermoClasses.Fase In ms.Phases.Values
+            For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 phase.Components.Add(compound, New DTL.BaseThermoClasses.Substance(compound, ""))
                 phase.Components(compound).ConstantProperties = pp._availablecomps(compound)
             Next
@@ -519,7 +519,7 @@ Namespace Thermodynamics
 
             Dim ms As New Streams.MaterialStream("", "")
 
-            For Each phase As DTL.BaseThermoClasses.Fase In ms.Phases.Values
+            For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 phase.Components.Add(compound, New DTL.BaseThermoClasses.Substance(compound, ""))
                 phase.Components(compound).ConstantProperties = pp._availablecomps(compound)
             Next
@@ -675,7 +675,7 @@ Namespace Thermodynamics
 
             Dim ms As New Streams.MaterialStream("", "")
 
-            For Each phase As DTL.BaseThermoClasses.Fase In ms.Phases.Values
+            For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
                     phase.Components.Add(c, New DTL.BaseThermoClasses.Substance(c, ""))
                     phase.Components(c).ConstantProperties = pp._availablecomps(c)
@@ -687,7 +687,7 @@ Namespace Thermodynamics
                 pp._selectedcomps.Add(c, tmpcomp)
             Next
 
-            Dim dwp As PropertyPackages.Fase = PropertyPackages.Fase.Mixture
+            Dim dwp As PropertyPackages.Phase = PropertyPackages.Phase.Mixture
             For Each pi As PropertyPackages.PhaseInfo In pp.PhaseMappings.Values
                 If pi.PhaseLabel = phaselabel Then dwp = pi.DWPhaseID
             Next
@@ -779,7 +779,7 @@ Namespace Thermodynamics
 
             Dim ms As New Streams.MaterialStream("", "")
 
-            For Each phase As DTL.BaseThermoClasses.Fase In ms.Phases.Values
+            For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
                     phase.Components.Add(c, New DTL.BaseThermoClasses.Substance(c, ""))
                     phase.Components(c).ConstantProperties = pp._availablecomps(c)
@@ -791,7 +791,7 @@ Namespace Thermodynamics
                 If Not pp._selectedcomps.ContainsKey(c) Then pp._selectedcomps.Add(c, tmpcomp)
             Next
 
-            Dim dwp As PropertyPackages.Fase = PropertyPackages.Fase.Mixture
+            Dim dwp As PropertyPackages.Phase = PropertyPackages.Phase.Mixture
             For Each pi As PropertyPackages.PhaseInfo In pp.PhaseMappings.Values
                 If pi.PhaseLabel = phaselabel Then dwp = pi.DWPhaseID
             Next
@@ -884,7 +884,7 @@ Namespace Thermodynamics
 
             Dim ms As New Streams.MaterialStream("", "")
 
-            For Each phase As DTL.BaseThermoClasses.Fase In ms.Phases.Values
+            For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
                     phase.Components.Add(c, New DTL.BaseThermoClasses.Substance(c, ""))
                     phase.Components(c).ConstantProperties = pp._availablecomps(c)
@@ -896,12 +896,12 @@ Namespace Thermodynamics
                 pp._selectedcomps.Add(c, tmpcomp)
             Next
 
-            Dim dwp1 As PropertyPackages.Fase = PropertyPackages.Fase.Mixture
+            Dim dwp1 As PropertyPackages.Phase = PropertyPackages.Phase.Mixture
             For Each pi As PropertyPackages.PhaseInfo In pp.PhaseMappings.Values
                 If pi.PhaseLabel = phaselabel1 Then dwp1 = pi.DWPhaseID
             Next
 
-            Dim dwp2 As PropertyPackages.Fase = PropertyPackages.Fase.Mixture
+            Dim dwp2 As PropertyPackages.Phase = PropertyPackages.Phase.Mixture
             For Each pi As PropertyPackages.PhaseInfo In pp.PhaseMappings.Values
                 If pi.PhaseLabel = phaselabel2 Then dwp2 = pi.DWPhaseID
             Next
@@ -991,7 +991,7 @@ Namespace Thermodynamics
 
             Dim ms As New Streams.MaterialStream("", "")
 
-            For Each phase As DTL.BaseThermoClasses.Fase In ms.Phases.Values
+            For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
                     phase.Components.Add(c, New DTL.BaseThermoClasses.Substance(c, ""))
                     phase.Components(c).ConstantProperties = pp._availablecomps(c)
@@ -1003,12 +1003,12 @@ Namespace Thermodynamics
                 If Not pp._selectedcomps.ContainsKey(c) Then pp._selectedcomps.Add(c, tmpcomp)
             Next
 
-            Dim dwp1 As PropertyPackages.Fase = PropertyPackages.Fase.Mixture
+            Dim dwp1 As PropertyPackages.Phase = PropertyPackages.Phase.Mixture
             For Each pi As PropertyPackages.PhaseInfo In pp.PhaseMappings.Values
                 If pi.PhaseLabel = phaselabel1 Then dwp1 = pi.DWPhaseID
             Next
 
-            Dim dwp2 As PropertyPackages.Fase = PropertyPackages.Fase.Mixture
+            Dim dwp2 As PropertyPackages.Phase = PropertyPackages.Phase.Mixture
             For Each pi As PropertyPackages.PhaseInfo In pp.PhaseMappings.Values
                 If pi.PhaseLabel = phaselabel2 Then dwp2 = pi.DWPhaseID
             Next
@@ -1245,7 +1245,7 @@ Namespace Thermodynamics
 
             Dim ms As New Streams.MaterialStream("", "")
 
-            For Each phase As DTL.BaseThermoClasses.Fase In ms.Phases.Values
+            For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
                     phase.Components.Add(c, New DTL.BaseThermoClasses.Substance(c, ""))
                     phase.Components(c).ConstantProperties = pp._availablecomps(c)
@@ -1356,7 +1356,7 @@ Namespace Thermodynamics
 
             Dim ms As New Streams.MaterialStream("", "")
 
-            For Each phase As DTL.BaseThermoClasses.Fase In ms.Phases.Values
+            For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
                     phase.Components.Add(c, New DTL.BaseThermoClasses.Substance(c, ""))
                     phase.Components(c).ConstantProperties = pp._availablecomps(c)
@@ -1471,7 +1471,7 @@ Namespace Thermodynamics
 
             Dim ms As New Streams.MaterialStream("", "")
 
-            For Each phase As DTL.BaseThermoClasses.Fase In ms.Phases.Values
+            For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
                     phase.Components.Add(c, New DTL.BaseThermoClasses.Substance(c, ""))
                     phase.Components(c).ConstantProperties = pp._availablecomps(c)
@@ -1586,7 +1586,7 @@ Namespace Thermodynamics
 
             Dim ms As New Streams.MaterialStream("", "")
 
-            For Each phase As DTL.BaseThermoClasses.Fase In ms.Phases.Values
+            For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
                     phase.Components.Add(c, New DTL.BaseThermoClasses.Substance(c, ""))
                     phase.Components(c).ConstantProperties = pp._availablecomps(c)
@@ -1701,7 +1701,7 @@ Namespace Thermodynamics
 
             Dim ms As New Streams.MaterialStream("", "")
 
-            For Each phase As DTL.BaseThermoClasses.Fase In ms.Phases.Values
+            For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
                     phase.Components.Add(c, New DTL.BaseThermoClasses.Substance(c, ""))
                     phase.Components(c).ConstantProperties = pp._availablecomps(c)
@@ -1814,7 +1814,7 @@ Namespace Thermodynamics
 
             Dim ms As New Streams.MaterialStream("", "")
 
-            For Each phase As DTL.BaseThermoClasses.Fase In ms.Phases.Values
+            For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
                     phase.Components.Add(c, New DTL.BaseThermoClasses.Substance(c, ""))
                     phase.Components(c).ConstantProperties = pp._availablecomps(c)
@@ -1911,7 +1911,7 @@ Namespace Thermodynamics
 
             Dim ms As New Streams.MaterialStream("", "")
 
-            For Each phase As DTL.BaseThermoClasses.Fase In ms.Phases.Values
+            For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
                     phase.Components.Add(c, New DTL.BaseThermoClasses.Substance(c, ""))
                     phase.Components(c).ConstantProperties = pp._availablecomps(c)
@@ -2011,7 +2011,7 @@ Namespace Thermodynamics
 
             Dim ms As New Streams.MaterialStream("", "")
 
-            For Each phase As DTL.BaseThermoClasses.Fase In ms.Phases.Values
+            For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
                     phase.Components.Add(c, New DTL.BaseThermoClasses.Substance(c, ""))
                     phase.Components(c).ConstantProperties = pp._availablecomps(c)
@@ -2111,7 +2111,7 @@ Namespace Thermodynamics
 
             Dim ms As New Streams.MaterialStream("", "")
 
-            For Each phase As DTL.BaseThermoClasses.Fase In ms.Phases.Values
+            For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
                     phase.Components.Add(c, New DTL.BaseThermoClasses.Substance(c, ""))
                     phase.Components(c).ConstantProperties = pp._availablecomps(c)
@@ -2212,7 +2212,7 @@ Namespace Thermodynamics
 
             Dim ms As New Streams.MaterialStream("", "")
 
-            For Each phase As DTL.BaseThermoClasses.Fase In ms.Phases.Values
+            For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
                     phase.Components.Add(c, New DTL.BaseThermoClasses.Substance(c, ""))
                     phase.Components(c).ConstantProperties = pp._availablecomps(c)
@@ -2508,7 +2508,7 @@ Namespace Thermodynamics
 
             Dim ms As New Streams.MaterialStream("", "")
 
-            For Each phase As DTL.BaseThermoClasses.Fase In ms.Phases.Values
+            For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
                     phase.Components.Add(c, New DTL.BaseThermoClasses.Substance(c, ""))
                     phase.Components(c).ConstantProperties = pp._availablecomps(c)

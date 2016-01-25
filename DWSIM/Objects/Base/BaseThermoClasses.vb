@@ -16,23 +16,17 @@
 '    You should have received a copy of the GNU General Public License
 '    along with DWSIM.  If not, see <http://www.gnu.org/licenses/>.
 
-Imports System.Collections.Generic
 Imports System.Xml.Serialization
-Imports FileHelpers
 Imports System.Runtime.Serialization.Formatters.Binary
 Imports System.Runtime.Serialization
 Imports System.IO
-Imports System.Linq
-Imports DTL.DTL.SimulationObjects.Streams
-Imports System.Reflection
-Imports System.Globalization
 
 Namespace DTL.BaseThermoClasses
 
     <System.Serializable()> Public Class Substance
 
-        Protected m_ComponentDescription As String = ""
-        Protected m_ComponentName As String = ""
+        Protected m_componentdescription As String = ""
+        Protected m_componentname As String = ""
         Protected m_molarfraction As Nullable(Of Double) = 0
         Protected m_massfraction As Nullable(Of Double) = 0
         Protected m_molarflow As Nullable(Of Double) = 0
@@ -65,7 +59,7 @@ Namespace DTL.BaseThermoClasses
             End Set
         End Property
 
-        Public Property FracaoDePetroleo() As Boolean
+        Public Property PetroleumFraction() As Boolean
             Get
                 Return m_isPF
             End Get
@@ -74,7 +68,7 @@ Namespace DTL.BaseThermoClasses
             End Set
         End Property
 
-        Public Property FracaoMolar() As Nullable(Of Double)
+        Public Property MolarFraction() As Nullable(Of Double)
             Get
                 Return m_molarfraction
             End Get
@@ -83,7 +77,7 @@ Namespace DTL.BaseThermoClasses
             End Set
         End Property
 
-        Public Property FracaoMassica() As Nullable(Of Double)
+        Public Property MassFraction() As Nullable(Of Double)
             Get
                 Return m_massfraction
             End Get
@@ -164,7 +158,7 @@ Namespace DTL.BaseThermoClasses
             End Set
         End Property
 
-        Public Property Descricao() As String
+        Public Property Description() As String
             Get
                 Return m_ComponentDescription
             End Get
@@ -173,7 +167,7 @@ Namespace DTL.BaseThermoClasses
             End Set
         End Property
 
-        Public Property Nome() As String
+        Public Property Name() As String
             Get
                 Return m_ComponentName
             End Get
@@ -186,21 +180,21 @@ Namespace DTL.BaseThermoClasses
         Public PDProperties As New PressureDependentProperties
         Public ConstantProperties As New ConstantProperties
 
-        Public Sub New(ByVal nome As String, ByVal descricao As String)
+        Public Sub New(ByVal name As String, ByVal description As String)
 
-            Me.m_ComponentName = nome
-            Me.m_ComponentDescription = descricao
+            Me.m_ComponentName = name
+            Me.m_ComponentDescription = description
 
         End Sub
 
     End Class
 
-    <System.Serializable()> Public Class Fase
+    <System.Serializable()> Public Class Phase
 
         Protected m_ComponentDescription As String
         Protected m_ComponentName As String
 
-        Public Property Descricao() As String
+        Public Property Description() As String
             Get
                 Return m_ComponentDescription
             End Get
@@ -209,7 +203,7 @@ Namespace DTL.BaseThermoClasses
             End Set
         End Property
 
-        Public Property Nome() As String
+        Public Property Name() As String
             Get
                 Return m_ComponentName
             End Get
@@ -223,18 +217,18 @@ Namespace DTL.BaseThermoClasses
         Public SPMProperties As New SinglePhaseMixtureProperties
         Public TPMProperties As New TwoPhaseMixtureProperties
 
-        Public Sub New(ByVal nome As String, ByVal descricao As String)
+        Public Sub New(ByVal name As String, ByVal description As String)
 
-            Me.m_ComponentName = nome
-            Me.m_ComponentDescription = descricao
+            Me.m_ComponentName = name
+            Me.m_ComponentDescription = description
             Me.Components = New Dictionary(Of String, Substance)
 
         End Sub
 
-        Public Sub New(ByVal nome As String, ByVal descricao As String, ByVal Substances As Dictionary(Of String, Substance))
+        Public Sub New(ByVal name As String, ByVal description As String, ByVal Substances As Dictionary(Of String, Substance))
 
-            Me.m_ComponentName = nome
-            Me.m_ComponentDescription = descricao
+            Me.m_ComponentName = name
+            Me.m_ComponentDescription = description
             Me.Components = Substances
 
         End Sub
@@ -284,6 +278,7 @@ Namespace DTL.BaseThermoClasses
                 tdp_idealGasHeatCapacity = value
             End Set
         End Property
+
         Public Property thermalConductivityOfLiquid() As Nullable(Of Double)
             Get
                 Return tdp_thermalConductivityOfLiquid
@@ -292,6 +287,7 @@ Namespace DTL.BaseThermoClasses
                 tdp_thermalConductivityOfLiquid = value
             End Set
         End Property
+
         Public Property thermalConductivityOfVapor() As Nullable(Of Double)
             Get
                 Return tdp_thermalConductivityOfVapor
@@ -300,6 +296,7 @@ Namespace DTL.BaseThermoClasses
                 tdp_thermalConductivityOfVapor = value
             End Set
         End Property
+
         Public Property vaporPressure() As Nullable(Of Double)
             Get
                 Return tdp_vaporPressure
@@ -308,6 +305,7 @@ Namespace DTL.BaseThermoClasses
                 tdp_vaporPressure = value
             End Set
         End Property
+
         Public Property viscosityOfLiquid() As Nullable(Of Double)
             Get
                 Return tdp_viscosityOfLiquid
@@ -316,6 +314,7 @@ Namespace DTL.BaseThermoClasses
                 tdp_viscosityOfLiquid = value
             End Set
         End Property
+
         Public Property viscosityOfVapor() As Nullable(Of Double)
             Get
                 Return tdp_viscosityOfVapor
@@ -324,6 +323,7 @@ Namespace DTL.BaseThermoClasses
                 tdp_viscosityOfVapor = value
             End Set
         End Property
+
         Public Property surfaceTension() As Nullable(Of Double)
             Get
                 Return tdp_surfaceTension
@@ -346,6 +346,7 @@ Namespace DTL.BaseThermoClasses
                 pdp_boilingPointTemperature = value
             End Set
         End Property
+
         Protected pdp_meltingTemperature As Nullable(Of Double) = Nothing
         Public Property meltingTemperature() As Nullable(Of Double)
             Get
@@ -376,7 +377,6 @@ Namespace DTL.BaseThermoClasses
             End Set
         End Property
 
-
         Protected _dewpressure As Nullable(Of Double) = Nothing
         Public Property dewPressure() As Nullable(Of Double)
             Get
@@ -397,7 +397,6 @@ Namespace DTL.BaseThermoClasses
             End Set
         End Property
 
-
         Protected _bubblepressure As Nullable(Of Double) = Nothing
         Public Property bubblePressure() As Nullable(Of Double)
             Get
@@ -417,6 +416,7 @@ Namespace DTL.BaseThermoClasses
                 spmp_activity = value
             End Set
         End Property
+
         Protected spmp_activityCoefficient As Nullable(Of Double) = Nothing
         Public Property activityCoefficient() As Nullable(Of Double)
             Get
@@ -426,6 +426,7 @@ Namespace DTL.BaseThermoClasses
                 spmp_activityCoefficient = value
             End Set
         End Property
+
         Protected spmp_compressibility As Nullable(Of Double) = Nothing
         Public Property compressibility() As Nullable(Of Double)
             Get
@@ -435,6 +436,7 @@ Namespace DTL.BaseThermoClasses
                 spmp_compressibility = value
             End Set
         End Property
+
         Protected spmp_compressibilityFactor As Nullable(Of Double) = Nothing
         Public Property compressibilityFactor() As Nullable(Of Double)
             Get
@@ -444,6 +446,7 @@ Namespace DTL.BaseThermoClasses
                 spmp_compressibilityFactor = value
             End Set
         End Property
+
         Protected spmp_density As Nullable(Of Double) = Nothing
         Public Property density() As Nullable(Of Double)
             Get
@@ -453,6 +456,7 @@ Namespace DTL.BaseThermoClasses
                 spmp_density = value
             End Set
         End Property
+
         Protected spmp_enthalpy As Nullable(Of Double) = Nothing
         Public Property enthalpy() As Nullable(Of Double)
             Get
@@ -462,6 +466,7 @@ Namespace DTL.BaseThermoClasses
                 spmp_enthalpy = value
             End Set
         End Property
+
         Protected spmp_entropy As Nullable(Of Double) = Nothing
         Public Property entropy() As Nullable(Of Double)
             Get
@@ -471,6 +476,7 @@ Namespace DTL.BaseThermoClasses
                 spmp_entropy = value
             End Set
         End Property
+
         Protected spmp_enthalpyF As Nullable(Of Double) = Nothing
         Public Property enthalpyF() As Nullable(Of Double)
             Get
@@ -480,6 +486,7 @@ Namespace DTL.BaseThermoClasses
                 spmp_enthalpyF = value
             End Set
         End Property
+
         Protected spmp_entropyF As Nullable(Of Double) = Nothing
         Public Property entropyF() As Nullable(Of Double)
             Get
@@ -489,6 +496,7 @@ Namespace DTL.BaseThermoClasses
                 spmp_entropyF = value
             End Set
         End Property
+
         Protected spmp_excessEnthalpy As Nullable(Of Double) = Nothing
         Public Property excessEnthalpy() As Nullable(Of Double)
             Get
@@ -498,6 +506,7 @@ Namespace DTL.BaseThermoClasses
                 spmp_excessEnthalpy = value
             End Set
         End Property
+
         Protected spmp_excessEntropy As Nullable(Of Double) = Nothing
         Public Property excessEntropy() As Nullable(Of Double)
             Get
@@ -507,6 +516,7 @@ Namespace DTL.BaseThermoClasses
                 spmp_excessEntropy = value
             End Set
         End Property
+
         Protected spmp_molarflow As Nullable(Of Double) = Nothing
         Public Property molarflow() As Nullable(Of Double)
             Get
@@ -516,6 +526,7 @@ Namespace DTL.BaseThermoClasses
                 spmp_molarflow = value
             End Set
         End Property
+
         Protected spmp_massflow As Nullable(Of Double) = Nothing
         Public Property massflow() As Nullable(Of Double)
             Get
@@ -525,6 +536,7 @@ Namespace DTL.BaseThermoClasses
                 spmp_massflow = value
             End Set
         End Property
+
         Protected spmp_molarfraction As Nullable(Of Double) = Nothing
         Public Property molarfraction() As Nullable(Of Double)
             Get
@@ -534,6 +546,7 @@ Namespace DTL.BaseThermoClasses
                 spmp_molarfraction = value
             End Set
         End Property
+
         Protected spmp_massfraction As Nullable(Of Double) = Nothing
         Public Property massfraction() As Nullable(Of Double)
             Get
@@ -543,6 +556,7 @@ Namespace DTL.BaseThermoClasses
                 spmp_massfraction = value
             End Set
         End Property
+
         Protected spmp_fugacity As Nullable(Of Double) = Nothing
         Public Property fugacity() As Nullable(Of Double)
             Get
@@ -552,6 +566,7 @@ Namespace DTL.BaseThermoClasses
                 spmp_fugacity = value
             End Set
         End Property
+
         Protected spmp_fugacityCoefficient As Nullable(Of Double) = Nothing
         Public Property fugacityCoefficient() As Nullable(Of Double)
             Get
@@ -561,6 +576,7 @@ Namespace DTL.BaseThermoClasses
                 spmp_fugacityCoefficient = value
             End Set
         End Property
+
         Protected spmp_heatCapacityCp As Nullable(Of Double) = Nothing
         Public Property heatCapacityCp() As Nullable(Of Double)
             Get
@@ -570,6 +586,7 @@ Namespace DTL.BaseThermoClasses
                 spmp_heatCapacityCp = value
             End Set
         End Property
+
         Protected spmp_heatCapacityCv As Nullable(Of Double) = Nothing
         Public Property heatCapacityCv() As Nullable(Of Double)
             Get
@@ -579,6 +596,7 @@ Namespace DTL.BaseThermoClasses
                 spmp_heatCapacityCv = value
             End Set
         End Property
+
         Protected spmp_jouleThomsonCoefficient As Nullable(Of Double) = Nothing
         Public Property jouleThomsonCoefficient() As Nullable(Of Double)
             Get
@@ -588,6 +606,7 @@ Namespace DTL.BaseThermoClasses
                 spmp_jouleThomsonCoefficient = value
             End Set
         End Property
+
         Protected spmp_logFugacityCoefficient As Nullable(Of Double) = Nothing
         Public Property logFugacityCoefficient() As Nullable(Of Double)
             Get
@@ -597,6 +616,7 @@ Namespace DTL.BaseThermoClasses
                 spmp_logFugacityCoefficient = value
             End Set
         End Property
+
         Protected spmp_molecularWeight As Nullable(Of Double) = Nothing
         Public Property molecularWeight() As Nullable(Of Double)
             Get
@@ -606,6 +626,7 @@ Namespace DTL.BaseThermoClasses
                 spmp_molecularWeight = value
             End Set
         End Property
+
         Protected spmp_pressure As Nullable(Of Double) = Nothing
         Public Property pressure() As Nullable(Of Double)
             Get
@@ -615,6 +636,7 @@ Namespace DTL.BaseThermoClasses
                 spmp_pressure = value
             End Set
         End Property
+
         Protected spmp_temperature As Nullable(Of Double) = Nothing
         Public Property temperature() As Nullable(Of Double)
             Get
@@ -624,6 +646,7 @@ Namespace DTL.BaseThermoClasses
                 spmp_temperature = value
             End Set
         End Property
+
         Protected spmp_speedOfSound As Nullable(Of Double) = Nothing
         Public Property speedOfSound() As Nullable(Of Double)
             Get
@@ -633,6 +656,7 @@ Namespace DTL.BaseThermoClasses
                 spmp_speedOfSound = value
             End Set
         End Property
+
         Protected spmp_thermalConductivity As Nullable(Of Double) = Nothing
         Public Property thermalConductivity() As Nullable(Of Double)
             Get
@@ -642,15 +666,17 @@ Namespace DTL.BaseThermoClasses
                 spmp_thermalConductivity = value
             End Set
         End Property
-        Protected spmp_viscosity As Nullable(Of Double) = Nothing
+
+        Protected spmp_dynamic_viscosity As Nullable(Of Double) = Nothing
         Public Property viscosity() As Nullable(Of Double)
             Get
-                Return spmp_viscosity
+                Return spmp_dynamic_viscosity
             End Get
             Set(ByVal value As Nullable(Of Double))
-                spmp_viscosity = value
+                spmp_dynamic_viscosity = value
             End Set
         End Property
+
         Protected spmp_kinematic_viscosity As Nullable(Of Double) = Nothing
         Public Property kinematic_viscosity() As Nullable(Of Double)
             Get
@@ -660,6 +686,7 @@ Namespace DTL.BaseThermoClasses
                 spmp_kinematic_viscosity = value
             End Set
         End Property
+
         Protected spmp_volumetric_flow As Nullable(Of Double) = Nothing
         Public Property volumetric_flow() As Nullable(Of Double)
             Get
@@ -669,6 +696,7 @@ Namespace DTL.BaseThermoClasses
                 spmp_volumetric_flow = value
             End Set
         End Property
+
         Protected spmp_molarenthalpy As Nullable(Of Double) = Nothing
         Public Property molar_enthalpy() As Nullable(Of Double)
             Get
@@ -678,6 +706,7 @@ Namespace DTL.BaseThermoClasses
                 spmp_molarenthalpy = value
             End Set
         End Property
+
         Protected spmp_molarentropy As Nullable(Of Double) = Nothing
         Public Property molar_entropy() As Nullable(Of Double)
             Get
@@ -687,6 +716,7 @@ Namespace DTL.BaseThermoClasses
                 spmp_molarentropy = value
             End Set
         End Property
+
         Protected spmp_molarenthalpyF As Nullable(Of Double) = Nothing
         Public Property molar_enthalpyF() As Nullable(Of Double)
             Get
@@ -696,6 +726,7 @@ Namespace DTL.BaseThermoClasses
                 spmp_molarenthalpyF = value
             End Set
         End Property
+
         Protected spmp_molarentropyF As Nullable(Of Double) = Nothing
         Public Property molar_entropyF() As Nullable(Of Double)
             Get
@@ -709,6 +740,7 @@ Namespace DTL.BaseThermoClasses
         Public Sub New()
 
         End Sub
+
     End Class
 
     <System.Serializable()> Public Class TwoPhaseMixtureProperties
@@ -722,6 +754,7 @@ Namespace DTL.BaseThermoClasses
                 tpmp_kvalue = value
             End Set
         End Property
+
         Protected tpmp_logKvalue As Nullable(Of Double) = Nothing
         Public Property logKvalue() As Nullable(Of Double)
             Get
@@ -731,6 +764,7 @@ Namespace DTL.BaseThermoClasses
                 tpmp_logKvalue = value
             End Set
         End Property
+
         Protected tpmp_surfaceTension As Nullable(Of Double) = Nothing
         Public Property surfaceTension() As Nullable(Of Double)
             Get
@@ -742,6 +776,7 @@ Namespace DTL.BaseThermoClasses
         End Property
 
     End Class
+
     <System.Serializable()> Public Class InteractionParameter
 
         Implements ICloneable
@@ -777,6 +812,7 @@ Namespace DTL.BaseThermoClasses
         End Function
 
     End Class
+
     <System.Serializable()> Public Class ConstantProperties
 
         Implements ICloneable
@@ -990,7 +1026,6 @@ Namespace DTL.BaseThermoClasses
             NISTMODFACGroups = New UNIFACGroupCollection
         End Sub
 
-
         Public Function Clone() As Object Implements System.ICloneable.Clone
 
             Return ObjectCopy(Me)
@@ -1019,14 +1054,19 @@ Namespace DTL.BaseThermoClasses
     End Class
 
     <System.Serializable()> Public Class UNIFACGroupCollection
+
         Public Collection As System.Collections.SortedList
+
         Sub New()
             Collection = New System.Collections.SortedList
         End Sub
+
     End Class
 
     <System.Serializable()> Public Class ElementCollection
+
         Public Collection As New System.Collections.SortedList
+
         Sub New()
             Collection = New System.Collections.SortedList
         End Sub
