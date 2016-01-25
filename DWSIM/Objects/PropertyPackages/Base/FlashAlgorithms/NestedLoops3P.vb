@@ -17,7 +17,6 @@
 '    along with DWSIM.  If not, see <http://www.gnu.org/licenses/>.
 
 Imports System.Math
-Imports DTL.DTL.SimulationObjects
 Imports DTL.DTL.MathEx
 Imports DTL.DTL.MathEx.Common
 
@@ -811,14 +810,6 @@ out:
             End If
             If Tinf < 100 Then Tinf = 100
 
-            'Hinf = PP.DW_CalcEnthalpy(Vz, Tinf, P, State.Liquid)
-            'Hsup = PP.DW_CalcEnthalpy(Vz, Tsup, P, State.Vapor)
-
-            'If H >= Hsup Then
-            '    Tf = Me.ESTIMAR_T_H(H, Tref, "V", P, Vz)
-            'ElseIf H <= Hinf Then
-            '    Tf = Me.ESTIMAR_T_H(H, Tref, "L", P, Vz)
-            'Else
             Dim bo As New BrentOpt.Brent
             bo.DefineFuncDelegate(AddressOf Herror)
             WriteDebugInfo("PH Flash: Starting calculation for " & Tinf & " <= T <= " & Tsup)
@@ -842,8 +833,6 @@ alt:            Tf = bo.BrentOpt(Tinf, Tsup, 4, tolEXT, maxitEXT, Nothing)
             Else
                 Tf = x1
             End If
-
-            'End If
 
             Dim tmp As Object = Flash_PT(Vz, P, Tf, PP)
 
@@ -902,14 +891,6 @@ alt:            Tf = bo.BrentOpt(Tinf, Tsup, 4, tolEXT, maxitEXT, Nothing)
             End If
             If Tinf < 100 Then Tinf = 100
 
-            'Sinf = PP.DW_CalcEntropy(Vz, Tinf, P, State.Liquid)
-            'Ssup = PP.DW_CalcEntropy(Vz, Tsup, P, State.Vapor)
-
-            'If S >= Ssup Then
-            '    Tf = Me.ESTIMAR_T_S(S, Tref, "V", P, Vz)
-            'ElseIf S <= Sinf Then
-            '    Tf = Me.ESTIMAR_T_S(S, Tref, "L", P, Vz)
-            'Else
             Dim bo As New BrentOpt.Brent
             bo.DefineFuncDelegate(AddressOf Serror)
             WriteDebugInfo("PS Flash: Starting calculation for " & Tinf & " <= T <= " & Tsup)
@@ -933,8 +914,6 @@ alt:            Tf = bo.BrentOpt(Tinf, Tsup, 4, tolEXT, maxitEXT, Nothing)
             Else
                 Tf = x1
             End If
-
-            'End If
 
             Dim tmp As Object = Flash_PT(Vz, P, Tf, PP)
 
@@ -1160,8 +1139,6 @@ alt:            Tf = bo.BrentOpt(Tinf, Tsup, 4, tolEXT, maxitEXT, Nothing)
 
                     Dim cont_int = 0
                     Do
-
-
                         Ki = PP.DW_CalcKvalue(Vx, Vy, T, P)
 
                         marker = 0
@@ -1251,8 +1228,6 @@ alt:            Tf = bo.BrentOpt(Tinf, Tsup, 4, tolEXT, maxitEXT, Nothing)
                     End If
 
                     WriteDebugInfo("TV Flash [NL]: Iteration #" & ecount & ", P = " & P & ", VF = " & V)
-
-
 
                 Loop Until Abs(P - Pant) < 1 Or Double.IsNaN(P) = True Or ecount > maxit_e Or Double.IsNaN(P) Or Double.IsInfinity(P)
 
@@ -1355,8 +1330,6 @@ alt:            Tf = bo.BrentOpt(Tinf, Tsup, 4, tolEXT, maxitEXT, Nothing)
                     End If
 
                     WriteDebugInfo("TV Flash [NL]: Iteration #" & ecount & ", P = " & P & ", VF = " & V)
-
-
 
                 Loop Until Abs(fval) < etol Or Double.IsNaN(P) = True Or ecount > maxit_e
 
@@ -1487,8 +1460,6 @@ alt:            Tf = bo.BrentOpt(Tinf, Tsup, 4, tolEXT, maxitEXT, Nothing)
 
                     Dim cont_int = 0
                     Do
-
-
                         Ki = PP.DW_CalcKvalue(Vx, Vy, T, P)
 
                         marker = 0
@@ -1572,12 +1543,8 @@ alt:            Tf = bo.BrentOpt(Tinf, Tsup, 4, tolEXT, maxitEXT, Nothing)
 
                     Tant = T
                     T = T - fval / dFdT
-                    'If T < Tmin Then T = Tmin
-                    'If T > Tmax Then T = Tmax
 
                     WriteDebugInfo("PV Flash [NL]: Iteration #" & ecount & ", T = " & T & ", VF = " & V)
-
-
 
                 Loop Until Abs(T - Tant) < 0.1 Or Double.IsNaN(T) = True Or ecount > maxit_e Or Double.IsNaN(T) Or Double.IsInfinity(T)
 
@@ -1674,12 +1641,8 @@ alt:            Tf = bo.BrentOpt(Tinf, Tsup, 4, tolEXT, maxitEXT, Nothing)
 
                     Tant = T
                     T = T - fval / dFdT
-                    'If T < Tmin Then T = Tmin
-                    'If T > Tmax Then T = Tmax
 
                     WriteDebugInfo("PV Flash [NL]: Iteration #" & ecount & ", T = " & T & ", VF = " & V)
-
-
 
                 Loop Until Abs(fval) < etol Or Double.IsNaN(T) = True Or ecount > maxit_e
 
