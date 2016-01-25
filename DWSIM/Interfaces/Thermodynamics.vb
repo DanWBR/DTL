@@ -433,7 +433,7 @@ Namespace Thermodynamics
             Dim ms As New Streams.MaterialStream("", "")
 
             For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
-                phase.Components.Add(compound, New DTL.BaseThermoClasses.Substance(compound, ""))
+                phase.Components.Add(compound, New Substance(compound, ""))
                 phase.Components(compound).ConstantProperties = pp._availablecomps(compound)
             Next
 
@@ -476,7 +476,7 @@ Namespace Thermodynamics
             Dim ms As New Streams.MaterialStream("", "")
 
             For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
-                phase.Components.Add(compound, New DTL.BaseThermoClasses.Substance(compound, ""))
+                phase.Components.Add(compound, New Substance(compound, ""))
                 phase.Components(compound).ConstantProperties = pp._availablecomps(compound)
             Next
 
@@ -520,7 +520,7 @@ Namespace Thermodynamics
             Dim ms As New Streams.MaterialStream("", "")
 
             For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
-                phase.Components.Add(compound, New DTL.BaseThermoClasses.Substance(compound, ""))
+                phase.Components.Add(compound, New Substance(compound, ""))
                 phase.Components(compound).ConstantProperties = pp._availablecomps(compound)
             Next
 
@@ -677,7 +677,7 @@ Namespace Thermodynamics
 
             For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
-                    phase.Components.Add(c, New DTL.BaseThermoClasses.Substance(c, ""))
+                    phase.Components.Add(c, New Substance(c, ""))
                     phase.Components(c).ConstantProperties = pp._availablecomps(c)
                 Next
             Next
@@ -781,7 +781,7 @@ Namespace Thermodynamics
 
             For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
-                    phase.Components.Add(c, New DTL.BaseThermoClasses.Substance(c, ""))
+                    phase.Components.Add(c, New Substance(c, ""))
                     phase.Components(c).ConstantProperties = pp._availablecomps(c)
                 Next
             Next
@@ -886,7 +886,7 @@ Namespace Thermodynamics
 
             For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
-                    phase.Components.Add(c, New DTL.BaseThermoClasses.Substance(c, ""))
+                    phase.Components.Add(c, New Substance(c, ""))
                     phase.Components(c).ConstantProperties = pp._availablecomps(c)
                 Next
             Next
@@ -993,7 +993,7 @@ Namespace Thermodynamics
 
             For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
-                    phase.Components.Add(c, New DTL.BaseThermoClasses.Substance(c, ""))
+                    phase.Components.Add(c, New Substance(c, ""))
                     phase.Components(c).ConstantProperties = pp._availablecomps(c)
                 Next
             Next
@@ -1247,7 +1247,7 @@ Namespace Thermodynamics
 
             For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
-                    phase.Components.Add(c, New DTL.BaseThermoClasses.Substance(c, ""))
+                    phase.Components.Add(c, New Substance(c, ""))
                     phase.Components(c).ConstantProperties = pp._availablecomps(c)
                 Next
             Next
@@ -1358,7 +1358,7 @@ Namespace Thermodynamics
 
             For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
-                    phase.Components.Add(c, New DTL.BaseThermoClasses.Substance(c, ""))
+                    phase.Components.Add(c, New Substance(c, ""))
                     phase.Components(c).ConstantProperties = pp._availablecomps(c)
                 Next
             Next
@@ -1403,7 +1403,7 @@ Namespace Thermodynamics
             Dim i, j As Integer
             i = 0
             For Each l As String In labels
-                If statuses(i) = CapeOpen.eCapePhaseStatus.CAPE_ATEQUILIBRIUM Then
+                If statuses(i) = eCapePhaseStatus.CAPE_ATEQUILIBRIUM Then
                     fractions(0, i) = labels(i)
                     ms.GetSinglePhaseProp("phasefraction", labels(i), "Mole", res)
                     fractions(1, i) = res(0)
@@ -1473,7 +1473,7 @@ Namespace Thermodynamics
 
             For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
-                    phase.Components.Add(c, New DTL.BaseThermoClasses.Substance(c, ""))
+                    phase.Components.Add(c, New Substance(c, ""))
                     phase.Components(c).ConstantProperties = pp._availablecomps(c)
                 Next
             Next
@@ -1518,7 +1518,7 @@ Namespace Thermodynamics
             Dim i, j As Integer
             i = 0
             For Each l As String In labels
-                If statuses(i) = CapeOpen.eCapePhaseStatus.CAPE_ATEQUILIBRIUM Then
+                If statuses(i) = eCapePhaseStatus.CAPE_ATEQUILIBRIUM Then
                     fractions(0, i) = labels(i)
                     ms.GetSinglePhaseProp("phasefraction", labels(i), "Mole", res)
                     fractions(1, i) = res(0)
@@ -1588,7 +1588,7 @@ Namespace Thermodynamics
 
             For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
-                    phase.Components.Add(c, New DTL.BaseThermoClasses.Substance(c, ""))
+                    phase.Components.Add(c, New Substance(c, ""))
                     phase.Components(c).ConstantProperties = pp._availablecomps(c)
                 Next
             Next
@@ -1633,7 +1633,7 @@ Namespace Thermodynamics
             Dim i, j As Integer
             i = 0
             For Each l As String In labels
-                If statuses(i) = CapeOpen.eCapePhaseStatus.CAPE_ATEQUILIBRIUM Then
+                If statuses(i) = eCapePhaseStatus.CAPE_ATEQUILIBRIUM Then
                     fractions(0, i) = labels(i)
                     ms.GetSinglePhaseProp("phasefraction", labels(i), "Mole", res)
                     fractions(1, i) = res(0)
@@ -1703,7 +1703,7 @@ Namespace Thermodynamics
 
             For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
-                    phase.Components.Add(c, New DTL.BaseThermoClasses.Substance(c, ""))
+                    phase.Components.Add(c, New Substance(c, ""))
                     phase.Components(c).ConstantProperties = pp._availablecomps(c)
                 Next
             Next
@@ -1748,7 +1748,7 @@ Namespace Thermodynamics
             Dim i, j As Integer
             i = 0
             For Each l As String In labels
-                If statuses(i) = CapeOpen.eCapePhaseStatus.CAPE_ATEQUILIBRIUM Then
+                If statuses(i) = eCapePhaseStatus.CAPE_ATEQUILIBRIUM Then
                     fractions(0, i) = labels(i)
                     ms.GetSinglePhaseProp("phasefraction", labels(i), "Mole", res)
                     fractions(1, i) = res(0)
@@ -1816,7 +1816,7 @@ Namespace Thermodynamics
 
             For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
-                    phase.Components.Add(c, New DTL.BaseThermoClasses.Substance(c, ""))
+                    phase.Components.Add(c, New Substance(c, ""))
                     phase.Components(c).ConstantProperties = pp._availablecomps(c)
                 Next
             Next
@@ -1850,7 +1850,7 @@ Namespace Thermodynamics
             Dim i, j As Integer
             i = 0
             For Each l As String In labels
-                If statuses(i) = CapeOpen.eCapePhaseStatus.CAPE_ATEQUILIBRIUM Then
+                If statuses(i) = eCapePhaseStatus.CAPE_ATEQUILIBRIUM Then
                     fractions(0, i) = labels(i)
                     ms.GetSinglePhaseProp("phasefraction", labels(i), "Mole", res)
                     fractions(1, i) = res(0)
@@ -1913,7 +1913,7 @@ Namespace Thermodynamics
 
             For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
-                    phase.Components.Add(c, New DTL.BaseThermoClasses.Substance(c, ""))
+                    phase.Components.Add(c, New Substance(c, ""))
                     phase.Components(c).ConstantProperties = pp._availablecomps(c)
                 Next
             Next
@@ -1948,7 +1948,7 @@ Namespace Thermodynamics
             Dim i, j As Integer
             i = 0
             For Each l As String In labels
-                If statuses(i) = CapeOpen.eCapePhaseStatus.CAPE_ATEQUILIBRIUM Then
+                If statuses(i) = eCapePhaseStatus.CAPE_ATEQUILIBRIUM Then
                     fractions(0, i) = labels(i)
                     ms.GetSinglePhaseProp("phasefraction", labels(i), "Mole", res)
                     fractions(1, i) = res(0)
@@ -2013,7 +2013,7 @@ Namespace Thermodynamics
 
             For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
-                    phase.Components.Add(c, New DTL.BaseThermoClasses.Substance(c, ""))
+                    phase.Components.Add(c, New Substance(c, ""))
                     phase.Components(c).ConstantProperties = pp._availablecomps(c)
                 Next
             Next
@@ -2048,7 +2048,7 @@ Namespace Thermodynamics
             Dim i, j As Integer
             i = 0
             For Each l As String In labels
-                If statuses(i) = CapeOpen.eCapePhaseStatus.CAPE_ATEQUILIBRIUM Then
+                If statuses(i) = eCapePhaseStatus.CAPE_ATEQUILIBRIUM Then
                     fractions(0, i) = labels(i)
                     ms.GetSinglePhaseProp("phasefraction", labels(i), "Mole", res)
                     fractions(1, i) = res(0)
@@ -2113,7 +2113,7 @@ Namespace Thermodynamics
 
             For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
-                    phase.Components.Add(c, New DTL.BaseThermoClasses.Substance(c, ""))
+                    phase.Components.Add(c, New Substance(c, ""))
                     phase.Components(c).ConstantProperties = pp._availablecomps(c)
                 Next
             Next
@@ -2149,7 +2149,7 @@ Namespace Thermodynamics
             Dim i, j As Integer
             i = 0
             For Each l As String In labels
-                If statuses(i) = CapeOpen.eCapePhaseStatus.CAPE_ATEQUILIBRIUM Then
+                If statuses(i) = eCapePhaseStatus.CAPE_ATEQUILIBRIUM Then
                     fractions(0, i) = labels(i)
                     ms.GetSinglePhaseProp("phasefraction", labels(i), "Mole", res)
                     fractions(1, i) = res(0)
@@ -2214,7 +2214,7 @@ Namespace Thermodynamics
 
             For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
-                    phase.Components.Add(c, New DTL.BaseThermoClasses.Substance(c, ""))
+                    phase.Components.Add(c, New Substance(c, ""))
                     phase.Components(c).ConstantProperties = pp._availablecomps(c)
                 Next
             Next
@@ -2249,7 +2249,7 @@ Namespace Thermodynamics
             Dim i, j As Integer
             i = 0
             For Each l As String In labels
-                If statuses(i) = CapeOpen.eCapePhaseStatus.CAPE_ATEQUILIBRIUM Then
+                If statuses(i) = eCapePhaseStatus.CAPE_ATEQUILIBRIUM Then
                     fractions(0, i) = labels(i)
                     ms.GetSinglePhaseProp("phasefraction", labels(i), "Mole", res)
                     fractions(1, i) = res(0)
@@ -2510,7 +2510,7 @@ Namespace Thermodynamics
 
             For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
-                    phase.Components.Add(c, New DTL.BaseThermoClasses.Substance(c, ""))
+                    phase.Components.Add(c, New Substance(c, ""))
                     phase.Components(c).ConstantProperties = pp._availablecomps(c)
                 Next
             Next

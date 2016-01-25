@@ -17,29 +17,22 @@
 '    along with DTL.  If not, see <http://www.gnu.org/licenses/>.
 
 Imports DTL.DTL.SimulationObjects.Streams
-Imports DTL.DTL.SimulationObjects
 Imports DTL.DTL.BaseThermoClasses
 Imports System.Runtime.Serialization.Formatters.Binary
 Imports System.Runtime.Serialization
 Imports System.IO
 Imports System.Math
-Imports CapeOpen = CAPEOPEN110
 Imports System.Runtime.InteropServices.ComTypes
-Imports iop = System.Runtime.InteropServices
-Imports System.Xml.Serialization
-Imports System.Runtime.Serialization.Formatters
 Imports CAPEOPEN110
 Imports System.Runtime.InteropServices
 Imports System.Threading.Tasks
 Imports DTL.DTL.MathEx
-Imports Microsoft.VisualBasic.FileIO
 
 Namespace DTL.SimulationObjects.PropertyPackages
 
-#Region "    Global Enumerations"
+#Region "Global Enumerations"
 
     Public Enum Phase
-
         Liquid
         Liquid1
         Liquid2
@@ -48,7 +41,6 @@ Namespace DTL.SimulationObjects.PropertyPackages
         Vapor
         Solid
         Mixture
-
     End Enum
 
     Public Enum State
@@ -58,7 +50,6 @@ Namespace DTL.SimulationObjects.PropertyPackages
     End Enum
 
     Public Enum FlashSpec
-
         P
         T
         S
@@ -67,7 +58,6 @@ Namespace DTL.SimulationObjects.PropertyPackages
         U
         VAP
         SF
-
     End Enum
 
     Public Enum ThermoProperty
@@ -125,14 +115,14 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
         Public Const ClassId As String = ""
 
-        Private m_props As New DTL.SimulationObjects.PropertyPackages.Auxiliary.PROPS
-        Public m_Henry As New System.Collections.Generic.Dictionary(Of String, HenryParam)
+        Private m_props As New Auxiliary.PROPS
+        Public m_Henry As New Dictionary(Of String, HenryParam)
 
-        Private m_ms As DTL.SimulationObjects.Streams.MaterialStream = Nothing
-        Private m_ss As New System.Collections.Generic.List(Of String)
+        Private m_ms As MaterialStream = Nothing
+        Private m_ss As New List(Of String)
         Private m_configurable As Boolean = False
 
-        Public m_par As System.Collections.Generic.Dictionary(Of String, Double)
+        Public m_par As Dictionary(Of String, Double)
 
         Private _tag As String = ""
         Private _uniqueID As String = ""
@@ -143,14 +133,14 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
         Public _packagetype As PackageType
 
-        <System.NonSerialized()> Public _brio3 As Auxiliary.FlashAlgorithms.BostonFournierInsideOut3P
-        <System.NonSerialized()> Public _bbio As Auxiliary.FlashAlgorithms.BostonBrittInsideOut
-        <System.NonSerialized()> Public _dwdf As Auxiliary.FlashAlgorithms.DWSIMDefault
-        <System.NonSerialized()> Public _gm3 As Auxiliary.FlashAlgorithms.GibbsMinimization3P
-        <System.NonSerialized()> Public _nl3 As Auxiliary.FlashAlgorithms.NestedLoops3PV3
-        <System.NonSerialized()> Public _nlsle As Auxiliary.FlashAlgorithms.NestedLoopsSLE
-        <System.NonSerialized()> Public _nli As Auxiliary.FlashAlgorithms.NestedLoopsImmiscible
-        <System.NonSerialized()> Public _simplelle As Auxiliary.FlashAlgorithms.SimpleLLE
+        <NonSerialized()> Public _brio3 As Auxiliary.FlashAlgorithms.BostonFournierInsideOut3P
+        <NonSerialized()> Public _bbio As Auxiliary.FlashAlgorithms.BostonBrittInsideOut
+        <NonSerialized()> Public _dwdf As Auxiliary.FlashAlgorithms.DWSIMDefault
+        <NonSerialized()> Public _gm3 As Auxiliary.FlashAlgorithms.GibbsMinimization3P
+        <NonSerialized()> Public _nl3 As Auxiliary.FlashAlgorithms.NestedLoops3PV3
+        <NonSerialized()> Public _nlsle As Auxiliary.FlashAlgorithms.NestedLoopsSLE
+        <NonSerialized()> Public _nli As Auxiliary.FlashAlgorithms.NestedLoopsImmiscible
+        <NonSerialized()> Public _simplelle As Auxiliary.FlashAlgorithms.SimpleLLE
 
         Public _ioquick As Boolean = True
         Public _tpseverity As Integer = 0
@@ -162,9 +152,9 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
         Public Property ForceNewFlashAlgorithmInstance As Boolean = False
 
-        <System.NonSerialized()> Private _como As Object 'CAPE-OPEN Material Object
+        <NonSerialized()> Private _como As Object 'CAPE-OPEN Material Object
 
-#Region "   Constructor"
+#Region "Constructor"
 
         Sub New()
             MyBase.New()
@@ -189,7 +179,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
         End Sub
 
         Sub ConfigParameters()
-            m_par = New System.Collections.Generic.Dictionary(Of String, Double)
+            m_par = New Dictionary(Of String, Double)
             With Me.Parameters
                 .Clear()
                 .Add("PP_PHFILT", 0.001)
@@ -288,7 +278,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
 #End Region
 
-#Region "   Properties"
+#Region "Properties"
 
         ''' <summary>
         ''' Get or sets the list of compounds to be used in the liquid phase stability test during three-phase flash calculations.
@@ -319,9 +309,6 @@ Namespace DTL.SimulationObjects.PropertyPackages
                 _tpseverity = value
             End Set
         End Property
-
-
-
 
         Public ReadOnly Property PhaseMappings() As Dictionary(Of String, PhaseInfo)
             Get
@@ -480,7 +467,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
             End Get
         End Property
 
-        Public Property ParametrosDeInteracao() As DataTable
+        Public Property InteractionParameters() As DataTable
             Get
                 Return m_ip
             End Get
@@ -520,16 +507,17 @@ Namespace DTL.SimulationObjects.PropertyPackages
             End Set
         End Property
 
-        Public ReadOnly Property SupportedComponents() As System.Collections.Generic.List(Of String)
+        Public ReadOnly Property SupportedComponents() As List(Of String)
             Get
                 Return m_ss
             End Get
         End Property
+
 #End Region
 
-#Region "   Cloning Support"
+#Region "Cloning Support"
 
-        Public Function Clone() As Object Implements System.ICloneable.Clone
+        Public Function Clone() As Object Implements ICloneable.Clone
 
             Return ObjectCopy(Me)
 
@@ -547,10 +535,11 @@ Namespace DTL.SimulationObjects.PropertyPackages
             ObjectCopy = objBinaryFormatter.Deserialize(objMemStream)
 
             objMemStream.Close()
+
         End Function
 #End Region
 
-#Region "   Must Override or Overridable Functions"
+#Region "Must Override or Overridable Functions"
 
         Public Overridable Sub ShowConfigForm()
 
@@ -588,11 +577,11 @@ Namespace DTL.SimulationObjects.PropertyPackages
             For Each su As Substance In Me.CurrentMaterialStream.Phases(0).Components.Values
                 constprops.Add(su.ConstantProperties)
             Next
-            result = Me.DW_CalcSolidEnthalpy(T, RET_VMOL(PropertyPackages.Phase.Solid), constprops)
+            result = Me.DW_CalcSolidEnthalpy(T, RET_VMOL(Phase.Solid), constprops)
             Me.CurrentMaterialStream.Phases(phaseID).SPMProperties.enthalpy = result
             Me.CurrentMaterialStream.Phases(phaseID).SPMProperties.entropy = result / T
             Me.CurrentMaterialStream.Phases(phaseID).SPMProperties.compressibilityFactor = 0.0#
-            result = Me.DW_CalcSolidHeatCapacityCp(T, RET_VMOL(PropertyPackages.Phase.Solid), constprops)
+            result = Me.DW_CalcSolidHeatCapacityCp(T, RET_VMOL(Phase.Solid), constprops)
             Me.CurrentMaterialStream.Phases(phaseID).SPMProperties.heatCapacityCp = result
             Me.CurrentMaterialStream.Phases(phaseID).SPMProperties.heatCapacityCv = result
             result = Me.AUX_MMM(Phase.Solid)
@@ -660,7 +649,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
         ''' <param name="P">Pressure of the system.</param>
         ''' <returns>An array containing K-values for all components in the mixture.</returns>
         ''' <remarks>The composition vector must follow the same sequence as the components which were added in the material stream.</remarks>
-        Public Overridable Overloads Function DW_CalcKvalue(ByVal Vx As System.Array, ByVal Vy As System.Array, ByVal T As Double, ByVal P As Double, Optional ByVal type As String = "LV") As Object
+        Public Overridable Overloads Function DW_CalcKvalue(ByVal Vx As Array, ByVal Vy As Array, ByVal T As Double, ByVal P As Double, Optional ByVal type As String = "LV") As Object
 
             Dim fugvap As Object = Nothing
             Dim fugliq As Object = Nothing
@@ -702,7 +691,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
             Next
 
             i = 0
-            For Each subst As BaseThermoClasses.Substance In Me.CurrentMaterialStream.Phases(1).Components.Values
+            For Each subst As Substance In Me.CurrentMaterialStream.Phases(1).Components.Values
                 If K(i) = 0 Or Double.IsInfinity(K(i)) Or Double.IsNaN(K(i)) Then
                     Dim Pc, Tc, w As Double
                     Pc = subst.ConstantProperties.Critical_Pressure
@@ -719,7 +708,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
             If Me.AUX_CheckTrivial(K) Then
                 i = 0
-                For Each subst As BaseThermoClasses.Substance In Me.CurrentMaterialStream.Phases(1).Components.Values
+                For Each subst As Substance In Me.CurrentMaterialStream.Phases(1).Components.Values
                     Dim Pc, Tc, w As Double
                     Pc = subst.ConstantProperties.Critical_Pressure
                     Tc = subst.ConstantProperties.Critical_Temperature
@@ -745,7 +734,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
         ''' <param name="P">Pressure of the system, in Pa.</param>
         ''' <returns>An array containing K-values for all components in the mixture.</returns>
         ''' <remarks>The composition vector must follow the same sequence as the components which were added in the material stream.</remarks>
-        Public Overridable Overloads Function DW_CalcKvalue(ByVal Vx As System.Array, ByVal T As Double, ByVal P As Double) As [Object]
+        Public Overridable Overloads Function DW_CalcKvalue(ByVal Vx As Array, ByVal T As Double, ByVal P As Double) As [Object]
 
             Dim i As Integer
             Dim result = Me.FlashBase.Flash_PT(Vx, P, T, Me)
@@ -753,13 +742,13 @@ Namespace DTL.SimulationObjects.PropertyPackages
             Dim K(n) As Double
 
             i = 0
-            For Each subst As BaseThermoClasses.Substance In Me.CurrentMaterialStream.Phases(1).Components.Values
+            For Each subst As Substance In Me.CurrentMaterialStream.Phases(1).Components.Values
                 K(i) = (result(3)(i) / result(2)(i))
                 i += 1
             Next
 
             i = 0
-            For Each subst As BaseThermoClasses.Substance In Me.CurrentMaterialStream.Phases(1).Components.Values
+            For Each subst As Substance In Me.CurrentMaterialStream.Phases(1).Components.Values
                 If K(i) = 0 Then K(i) = Me.AUX_PVAPi(subst.Name, T) / P
                 If Double.IsInfinity(K(i)) Or Double.IsNaN(K(i)) Then
                     Dim Pc, Tc, w As Double
@@ -795,7 +784,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
         ''' composition vector, P is the calculated Pressure in Pa, ecount is the number of iterations and Ki is a vector containing 
         ''' the calculated K-values.</returns>
         ''' <remarks>The composition vector must follow the same sequence as the components which were added in the material stream.</remarks>
-        Public Overridable Function DW_CalcBubP(ByVal Vx As System.Array, ByVal T As Double, Optional ByVal Pref As Double = 0, Optional ByVal K As System.Array = Nothing, Optional ByVal ReuseK As Boolean = False) As Object
+        Public Overridable Function DW_CalcBubP(ByVal Vx As Array, ByVal T As Double, Optional ByVal Pref As Double = 0, Optional ByVal K As Array = Nothing, Optional ByVal ReuseK As Boolean = False) As Object
             Return Me.FlashBase.Flash_TV(Vx, T, 0, Pref, Me, ReuseK, K)
         End Function
 
@@ -812,7 +801,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
         ''' composition vector, T is the calculated Temperature in K, ecount is the number of iterations and Ki is a vector containing 
         ''' the calculated K-values.</returns>
         ''' <remarks>The composition vector must follow the same sequence as the components which were added in the material stream.</remarks>
-        Public Overridable Function DW_CalcBubT(ByVal Vx As System.Array, ByVal P As Double, Optional ByVal Tref As Double = 0, Optional ByVal K As System.Array = Nothing, Optional ByVal ReuseK As Boolean = False) As Object
+        Public Overridable Function DW_CalcBubT(ByVal Vx As Array, ByVal P As Double, Optional ByVal Tref As Double = 0, Optional ByVal K As Array = Nothing, Optional ByVal ReuseK As Boolean = False) As Object
             Return Me.FlashBase.Flash_PV(Vx, P, 0, Tref, Me, ReuseK, K)
         End Function
 
@@ -829,7 +818,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
         ''' composition vector, P is the calculated Pressure in Pa, ecount is the number of iterations and Ki is a vector containing 
         ''' the calculated K-values.</returns>
         ''' <remarks>The composition vector must follow the same sequence as the components which were added in the material stream.</remarks>
-        Public Overridable Function DW_CalcDewP(ByVal Vx As System.Array, ByVal T As Double, Optional ByVal Pref As Double = 0, Optional ByVal K As System.Array = Nothing, Optional ByVal ReuseK As Boolean = False) As Object
+        Public Overridable Function DW_CalcDewP(ByVal Vx As Array, ByVal T As Double, Optional ByVal Pref As Double = 0, Optional ByVal K As Array = Nothing, Optional ByVal ReuseK As Boolean = False) As Object
             Return Me.FlashBase.Flash_TV(Vx, T, 1, Pref, Me, ReuseK, K)
         End Function
 
@@ -846,7 +835,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
         ''' composition vector, T is the calculated Temperature in K, ecount is the number of iterations and Ki is a vector containing 
         ''' the calculated K-values.</returns>
         ''' <remarks>The composition vector must follow the same sequence as the components which were added in the material stream.</remarks>
-        Public Overridable Function DW_CalcDewT(ByVal Vx As System.Array, ByVal P As Double, Optional ByVal Tref As Double = 0, Optional ByVal K As System.Array = Nothing, Optional ByVal ReuseK As Boolean = False) As Object
+        Public Overridable Function DW_CalcDewT(ByVal Vx As Array, ByVal P As Double, Optional ByVal Tref As Double = 0, Optional ByVal K As Array = Nothing, Optional ByVal ReuseK As Boolean = False) As Object
             Return Me.FlashBase.Flash_PV(Vx, P, 1, Tref, Me, ReuseK, K)
         End Function
 
@@ -861,7 +850,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
         ''' <remarks>The composition vector must follow the same sequence as the components which were added in the material stream.</remarks>
         Public MustOverride Function DW_CalcFugCoeff(ByVal Vx As Array, ByVal T As Double, ByVal P As Double, ByVal st As State) As Double()
 
-        Public MustOverride Function SupportsComponent(ByVal comp As DTL.BaseThermoClasses.ConstantProperties) As Boolean
+        Public MustOverride Function SupportsComponent(ByVal comp As ConstantProperties) As Boolean
 
         Public MustOverride Sub DW_CalcPhaseProps(ByVal Phase As Phase)
 
@@ -874,7 +863,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
         End Sub
 
-        Public Function DW_CalcGibbsEnergy(ByVal Vx As System.Array, ByVal T As Double, ByVal P As Double) As Double
+        Public Function DW_CalcGibbsEnergy(ByVal Vx As Array, ByVal T As Double, ByVal P As Double) As Double
 
             Dim fugvap As Object = Nothing
             Dim fugliq As Object = Nothing
@@ -909,10 +898,6 @@ Namespace DTL.SimulationObjects.PropertyPackages
             Dim g, gid, gexv, gexl As Double
 
             gid = 0.0#
-
-            'If MathEx.Common.Sum(Vx) <> 0.0# Then
-            '    gid = RET_Gid(298.15, T, P, Vx) * AUX_MMM(Vx) 'kJ/kmol
-            'End If
 
             gexv = 0.0#
             gexl = 0.0#
@@ -1178,7 +1163,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
             Dim P, T, H, S, xv, xl, xl2, xs As Double
             Dim result As Object = Nothing
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
             Dim n As Integer = Me.CurrentMaterialStream.Phases(0).Components.Count
             Dim i As Integer = 0
 
@@ -1187,20 +1172,20 @@ Namespace DTL.SimulationObjects.PropertyPackages
             H = Me.CurrentMaterialStream.Phases(0).SPMProperties.enthalpy.GetValueOrDefault
             S = Me.CurrentMaterialStream.Phases(0).SPMProperties.entropy.GetValueOrDefault
 
-            Me.DW_ZerarPhaseProps(Phase.Vapor)
-            Me.DW_ZerarPhaseProps(Phase.Liquid)
-            Me.DW_ZerarPhaseProps(Phase.Liquid1)
-            Me.DW_ZerarPhaseProps(Phase.Liquid2)
-            Me.DW_ZerarPhaseProps(Phase.Liquid3)
-            Me.DW_ZerarPhaseProps(Phase.Aqueous)
-            Me.DW_ZerarPhaseProps(Phase.Solid)
-            Me.DW_ZerarComposicoes(Phase.Vapor)
-            Me.DW_ZerarComposicoes(Phase.Liquid)
-            Me.DW_ZerarComposicoes(Phase.Liquid1)
-            Me.DW_ZerarComposicoes(Phase.Liquid2)
-            Me.DW_ZerarComposicoes(Phase.Liquid3)
-            Me.DW_ZerarComposicoes(Phase.Aqueous)
-            Me.DW_ZerarComposicoes(Phase.Solid)
+            Me.DW_ClearPhaseProps(Phase.Vapor)
+            Me.DW_ClearPhaseProps(Phase.Liquid)
+            Me.DW_ClearPhaseProps(Phase.Liquid1)
+            Me.DW_ClearPhaseProps(Phase.Liquid2)
+            Me.DW_ClearPhaseProps(Phase.Liquid3)
+            Me.DW_ClearPhaseProps(Phase.Aqueous)
+            Me.DW_ClearPhaseProps(Phase.Solid)
+            Me.DW_ClearCompositions(Phase.Vapor)
+            Me.DW_ClearCompositions(Phase.Liquid)
+            Me.DW_ClearCompositions(Phase.Liquid1)
+            Me.DW_ClearCompositions(Phase.Liquid2)
+            Me.DW_ClearCompositions(Phase.Liquid3)
+            Me.DW_ClearCompositions(Phase.Aqueous)
+            Me.DW_ClearCompositions(Phase.Solid)
 
             Select Case spec1
 
@@ -2067,35 +2052,34 @@ redirect2:                      result = Me.FlashBase.Flash_PS(RET_VMOL(Phase.Mi
 
         End Function
 
+        Public MustOverride Sub DW_CalcMolarFlow()
 
-        Public MustOverride Sub DW_CalcVazaoMolar()
+        Public MustOverride Sub DW_CalcMassFlow()
 
-        Public MustOverride Sub DW_CalcVazaoMassica()
+        Public MustOverride Sub DW_CalcVolumetricFlow()
 
-        Public MustOverride Sub DW_CalcVazaoVolumetrica()
+        Public MustOverride Function DW_CalcSpecificMass_ISOL(ByVal Phase1 As Phase, ByVal T As Double, ByVal P As Double, Optional ByVal Pvp As Double = 0) As Double
 
-        Public MustOverride Function DW_CalcMassaEspecifica_ISOL(ByVal Phase1 As Phase, ByVal T As Double, ByVal P As Double, Optional ByVal Pvp As Double = 0) As Double
-
-        Public MustOverride Function DW_CalcViscosidadeDinamica_ISOL(ByVal Phase1 As Phase, ByVal T As Double, ByVal P As Double) As Double
+        Public MustOverride Function DW_CalcDynamicViscosity_ISOL(ByVal Phase1 As Phase, ByVal T As Double, ByVal P As Double) As Double
 
 
-        Public MustOverride Function DW_CalcEnergiaMistura_ISOL(ByVal T As Double, ByVal P As Double) As Double
+        Public MustOverride Function DW_CalcMixtureEnergy_ISOL(ByVal T As Double, ByVal P As Double) As Double
 
-        Public MustOverride Function DW_CalcCp_ISOL(ByVal Phase1 As DTL.SimulationObjects.PropertyPackages.Phase, ByVal T As Double, ByVal P As Double) As Double
+        Public MustOverride Function DW_CalcCp_ISOL(ByVal Phase1 As Phase, ByVal T As Double, ByVal P As Double) As Double
 
-        Public MustOverride Function DW_CalcCv_ISOL(ByVal Phase1 As DTL.SimulationObjects.PropertyPackages.Phase, ByVal T As Double, ByVal P As Double) As Double
+        Public MustOverride Function DW_CalcCv_ISOL(ByVal Phase1 As Phase, ByVal T As Double, ByVal P As Double) As Double
 
-        Public MustOverride Function DW_CalcK_ISOL(ByVal Phase1 As DTL.SimulationObjects.PropertyPackages.Phase, ByVal T As Double, ByVal P As Double) As Double
+        Public MustOverride Function DW_CalcK_ISOL(ByVal Phase1 As Phase, ByVal T As Double, ByVal P As Double) As Double
 
-        Public MustOverride Function DW_CalcMM_ISOL(ByVal Phase1 As DTL.SimulationObjects.PropertyPackages.Phase, ByVal T As Double, ByVal P As Double) As Double
+        Public MustOverride Function DW_CalcMM_ISOL(ByVal Phase1 As Phase, ByVal T As Double, ByVal P As Double) As Double
 
         Public MustOverride Function DW_CalcPVAP_ISOL(ByVal T As Double) As Double
 
-        Public MustOverride Sub DW_CalcCompPartialVolume(ByVal phase As DTL.SimulationObjects.PropertyPackages.Phase, ByVal T As Double, ByVal P As Double)
+        Public MustOverride Sub DW_CalcCompPartialVolume(ByVal phase As Phase, ByVal T As Double, ByVal P As Double)
 
 #End Region
 
-#Region "   Commmon Functions"
+#Region "Commmon Functions"
 
         Public Function DW_GetConstantProperties() As List(Of ConstantProperties)
 
@@ -2111,7 +2095,7 @@ redirect2:                      result = Me.FlashBase.Flash_PS(RET_VMOL(Phase.Mi
 
         Public Overloads Sub DW_CalcKvalue()
 
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
 
             For Each phase As BaseThermoClasses.Phase In Me.CurrentMaterialStream.Phases.Values
                 For Each subst In phase.Components.Values
@@ -2284,7 +2268,7 @@ redirect2:                      result = Me.FlashBase.Flash_PS(RET_VMOL(Phase.Mi
 
         End Sub
 
-        Public Sub DW_ZerarPhaseProps(ByVal Phase As Phase)
+        Public Sub DW_ClearPhaseProps(ByVal Phase As Phase)
 
             Dim phaseID As Integer
 
@@ -2360,7 +2344,7 @@ redirect2:                      result = Me.FlashBase.Flash_PS(RET_VMOL(Phase.Mi
 
         End Sub
 
-        Public Sub DW_ZerarTwoPhaseProps(ByVal Phase1 As Phase, ByVal Phase2 As Phase)
+        Public Sub DW_ClearTwoPhaseProps(ByVal Phase1 As Phase, ByVal Phase2 As Phase)
 
             Me.CurrentMaterialStream.Phases(0).TPMProperties.kvalue = Nothing
             Me.CurrentMaterialStream.Phases(0).TPMProperties.logKvalue = Nothing
@@ -2368,34 +2352,34 @@ redirect2:                      result = Me.FlashBase.Flash_PS(RET_VMOL(Phase.Mi
 
         End Sub
 
-        Public Sub DW_ZerarOverallProps()
+        Public Sub DW_ClearOverallProps()
 
         End Sub
 
-        Public Sub DW_ZerarVazaoMolar()
+        Public Sub DW_ClearMolarFlow()
             With Me.CurrentMaterialStream
                 .Phases(0).SPMProperties.molarflow = 0
             End With
         End Sub
 
-        Public Sub DW_ZerarVazaoVolumetrica()
+        Public Sub DW_ClearVolumetricFlow()
             With Me.CurrentMaterialStream
                 .Phases(0).SPMProperties.volumetric_flow = 0
             End With
         End Sub
 
-        Public Sub DW_ZerarVazaoMassica()
+        Public Sub DW_ClearMassFlow()
             With Me.CurrentMaterialStream
                 .Phases(0).SPMProperties.massflow = 0
             End With
         End Sub
 
-        Public Sub DW_ZerarComposicoes(ByVal Phase As Phase)
+        Public Sub DW_ClearCompositions(ByVal Phase As Phase)
 
             Dim phaseID As Integer
             phaseID = Me.RET_PHASEID(Phase)
 
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
 
             For Each subst In Me.CurrentMaterialStream.Phases(phaseID).Components.Values
                 subst.MolarFraction = Nothing
@@ -2407,7 +2391,7 @@ redirect2:                      result = Me.FlashBase.Flash_PS(RET_VMOL(Phase.Mi
         Public Function AUX_TCM(ByVal Phase As Phase) As Double
 
             Dim Tc As Double
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
 
             For Each subst In Me.CurrentMaterialStream.Phases(Me.RET_PHASEID(Phase)).Components.Values
                 Tc += subst.MolarFraction.GetValueOrDefault * subst.ConstantProperties.Critical_Temperature
@@ -2419,7 +2403,7 @@ redirect2:                      result = Me.FlashBase.Flash_PS(RET_VMOL(Phase.Mi
         Public Function AUX_TBM(ByVal Phase As Phase) As Double
 
             Dim Tb As Double
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
 
             For Each subst In Me.CurrentMaterialStream.Phases(Me.RET_PHASEID(Phase)).Components.Values
                 Tb += subst.MolarFraction.GetValueOrDefault * subst.ConstantProperties.Normal_Boiling_Point
@@ -2432,7 +2416,7 @@ redirect2:                      result = Me.FlashBase.Flash_PS(RET_VMOL(Phase.Mi
         Public Function AUX_TFM(ByVal Phase As Phase) As Double
 
             Dim Tf As Double
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
 
             For Each subst In Me.CurrentMaterialStream.Phases(Me.RET_PHASEID(Phase)).Components.Values
                 Tf += subst.MolarFraction.GetValueOrDefault * subst.ConstantProperties.TemperatureOfFusion
@@ -2445,7 +2429,7 @@ redirect2:                      result = Me.FlashBase.Flash_PS(RET_VMOL(Phase.Mi
         Public Function AUX_WM(ByVal Phase As Phase) As Double
 
             Dim val As Double
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
 
             For Each subst In Me.CurrentMaterialStream.Phases(Me.RET_PHASEID(Phase)).Components.Values
                 val += subst.MolarFraction.GetValueOrDefault * subst.ConstantProperties.Acentric_Factor
@@ -2458,7 +2442,7 @@ redirect2:                      result = Me.FlashBase.Flash_PS(RET_VMOL(Phase.Mi
         Public Function AUX_ZCM(ByVal Phase As Phase) As Double
 
             Dim val As Double
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
 
             For Each subst In Me.CurrentMaterialStream.Phases(Me.RET_PHASEID(Phase)).Components.Values
                 val += subst.MolarFraction.GetValueOrDefault * subst.ConstantProperties.Critical_Compressibility
@@ -2471,7 +2455,7 @@ redirect2:                      result = Me.FlashBase.Flash_PS(RET_VMOL(Phase.Mi
         Public Function AUX_ZRAM(ByVal Phase As Phase) As Double
 
             Dim val As Double
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
 
             For Each subst In Me.CurrentMaterialStream.Phases(Me.RET_PHASEID(Phase)).Components.Values
                 If subst.ConstantProperties.Z_Rackett <> 0 Then
@@ -2488,7 +2472,7 @@ redirect2:                      result = Me.FlashBase.Flash_PS(RET_VMOL(Phase.Mi
         Public Function AUX_VCM(ByVal Phase As Phase) As Double
 
             Dim val, vc As Double
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
 
             For Each subst In Me.CurrentMaterialStream.Phases(Me.RET_PHASEID(Phase)).Components.Values
                 vc = subst.ConstantProperties.Critical_Volume
@@ -2505,7 +2489,7 @@ redirect2:                      result = Me.FlashBase.Flash_PS(RET_VMOL(Phase.Mi
         Public Function AUX_PCM(ByVal Phase As Phase) As Double
 
             Dim val As Double
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
 
             For Each subst In Me.CurrentMaterialStream.Phases(Me.RET_PHASEID(Phase)).Components.Values
                 val += subst.MolarFraction.GetValueOrDefault * subst.ConstantProperties.Critical_Pressure
@@ -2518,7 +2502,7 @@ redirect2:                      result = Me.FlashBase.Flash_PS(RET_VMOL(Phase.Mi
         Public Function AUX_PVAPM(ByVal T) As Double
 
             Dim val As Double = 0
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
 
             For Each subst In Me.CurrentMaterialStream.Phases(0).Components.Values
                 val += subst.MolarFraction.GetValueOrDefault * Me.AUX_PVAPi(subst.Name, T)
@@ -2544,7 +2528,7 @@ redirect2:                      result = Me.FlashBase.Flash_PS(RET_VMOL(Phase.Mi
         Public Function AUX_MMM(ByVal Phase As Phase) As Double
 
             Dim val As Double
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
 
             For Each subst In Me.CurrentMaterialStream.Phases(Me.RET_PHASEID(Phase)).Components.Values
                 val += subst.MolarFraction.GetValueOrDefault * subst.ConstantProperties.Molar_Weight
@@ -2596,7 +2580,7 @@ redirect2:                      result = Me.FlashBase.Flash_PS(RET_VMOL(Phase.Mi
         Private Function AUX_Rackett_Tcm(ByVal Phase As Phase) As Double
 
             Dim Tc As Double
-            Dim subst1, subst2 As DTL.BaseThermoClasses.Substance
+            Dim subst1, subst2 As Substance
 
             For Each subst1 In Me.CurrentMaterialStream.Phases(Me.RET_PHASEID(Phase)).Components.Values
                 For Each subst2 In Me.CurrentMaterialStream.Phases(Me.RET_PHASEID(Phase)).Components.Values
@@ -2675,7 +2659,7 @@ redirect2:                      result = Me.FlashBase.Flash_PS(RET_VMOL(Phase.Mi
         Public Function AUX_CPm(ByVal Phase As Phase, ByVal T As Double) As Double
 
             Dim val As Double
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
 
             For Each subst In Me.CurrentMaterialStream.Phases(Me.RET_PHASEID(Phase)).Components.Values
                 val += subst.MassFraction.GetValueOrDefault * Me.AUX_CPi(subst.Name, T)
@@ -2688,7 +2672,7 @@ redirect2:                      result = Me.FlashBase.Flash_PS(RET_VMOL(Phase.Mi
         Public Overridable Function AUX_HFm25(ByVal Phase As Phase) As Double
 
             Dim val As Double
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
 
             For Each subst In Me.CurrentMaterialStream.Phases(Me.RET_PHASEID(Phase)).Components.Values
                 val += subst.MolarFraction.GetValueOrDefault * subst.ConstantProperties.IG_Enthalpy_of_Formation_25C * subst.ConstantProperties.Molar_Weight
@@ -2703,7 +2687,7 @@ redirect2:                      result = Me.FlashBase.Flash_PS(RET_VMOL(Phase.Mi
         Public Overridable Function AUX_SFm25(ByVal Phase As Phase) As Double
 
             Dim val As Double
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
 
             For Each subst In Me.CurrentMaterialStream.Phases(Me.RET_PHASEID(Phase)).Components.Values
                 val += subst.MolarFraction.GetValueOrDefault * subst.ConstantProperties.IG_Entropy_of_Formation_25C * subst.ConstantProperties.Molar_Weight
@@ -2805,7 +2789,7 @@ redirect2:                      result = Me.FlashBase.Flash_PS(RET_VMOL(Phase.Mi
 
         Public Function AUX_PVAPi(ByVal index As Integer, ByVal T As Double)
 
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
             Dim Name As String = ""
             Dim i As Integer = 0
 
@@ -3156,7 +3140,7 @@ Final3:
         Public Function AUX_LIQVISCm(ByVal T As Double, Optional ByVal phaseid As Integer = 3) As Double
 
             Dim val, val2, logvisc, result As Double
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
 
             val = 0
             val2 = 0
@@ -3178,7 +3162,7 @@ Final3:
         Public Overridable Function AUX_SOLIDDENS() As Double
 
             Dim val As Double
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
             Dim zerodens As Double = 0
             Dim db As String
             Dim T As Double = Me.CurrentMaterialStream.Phases(0).SPMProperties.temperature.GetValueOrDefault
@@ -3273,11 +3257,11 @@ Final3:
 
         Public Function AUX_SURFTM(ByVal T As Double) As Double
 
-            If m_props Is Nothing Then m_props = New DTL.SimulationObjects.PropertyPackages.Auxiliary.PROPS
+            If m_props Is Nothing Then m_props = New Auxiliary.PROPS
 
             Dim val As Double = 0
             Dim nbp As Double
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
             Dim ftotal As Double = 1
 
             For Each subst In Me.CurrentMaterialStream.Phases(1).Components.Values
@@ -3306,7 +3290,7 @@ Final3:
 
         Public Function AUX_SURFTi(ByVal constprop As ConstantProperties, ByVal T As Double) As Double
 
-            If m_props Is Nothing Then m_props = New DTL.SimulationObjects.PropertyPackages.Auxiliary.PROPS
+            If m_props Is Nothing Then m_props = New Auxiliary.PROPS
 
             Dim val As Double = 0
             Dim nbp As Double
@@ -3333,10 +3317,10 @@ Final3:
 
         Public Function AUX_CONDTL(ByVal T As Double, Optional ByVal phaseid As Integer = 3) As Double
 
-            If m_props Is Nothing Then m_props = New DTL.SimulationObjects.PropertyPackages.Auxiliary.PROPS
+            If m_props Is Nothing Then m_props = New Auxiliary.PROPS
 
             Dim val As Double
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
             Dim vcl(Me.CurrentMaterialStream.Phases(0).Components.Count - 1)
             Dim i As Integer = 0
             For Each subst In Me.CurrentMaterialStream.Phases(phaseid).Components.Values
@@ -3362,10 +3346,10 @@ Final3:
 
         Public Function AUX_CONDTG(ByVal T As Double, ByVal P As Double) As Double
 
-            If m_props Is Nothing Then m_props = New DTL.SimulationObjects.PropertyPackages.Auxiliary.PROPS
+            If m_props Is Nothing Then m_props = New Auxiliary.PROPS
 
             Dim val As Double
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
             Dim i As Integer = 0
             For Each subst In Me.CurrentMaterialStream.Phases(2).Components.Values
                 If subst.ConstantProperties.VaporThermalConductivityEquation <> "" Then
@@ -3414,7 +3398,7 @@ Final3:
 
         Public Function AUX_VAPVISCm(ByVal T As Double, ByVal RHO As Double, ByVal MM As Double) As Double
 
-            If m_props Is Nothing Then m_props = New DTL.SimulationObjects.PropertyPackages.Auxiliary.PROPS
+            If m_props Is Nothing Then m_props = New Auxiliary.PROPS
 
             Dim val As Double = 0.0#
 
@@ -3446,10 +3430,10 @@ Final3:
 
         Public Overridable Function AUX_LIQDENS(ByVal T As Double, Optional ByVal P As Double = 0, Optional ByVal Pvp As Double = 0, Optional ByVal phaseid As Integer = 3, Optional ByVal FORCE_EOS As Boolean = False) As Double
 
-            If m_props Is Nothing Then m_props = New DTL.SimulationObjects.PropertyPackages.Auxiliary.PROPS
+            If m_props Is Nothing Then m_props = New Auxiliary.PROPS
 
             Dim val As Double
-            Dim m_pr2 As New DTL.SimulationObjects.PropertyPackages.Auxiliary.PengRobinson
+            Dim m_pr2 As New Auxiliary.PengRobinson
 
             If phaseid = 1 Then
                 If T / Me.AUX_TCM(Phase.Liquid) > 1 Then
@@ -3681,10 +3665,10 @@ Final3:
 
         Public Overridable Function AUX_LIQDENS(ByVal T As Double, ByVal Vx As Array, Optional ByVal P As Double = 0, Optional ByVal Pvp As Double = 0, Optional ByVal FORCE_EOS As Boolean = False) As Double
 
-            If m_props Is Nothing Then m_props = New DTL.SimulationObjects.PropertyPackages.Auxiliary.PROPS
+            If m_props Is Nothing Then m_props = New Auxiliary.PROPS
 
             Dim val As Double
-            Dim m_pr2 As New DTL.SimulationObjects.PropertyPackages.Auxiliary.PengRobinson
+            Dim m_pr2 As New Auxiliary.PengRobinson
 
             Dim i As Integer
             Dim vk(Me.CurrentMaterialStream.Phases(0).Components.Count - 1) As Double
@@ -3720,7 +3704,7 @@ Final3:
 
         Public Overridable Function AUX_LIQDENSi(ByVal subst As Substance, ByVal T As Double) As Double
 
-            If m_props Is Nothing Then m_props = New DTL.SimulationObjects.PropertyPackages.Auxiliary.PROPS
+            If m_props Is Nothing Then m_props = New Auxiliary.PROPS
 
             Dim val As Double
 
@@ -3753,7 +3737,7 @@ Final3:
         Public Function AUX_LIQCPm(ByVal T As Double, ByVal phaseid As Double) As Double
 
             Dim val As Double
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
 
             val = 0
             For Each subst In Me.CurrentMaterialStream.Phases(phaseid).Components.Values
@@ -3850,11 +3834,11 @@ Final3:
         Public Function AUX_INT_CPDTm(ByVal T1 As Double, ByVal T2 As Double, ByVal Phase As Phase)
 
             Dim val As Double = 0
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
 
             Select Case Phase
 
-                Case DTL.SimulationObjects.PropertyPackages.Phase.Mixture
+                Case Phase.Mixture
 
                     For Each subst In Me.CurrentMaterialStream.Phases(0).Components.Values
                         If subst.MolarFraction.GetValueOrDefault <> 0.0# And subst.MassFraction.GetValueOrDefault = 0.0# Then
@@ -3863,7 +3847,7 @@ Final3:
                         val += subst.MassFraction.GetValueOrDefault * Me.AUX_INT_CPDTi(T1, T2, subst.Name)
                     Next
 
-                Case DTL.SimulationObjects.PropertyPackages.Phase.Liquid
+                Case Phase.Liquid
 
                     For Each subst In Me.CurrentMaterialStream.Phases(1).Components.Values
                         If subst.MolarFraction.GetValueOrDefault <> 0.0# And subst.MassFraction.GetValueOrDefault = 0.0# Then
@@ -3872,7 +3856,7 @@ Final3:
                         val += subst.MassFraction.GetValueOrDefault * Me.AUX_INT_CPDTi(T1, T2, subst.Name)
                     Next
 
-                Case DTL.SimulationObjects.PropertyPackages.Phase.Liquid1
+                Case Phase.Liquid1
 
                     For Each subst In Me.CurrentMaterialStream.Phases(3).Components.Values
                         If subst.MolarFraction.GetValueOrDefault <> 0.0# And subst.MassFraction.GetValueOrDefault = 0.0# Then
@@ -3881,7 +3865,7 @@ Final3:
                         val += subst.MassFraction.GetValueOrDefault * Me.AUX_INT_CPDTi(T1, T2, subst.Name)
                     Next
 
-                Case DTL.SimulationObjects.PropertyPackages.Phase.Liquid2
+                Case Phase.Liquid2
 
                     For Each subst In Me.CurrentMaterialStream.Phases(4).Components.Values
                         If subst.MolarFraction.GetValueOrDefault <> 0.0# And subst.MassFraction.GetValueOrDefault = 0.0# Then
@@ -3890,7 +3874,7 @@ Final3:
                         val += subst.MassFraction.GetValueOrDefault * Me.AUX_INT_CPDTi(T1, T2, subst.Name)
                     Next
 
-                Case DTL.SimulationObjects.PropertyPackages.Phase.Liquid3
+                Case Phase.Liquid3
 
                     For Each subst In Me.CurrentMaterialStream.Phases(5).Components.Values
                         If subst.MolarFraction.GetValueOrDefault <> 0.0# And subst.MassFraction.GetValueOrDefault = 0.0# Then
@@ -3899,7 +3883,7 @@ Final3:
                         val += subst.MassFraction.GetValueOrDefault * Me.AUX_INT_CPDTi(T1, T2, subst.Name)
                     Next
 
-                Case DTL.SimulationObjects.PropertyPackages.Phase.Vapor
+                Case Phase.Vapor
 
                     For Each subst In Me.CurrentMaterialStream.Phases(2).Components.Values
                         If subst.MolarFraction.GetValueOrDefault <> 0.0# And subst.MassFraction.GetValueOrDefault = 0.0# Then
@@ -3941,7 +3925,7 @@ Final3:
 
             Dim val As Double
             Dim i As Integer = 0
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
             For Each subst In Me.CurrentMaterialStream.Phases(0).Components.Values
                 val += Vw(i) * Me.AUX_INT_CPDTi_L(T1, T2, subst.Name)
                 i += 1
@@ -3954,7 +3938,7 @@ Final3:
         Public Function AUX_INT_CPDT_Tm(ByVal T1 As Double, ByVal T2 As Double, ByVal Phase As Phase)
 
             Dim val As Double
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
 
             For Each subst In Me.CurrentMaterialStream.Phases(Me.RET_PHASEID(Phase)).Components.Values
                 If subst.MolarFraction.GetValueOrDefault <> 0.0# And subst.MassFraction.GetValueOrDefault = 0.0# Then
@@ -4087,7 +4071,7 @@ Final3:
         Public Function AUX_CONVERT_MOL_TO_MASS(ByVal subst As String, ByVal phasenumber As Integer) As Double
 
             Dim mol_x_mm As Double
-            Dim sub1 As DTL.BaseThermoClasses.Substance
+            Dim sub1 As Substance
             For Each sub1 In Me.CurrentMaterialStream.Phases(phasenumber).Components.Values
                 mol_x_mm += sub1.MolarFraction.GetValueOrDefault * sub1.ConstantProperties.Molar_Weight
             Next
@@ -4104,7 +4088,7 @@ Final3:
         Public Function AUX_CONVERT_MASS_TO_MOL(ByVal subst As String, ByVal phasenumber As Integer) As Double
 
             Dim mass_div_mm As Double
-            Dim sub1 As DTL.BaseThermoClasses.Substance
+            Dim sub1 As Substance
             For Each sub1 In Me.CurrentMaterialStream.Phases(phasenumber).Components.Values
                 mass_div_mm += sub1.MassFraction.GetValueOrDefault / sub1.ConstantProperties.Molar_Weight
             Next
@@ -4177,7 +4161,7 @@ Final3:
         Public Function RET_VMOL(ByVal Phase As Phase) As Double()
 
             Dim val(Me.CurrentMaterialStream.Phases(0).Components.Count - 1) As Double
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
             Dim i As Integer = 0
 
             For Each subst In Me.CurrentMaterialStream.Phases(Me.RET_PHASEID(Phase)).Components.Values
@@ -4192,7 +4176,7 @@ Final3:
         Public Function RET_VMM()
 
             Dim val(Me.CurrentMaterialStream.Phases(0).Components.Count - 1) As Double
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
             Dim i As Integer = 0
 
             For Each subst In Me.CurrentMaterialStream.Phases(0).Components.Values
@@ -4207,7 +4191,7 @@ Final3:
         Public Function RET_VMAS(ByVal Phase As Phase) As Double()
 
             Dim val(Me.CurrentMaterialStream.Phases(0).Components.Count - 1) As Double
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
             Dim i As Integer = 0
             Dim sum As Double = 0.0#
 
@@ -4228,7 +4212,7 @@ Final3:
         Public Function RET_VTC()
 
             Dim val(Me.CurrentMaterialStream.Phases(0).Components.Count - 1) As Double
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
             Dim i As Integer = 0
 
             For Each subst In Me.CurrentMaterialStream.Phases(0).Components.Values
@@ -4243,7 +4227,7 @@ Final3:
         Public Function RET_VTF()
 
             Dim val(Me.CurrentMaterialStream.Phases(0).Components.Count - 1) As Double
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
             Dim i As Integer = 0
 
             For Each subst In Me.CurrentMaterialStream.Phases(0).Components.Values
@@ -4258,7 +4242,7 @@ Final3:
         Public Function RET_VTB()
 
             Dim val(Me.CurrentMaterialStream.Phases(0).Components.Count - 1) As Double
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
             Dim i As Integer = 0
 
             For Each subst In Me.CurrentMaterialStream.Phases(0).Components.Values
@@ -4273,7 +4257,7 @@ Final3:
         Public Function RET_VPC()
 
             Dim val(Me.CurrentMaterialStream.Phases(0).Components.Count - 1) As Double
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
             Dim i As Integer = 0
 
 
@@ -4289,7 +4273,7 @@ Final3:
         Public Function RET_VZC()
 
             Dim val(Me.CurrentMaterialStream.Phases(0).Components.Count - 1) As Double
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
             Dim i As Integer = 0
 
             For Each subst In Me.CurrentMaterialStream.Phases(0).Components.Values
@@ -4304,7 +4288,7 @@ Final3:
         Public Function RET_VZRa()
 
             Dim val(Me.CurrentMaterialStream.Phases(0).Components.Count - 1) As Double
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
             Dim i As Integer = 0
 
             For Each subst In Me.CurrentMaterialStream.Phases(0).Components.Values
@@ -4318,7 +4302,7 @@ Final3:
         Public Function RET_VVC()
 
             Dim vc, val(Me.CurrentMaterialStream.Phases(0).Components.Count - 1) As Double
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
             Dim i As Integer = 0
 
             For Each subst In Me.CurrentMaterialStream.Phases(0).Components.Values
@@ -4337,7 +4321,7 @@ Final3:
         Public Function RET_VW()
 
             Dim val(Me.CurrentMaterialStream.Phases(0).Components.Count - 1) As Double
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
             Dim i As Integer = 0
 
             For Each subst In Me.CurrentMaterialStream.Phases(0).Components.Values
@@ -4352,7 +4336,7 @@ Final3:
         Public Function RET_VCP(ByVal T As Double)
 
             Dim val(Me.CurrentMaterialStream.Phases(0).Components.Count - 1) As Double
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
             Dim i As Integer = 0
 
             For Each subst In Me.CurrentMaterialStream.Phases(0).Components.Values
@@ -4367,7 +4351,7 @@ Final3:
         Public Function RET_VHVAP(ByVal T As Double) As Array
 
             Dim val(Me.CurrentMaterialStream.Phases(0).Components.Count - 1) As Double
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
             Dim i As Integer = 0
 
             For Each subst In Me.CurrentMaterialStream.Phases(0).Components.Values
@@ -4434,20 +4418,15 @@ Final3:
         Public Function RET_Hid(ByVal T1 As Double, ByVal T2 As Double, ByVal Phase As Phase) As Double
 
             Dim val As Double
-            'Dim subst As DTL.BaseThermoClasses.Substance
 
             Dim phaseID As Integer
 
-            If Phase = PropertyPackages.Phase.Liquid Then phaseID = 1
-            If Phase = PropertyPackages.Phase.Liquid1 Then phaseID = 3
-            If Phase = PropertyPackages.Phase.Liquid2 Then phaseID = 4
-            If Phase = PropertyPackages.Phase.Liquid3 Then phaseID = 5
-            If Phase = PropertyPackages.Phase.Vapor Then phaseID = 2
-            If Phase = PropertyPackages.Phase.Mixture Then phaseID = 0
-
-            'For Each subst In Me.CurrentMaterialStream.Phases(phaseID).Components.Values
-            '    val += subst.MassFraction.GetValueOrDefault * subst.ConstantProperties.Enthalpy_of_Formation_25C
-            'Next
+            If Phase = Phase.Liquid Then phaseID = 1
+            If Phase = Phase.Liquid1 Then phaseID = 3
+            If Phase = Phase.Liquid2 Then phaseID = 4
+            If Phase = Phase.Liquid3 Then phaseID = 5
+            If Phase = Phase.Vapor Then phaseID = 2
+            If Phase = Phase.Mixture Then phaseID = 0
 
             Return Me.AUX_INT_CPDTm(T1, T2, Phase) + val
 
@@ -4487,16 +4466,16 @@ Final3:
         Public Function RET_Sid(ByVal T1 As Double, ByVal T2 As Double, ByVal P2 As Double, ByVal Phase As Phase) As Double
 
             Dim val As Double
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
 
             Dim phaseID As Integer
 
-            If Phase = PropertyPackages.Phase.Liquid Then phaseID = 1
-            If Phase = PropertyPackages.Phase.Liquid1 Then phaseID = 3
-            If Phase = PropertyPackages.Phase.Liquid2 Then phaseID = 4
-            If Phase = PropertyPackages.Phase.Liquid3 Then phaseID = 5
-            If Phase = PropertyPackages.Phase.Vapor Then phaseID = 2
-            If Phase = PropertyPackages.Phase.Mixture Then phaseID = 0
+            If Phase = Phase.Liquid Then phaseID = 1
+            If Phase = Phase.Liquid1 Then phaseID = 3
+            If Phase = Phase.Liquid2 Then phaseID = 4
+            If Phase = Phase.Liquid3 Then phaseID = 5
+            If Phase = Phase.Vapor Then phaseID = 2
+            If Phase = Phase.Mixture Then phaseID = 0
             'subst.MassFraction.GetValueOrDefault * subst.ConstantProperties.Standard_Absolute_Entropy 
             For Each subst In Me.CurrentMaterialStream.Phases(phaseID).Components.Values
                 If subst.MolarFraction.GetValueOrDefault <> 0 Then val += -8.314 * subst.MolarFraction.GetValueOrDefault * Math.Log(subst.MolarFraction.GetValueOrDefault) / subst.ConstantProperties.Molar_Weight
@@ -4511,7 +4490,7 @@ Final3:
         Public Function RET_Sid(ByVal T1 As Double, ByVal T2 As Double, ByVal P2 As Double, ByVal Vz As Object) As Double
 
             Dim val As Double
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
             Dim Vw = Me.AUX_CONVERT_MOL_TO_MASS(Vz)
 
             Dim i As Integer = 0
@@ -4567,16 +4546,16 @@ Final3:
 
         Public Overridable Function RET_VKij() As Double(,)
 
-            If Me.ParametrosDeInteracao Is Nothing Then
-                Me.ParametrosDeInteracao = New DataTable
-                With Me.ParametrosDeInteracao.Columns
-                    For Each subst As DTL.BaseThermoClasses.Substance In Me.CurrentMaterialStream.Phases(0).Components.Values
-                        .Add(subst.ConstantProperties.ID, GetType(System.Double))
+            If Me.InteractionParameters Is Nothing Then
+                Me.InteractionParameters = New DataTable
+                With Me.InteractionParameters.Columns
+                    For Each subst As Substance In Me.CurrentMaterialStream.Phases(0).Components.Values
+                        .Add(subst.ConstantProperties.ID, GetType(Double))
                     Next
                 End With
 
-                With Me.ParametrosDeInteracao.Rows
-                    For Each subst As DTL.BaseThermoClasses.Substance In Me.CurrentMaterialStream.Phases(0).Components.Values
+                With Me.InteractionParameters.Rows
+                    For Each subst As Substance In Me.CurrentMaterialStream.Phases(0).Components.Values
                         .Add()
                     Next
                 End With
@@ -4585,7 +4564,7 @@ Final3:
             Dim val(Me.CurrentMaterialStream.Phases(0).Components.Count - 1, Me.CurrentMaterialStream.Phases(0).Components.Count - 1) As Double
             Dim i As Integer = 0
             Dim l As Integer = 0
-            For Each r As DataRow In Me.ParametrosDeInteracao.Rows
+            For Each r As DataRow In Me.InteractionParameters.Rows
                 i = 0
                 Do
                     If l <> i And r.Item(i).GetType().ToString <> "System.DBNull" Then
@@ -4599,7 +4578,7 @@ Final3:
                         val(l, i) = 0
                     End If
                     i = i + 1
-                Loop Until i = Me.ParametrosDeInteracao.Rows.Count
+                Loop Until i = Me.InteractionParameters.Rows.Count
                 l = l + 1
             Next
 
@@ -4610,7 +4589,7 @@ Final3:
         Public Function RET_VCSACIDS() As String()
 
             Dim val(Me.CurrentMaterialStream.Phases(0).Components.Count - 1) As String
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
             Dim i As Integer = 0
 
             For Each subst In Me.CurrentMaterialStream.Phases(0).Components.Values
@@ -4626,7 +4605,7 @@ Final3:
         Public Function RET_VIDS() As String()
 
             Dim val(Me.CurrentMaterialStream.Phases(0).Components.Count - 1) As String
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
             Dim i As Integer = 0
 
             For Each subst In Me.CurrentMaterialStream.Phases(0).Components.Values
@@ -4641,7 +4620,7 @@ Final3:
         Public Function RET_VCAS() As String()
 
             Dim val(Me.CurrentMaterialStream.Phases(0).Components.Count - 1) As String
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
             Dim i As Integer = 0
 
             For Each subst In Me.CurrentMaterialStream.Phases(0).Components.Values
@@ -4656,7 +4635,7 @@ Final3:
         Public Function RET_VNAMES() As String()
 
             Dim val(Me.CurrentMaterialStream.Phases(0).Components.Count - 1) As String
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
             Dim i As Integer = 0
 
             For Each subst In Me.CurrentMaterialStream.Phases(0).Components.Values
@@ -4671,7 +4650,7 @@ Final3:
         Public Function RET_NullVector() As Double()
 
             Dim val(Me.CurrentMaterialStream.Phases(0).Components.Count - 1) As Double
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
             Dim i As Integer = 0
             For Each subst In Me.CurrentMaterialStream.Phases(0).Components.Values
                 val(i) = 0.0#
@@ -4681,7 +4660,7 @@ Final3:
 
         End Function
 
-        Public Function RET_PHASECODE(ByVal phaseID As Integer) As SimulationObjects.PropertyPackages.Phase
+        Public Function RET_PHASECODE(ByVal phaseID As Integer) As Phase
             Select Case phaseID
                 Case 0
                     Return Phase.Mixture
@@ -4702,7 +4681,7 @@ Final3:
             End Select
         End Function
 
-        Public Function RET_PHASEID(ByVal phasecode As SimulationObjects.PropertyPackages.Phase) As Integer
+        Public Function RET_PHASEID(ByVal phasecode As Phase) As Integer
             Select Case phasecode
                 Case Phase.Mixture
                     Return 0
@@ -4728,7 +4707,7 @@ Final3:
         Public Function AUX_MMM(ByVal Vz As Object) As Double
 
             Dim val As Double
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
 
             Dim i As Integer = 0
 
@@ -4796,7 +4775,7 @@ Final3:
 
             Dim i As Integer
 
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
 
             i = 0
             For Each subst In Me.CurrentMaterialStream.Phases(Me.RET_PHASEID(Phase)).Components.Values
@@ -4826,7 +4805,7 @@ Final3:
 
             Dim c As Integer
 
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
 
             c = 0
             For Each subst In Me.CurrentMaterialStream.Phases(Me.RET_PHASEID(Phase)).Components.Values
@@ -4841,7 +4820,7 @@ Final3:
 
             Dim val As Double
             Dim i As Integer = 0
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
             For Each subst In Me.CurrentMaterialStream.Phases(0).Components.Values
                 val += Vw(i) * Me.AUX_INT_CPDTi(T1, T2, subst.Name)
                 i += 1
@@ -4855,7 +4834,7 @@ Final3:
 
             Dim val As Double
             Dim i As Integer = 0
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As Substance
             For Each subst In Me.CurrentMaterialStream.Phases(0).Components.Values
                 val += Vw(i) * Me.AUX_INT_CPDT_Ti(T1, T2, subst.Name)
                 i += 1
@@ -4870,7 +4849,7 @@ Final3:
             Dim Vwe(UBound(Vz)) As Double
             Dim mol_x_mm As Double = 0
             Dim i As Integer = 0
-            Dim sub1 As DTL.BaseThermoClasses.Substance
+            Dim sub1 As Substance
             For Each sub1 In Me.CurrentMaterialStream.Phases(0).Components.Values
                 mol_x_mm += Vz(i) * sub1.ConstantProperties.Molar_Weight
                 i += 1
@@ -4895,7 +4874,7 @@ Final3:
             Dim Vw(UBound(Vz)) As Double
             Dim mass_div_mm As Double
             Dim i As Integer = 0
-            Dim sub1 As DTL.BaseThermoClasses.Substance
+            Dim sub1 As Substance
             For Each sub1 In Me.CurrentMaterialStream.Phases(0).Components.Values
                 mass_div_mm += Vz(i) / sub1.ConstantProperties.Molar_Weight
                 i += 1
@@ -5054,12 +5033,11 @@ Final3:
                     Return 0
             End Select
 
-
         End Function
 
 #End Region
 
-#Region "   CAPE-OPEN 1.0 Methods and Properties"
+#Region "CAPE-OPEN 1.0 Methods and Properties"
 
         Private _compdesc, _compname As String
 
@@ -5069,7 +5047,7 @@ Final3:
         ''' <value></value>
         ''' <returns>CapeString</returns>
         ''' <remarks>Implements CapeOpen.ICapeIdentification.ComponentDescription</remarks>
-        Public Overridable Property ComponentDescription() As String Implements CapeOpen.ICapeIdentification.ComponentDescription
+        Public Overridable Property ComponentDescription() As String Implements ICapeIdentification.ComponentDescription
             Get
                 Return _compdesc
             End Get
@@ -5084,7 +5062,7 @@ Final3:
         ''' <value></value>
         ''' <returns>CapeString</returns>
         ''' <remarks>Implements CapeOpen.ICapeIdentification.ComponentName</remarks>
-        Public Overridable Property ComponentName() As String Implements CapeOpen.ICapeIdentification.ComponentName
+        Public Overridable Property ComponentName() As String Implements ICapeIdentification.ComponentName
             Get
                 Return _compname
             End Get
@@ -5093,15 +5071,15 @@ Final3:
             End Set
         End Property
 
-        Public Sub PropList1(ByRef props As Object, ByRef phases As Object, ByRef calcType As Object) Implements CAPEOPEN110.ICapeThermoCalculationRoutine.PropList
+        Public Sub PropList1(ByRef props As Object, ByRef phases As Object, ByRef calcType As Object) Implements ICapeThermoCalculationRoutine.PropList
             Throw New NotImplementedException
         End Sub
 
-        Public Function PropCheck1(ByVal materialObject As Object, ByVal flashType As String, ByVal props As Object) As Object Implements CAPEOPEN110.ICapeThermoEquilibriumServer.PropCheck
+        Public Function PropCheck1(ByVal materialObject As Object, ByVal flashType As String, ByVal props As Object) As Object Implements ICapeThermoEquilibriumServer.PropCheck
             Throw New NotImplementedException
         End Function
 
-        Public Function ValidityCheck1(ByVal materialObject As Object, ByVal props As Object) As Object Implements CAPEOPEN110.ICapeThermoEquilibriumServer.ValidityCheck
+        Public Function ValidityCheck1(ByVal materialObject As Object, ByVal props As Object) As Object Implements ICapeThermoEquilibriumServer.ValidityCheck
             Throw New NotImplementedException
         End Function
 
@@ -5123,7 +5101,7 @@ Final3:
         ''' Through the returned error one cannot see which has failed, plus the additional arguments available in a
         ''' CalcProp call (such as calculation type) cannot be specified in a CalcEquilibrium call. Advice is to perform a
         ''' CalcEquilibrium, get the phaseIDs and perform a CalcProp for the existing phases.</para></remarks>
-        Public Overridable Sub CalcEquilibrium(ByVal materialObject As Object, ByVal flashType As String, ByVal props As Object) Implements CapeOpen.ICapeThermoPropertyPackage.CalcEquilibrium
+        Public Overridable Sub CalcEquilibrium(ByVal materialObject As Object, ByVal flashType As String, ByVal props As Object) Implements ICapeThermoPropertyPackage.CalcEquilibrium
 
             Dim mymat As ICapeThermoMaterial = materialObject
             Me.CurrentMaterialStream = mymat
@@ -5165,7 +5143,7 @@ Final3:
         ''' mixture, use “Mixture” CalcType. For pure compound fugacity
         ''' coefficients, use “Pure” CalcType.</param>
         ''' <remarks></remarks>
-        Public Overridable Sub CalcProp(ByVal materialObject As Object, ByVal props As Object, ByVal phases As Object, ByVal calcType As String) Implements CapeOpen.ICapeThermoPropertyPackage.CalcProp
+        Public Overridable Sub CalcProp(ByVal materialObject As Object, ByVal props As Object, ByVal phases As Object, ByVal calcType As String) Implements ICapeThermoPropertyPackage.CalcProp
             Dim mymat As MaterialStream = materialObject
             Me.CurrentMaterialStream = mymat
             Dim ph As String() = phases
@@ -5192,7 +5170,7 @@ Final3:
         ''' <param name="props">The list of properties.</param>
         ''' <returns>Compound Constant values.</returns>
         ''' <remarks></remarks>
-        Public Overridable Function GetComponentConstant(ByVal materialObject As Object, ByVal props As Object) As Object Implements CapeOpen.ICapeThermoPropertyPackage.GetComponentConstant
+        Public Overridable Function GetComponentConstant(ByVal materialObject As Object, ByVal props As Object) As Object Implements ICapeThermoPropertyPackage.GetComponentConstant
             Dim vals As New ArrayList
             Dim mymat As MaterialStream = materialObject
             For Each c As Substance In mymat.Phases(0).Components.Values
@@ -5244,7 +5222,7 @@ Final3:
         ''' 'casno’ argument instead of the compIds. The reason is that different PMEs may give different names to the same
         ''' chemical compounds, whereas CAS Numbers are universal. Therefore, it is recommended to provide a value for the
         ''' casno argument wherever available.</remarks>
-        Public Overridable Sub GetComponentList(ByRef compIds As Object, ByRef formulae As Object, ByRef names As Object, ByRef boilTemps As Object, ByRef molWt As Object, ByRef casNo As Object) Implements CapeOpen.ICapeThermoPropertyPackage.GetComponentList
+        Public Overridable Sub GetComponentList(ByRef compIds As Object, ByRef formulae As Object, ByRef names As Object, ByRef boilTemps As Object, ByRef molWt As Object, ByRef casNo As Object) Implements ICapeThermoPropertyPackage.GetComponentList
 
             Dim ids, formulas, nms, bts, casnos, molws As New ArrayList
 
@@ -5306,7 +5284,7 @@ Final3:
         ''' </summary>
         ''' <returns>The list of phases supported by the Property Package.</returns>
         ''' <remarks></remarks>
-        Public Overridable Function GetPhaseList() As Object Implements CapeOpen.ICapeThermoPropertyPackage.GetPhaseList
+        Public Overridable Function GetPhaseList() As Object Implements ICapeThermoPropertyPackage.GetPhaseList
             Dim pl As New ArrayList
             For Each pi As PhaseInfo In Me.PhaseMappings.Values
                 If pi.PhaseLabel <> "Disabled" Then
@@ -5333,7 +5311,7 @@ Final3:
         ''' must return the identifiers of all supported derivative and non-derivative properties. For instance, a Property
         ''' Package could return the following list:
         ''' enthalpy, enthalpy.Dtemperature, entropy, entropy.Dpressure.</remarks>
-        Public Overridable Function GetPropList() As Object Implements CapeOpen.ICapeThermoPropertyPackage.GetPropList
+        Public Overridable Function GetPropList() As Object Implements ICapeThermoPropertyPackage.GetPropList
             Dim arr As New ArrayList
             With arr
                 .Add("vaporPressure")
@@ -5386,7 +5364,7 @@ Final3:
         ''' <param name="props">List of requested Universal Constants;</param>
         ''' <returns>Values of Universal Constants.</returns>
         ''' <remarks></remarks>
-        Public Overridable Function GetUniversalConstant(ByVal materialObject As Object, ByVal props As Object) As Object Implements CapeOpen.ICapeThermoPropertyPackage.GetUniversalConstant
+        Public Overridable Function GetUniversalConstant(ByVal materialObject As Object, ByVal props As Object) As Object Implements ICapeThermoPropertyPackage.GetUniversalConstant
             Dim res As New ArrayList
             For Each p As String In props
                 Select Case p.ToLower
@@ -5417,7 +5395,7 @@ Final3:
         ''' argument list does not include a phase specification, implementations vary. It is generally expected that
         ''' PropCheck at least verifies that the Property is available for calculation in the property Package. However,
         ''' this can also be verified with PropList. It is advised not to use PropCheck.</remarks>
-        Public Overridable Function PropCheck(ByVal materialObject As Object, ByVal props As Object) As Object Implements CapeOpen.ICapeThermoPropertyPackage.PropCheck
+        Public Overridable Function PropCheck(ByVal materialObject As Object, ByVal props As Object) As Object Implements ICapeThermoPropertyPackage.PropCheck
             Return True
         End Function
 
@@ -5428,7 +5406,7 @@ Final3:
         ''' <param name="props">The list of properties to check.</param>
         ''' <returns>The properties for which reliability is checked.</returns>
         ''' <remarks>The ValidityCheck method must not be used, since the ICapeThermoReliability interface is not yet defined.</remarks>
-        Public Overridable Function ValidityCheck(ByVal materialObject As Object, ByVal props As Object) As Object Implements CapeOpen.ICapeThermoPropertyPackage.ValidityCheck
+        Public Overridable Function ValidityCheck(ByVal materialObject As Object, ByVal props As Object) As Object Implements ICapeThermoPropertyPackage.ValidityCheck
             Return True
         End Function
 
@@ -5450,7 +5428,7 @@ Final3:
         ''' see which has failed, plus the additional arguments to CalcProp (such as calculation type) cannot be
         ''' specified. Advice is to perform a CalcEquilibrium, get the phaseIDs and perform a CalcProp for those
         ''' phases.</remarks>
-        Public Overridable Sub CalcEquilibrium2(ByVal materialObject As Object, ByVal flashType As String, ByVal props As Object) Implements CapeOpen.ICapeThermoEquilibriumServer.CalcEquilibrium
+        Public Overridable Sub CalcEquilibrium2(ByVal materialObject As Object, ByVal flashType As String, ByVal props As Object) Implements ICapeThermoEquilibriumServer.CalcEquilibrium
             CalcEquilibrium(materialObject, flashType, props)
         End Sub
 
@@ -5462,28 +5440,28 @@ Final3:
         ''' <param name="phases">List of supported phases.</param>
         ''' <param name="calcType">List of supported calculation types.</param>
         ''' <remarks></remarks>
-        Public Overridable Sub PropList(ByRef flashType As Object, ByRef props As Object, ByRef phases As Object, ByRef calcType As Object) Implements CapeOpen.ICapeThermoEquilibriumServer.PropList
+        Public Overridable Sub PropList(ByRef flashType As Object, ByRef props As Object, ByRef phases As Object, ByRef calcType As Object) Implements ICapeThermoEquilibriumServer.PropList
             props = GetPropList()
             flashType = New String() {"TP", "PH", "PS", "TVF", "PVF", "PT", "HP", "SP", "VFT", "VFP"}
             phases = New String() {"Vapor", "Liquid1", "Liquid2", "Solid", "Overall"}
             calcType = New String() {"Mixture"}
         End Sub
 
-        Public Overridable Sub CalcProp1(ByVal materialObject As Object, ByVal props As Object, ByVal phases As Object, ByVal calcType As String) Implements CapeOpen.ICapeThermoCalculationRoutine.CalcProp
+        Public Overridable Sub CalcProp1(ByVal materialObject As Object, ByVal props As Object, ByVal phases As Object, ByVal calcType As String) Implements ICapeThermoCalculationRoutine.CalcProp
             CalcProp(materialObject, props, phases, calcType)
         End Sub
 
-        Public Overridable Function PropCheck2(ByVal materialObject As Object, ByVal props As Object) As Object Implements CapeOpen.ICapeThermoCalculationRoutine.PropCheck
+        Public Overridable Function PropCheck2(ByVal materialObject As Object, ByVal props As Object) As Object Implements ICapeThermoCalculationRoutine.PropCheck
             Return True
         End Function
 
-        Public Overridable Function ValidityCheck2(ByVal materialObject As Object, ByVal props As Object) As Object Implements CapeOpen.ICapeThermoCalculationRoutine.ValidityCheck
+        Public Overridable Function ValidityCheck2(ByVal materialObject As Object, ByVal props As Object) As Object Implements ICapeThermoCalculationRoutine.ValidityCheck
             Return True
         End Function
 
 #End Region
 
-#Region "   CAPE-OPEN 1.1 Thermo & Physical Properties"
+#Region "CAPE-OPEN 1.1 Thermo & Physical Properties"
 
         ''' <summary>
         ''' Returns the values of constant Physical Properties for the specified Compounds.
@@ -6101,11 +6079,11 @@ Final3:
                 Next
 
                 Dim f As Integer = -1
-                Dim phs As DTL.SimulationObjects.PropertyPackages.Phase
+                Dim phs As Phase
                 Select Case phaseLabel.ToLower
                     Case "overall"
                         f = 0
-                        phs = PropertyPackages.Phase.Mixture
+                        phs = Phase.Mixture
                     Case Else
                         For Each pi As PhaseInfo In Me.PhaseMappings.Values
                             If phaseLabel = pi.PhaseLabel Then
@@ -6165,19 +6143,19 @@ Final3:
                             End Select
                         Case "idealgasheatcapacity"
                             If f = 1 Then
-                                res.Add(Me.CurrentMaterialStream.PropertyPackage.AUX_CPm(PropertyPackages.Phase.Liquid, Me.CurrentMaterialStream.Phases(0).SPMProperties.temperature * 1000))
+                                res.Add(Me.CurrentMaterialStream.PropertyPackage.AUX_CPm(Phase.Liquid, Me.CurrentMaterialStream.Phases(0).SPMProperties.temperature * 1000))
                             ElseIf f = 2 Then
-                                res.Add(Me.CurrentMaterialStream.PropertyPackage.AUX_CPm(PropertyPackages.Phase.Vapor, Me.CurrentMaterialStream.Phases(0).SPMProperties.temperature * 1000))
+                                res.Add(Me.CurrentMaterialStream.PropertyPackage.AUX_CPm(Phase.Vapor, Me.CurrentMaterialStream.Phases(0).SPMProperties.temperature * 1000))
                             Else
-                                res.Add(Me.CurrentMaterialStream.PropertyPackage.AUX_CPm(PropertyPackages.Phase.Solid, Me.CurrentMaterialStream.Phases(0).SPMProperties.temperature * 1000))
+                                res.Add(Me.CurrentMaterialStream.PropertyPackage.AUX_CPm(Phase.Solid, Me.CurrentMaterialStream.Phases(0).SPMProperties.temperature * 1000))
                             End If
                         Case "idealgasenthalpy"
                             If f = 1 Then
-                                res.Add(Me.CurrentMaterialStream.PropertyPackage.RET_Hid(298.15, Me.CurrentMaterialStream.Phases(0).SPMProperties.temperature.GetValueOrDefault * 1000, PropertyPackages.Phase.Liquid))
+                                res.Add(Me.CurrentMaterialStream.PropertyPackage.RET_Hid(298.15, Me.CurrentMaterialStream.Phases(0).SPMProperties.temperature.GetValueOrDefault * 1000, Phase.Liquid))
                             ElseIf f = 2 Then
-                                res.Add(Me.CurrentMaterialStream.PropertyPackage.RET_Hid(298.15, Me.CurrentMaterialStream.Phases(0).SPMProperties.temperature.GetValueOrDefault * 1000, PropertyPackages.Phase.Vapor))
+                                res.Add(Me.CurrentMaterialStream.PropertyPackage.RET_Hid(298.15, Me.CurrentMaterialStream.Phases(0).SPMProperties.temperature.GetValueOrDefault * 1000, Phase.Vapor))
                             Else
-                                res.Add(Me.CurrentMaterialStream.PropertyPackage.RET_Hid(298.15, Me.CurrentMaterialStream.Phases(0).SPMProperties.temperature.GetValueOrDefault * 1000, PropertyPackages.Phase.Solid))
+                                res.Add(Me.CurrentMaterialStream.PropertyPackage.RET_Hid(298.15, Me.CurrentMaterialStream.Phases(0).SPMProperties.temperature.GetValueOrDefault * 1000, Phase.Solid))
                             End If
                         Case "excessenthalpy"
                             Select Case basis
@@ -6994,8 +6972,8 @@ Final3:
         Public Overridable Sub SetMaterial(ByVal material As Object) Implements ICapeThermoMaterialContext.SetMaterial
             Me.CurrentMaterialStream = Nothing
             If _como IsNot Nothing Then
-                If System.Runtime.InteropServices.Marshal.IsComObject(_como) Then
-                    System.Runtime.InteropServices.Marshal.ReleaseComObject(_como)
+                If Marshal.IsComObject(_como) Then
+                    Marshal.ReleaseComObject(_como)
                 End If
             End If
             If My.Application.CAPEOPENMode Then
@@ -7025,8 +7003,8 @@ Final3:
             Me.CurrentMaterialStream = Nothing
             If My.Application.CAPEOPENMode Then
                 If _como IsNot Nothing Then
-                    If System.Runtime.InteropServices.Marshal.IsComObject(_como) Then
-                        System.Runtime.InteropServices.Marshal.ReleaseComObject(_como)
+                    If Marshal.IsComObject(_como) Then
+                        Marshal.ReleaseComObject(_como)
                     End If
                 End If
             End If
@@ -7043,7 +7021,7 @@ Final3:
             Dim ms As New MaterialStream(CType(material, ICapeIdentification).ComponentName, "")
             For Each phase As BaseThermoClasses.Phase In ms.Phases.Values
                 For Each tmpcomp As ConstantProperties In _selectedcomps.Values
-                    phase.Components.Add(tmpcomp.Name, New DTL.BaseThermoClasses.Substance(tmpcomp.Name, ""))
+                    phase.Components.Add(tmpcomp.Name, New Substance(tmpcomp.Name, ""))
                     phase.Components(tmpcomp.Name).ConstantProperties = tmpcomp
                 Next
             Next
@@ -7079,7 +7057,7 @@ Final3:
             Dim n As Integer = UBound(labels)
 
             For i = 0 To n
-                If statuses(i) = CapeOpen.eCapePhaseStatus.CAPE_ATEQUILIBRIUM Then
+                If statuses(i) = eCapePhaseStatus.CAPE_ATEQUILIBRIUM Then
                     Select Case labels(i)
                         Case "Vapor"
                             mys.GetTPFraction(labels(i), Tv, Pv, Vy)
@@ -7204,7 +7182,7 @@ Final3:
 
 #End Region
 
-#Region "   CAPE-OPEN ICapeUtilities Implementation"
+#Region "CAPE-OPEN ICapeUtilities Implementation"
 
         Friend _availablecomps As Dictionary(Of String, ConstantProperties)
         Friend _selectedcomps As Dictionary(Of String, ConstantProperties)
@@ -7221,13 +7199,13 @@ Final3:
             End Get
         End Property
 
-        <System.NonSerialized()> Friend _pme As Object
+        <NonSerialized()> Friend _pme As Object
 
         ''' <summary>
         ''' The PMC displays its user interface and allows the Flowsheet User to interact with it. If no user interface is
         ''' available it returns an error.</summary>
         ''' <remarks></remarks>
-        Public Overridable Sub Edit() Implements CapeOpen.ICapeUtilities.Edit
+        Public Overridable Sub Edit() Implements ICapeUtilities.Edit
 
             'do nothing
 
@@ -7246,16 +7224,16 @@ Final3:
         ''' the PMC through the middleware native mechanisms.
         ''' </summary>
         ''' <remarks></remarks>
-        Public Overridable Sub Initialize() Implements CapeOpen.ICapeUtilities.Initialize
+        Public Overridable Sub Initialize() Implements ICapeUtilities.Initialize
 
             Me.m_ip = New DataTable
-            Me.m_props = New DTL.SimulationObjects.PropertyPackages.Auxiliary.PROPS
+            Me.m_props = New Auxiliary.PROPS
             ConfigParameters()
 
             'load Henry Coefficients
-       
-            Using stream As IO.Stream = New IO.MemoryStream(My.Resources.Henry)
-                Using reader As TextReader = New IO.StreamReader(stream)
+
+            Using stream As Stream = New MemoryStream(My.Resources.Henry)
+                Using reader As TextReader = New StreamReader(stream)
                     reader.ReadLine()
                     reader.ReadLine()
                     Dim line As String = ""
@@ -7286,7 +7264,7 @@ Final3:
         ''' If the PMC does not support exposing its parameters, it should raise the ECapeNoImpl error, instead of
         ''' returning a NULL reference or an empty Collection. But if the PMC supports parameters but has for this call
         ''' no parameters, it should return a valid ICapeCollection reference exposing zero parameters.</remarks>
-        Public Overridable ReadOnly Property parameters1() As Object Implements CapeOpen.ICapeUtilities.parameters
+        Public Overridable ReadOnly Property parameters1() As Object Implements ICapeUtilities.parameters
             Get
                 Throw New NotImplementedException
             End Get
@@ -7305,7 +7283,7 @@ Final3:
         ''' simulation context, it is recommended to raise the ECapeNoImpl error.
         ''' Initially, this method was only present in the ICapeUnit interface. Since ICapeUtilities.SetSimulationContext
         ''' is now available for any kind of PMC, ICapeUnit. SetSimulationContext is deprecated.</remarks>
-        Public Overridable WriteOnly Property simulationContext() As Object Implements CapeOpen.ICapeUtilities.simulationContext
+        Public Overridable WriteOnly Property simulationContext() As Object Implements ICapeUtilities.simulationContext
             Set(ByVal value As Object)
                 _pme = value
             End Set
@@ -7325,15 +7303,15 @@ Final3:
         ''' better to leave the PME to handle the situation instead of each PMC providing a different implementation.
         ''' </summary>
         ''' <remarks></remarks>
-        Public Overridable Sub Terminate() Implements CapeOpen.ICapeUtilities.Terminate
+        Public Overridable Sub Terminate() Implements ICapeUtilities.Terminate
             Me.CurrentMaterialStream = Nothing
-            If _como IsNot Nothing Then System.Runtime.InteropServices.Marshal.ReleaseComObject(_como)
+            If _como IsNot Nothing Then Marshal.ReleaseComObject(_como)
             Me.Dispose()
         End Sub
 
 #End Region
 
-#Region "   CAPE-OPEN Error Interfaces"
+#Region "CAPE-OPEN Error Interfaces"
 
         Sub ThrowCAPEException(ByRef ex As Exception, ByVal name As String, ByVal description As String, ByVal interf As String, ByVal moreinfo As String, ByVal operation As String, ByVal scope As String, ByVal code As Integer)
 
@@ -7351,43 +7329,43 @@ Final3:
 
         Private _name, _description, _interfacename, _moreinfo, _operation, _scope As String, _code As Integer
 
-        Public ReadOnly Property Name() As String Implements CapeOpen.ECapeRoot.name
+        Public ReadOnly Property Name() As String Implements ECapeRoot.name
             Get
                 Return _name
             End Get
         End Property
 
-        Public ReadOnly Property code() As Integer Implements CapeOpen.ECapeUser.code
+        Public ReadOnly Property code() As Integer Implements ECapeUser.code
             Get
                 Return _code
             End Get
         End Property
 
-        Public ReadOnly Property description() As String Implements CapeOpen.ECapeUser.description
+        Public ReadOnly Property description() As String Implements ECapeUser.description
             Get
                 Return _description
             End Get
         End Property
 
-        Public ReadOnly Property interfaceName() As String Implements CapeOpen.ECapeUser.interfaceName
+        Public ReadOnly Property interfaceName() As String Implements ECapeUser.interfaceName
             Get
                 Return _interfacename
             End Get
         End Property
 
-        Public ReadOnly Property moreInfo() As String Implements CapeOpen.ECapeUser.moreInfo
+        Public ReadOnly Property moreInfo() As String Implements ECapeUser.moreInfo
             Get
                 Return _moreinfo
             End Get
         End Property
 
-        Public ReadOnly Property operation() As String Implements CapeOpen.ECapeUser.operation
+        Public ReadOnly Property operation() As String Implements ECapeUser.operation
             Get
                 Return _operation
             End Get
         End Property
 
-        Public ReadOnly Property scope() As String Implements CapeOpen.ECapeUser.scope
+        Public ReadOnly Property scope() As String Implements ECapeUser.scope
             Get
                 Return _scope
             End Get
@@ -7395,7 +7373,7 @@ Final3:
 
 #End Region
 
-#Region "   IDisposable Support "
+#Region "IDisposable Support "
         Private disposedValue As Boolean = False        ' To detect redundant calls
 
         ' IDisposable
@@ -7407,15 +7385,15 @@ Final3:
 
                 ' TODO: free your own state (unmanaged objects).
                 If _como IsNot Nothing Then
-                    If System.Runtime.InteropServices.Marshal.IsComObject(_como) Then
-                        System.Runtime.InteropServices.Marshal.ReleaseComObject(_como)
+                    If Marshal.IsComObject(_como) Then
+                        Marshal.ReleaseComObject(_como)
                     Else
                         _como = Nothing
                     End If
                 End If
                 If _pme IsNot Nothing Then
-                    If System.Runtime.InteropServices.Marshal.IsComObject(_pme) Then
-                        System.Runtime.InteropServices.Marshal.ReleaseComObject(_pme)
+                    If Marshal.IsComObject(_pme) Then
+                        Marshal.ReleaseComObject(_pme)
                     Else
                         _pme = Nothing
                     End If
@@ -7463,18 +7441,18 @@ Final3:
     ''' </summary>
     ''' <remarks></remarks>
     <Serializable()> Public Class ComStreamWrapper
-        Inherits System.IO.Stream
+        Inherits Stream
         Private mSource As IStream
         Private mInt64 As IntPtr
 
         Public Sub New(ByVal source As IStream)
             mSource = source
-            mInt64 = iop.Marshal.AllocCoTaskMem(8)
+            mInt64 = Marshal.AllocCoTaskMem(8)
         End Sub
 
         Protected Overrides Sub Finalize()
             Try
-                iop.Marshal.FreeCoTaskMem(mInt64)
+                Marshal.FreeCoTaskMem(mInt64)
             Finally
                 MyBase.Finalize()
             End Try
@@ -7525,12 +7503,12 @@ Final3:
                 Throw New NotImplementedException()
             End If
             mSource.Read(buffer, count, mInt64)
-            Return iop.Marshal.ReadInt32(mInt64)
+            Return Marshal.ReadInt32(mInt64)
         End Function
 
-        Public Overrides Function Seek(ByVal offset As Long, ByVal origin As System.IO.SeekOrigin) As Long
+        Public Overrides Function Seek(ByVal offset As Long, ByVal origin As SeekOrigin) As Long
             Me.mSource.Seek(offset, origin, Me.mInt64)
-            Return iop.Marshal.ReadInt64(Me.mInt64)
+            Return Marshal.ReadInt64(Me.mInt64)
         End Function
 
         Public Overrides Sub SetLength(ByVal value As Long)

@@ -143,7 +143,7 @@ Namespace DTL.SimulationObjects.Streams
                     Phases(i).SPMProperties.enthalpy = ASource.Phases(i).SPMProperties.enthalpy
 
                     'Copy component properties.
-                    Dim comp As DTL.BaseThermoClasses.Substance
+                    Dim comp As Substance
 
                     For Each comp In Phases(i).Components.Values
                         comp.MolarFraction = ASource.Phases(i).Components(comp.Name).MolarFraction
@@ -221,7 +221,7 @@ Namespace DTL.SimulationObjects.Streams
                 Phases(i).SPMProperties.massfraction = Nothing
 
                 'Copy component properties.
-                Dim comp As DTL.BaseThermoClasses.Substance
+                Dim comp As Substance
 
                 For Each comp In Phases(i).Components.Values
                     comp.MolarFraction = Nothing
@@ -299,7 +299,7 @@ Namespace DTL.SimulationObjects.Streams
 
             Dim mol_x_mm As Double
 
-            Dim sub1 As DTL.BaseThermoClasses.Substance
+            Dim sub1 As Substance
 
             For Each sub1 In Phases(idx).Components.Values
                 mol_x_mm += sub1.MolarFraction.GetValueOrDefault * sub1.ConstantProperties.Molar_Weight
@@ -825,18 +825,18 @@ Namespace DTL.SimulationObjects.Streams
                 Case 2
                     'PROP_MS_2	Mass Flow
                     Me.Phases(0).SPMProperties.massflow = cv.ConvertToSI(su.spmp_massflow, propval)
-                    Me.PropertyPackage.DW_CalcVazaoMolar()
-                    Me.PropertyPackage.DW_CalcVazaoVolumetrica()
+                    Me.PropertyPackage.DW_CalcMolarFlow()
+                    Me.PropertyPackage.DW_CalcVolumetricFlow()
                 Case 3
                     'PROP_MS_3	Molar Flow
                     Me.Phases(0).SPMProperties.molarflow = cv.ConvertToSI(su.spmp_molarflow, propval)
-                    Me.PropertyPackage.DW_CalcVazaoMassica()
-                    Me.PropertyPackage.DW_CalcVazaoVolumetrica()
+                    Me.PropertyPackage.DW_CalcMassFlow()
+                    Me.PropertyPackage.DW_CalcVolumetricFlow()
                 Case 4
                     'PROP_MS_4	Volumetric Flow
                     Me.Phases(0).SPMProperties.volumetric_flow = cv.ConvertToSI(su.spmp_volumetricFlow, propval)
                     Me.Phases(0).SPMProperties.massflow = Me.Phases(0).SPMProperties.volumetric_flow * Me.Phases(0).SPMProperties.density.GetValueOrDefault
-                    Me.PropertyPackage.DW_CalcVazaoMolar()
+                    Me.PropertyPackage.DW_CalcMolarFlow()
                 Case 102
                     If Me.Phases(0).Components.ContainsKey(sname) Then
                         Me.Phases(0).Components(sname).MolarFraction = propval
@@ -1258,15 +1258,15 @@ Namespace DTL.SimulationObjects.Streams
 
 #Region "    CAPE-OPEN 1.0 Methods and Properties"
 
-        Public Sub PropList1(ByRef props As Object, ByRef phases As Object, ByRef calcType As Object) Implements CAPEOPEN110.ICapeThermoCalculationRoutine.PropList
+        Public Sub PropList1(ByRef props As Object, ByRef phases As Object, ByRef calcType As Object) Implements ICapeThermoCalculationRoutine.PropList
             Throw New NotImplementedException
         End Sub
 
-        Public Function PropCheck2(ByVal materialObject As Object, ByVal flashType As String, ByVal props As Object) As Object Implements CAPEOPEN110.ICapeThermoEquilibriumServer.PropCheck
+        Public Function PropCheck2(ByVal materialObject As Object, ByVal flashType As String, ByVal props As Object) As Object Implements ICapeThermoEquilibriumServer.PropCheck
             Throw New NotImplementedException
         End Function
 
-        Public Function ValidityCheck2(ByVal materialObject As Object, ByVal props As Object) As Object Implements CAPEOPEN110.ICapeThermoEquilibriumServer.ValidityCheck
+        Public Function ValidityCheck2(ByVal materialObject As Object, ByVal props As Object) As Object Implements ICapeThermoEquilibriumServer.ValidityCheck
             Throw New NotImplementedException
         End Function
 
@@ -1276,7 +1276,7 @@ Namespace DTL.SimulationObjects.Streams
         ''' <value></value>
         ''' <returns>CapeString</returns>
         ''' <remarks>Implements CapeOpen.ICapeIdentification.ComponentDescription</remarks>
-        Public Overridable Property ComponentDescription() As String Implements CapeOpen.ICapeIdentification.ComponentDescription
+        Public Overridable Property ComponentDescription() As String Implements ICapeIdentification.ComponentDescription
             Get
                 Return Me.m_ComponentName
             End Get
@@ -1291,7 +1291,7 @@ Namespace DTL.SimulationObjects.Streams
         ''' <value></value>
         ''' <returns>CapeString</returns>
         ''' <remarks>Implements CapeOpen.ICapeIdentification.ComponentName</remarks>
-        Public Property ComponentName() As String Implements CapeOpen.ICapeIdentification.ComponentName
+        Public Property ComponentName() As String Implements ICapeIdentification.ComponentName
             Get
                 Return "temporary stream"
             End Get
@@ -2018,20 +2018,20 @@ Namespace DTL.SimulationObjects.Streams
             Return Me.PropertyPackage.ValidityCheck(Me, props)
         End Function
 
-        Public Sub CalcProp1(ByVal materialObject As Object, ByVal props As Object, ByVal phases As Object, ByVal calcType As String) Implements CapeOpen.ICapeThermoCalculationRoutine.CalcProp
+        Public Sub CalcProp1(ByVal materialObject As Object, ByVal props As Object, ByVal phases As Object, ByVal calcType As String) Implements ICapeThermoCalculationRoutine.CalcProp
             CalcProp1(materialObject, props, phases, calcType)
         End Sub
 
-        Public Function PropCheck1(ByVal materialObject As Object, ByVal props As Object) As Object Implements CapeOpen.ICapeThermoCalculationRoutine.PropCheck
+        Public Function PropCheck1(ByVal materialObject As Object, ByVal props As Object) As Object Implements ICapeThermoCalculationRoutine.PropCheck
             Return PropCheck1(materialObject, props)
         End Function
 
-        Public Function ValidityCheck1(ByVal materialObject As Object, ByVal props As Object) As Object Implements CapeOpen.ICapeThermoCalculationRoutine.ValidityCheck
+        Public Function ValidityCheck1(ByVal materialObject As Object, ByVal props As Object) As Object Implements ICapeThermoCalculationRoutine.ValidityCheck
             Me.PropertyPackage.CurrentMaterialStream = Me
             Return ValidityCheck(props)
         End Function
 
-        Public Sub CalcEquilibrium2(ByVal materialObject As Object, ByVal flashType As String, ByVal props As Object) Implements CapeOpen.ICapeThermoEquilibriumServer.CalcEquilibrium
+        Public Sub CalcEquilibrium2(ByVal materialObject As Object, ByVal flashType As String, ByVal props As Object) Implements ICapeThermoEquilibriumServer.CalcEquilibrium
             Try
                 Me.PropertyPackage.CalcEquilibrium(materialObject, flashType, props)
             Catch ex As Exception
@@ -2042,7 +2042,7 @@ Namespace DTL.SimulationObjects.Streams
             End Try
         End Sub
 
-        Public Sub PropList(ByRef flashType As Object, ByRef props As Object, ByRef phases As Object, ByRef calcType As Object) Implements CapeOpen.ICapeThermoEquilibriumServer.PropList
+        Public Sub PropList(ByRef flashType As Object, ByRef props As Object, ByRef phases As Object, ByRef calcType As Object) Implements ICapeThermoEquilibriumServer.PropList
             Try
                 Me.PropertyPackage.PropList(flashType, props, phases, calcType)
             Catch ex As Exception
@@ -2053,7 +2053,7 @@ Namespace DTL.SimulationObjects.Streams
             End Try
         End Sub
 
-        Public Sub CalcEquilibrium3(ByVal materialObject As Object, ByVal flashType As String, ByVal props As Object) Implements CapeOpen.ICapeThermoPropertyPackage.CalcEquilibrium
+        Public Sub CalcEquilibrium3(ByVal materialObject As Object, ByVal flashType As String, ByVal props As Object) Implements ICapeThermoPropertyPackage.CalcEquilibrium
             Me.PropertyPackage.CurrentMaterialStream = Me
             Try
                 Me.PropertyPackage.CalcEquilibrium(materialObject, flashType, props)
@@ -2065,7 +2065,7 @@ Namespace DTL.SimulationObjects.Streams
             End Try
         End Sub
 
-        Public Sub CalcProp2(ByVal materialObject As Object, ByVal props As Object, ByVal phases As Object, ByVal calcType As String) Implements CapeOpen.ICapeThermoPropertyPackage.CalcProp
+        Public Sub CalcProp2(ByVal materialObject As Object, ByVal props As Object, ByVal phases As Object, ByVal calcType As String) Implements ICapeThermoPropertyPackage.CalcProp
             Me.PropertyPackage.CurrentMaterialStream = Me
             Try
                 Me.PropertyPackage.CalcProp(materialObject, props, phases, calcType)
@@ -2077,7 +2077,7 @@ Namespace DTL.SimulationObjects.Streams
             End Try
         End Sub
 
-        Public Function GetComponentConstant1(ByVal materialObject As Object, ByVal props As Object) As Object Implements CapeOpen.ICapeThermoPropertyPackage.GetComponentConstant
+        Public Function GetComponentConstant1(ByVal materialObject As Object, ByVal props As Object) As Object Implements ICapeThermoPropertyPackage.GetComponentConstant
             Me.PropertyPackage.CurrentMaterialStream = Me
             Try
                 Return Me.PropertyPackage.GetComponentConstant(materialObject, props)
@@ -2090,7 +2090,7 @@ Namespace DTL.SimulationObjects.Streams
             End Try
         End Function
 
-        Public Sub GetComponentList(ByRef compIds As Object, ByRef formulae As Object, ByRef names As Object, ByRef boilTemps As Object, ByRef molWt As Object, ByRef casNo As Object) Implements CapeOpen.ICapeThermoPropertyPackage.GetComponentList
+        Public Sub GetComponentList(ByRef compIds As Object, ByRef formulae As Object, ByRef names As Object, ByRef boilTemps As Object, ByRef molWt As Object, ByRef casNo As Object) Implements ICapeThermoPropertyPackage.GetComponentList
             Me.PropertyPackage.CurrentMaterialStream = Me
             Try
                 Me.PropertyPackage.GetComponentList(compIds, formulae, names, boilTemps, molWt, casNo)
@@ -2102,7 +2102,7 @@ Namespace DTL.SimulationObjects.Streams
             End Try
         End Sub
 
-        Public Function GetPhaseList1() As Object Implements CapeOpen.ICapeThermoPropertyPackage.GetPhaseList
+        Public Function GetPhaseList1() As Object Implements ICapeThermoPropertyPackage.GetPhaseList
             Try
                 Return Me.PropertyPackage.GetPhaseList()
             Catch ex As Exception
@@ -2114,7 +2114,7 @@ Namespace DTL.SimulationObjects.Streams
             End Try
         End Function
 
-        Public Function GetPropList2() As Object Implements CapeOpen.ICapeThermoPropertyPackage.GetPropList
+        Public Function GetPropList2() As Object Implements ICapeThermoPropertyPackage.GetPropList
             Try
                 Return Me.PropertyPackage.GetPropList()
             Catch ex As Exception
@@ -2126,11 +2126,11 @@ Namespace DTL.SimulationObjects.Streams
             End Try
         End Function
 
-        Public Function GetUniversalConstant1(ByVal materialObject As Object, ByVal props As Object) As Object Implements CapeOpen.ICapeThermoPropertyPackage.GetUniversalConstant
+        Public Function GetUniversalConstant1(ByVal materialObject As Object, ByVal props As Object) As Object Implements ICapeThermoPropertyPackage.GetUniversalConstant
             Return Me.PropertyPackage.GetUniversalConstant(materialObject, props)
         End Function
 
-        Public Function PropCheck3(ByVal materialObject As Object, ByVal props As Object) As Object Implements CapeOpen.ICapeThermoPropertyPackage.PropCheck
+        Public Function PropCheck3(ByVal materialObject As Object, ByVal props As Object) As Object Implements ICapeThermoPropertyPackage.PropCheck
             Try
                 Return Me.PropertyPackage.PropCheck(materialObject, props)
             Catch ex As Exception
@@ -2142,7 +2142,7 @@ Namespace DTL.SimulationObjects.Streams
             End Try
         End Function
 
-        Public Function ValidityCheck3(ByVal materialObject As Object, ByVal props As Object) As Object Implements CapeOpen.ICapeThermoPropertyPackage.ValidityCheck
+        Public Function ValidityCheck3(ByVal materialObject As Object, ByVal props As Object) As Object Implements ICapeThermoPropertyPackage.ValidityCheck
             Return Me.PropertyPackage.ValidityCheck(materialObject, props)
         End Function
 
@@ -2396,22 +2396,22 @@ Namespace DTL.SimulationObjects.Streams
         ''' expected to have a smaller overhead in operating system resources.</remarks>
         Public Sub ClearAllProps() Implements ICapeThermoMaterial.ClearAllProps
             Me.PropertyPackage.CurrentMaterialStream = Me
-            Me.PropertyPackage.DW_ZerarPhaseProps(PropertyPackages.Phase.Vapor)
-            Me.PropertyPackage.DW_ZerarPhaseProps(PropertyPackages.Phase.Liquid)
-            Me.PropertyPackage.DW_ZerarPhaseProps(PropertyPackages.Phase.Liquid1)
-            Me.PropertyPackage.DW_ZerarPhaseProps(PropertyPackages.Phase.Liquid2)
-            Me.PropertyPackage.DW_ZerarPhaseProps(PropertyPackages.Phase.Liquid3)
-            Me.PropertyPackage.DW_ZerarPhaseProps(PropertyPackages.Phase.Aqueous)
-            Me.PropertyPackage.DW_ZerarPhaseProps(PropertyPackages.Phase.Solid)
-            Me.PropertyPackage.DW_ZerarPhaseProps(PropertyPackages.Phase.Mixture)
-            Me.PropertyPackage.DW_ZerarComposicoes(PropertyPackages.Phase.Vapor)
-            Me.PropertyPackage.DW_ZerarComposicoes(PropertyPackages.Phase.Liquid)
-            Me.PropertyPackage.DW_ZerarComposicoes(PropertyPackages.Phase.Liquid1)
-            Me.PropertyPackage.DW_ZerarComposicoes(PropertyPackages.Phase.Liquid2)
-            Me.PropertyPackage.DW_ZerarComposicoes(PropertyPackages.Phase.Liquid3)
-            Me.PropertyPackage.DW_ZerarComposicoes(PropertyPackages.Phase.Aqueous)
-            Me.PropertyPackage.DW_ZerarComposicoes(PropertyPackages.Phase.Solid)
-            Me.PropertyPackage.DW_ZerarComposicoes(PropertyPackages.Phase.Mixture)
+            Me.PropertyPackage.DW_ClearPhaseProps(PropertyPackages.Phase.Vapor)
+            Me.PropertyPackage.DW_ClearPhaseProps(PropertyPackages.Phase.Liquid)
+            Me.PropertyPackage.DW_ClearPhaseProps(PropertyPackages.Phase.Liquid1)
+            Me.PropertyPackage.DW_ClearPhaseProps(PropertyPackages.Phase.Liquid2)
+            Me.PropertyPackage.DW_ClearPhaseProps(PropertyPackages.Phase.Liquid3)
+            Me.PropertyPackage.DW_ClearPhaseProps(PropertyPackages.Phase.Aqueous)
+            Me.PropertyPackage.DW_ClearPhaseProps(PropertyPackages.Phase.Solid)
+            Me.PropertyPackage.DW_ClearPhaseProps(PropertyPackages.Phase.Mixture)
+            Me.PropertyPackage.DW_ClearCompositions(PropertyPackages.Phase.Vapor)
+            Me.PropertyPackage.DW_ClearCompositions(PropertyPackages.Phase.Liquid)
+            Me.PropertyPackage.DW_ClearCompositions(PropertyPackages.Phase.Liquid1)
+            Me.PropertyPackage.DW_ClearCompositions(PropertyPackages.Phase.Liquid2)
+            Me.PropertyPackage.DW_ClearCompositions(PropertyPackages.Phase.Liquid3)
+            Me.PropertyPackage.DW_ClearCompositions(PropertyPackages.Phase.Aqueous)
+            Me.PropertyPackage.DW_ClearCompositions(PropertyPackages.Phase.Solid)
+            Me.PropertyPackage.DW_ClearCompositions(PropertyPackages.Phase.Mixture)
         End Sub
 
         ''' <summary>
@@ -2592,7 +2592,7 @@ Namespace DTL.SimulationObjects.Streams
                     If pi.PhaseLabel <> "Disabled" Then
                         If Me.Phases(pi.DWPhaseIndex).SPMProperties.molarfraction.HasValue Then
                             pl.Add(pi.PhaseLabel)
-                            stat.Add(CapeOpen.eCapePhaseStatus.CAPE_ATEQUILIBRIUM)
+                            stat.Add(eCapePhaseStatus.CAPE_ATEQUILIBRIUM)
                         End If
                     End If
                 Next
@@ -2600,7 +2600,7 @@ Namespace DTL.SimulationObjects.Streams
                 For Each pi As PhaseInfo In Me.PropertyPackage.PhaseMappings.Values
                     If pi.PhaseLabel <> "Disabled" Then
                         pl.Add(pi.PhaseLabel)
-                        stat.Add(CapeOpen.eCapePhaseStatus.CAPE_UNKNOWNPHASESTATUS)
+                        stat.Add(eCapePhaseStatus.CAPE_UNKNOWNPHASESTATUS)
                     End If
                 Next
             End If
@@ -4036,31 +4036,31 @@ Namespace DTL.SimulationObjects.Streams
             End Get
         End Property
 
-        Public ReadOnly Property code() As Integer Implements CapeOpen.ECapeUser.code
+        Public ReadOnly Property code() As Integer Implements ECapeUser.code
             Get
                 Return _code
             End Get
         End Property
 
-        Public ReadOnly Property description() As String Implements CapeOpen.ECapeUser.description
+        Public ReadOnly Property description() As String Implements ECapeUser.description
             Get
                 Return _description
             End Get
         End Property
 
-        Public ReadOnly Property interfaceName() As String Implements CapeOpen.ECapeUser.interfaceName
+        Public ReadOnly Property interfaceName() As String Implements ECapeUser.interfaceName
             Get
                 Return _interfacename
             End Get
         End Property
 
-        Public ReadOnly Property moreInfo() As String Implements CapeOpen.ECapeUser.moreInfo
+        Public ReadOnly Property moreInfo() As String Implements ECapeUser.moreInfo
             Get
                 Return _moreinfo
             End Get
         End Property
 
-        Public ReadOnly Property operation() As String Implements CapeOpen.ECapeUser.operation
+        Public ReadOnly Property operation() As String Implements ECapeUser.operation
             Get
                 Return _operation
             End Get
