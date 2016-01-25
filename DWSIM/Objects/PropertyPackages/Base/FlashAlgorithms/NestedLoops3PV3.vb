@@ -18,9 +18,7 @@
 '    along with DTL.  If not, see <http://www.gnu.org/licenses/>.
 
 Imports System.Math
-Imports DTL.DTL.SimulationObjects
 Imports DTL.DTL.MathEx
-Imports DTL.DTL.MathEx.Common
 Imports System.Threading.Tasks
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
