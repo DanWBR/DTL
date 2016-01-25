@@ -10,7 +10,7 @@ Namespace DTL.MathEx.ODESolver
         End Sub
 
         Sub DefineFuncDelegate(ByVal func As fdelegate)
-            Me.fc = func
+            fc = func
         End Sub
 
         Sub f(ByVal y As Double(), ByRef dy As Double())
