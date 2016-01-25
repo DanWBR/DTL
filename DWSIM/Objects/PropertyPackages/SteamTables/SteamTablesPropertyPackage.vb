@@ -71,20 +71,20 @@ Namespace DTL.SimulationObjects.PropertyPackages
             S = Me.CurrentMaterialStream.Phases(0).SPMProperties.entropy.GetValueOrDefault
             vf = Me.CurrentMaterialStream.Phases(2).SPMProperties.molarfraction.GetValueOrDefault
 
-            Me.DW_ZerarPhaseProps(Phase.Vapor)
-            Me.DW_ZerarPhaseProps(Phase.Liquid)
-            Me.DW_ZerarPhaseProps(Phase.Liquid1)
-            Me.DW_ZerarPhaseProps(Phase.Liquid2)
-            Me.DW_ZerarPhaseProps(Phase.Liquid3)
-            Me.DW_ZerarPhaseProps(Phase.Aqueous)
-            Me.DW_ZerarPhaseProps(Phase.Solid)
-            Me.DW_ZerarComposicoes(Phase.Vapor)
-            Me.DW_ZerarComposicoes(Phase.Liquid)
-            Me.DW_ZerarComposicoes(Phase.Liquid1)
-            Me.DW_ZerarComposicoes(Phase.Liquid2)
-            Me.DW_ZerarComposicoes(Phase.Liquid3)
-            Me.DW_ZerarComposicoes(Phase.Aqueous)
-            Me.DW_ZerarComposicoes(Phase.Solid)
+            Me.DW_ClearPhaseProps(Phase.Vapor)
+            Me.DW_ClearPhaseProps(Phase.Liquid)
+            Me.DW_ClearPhaseProps(Phase.Liquid1)
+            Me.DW_ClearPhaseProps(Phase.Liquid2)
+            Me.DW_ClearPhaseProps(Phase.Liquid3)
+            Me.DW_ClearPhaseProps(Phase.Aqueous)
+            Me.DW_ClearPhaseProps(Phase.Solid)
+            Me.DW_ClearCompositions(Phase.Vapor)
+            Me.DW_ClearCompositions(Phase.Liquid)
+            Me.DW_ClearCompositions(Phase.Liquid1)
+            Me.DW_ClearCompositions(Phase.Liquid2)
+            Me.DW_ClearCompositions(Phase.Liquid3)
+            Me.DW_ClearCompositions(Phase.Aqueous)
+            Me.DW_ClearCompositions(Phase.Solid)
 
             Select Case spec1
 
@@ -388,21 +388,21 @@ FINAL:
             End Select
 
             Select Case phase
-                Case PropertyPackages.Phase.Mixture
+                Case Phase.Mixture
                     phaseID = 0
-                Case PropertyPackages.Phase.Vapor
+                Case Phase.Vapor
                     phaseID = 2
-                Case PropertyPackages.Phase.Liquid1
+                Case Phase.Liquid1
                     phaseID = 3
-                Case PropertyPackages.Phase.Liquid2
+                Case Phase.Liquid2
                     phaseID = 4
-                Case PropertyPackages.Phase.Liquid3
+                Case Phase.Liquid3
                     phaseID = 5
-                Case PropertyPackages.Phase.Liquid
+                Case Phase.Liquid
                     phaseID = 1
-                Case PropertyPackages.Phase.Aqueous
+                Case Phase.Aqueous
                     phaseID = 6
-                Case PropertyPackages.Phase.Solid
+                Case Phase.Solid
                     phaseID = 7
             End Select
 
@@ -464,7 +464,7 @@ FINAL:
 
         End Sub
 
-        Public Overrides Sub DW_CalcPhaseProps(ByVal Phase As DTL.SimulationObjects.PropertyPackages.Phase)
+        Public Overrides Sub DW_CalcPhaseProps(ByVal Phase As Phase)
 
             Dim result As Double
 
@@ -478,21 +478,21 @@ FINAL:
             P = Me.CurrentMaterialStream.Phases(0).SPMProperties.pressure
 
             Select Case Phase
-                Case PropertyPackages.Phase.Mixture
+                Case Phase.Mixture
                     phaseID = 0
-                Case PropertyPackages.Phase.Vapor
+                Case Phase.Vapor
                     phaseID = 2
-                Case PropertyPackages.Phase.Liquid1
+                Case Phase.Liquid1
                     phaseID = 3
-                Case PropertyPackages.Phase.Liquid2
+                Case Phase.Liquid2
                     phaseID = 4
-                Case PropertyPackages.Phase.Liquid3
+                Case Phase.Liquid3
                     phaseID = 5
-                Case PropertyPackages.Phase.Liquid
+                Case Phase.Liquid
                     phaseID = 1
-                Case PropertyPackages.Phase.Aqueous
+                Case Phase.Aqueous
                     phaseID = 6
-                Case PropertyPackages.Phase.Solid
+                Case Phase.Solid
                     phaseID = 7
             End Select
 
@@ -623,7 +623,7 @@ FINAL:
 
         End Sub
 
-        Public Overrides Sub DW_CalcTwoPhaseProps(ByVal Phase1 As DTL.SimulationObjects.PropertyPackages.Phase, ByVal Phase2 As DTL.SimulationObjects.PropertyPackages.Phase)
+        Public Overrides Sub DW_CalcTwoPhaseProps(ByVal Phase1 As Phase, ByVal Phase2 As Phase)
 
             Dim result As Double
 
@@ -644,25 +644,25 @@ FINAL:
 
         End Sub
 
-        Public Overrides Sub DW_CalcVazaoMassica()
+        Public Overrides Sub DW_CalcMassFlow()
             With Me.CurrentMaterialStream
                 .Phases(0).SPMProperties.massflow = .Phases(0).SPMProperties.molarflow.GetValueOrDefault * 18 / 1000
             End With
         End Sub
 
-        Public Overrides Sub DW_CalcVazaoMolar()
+        Public Overrides Sub DW_CalcMolarFlow()
             With Me.CurrentMaterialStream
                 .Phases(0).SPMProperties.molarflow = .Phases(0).SPMProperties.massflow.GetValueOrDefault / 18 * 1000
             End With
         End Sub
 
-        Public Overrides Sub DW_CalcVazaoVolumetrica()
+        Public Overrides Sub DW_CalcVolumetricFlow()
             With Me.CurrentMaterialStream
                 .Phases(0).SPMProperties.volumetric_flow = .Phases(0).SPMProperties.massflow.GetValueOrDefault / .Phases(0).SPMProperties.density.GetValueOrDefault
             End With
         End Sub
 
-        Public Overrides Function DW_CalcMassaEspecifica_ISOL(ByVal Phase1 As DTL.SimulationObjects.PropertyPackages.Phase, ByVal T As Double, ByVal P As Double, Optional ByVal pvp As Double = 0) As Double
+        Public Overrides Function DW_CalcSpecificMass_ISOL(ByVal Phase1 As Phase, ByVal T As Double, ByVal P As Double, Optional ByVal pvp As Double = 0) As Double
             If Phase1 = Phase.Liquid Then
                 Return Me.m_iapws97.densW(T, P / 100000)
             ElseIf Phase1 = Phase.Vapor Then
@@ -676,7 +676,7 @@ FINAL:
             End If
         End Function
 
-        Public Overrides Function DW_CalcViscosidadeDinamica_ISOL(ByVal Phase1 As DTL.SimulationObjects.PropertyPackages.Phase, ByVal T As Double, ByVal P As Double) As Double
+        Public Overrides Function DW_CalcDynamicViscosity_ISOL(ByVal Phase1 As Phase, ByVal T As Double, ByVal P As Double) As Double
             If Phase1 = Phase.Liquid Then
                 Return Me.m_iapws97.viscW(T, P / 100000)
             ElseIf Phase1 = Phase.Vapor Then
@@ -688,17 +688,17 @@ FINAL:
             End If
         End Function
 
-        Public Overrides Function DW_CalcEnergiaMistura_ISOL(ByVal T As Double, ByVal P As Double) As Double
+        Public Overrides Function DW_CalcMixtureEnergy_ISOL(ByVal T As Double, ByVal P As Double) As Double
             Dim ent_massica = Me.m_iapws97.enthalpyW(T, P / 100000)
             Dim flow = Me.CurrentMaterialStream.Phases(0).SPMProperties.massflow
             Return ent_massica * flow
         End Function
 
-        Public Overrides Function DW_CalcCp_ISOL(ByVal Phase1 As DTL.SimulationObjects.PropertyPackages.Phase, ByVal T As Double, ByVal P As Double) As Double
+        Public Overrides Function DW_CalcCp_ISOL(ByVal Phase1 As Phase, ByVal T As Double, ByVal P As Double) As Double
             Return Me.m_iapws97.cpW(T, P / 10000)
         End Function
 
-        Public Overrides Function DW_CalcK_ISOL(ByVal Phase1 As DTL.SimulationObjects.PropertyPackages.Phase, ByVal T As Double, ByVal P As Double) As Double
+        Public Overrides Function DW_CalcK_ISOL(ByVal Phase1 As Phase, ByVal T As Double, ByVal P As Double) As Double
             If Phase1 = Phase.Liquid Then
                 Return Me.m_iapws97.thconW(T, P / 100000)
             ElseIf Phase1 = Phase.Vapor Then
@@ -710,7 +710,7 @@ FINAL:
             End If
         End Function
 
-        Public Overrides Function DW_CalcMM_ISOL(ByVal Phase1 As DTL.SimulationObjects.PropertyPackages.Phase, ByVal T As Double, ByVal P As Double) As Double
+        Public Overrides Function DW_CalcMM_ISOL(ByVal Phase1 As Phase, ByVal T As Double, ByVal P As Double) As Double
             Return 18
         End Function
 
@@ -728,7 +728,7 @@ FINAL:
 
         End Function
 
-        Public Overrides Function DW_CalcEnthalpy(ByVal Vx As System.Array, ByVal T As Double, ByVal P As Double, ByVal st As State) As Double
+        Public Overrides Function DW_CalcEnthalpy(ByVal Vx As Array, ByVal T As Double, ByVal P As Double, ByVal st As State) As Double
             Select Case st
                 Case State.Liquid
                     Return Me.m_iapws97.enthalpySatLiqTW(T)
@@ -739,11 +739,11 @@ FINAL:
             End Select
         End Function
 
-        Public Overrides Function DW_CalcKvalue(ByVal Vx As System.Array, ByVal T As Double, ByVal P As Double) As [Object]
+        Public Overrides Function DW_CalcKvalue(ByVal Vx As Array, ByVal T As Double, ByVal P As Double) As [Object]
             Return New Object() {1}
         End Function
 
-        Public Overrides Function DW_CalcEnthalpyDeparture(ByVal Vx As System.Array, ByVal T As Double, ByVal P As Double, ByVal st As State) As Double
+        Public Overrides Function DW_CalcEnthalpyDeparture(ByVal Vx As Array, ByVal T As Double, ByVal P As Double, ByVal st As State) As Double
             Select Case st
                 Case State.Liquid
                     Return Me.m_iapws97.enthalpySatLiqTW(T) - Me.RET_Hid(298.15, T, Vx)
@@ -754,19 +754,19 @@ FINAL:
             End Select
         End Function
 
-        Public Overrides Function DW_CalcBubP(ByVal Vx As System.Array, ByVal T As Double, Optional ByVal Pref As Double = 0, Optional ByVal K As System.Array = Nothing, Optional ByVal ReuseK As Boolean = False) As Object
+        Public Overrides Function DW_CalcBubP(ByVal Vx As Array, ByVal T As Double, Optional ByVal Pref As Double = 0, Optional ByVal K As Array = Nothing, Optional ByVal ReuseK As Boolean = False) As Object
             Return New Object() {Me.m_iapws97.pSatW(T) * 1.001}
         End Function
 
-        Public Overrides Function DW_CalcBubT(ByVal Vx As System.Array, ByVal P As Double, Optional ByVal Tref As Double = 0, Optional ByVal K As System.Array = Nothing, Optional ByVal ReuseK As Boolean = False) As Object
+        Public Overrides Function DW_CalcBubT(ByVal Vx As Array, ByVal P As Double, Optional ByVal Tref As Double = 0, Optional ByVal K As Array = Nothing, Optional ByVal ReuseK As Boolean = False) As Object
             Return New Object() {Me.m_iapws97.tSatW(P / 100000) * 0.999}
         End Function
 
-        Public Overrides Function DW_CalcDewP(ByVal Vx As System.Array, ByVal T As Double, Optional ByVal Pref As Double = 0, Optional ByVal K As System.Array = Nothing, Optional ByVal ReuseK As Boolean = False) As Object
+        Public Overrides Function DW_CalcDewP(ByVal Vx As Array, ByVal T As Double, Optional ByVal Pref As Double = 0, Optional ByVal K As Array = Nothing, Optional ByVal ReuseK As Boolean = False) As Object
             Return New Object() {Me.m_iapws97.pSatW(T) * 0.999}
         End Function
 
-        Public Overrides Function DW_CalcDewT(ByVal Vx As System.Array, ByVal P As Double, Optional ByVal Tref As Double = 0, Optional ByVal K As System.Array = Nothing, Optional ByVal ReuseK As Boolean = False) As Object
+        Public Overrides Function DW_CalcDewT(ByVal Vx As Array, ByVal P As Double, Optional ByVal Tref As Double = 0, Optional ByVal K As Array = Nothing, Optional ByVal ReuseK As Boolean = False) As Object
             Return New Object() {Me.m_iapws97.tSatW(P / 100000) * 1.001}
         End Function
 
@@ -794,7 +794,7 @@ FINAL:
 
         End Function
 
-        Public Overrides Function DW_CalcEntropy(ByVal Vx As System.Array, ByVal T As Double, ByVal P As Double, ByVal st As State) As Double
+        Public Overrides Function DW_CalcEntropy(ByVal Vx As Array, ByVal T As Double, ByVal P As Double, ByVal st As State) As Double
             Select Case st
                 Case State.Liquid
                     Return Me.m_iapws97.entropySatLiqTW(T)
@@ -805,7 +805,7 @@ FINAL:
             End Select
         End Function
 
-        Public Overrides Function DW_CalcEntropyDeparture(ByVal Vx As System.Array, ByVal T As Double, ByVal P As Double, ByVal st As State) As Double
+        Public Overrides Function DW_CalcEntropyDeparture(ByVal Vx As Array, ByVal T As Double, ByVal P As Double, ByVal st As State) As Double
             Select Case st
                 Case State.Liquid
                     Return Me.m_iapws97.entropySatLiqTW(T) - Me.RET_Sid(298.15, T, P, Vx)
@@ -816,7 +816,7 @@ FINAL:
             End Select
         End Function
 
-        Public Overrides Function DW_CalcFugCoeff(ByVal Vx As System.Array, ByVal T As Double, ByVal P As Double, ByVal st As State) As Double()
+        Public Overrides Function DW_CalcFugCoeff(ByVal Vx As Array, ByVal T As Double, ByVal P As Double, ByVal st As State) As Double()
 
             Return New Double() {1.0#}
         End Function
