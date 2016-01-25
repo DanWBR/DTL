@@ -24,7 +24,7 @@ Imports DTL.DTL.SimulationObjects.PropertyPackages.Auxiliary
 
 Namespace DTL.Databases
 
-    <DelimitedRecord(";")> <IgnoreFirst()> <System.Serializable()> _
+    <DelimitedRecord(";")> <IgnoreFirst()> <Serializable()>
     Public Class ChemSepNameIDPair
 
         Implements ICloneable
@@ -33,25 +33,25 @@ Namespace DTL.Databases
         Public ChemSepName As String = ""
         Public DWSIMName As String = ""
 
-        Public Function Clone() As Object Implements System.ICloneable.Clone
+        Public Function Clone() As Object Implements ICloneable.Clone
 
             Dim newclass As New ChemSepNameIDPair
             With newclass
-                .ID = Me.ID
-                .ChemSepName = Me.ChemSepName
-                .DWSIMName = Me.DWSIMName
+                .ID = ID
+                .ChemSepName = ChemSepName
+                .DWSIMName = DWSIMName
             End With
             Return newclass
         End Function
 
     End Class
 
-    <System.Serializable()> Public Class ChemSep
+    <Serializable()> Public Class ChemSep
 
-        Private _ids As System.Collections.Generic.Dictionary(Of Integer, ChemSepNameIDPair)
+        Private _ids As Dictionary(Of Integer, ChemSepNameIDPair)
         Private xmldoc As XmlDocument
 
-        Public ReadOnly Property IDs() As System.Collections.Generic.Dictionary(Of Integer, ChemSepNameIDPair)
+        Public ReadOnly Property IDs() As Dictionary(Of Integer, ChemSepNameIDPair)
             Get
                 Return _ids
             End Get
@@ -59,9 +59,9 @@ Namespace DTL.Databases
 
         Sub New()
 
-            _ids = New System.Collections.Generic.Dictionary(Of Integer, ChemSepNameIDPair)
+            _ids = New Dictionary(Of Integer, ChemSepNameIDPair)
 
-            Dim pathsep As Char = System.IO.Path.DirectorySeparatorChar
+            Dim pathsep As Char = Path.DirectorySeparatorChar
 
             Dim csid As ChemSepNameIDPair
             Dim csidc() As ChemSepNameIDPair
@@ -75,7 +75,7 @@ Namespace DTL.Databases
             End With
 
             For Each csid In csidc
-                Me.IDs.Add(csid.ID, csid.Clone)
+                IDs.Add(csid.ID, csid.Clone)
             Next
 
             csid = Nothing
@@ -86,8 +86,8 @@ Namespace DTL.Databases
 
         Public Function GetCSName(ByVal id As String)
 
-            If Me.IDs.ContainsKey(id) Then
-                Return Me.IDs(id).ChemSepName
+            If IDs.ContainsKey(id) Then
+                Return IDs(id).ChemSepName
             Else
                 Return id
             End If
@@ -96,8 +96,8 @@ Namespace DTL.Databases
 
         Public Function GetDWSIMName(ByVal id As String)
 
-            If Me.IDs.ContainsKey(id) Then
-                Return Me.IDs(id).DWSIMName
+            If IDs.ContainsKey(id) Then
+                Return IDs(id).DWSIMName
             Else
                 Return id
             End If
@@ -128,8 +128,8 @@ Namespace DTL.Databases
             Dim cult As Globalization.CultureInfo = New Globalization.CultureInfo("en-US")
             Dim nf As Globalization.NumberFormatInfo = cult.NumberFormat
 
-            Dim unif As New Global.DTL.DTL.SimulationObjects.PropertyPackages.Auxiliary.Unifac
-            Dim modf As New Global.DTL.DTL.SimulationObjects.PropertyPackages.Auxiliary.Modfac
+            Dim unif As New Unifac
+            Dim modf As New Modfac
 
             For Each node As XmlNode In xmldoc.ChildNodes(0).ChildNodes
                 cp = New BaseThermoClasses.ConstantProperties
@@ -488,7 +488,7 @@ Namespace DTL.Databases
 
     End Class
 
-    <System.Serializable()> Public Class DWSIM
+    <Serializable()> Public Class DWSIM
 
         Private xmldoc As XmlDocument
 
@@ -520,8 +520,8 @@ Namespace DTL.Databases
             Dim cult As Globalization.CultureInfo = New Globalization.CultureInfo("en-US")
             Dim nf As Globalization.NumberFormatInfo = cult.NumberFormat
 
-            Dim unif As New SimulationObjects.PropertyPackages.Auxiliary.Unifac
-            Dim modf As New SimulationObjects.PropertyPackages.Auxiliary.Modfac
+            Dim unif As New Unifac
+            Dim modf As New Modfac
 
             For Each node As XmlNode In xmldoc.ChildNodes(1)
                 cp = New BaseThermoClasses.ConstantProperties
@@ -777,7 +777,7 @@ Namespace DTL.Databases
 
     End Class
 
-    <System.Serializable()> Public Class UserDB
+    <Serializable()> Public Class UserDB
 
         Public Shared Sub CreateNew(ByVal path As String, ByVal TopNode As String)
 
@@ -940,7 +940,6 @@ Namespace DTL.Databases
 
             xmldoc.Save(xmlpath)
             xmldoc = Nothing
-
 
         End Sub
 
@@ -1185,7 +1184,7 @@ Namespace DTL.Databases
     ''' Interaction Parameter user database class
     ''' </summary>
     ''' <remarks></remarks>
-    <System.Serializable()> Public Class UserIPDB
+    <Serializable()> Public Class UserIPDB
 
         Public Shared Sub CreateNew(ByVal path As String, ByVal TopNode As String)
 
@@ -1343,6 +1342,7 @@ Namespace DTL.Databases
         End Sub
 
         Public Sub Load(ByVal filename As String)
+
             Dim pathsep As Char = Path.DirectorySeparatorChar
 
             Dim settings As New XmlReaderSettings()
