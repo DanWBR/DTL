@@ -65,7 +65,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
         Public Function RET_VVL() As Double()
 
             Dim val(Me.CurrentMaterialStream.Phases(0).Components.Count - 1) As Double
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As BaseThermoClasses.Substance
             Dim i As Integer = 0
 
             For Each subst In Me.CurrentMaterialStream.Phases(0).Components.Values
@@ -80,7 +80,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
         Public Function RET_VCSAc() As Double()
 
             Dim val(Me.CurrentMaterialStream.Phases(0).Components.Count - 1) As Double
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As BaseThermoClasses.Substance
             Dim i As Integer = 0
 
             For Each subst In Me.CurrentMaterialStream.Phases(0).Components.Values
@@ -95,7 +95,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
         Public Function RET_VCSS() As Double()
 
             Dim val(Me.CurrentMaterialStream.Phases(0).Components.Count - 1) As Double
-            Dim subst As DTL.BaseThermoClasses.Substance
+            Dim subst As BaseThermoClasses.Substance
             Dim i As Integer = 0
 
             For Each subst In Me.CurrentMaterialStream.Phases(0).Components.Values
