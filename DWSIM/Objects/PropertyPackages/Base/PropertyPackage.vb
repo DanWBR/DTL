@@ -1383,11 +1383,11 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
                         Case FlashSpec.H
 
-                            Throw New Exception(DTL.App.GetLocalString("PropPack_FlashTHNotSupported"))
+                            Throw New Exception(App.GetLocalString("PropPack_FlashTHNotSupported"))
 
                         Case FlashSpec.S
 
-                            Throw New Exception(DTL.App.GetLocalString("PropPack_FlashTSNotSupported"))
+                            Throw New Exception(App.GetLocalString("PropPack_FlashTSNotSupported"))
 
                         Case FlashSpec.VAP
 
@@ -2918,7 +2918,7 @@ redirect2:                      result = Me.FlashBase.Flash_PS(RET_VMOL(Phase.Mi
                     ddd = bbb - aaa
                     eee = ddd
                 End If
-                If Math.Abs(fcc) < Math.Abs(fbb) Then
+                If Abs(fcc) < Abs(fbb) Then
                     aaa = bbb
                     bbb = ccc
                     ccc = aaa
@@ -2928,8 +2928,8 @@ redirect2:                      result = Me.FlashBase.Flash_PS(RET_VMOL(Phase.Mi
                 End If
                 tol11 = 0.0001
                 xmm = 0.5 * (ccc - bbb)
-                If (Math.Abs(xmm) <= tol11) Or (fbb = 0) Then GoTo Final3
-                If (Math.Abs(eee) >= tol11) And (Math.Abs(faa) > Math.Abs(fbb)) Then
+                If (Abs(xmm) <= tol11) Or (fbb = 0) Then GoTo Final3
+                If (Abs(eee) >= tol11) And (Abs(faa) > Abs(fbb)) Then
                     sss = fbb / faa
                     If aaa = ccc Then
                         ppp = 2 * xmm * sss
@@ -2941,9 +2941,9 @@ redirect2:                      result = Me.FlashBase.Flash_PS(RET_VMOL(Phase.Mi
                         qqq = (qqq - 1) * (rrr - 1) * (sss - 1)
                     End If
                     If ppp > 0 Then qqq = -qqq
-                    ppp = Math.Abs(ppp)
-                    min11 = 3 * xmm * qqq - Math.Abs(tol11 * qqq)
-                    min22 = Math.Abs(eee * qqq)
+                    ppp = Abs(ppp)
+                    min11 = 3 * xmm * qqq - Abs(tol11 * qqq)
+                    min22 = Abs(eee * qqq)
                     Dim tvar2 As Double
                     If min11 < min22 Then tvar2 = min11
                     If min11 > min22 Then tvar2 = min22
@@ -2960,7 +2960,7 @@ redirect2:                      result = Me.FlashBase.Flash_PS(RET_VMOL(Phase.Mi
                 End If
                 aaa = bbb
                 faa = fbb
-                If (Math.Abs(ddd) > tol11) Then
+                If (Abs(ddd) > tol11) Then
                     bbb += ddd
                 Else
                     bbb += Math.Sign(xmm) * tol11
@@ -3022,7 +3022,7 @@ Final3:
                     ddd = bbb - aaa
                     eee = ddd
                 End If
-                If Math.Abs(fcc) < Math.Abs(fbb) Then
+                If Abs(fcc) < Abs(fbb) Then
                     aaa = bbb
                     bbb = ccc
                     ccc = aaa
@@ -3032,8 +3032,8 @@ Final3:
                 End If
                 tol11 = 0.0001
                 xmm = 0.5 * (ccc - bbb)
-                If (Math.Abs(xmm) <= tol11) Or (fbb = 0) Then GoTo Final3
-                If (Math.Abs(eee) >= tol11) And (Math.Abs(faa) > Math.Abs(fbb)) Then
+                If (Abs(xmm) <= tol11) Or (fbb = 0) Then GoTo Final3
+                If (Abs(eee) >= tol11) And (Abs(faa) > Abs(fbb)) Then
                     sss = fbb / faa
                     If aaa = ccc Then
                         ppp = 2 * xmm * sss
@@ -3045,9 +3045,9 @@ Final3:
                         qqq = (qqq - 1) * (rrr - 1) * (sss - 1)
                     End If
                     If ppp > 0 Then qqq = -qqq
-                    ppp = Math.Abs(ppp)
-                    min11 = 3 * xmm * qqq - Math.Abs(tol11 * qqq)
-                    min22 = Math.Abs(eee * qqq)
+                    ppp = Abs(ppp)
+                    min11 = 3 * xmm * qqq - Abs(tol11 * qqq)
+                    min22 = Abs(eee * qqq)
                     Dim tvar2 As Double
                     If min11 < min22 Then tvar2 = min11
                     If min11 > min22 Then tvar2 = min22
@@ -3064,7 +3064,7 @@ Final3:
                 End If
                 aaa = bbb
                 faa = fbb
-                If (Math.Abs(ddd) > tol11) Then
+                If (Abs(ddd) > tol11) Then
                     bbb += ddd
                 Else
                     bbb += Math.Sign(xmm) * tol11
@@ -5252,7 +5252,7 @@ Final3:
                 For Each c As ConstantProperties In _selectedcomps.Values
                     ids.Add(c.Name)
                     formulas.Add(c.Formula)
-                    nms.Add(DTL.App.GetComponentName(c.Name))
+                    nms.Add(App.GetComponentName(c.Name))
                     bts.Add(c.Normal_Boiling_Point)
                     casnos.Add(c.CAS_Number)
                     molws.Add(c.Molar_Weight)
@@ -5261,7 +5261,7 @@ Final3:
                 For Each c As Substance In Me.CurrentMaterialStream.Phases(0).Components.Values
                     ids.Add(c.ConstantProperties.Name)
                     formulas.Add(c.ConstantProperties.Formula)
-                    nms.Add(DTL.App.GetComponentName(c.ConstantProperties.Name))
+                    nms.Add(App.GetComponentName(c.ConstantProperties.Name))
                     bts.Add(c.ConstantProperties.Normal_Boiling_Point)
                     casnos.Add(c.ConstantProperties.CAS_Number)
                     molws.Add(c.ConstantProperties.Molar_Weight)
@@ -7529,8 +7529,8 @@ Final3:
         End Function
 
         Public Overrides Function Seek(ByVal offset As Long, ByVal origin As System.IO.SeekOrigin) As Long
-            mSource.Seek(offset, CInt(origin), mInt64)
-            Return iop.Marshal.ReadInt64(mInt64)
+            Me.mSource.Seek(offset, origin, Me.mInt64)
+            Return iop.Marshal.ReadInt64(Me.mInt64)
         End Function
 
         Public Overrides Sub SetLength(ByVal value As Long)

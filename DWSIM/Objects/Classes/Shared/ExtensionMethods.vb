@@ -109,7 +109,7 @@ Module Extensions
     ''' <returns></returns>
     ''' <remarks></remarks>
     <Runtime.CompilerServices.Extension()> Public Function ExpY(val As Double) As Double
-        Dim tmp As Long = CLng(1512775 * val + 1072632447)
+        Dim tmp As Long = 1512775 * val + 1072632447
         Return BitConverter.Int64BitsToDouble(tmp << 32)
     End Function
 

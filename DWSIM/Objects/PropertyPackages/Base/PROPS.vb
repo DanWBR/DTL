@@ -486,18 +486,18 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
             Dim n = UBound(Vz)
 
-            Dim phi(n) As Double, somaz, i, j
+            Dim phi(n) As Double, sumz, i, j
 
-            somaz = 0.0#
+            sumz = 0.0#
             i = 0
             Do
-                If Vz(i) <> 0.0# And Not Double.IsNaN(VVl(i)) Then somaz = somaz + Vz(i) * VVl(i)
+                If Vz(i) <> 0.0# And Not Double.IsNaN(VVl(i)) Then sumz = sumz + Vz(i) * VVl(i)
                 i = i + 1
             Loop Until i = n + 1
 
             i = 0
             Do
-                If Vz(i) <> 0.0# And Not Double.IsNaN(VVl(i)) Then phi(i) = Vz(i) * VVl(i) / somaz
+                If Vz(i) <> 0.0# And Not Double.IsNaN(VVl(i)) Then phi(i) = Vz(i) * VVl(i) / sumz
                 i = i + 1
             Loop Until i = n + 1
 

@@ -1084,7 +1084,7 @@ Namespace Thermodynamics
 
             Dim ppm As New CAPEOPENPropertyPackageManager()
 
-            Dim pp As PropertyPackages.PropertyPackage = ppm.GetPropertyPackage(proppackname)
+            Dim pp As PropertyPackage = ppm.GetPropertyPackage(proppackname)
 
             TransferComps(pp)
 

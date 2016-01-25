@@ -201,8 +201,8 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         Function Z_PR(ByVal T, ByVal P, ByVal Vx, ByVal VKij, ByVal VTc, ByVal VPc, ByVal Vw, ByVal TIPO)
 
-            DTL.App.WriteToConsole("PR cubic equation root finder (Z) for T = " & T & " K, P = " & P & " Pa and Phase = " & TIPO, 3)
-            DTL.App.WriteToConsole("Mole fractions: " & DirectCast(Vx, Double()).ToArrayString, 3)
+            App.WriteToConsole("PR cubic equation root finder (Z) for T = " & T & " K, P = " & P & " Pa and Phase = " & TIPO, 3)
+            App.WriteToConsole("Mole fractions: " & DirectCast(Vx, Double()).ToArrayString, 3)
 
             Dim ai(), bi(), aml2(), amv2() As Double
             Dim n, R, coeff(3), tmp() As Double
@@ -339,7 +339,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                 Z_PR = temp1(2, 0)
             End If
 
-            DTL.App.WriteToConsole("Result: Z = " & Z_PR, 3)
+            App.WriteToConsole("Result: Z = " & Z_PR, 3)
 
         End Function
 
@@ -923,7 +923,7 @@ Final3:
             Dim beta As Double
             Dim criterioOK As Boolean = False
             Dim hbcIndex, counter As Integer
-            Dim soma_x As Double
+            Dim sum_x As Double
             Dim ZV As Double
             Dim AG, BG, aml, bml As Double
 
@@ -1086,14 +1086,14 @@ Final3:
                         Vx(hbcIndex) += 1
                         'e em seguida normaliza-se a composição.
                         i = 0
-                        soma_x = 0
+                        sum_x = 0
                         Do
-                            soma_x = soma_x + Vx(i)
+                            sum_x = sum_x + Vx(i)
                             i = i + 1
                         Loop Until i = n + 1
                         i = 0
                         Do
-                            Vx(i) = Vx(i) / soma_x
+                            Vx(i) = Vx(i) / sum_x
                             i = i + 1
                         Loop Until i = n + 1
                     Else

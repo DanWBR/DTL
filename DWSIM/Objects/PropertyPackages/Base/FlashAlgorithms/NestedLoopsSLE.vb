@@ -45,7 +45,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
         Public Property SolidSolution As Boolean = False
 
-        Public Overrides Function Flash_PT(ByVal Vz As Double(), ByVal P As Double, ByVal T As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
+        Public Overrides Function Flash_PT(ByVal Vz As Double(), ByVal P As Double, ByVal T As Double, ByVal PP As PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
 
             If SolidSolution Then
                 Return Flash_PT_SS(Vz, P, T, PP, ReuseKI, PrevKi)
@@ -55,10 +55,10 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
         End Function
 
-        Public Function Flash_PT_SS(ByVal Vz As Double(), ByVal P As Double, ByVal T As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
+        Public Function Flash_PT_SS(ByVal Vz As Double(), ByVal P As Double, ByVal T As Double, ByVal PP As PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
 
             Dim i, n, ecount As Integer
-            Dim soma_x, soma_y, soma_s As Double
+            Dim sum_x, sum_y, sum_s As Double
             Dim d1, d2 As Date, dt As TimeSpan
             Dim L, S, Lant, V As Double
 
@@ -66,10 +66,10 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
             d1 = Date.Now
 
-            etol = CDbl(PP.Parameters("PP_PTFELT"))
-            maxit_e = CInt(PP.Parameters("PP_PTFMEI"))
-            itol = CDbl(PP.Parameters("PP_PTFILT"))
-            maxit_i = CInt(PP.Parameters("PP_PTFMII"))
+            Me.etol = PP.Parameters("PP_PTFELT")
+            Me.maxit_e = CInt(PP.Parameters("PP_PTFMEI"))
+            Me.itol = PP.Parameters("PP_PTFILT")
+            Me.maxit_i = CInt(PP.Parameters("PP_PTFMII"))
 
             n = UBound(Vz)
 
@@ -111,18 +111,18 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
             Loop Until i = n + 1
 
             i = 0
-            soma_x = 0
-            soma_s = 0
-            soma_y = 0.0#
+            sum_x = 0
+            sum_s = 0
+            sum_y = 0.0#
             Do
-                soma_x = soma_x + Vx(i)
-                soma_s = soma_s + Vs(i)
+                sum_x = sum_x + Vx(i)
+                sum_s = sum_s + Vs(i)
                 i = i + 1
             Loop Until i = n + 1
             i = 0
             Do
-                Vx(i) = Vx(i) / soma_x
-                Vs(i) = Vs(i) / soma_s
+                Vx(i) = Vx(i) / sum_x
+                Vs(i) = Vs(i) / sum_s
                 i = i + 1
             Loop Until i = n + 1
 
@@ -160,17 +160,17 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                 Loop Until i = n + 1
 
                 i = 0
-                soma_x = 0
-                soma_s = 0
+                sum_x = 0
+                sum_s = 0
                 Do
-                    soma_x = soma_x + Vx(i)
-                    soma_s = soma_s + Vs(i)
+                    sum_x = sum_x + Vx(i)
+                    sum_s = sum_s + Vs(i)
                     i = i + 1
                 Loop Until i = n + 1
                 i = 0
                 Do
-                    Vx(i) = Vx(i) / soma_x
-                    Vs(i) = Vs(i) / soma_s
+                    Vx(i) = Vx(i) / sum_x
+                    Vs(i) = Vs(i) / sum_s
                     i = i + 1
                 Loop Until i = n + 1
 
@@ -186,11 +186,11 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
                 e3 = (L - Lant)
 
-                If Double.IsNaN(Math.Abs(e1) + Math.Abs(e2)) Then
+                If Double.IsNaN(Abs(e1) + Abs(e2)) Then
 
-                    Throw New Exception(DTL.App.GetLocalString("PropPack_FlashError"))
+                    Throw New Exception(App.GetLocalString("PropPack_FlashError"))
 
-                ElseIf Math.Abs(e3) < 0.0000000001 And ecount > 0 Then
+                ElseIf Abs(e3) < 0.0000000001 And ecount > 0 Then
 
                     convergiu = 1
 
@@ -239,8 +239,8 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
                 ecount += 1
 
-                If Double.IsNaN(L) Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashTPVapFracError"))
-                If ecount > maxit_e Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt2"))
+                If Double.IsNaN(L) Then Throw New Exception(App.GetLocalString("PropPack_FlashTPVapFracError"))
+                If ecount > maxit_e Then Throw New Exception(App.GetLocalString("PropPack_FlashMaxIt2"))
 
                 WriteDebugInfo("PT Flash [NL-SLE]: Iteration #" & ecount & ", LF = " & L)
 
@@ -258,16 +258,16 @@ out:        Return New Object() {L, V, Vx, Vy, ecount, 0.0#, PP.RET_NullVector, 
 
         End Function
 
-        Public Function Flash_PT_E(ByVal Vz As Double(), ByVal P As Double, ByVal T As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
+        Public Function Flash_PT_E(ByVal Vz As Double(), ByVal P As Double, ByVal T As Double, ByVal PP As PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
 
             Dim d1, d2 As Date, dt As TimeSpan
 
             d1 = Date.Now
 
-            etol = CDbl(PP.Parameters("PP_PTFELT"))
-            maxit_e = CInt(PP.Parameters("PP_PTFMEI"))
-            itol = CDbl(PP.Parameters("PP_PTFILT"))
-            maxit_i = CInt(PP.Parameters("PP_PTFMII"))
+            Me.etol = PP.Parameters("PP_PTFELT")
+            Me.maxit_e = CInt(PP.Parameters("PP_PTFMEI"))
+            Me.itol = PP.Parameters("PP_PTFILT")
+            Me.maxit_i = CInt(PP.Parameters("PP_PTFMII"))
 
             'This flash algorithm is for Electrolye/Salt systems with Water as the single solvent.
             'The vapor and solid phases are considered to be ideal.
@@ -371,8 +371,8 @@ out:        Return New Object() {L, V, Vx, Vy, ecount, 0.0#, PP.RET_NullVector, 
 
                 If errfunc <= etol Then Exit Do
 
-                If Double.IsNaN(S) Then Throw New Exception(DTL.App.GetLocalString("PP_FlashTPSolidFracError"))
-                If ecount > maxit_e Then Throw New Exception(DTL.App.GetLocalString("PP_FlashMaxIt2"))
+                If Double.IsNaN(S) Then Throw New Exception(App.GetLocalString("PP_FlashTPSolidFracError"))
+                If ecount > maxit_e Then Throw New Exception(App.GetLocalString("PP_FlashMaxIt2"))
 
                 ecount += 1
 
@@ -392,7 +392,7 @@ out:        Return New Object() {L, V, Vxl, Vxv, ecount, 0.0#, PP.RET_NullVector
 
         End Function
 
-        Public Overrides Function Flash_PH(ByVal Vz As Double(), ByVal P As Double, ByVal H As Double, ByVal Tref As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
+        Public Overrides Function Flash_PH(ByVal Vz As Double(), ByVal P As Double, ByVal H As Double, ByVal Tref As Double, ByVal PP As PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
 
             Dim Vn(1) As String, Vx(1), Vy(1), Vx_ant(1), Vy_ant(1), Vp(1), Ki(1), Ki_ant(1), fi(1), Vs(1) As Double
             Dim i, n, ecount As Integer
@@ -412,10 +412,10 @@ out:        Return New Object() {L, V, Vxl, Vxv, ecount, 0.0#, PP.RET_NullVector
             Vn = PP.RET_VNAMES()
             fi = Vz.Clone
 
-            Dim maxitINT As Integer = CInt(PP.Parameters("PP_PHFMII"))
-            Dim maxitEXT As Integer = CInt(PP.Parameters("PP_PHFMEI"))
-            Dim tolINT As Double = CDbl(PP.Parameters("PP_PHFILT"))
-            Dim tolEXT As Double = CDbl(PP.Parameters("PP_PHFELT"))
+            Dim maxitINT As Integer = PP.Parameters("PP_PHFMII")
+            Dim maxitEXT As Integer = PP.Parameters("PP_PHFMEI")
+            Dim tolINT As Double = PP.Parameters("PP_PHFILT")
+            Dim tolEXT As Double = PP.Parameters("PP_PHFELT")
 
             Dim Tsup, Tinf
 
@@ -479,7 +479,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 100, tolEXT, maxitEXT, {P, Vz, PP})
 
         End Function
 
-        Public Overrides Function Flash_PS(ByVal Vz As Double(), ByVal P As Double, ByVal S As Double, ByVal Tref As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
+        Public Overrides Function Flash_PS(ByVal Vz As Double(), ByVal P As Double, ByVal S As Double, ByVal Tref As Double, ByVal PP As PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
 
             Dim doparallel As Boolean = My.MyApplication._EnableParallelProcessing
 
@@ -501,10 +501,10 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 100, tolEXT, maxitEXT, {P, Vz, PP})
             Vn = PP.RET_VNAMES()
             fi = Vz.Clone
 
-            Dim maxitINT As Integer = CInt(PP.Parameters("PP_PSFMII"))
-            Dim maxitEXT As Integer = CInt(PP.Parameters("PP_PSFMEI"))
-            Dim tolINT As Double = CDbl(PP.Parameters("PP_PSFILT"))
-            Dim tolEXT As Double = CDbl(PP.Parameters("PP_PSFELT"))
+            Dim maxitINT As Integer = PP.Parameters("PP_PSFMII")
+            Dim maxitEXT As Integer = PP.Parameters("PP_PSFMEI")
+            Dim tolINT As Double = PP.Parameters("PP_PSFILT")
+            Dim tolEXT As Double = PP.Parameters("PP_PSFELT")
 
             Dim Tsup, Tinf ', Ssup, Sinf
 
@@ -565,7 +565,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
 
         End Function
 
-        Public Overrides Function Flash_TV(ByVal Vz As Double(), ByVal T As Double, ByVal V As Double, ByVal Pref As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
+        Public Overrides Function Flash_TV(ByVal Vz As Double(), ByVal T As Double, ByVal V As Double, ByVal Pref As Double, ByVal PP As PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
 
             Dim d1, d2 As Date, dt As TimeSpan
 
@@ -665,7 +665,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
             Return OBJ_FUNC_PS_FLASH(Tt, Sf, otherargs(0), otherargs(1), otherargs(2))
         End Function
 
-        Public Overrides Function Flash_PV(ByVal Vz As Double(), ByVal P As Double, ByVal V As Double, ByVal Tref As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
+        Public Overrides Function Flash_PV(ByVal Vz As Double(), ByVal P As Double, ByVal V As Double, ByVal Tref As Double, ByVal PP As PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
 
             If SolidSolution Then
                 Return Flash_PV_SS(Vz, P, V, Tref, PP)
@@ -675,20 +675,20 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
 
         End Function
 
-        Public Function Flash_PV_SS(ByVal Vz As Double(), ByVal P As Double, ByVal V As Double, ByVal Tref As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
+        Public Function Flash_PV_SS(ByVal Vz As Double(), ByVal P As Double, ByVal V As Double, ByVal Tref As Double, ByVal PP As PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
 
             Dim i, n, ecount As Integer
             Dim d1, d2 As Date, dt As TimeSpan
-            Dim soma_x, soma_s As Double
+            Dim sum_x, sum_s As Double
             Dim L, S, Lf, Sf, T, Tf As Double
             Dim ids As New List(Of String)
 
             d1 = Date.Now
 
-            etol = CDbl(PP.Parameters("PP_PTFELT"))
-            maxit_e = CInt(PP.Parameters("PP_PTFMEI"))
-            itol = CDbl(PP.Parameters("PP_PTFILT"))
-            maxit_i = CInt(PP.Parameters("PP_PTFMII"))
+            Me.etol = PP.Parameters("PP_PTFELT")
+            Me.maxit_e = CInt(PP.Parameters("PP_PTFMEI"))
+            Me.itol = PP.Parameters("PP_PTFILT")
+            Me.maxit_i = CInt(PP.Parameters("PP_PTFMII"))
 
             n = UBound(Vz)
 
@@ -759,17 +759,17 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
             Loop Until i = n + 1
 
             i = 0
-            soma_x = 0.0#
-            soma_s = 0.0#
+            sum_x = 0.0#
+            sum_s = 0.0#
             Do
-                soma_x = soma_x + Vx(i)
-                soma_s = soma_s + Vs(i)
+                sum_x = sum_x + Vx(i)
+                sum_s = sum_s + Vs(i)
                 i = i + 1
             Loop Until i = n + 1
             i = 0
             Do
-                Vx(i) = Vx(i) / soma_x
-                Vs(i) = Vs(i) / soma_s
+                Vx(i) = Vx(i) / sum_x
+                Vs(i) = Vs(i) / sum_s
                 i = i + 1
             Loop Until i = n + 1
 
@@ -840,11 +840,11 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
                     marcador2 = 0
                     If marcador = 1 Then
                         If L = 0 Then
-                            If Math.Abs(Vx(0) - Vx_ant(0)) < itol Then
+                            If Abs(Vx(0) - Vx_ant(0)) < itol Then
                                 marcador2 = 1
                             End If
                         Else
-                            If Math.Abs(Vs(0) - Vs_ant(0)) < itol Then
+                            If Abs(Vs(0) - Vs_ant(0)) < itol Then
                                 marcador2 = 1
                             End If
                         End If
@@ -901,7 +901,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
 
 
 
-            Loop Until Math.Abs(T - Tant) < 0.01 Or Double.IsNaN(T) = True Or ecount > maxit_e Or Double.IsNaN(T) Or Double.IsInfinity(T)
+            Loop Until Abs(T - Tant) < 0.01 Or Double.IsNaN(T) = True Or ecount > maxit_e Or Double.IsNaN(T) Or Double.IsInfinity(T)
 
             d2 = Date.Now
 
@@ -914,20 +914,20 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
 
         End Function
 
-        Public Function Flash_PV_E(ByVal Vz As Double(), ByVal P As Double, ByVal V As Double, ByVal Tref As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
+        Public Function Flash_PV_E(ByVal Vz As Double(), ByVal P As Double, ByVal V As Double, ByVal Tref As Double, ByVal PP As PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
 
             Dim i, n, ecount As Integer
             Dim d1, d2 As Date, dt As TimeSpan
-            Dim soma_x, soma_s As Double
+            Dim sum_x, sum_s As Double
             Dim L, S, Lf, Sf, T, Tf As Double
             Dim ids As New List(Of String)
 
             d1 = Date.Now
 
-            etol = CDbl(PP.Parameters("PP_PTFELT"))
-            maxit_e = CInt(PP.Parameters("PP_PTFMEI"))
-            itol = CDbl(PP.Parameters("PP_PTFILT"))
-            maxit_i = CInt(PP.Parameters("PP_PTFMII"))
+            Me.etol = PP.Parameters("PP_PTFELT")
+            Me.maxit_e = CInt(PP.Parameters("PP_PTFMEI"))
+            Me.itol = PP.Parameters("PP_PTFILT")
+            Me.maxit_i = CInt(PP.Parameters("PP_PTFMII"))
 
             n = UBound(Vz)
 
@@ -998,17 +998,17 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
             Loop Until i = n + 1
 
             i = 0
-            soma_x = 0.0#
-            soma_s = 0.0#
+            sum_x = 0.0#
+            sum_s = 0.0#
             Do
-                soma_x = soma_x + Vx(i)
-                soma_s = soma_s + Vs(i)
+                sum_x = sum_x + Vx(i)
+                sum_s = sum_s + Vs(i)
                 i = i + 1
             Loop Until i = n + 1
             i = 0
             Do
-                Vx(i) = Vx(i) / soma_x
-                Vs(i) = Vs(i) / soma_s
+                Vx(i) = Vx(i) / sum_x
+                Vs(i) = Vs(i) / sum_s
                 i = i + 1
             Loop Until i = n + 1
 

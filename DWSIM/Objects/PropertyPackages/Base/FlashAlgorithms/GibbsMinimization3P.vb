@@ -48,8 +48,8 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
         Dim DSv, DSl, DSl1, DSl2, Sv0, Svid, Slid1, Slid2, Sm, Sv, Sl1, Sl2 As Double
         Dim DGv, DGl, DGl1, DGl2, Gv0, Gvid, Glid1, Glid2, Gm, Gv, Gl1, Gl2 As Double
         Dim MMv, MMl1, MMl2 As Double
-        Dim Pb, Pd, Pmin, Pmax, Px, soma_x1, soma_x2, soma_y, soma_x, Tmin, Tmax As Double
-        Dim proppack As PropertyPackages.PropertyPackage
+        Dim Pb, Pd, Pmin, Pmax, Px, sum_x1, sum_x2, sum_y, sum_x, Tmin, Tmax As Double
+        Dim proppack As PropertyPackage
         Dim objval, objval0 As Double
 
         Dim Vx1_ant(n), Vx2_ant(n), Ki2(n), Ki2_ant(n) As Double
@@ -83,10 +83,10 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
             d1 = Date.Now
 
-            etol = CDbl(PP.Parameters("PP_PTFELT"))
-            maxit_e = CInt(PP.Parameters("PP_PTFMEI"))
-            itol = CDbl(PP.Parameters("PP_PTFILT"))
-            maxit_i = CInt(PP.Parameters("PP_PTFMII"))
+            Me.etol = PP.Parameters("PP_PTFELT")
+            Me.maxit_e = CInt(PP.Parameters("PP_PTFMEI"))
+            Me.itol = PP.Parameters("PP_PTFILT")
+            Me.maxit_i = CInt(PP.Parameters("PP_PTFMII"))
 
             n = UBound(Vz)
 
@@ -121,7 +121,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
             'Estimate V
 
-            If T > DTL.MathEx.Common.Max(proppack.RET_VTC, Vz) Then
+            If T > Common.Max(proppack.RET_VTC, Vz) Then
                 Vy = Vz
                 V = 1
                 L = 0
@@ -215,17 +215,17 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
             Loop Until i = n + 1
 
             i = 0
-            soma_x1 = 0
-            soma_y = 0
+            sum_x1 = 0
+            sum_y = 0
             Do
-                soma_x1 = soma_x1 + Vx1(i)
-                soma_y = soma_y + Vy(i)
+                sum_x1 = sum_x1 + Vx1(i)
+                sum_y = sum_y + Vy(i)
                 i = i + 1
             Loop Until i = n + 1
             i = 0
             Do
-                Vx1(i) = Vx1(i) / soma_x1
-                Vy(i) = Vy(i) / soma_y
+                Vx1(i) = Vx1(i) / sum_x1
+                Vy(i) = Vy(i) / sum_y
                 i = i + 1
             Loop Until i = n + 1
 
@@ -512,7 +512,7 @@ out:        Return result
 
         End Function
 
-        Public Overrides Function Flash_PH(ByVal Vz As Double(), ByVal P As Double, ByVal H As Double, ByVal Tref As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
+        Public Overrides Function Flash_PH(ByVal Vz As Double(), ByVal P As Double, ByVal H As Double, ByVal Tref As Double, ByVal PP As PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
 
             Dim doparallel As Boolean = My.MyApplication._EnableParallelProcessing
 
@@ -537,10 +537,10 @@ out:        Return result
             Vn = PP.RET_VNAMES()
             fi = Vz.Clone
 
-            Dim maxitINT As Integer = CInt(PP.Parameters("PP_PHFMII"))
-            Dim maxitEXT As Integer = CInt(PP.Parameters("PP_PHFMEI"))
-            Dim tolINT As Double = CDbl(PP.Parameters("PP_PHFILT"))
-            Dim tolEXT As Double = CDbl(PP.Parameters("PP_PHFELT"))
+            Dim maxitINT As Integer = PP.Parameters("PP_PHFMII")
+            Dim maxitEXT As Integer = PP.Parameters("PP_PHFMEI")
+            Dim tolINT As Double = PP.Parameters("PP_PHFILT")
+            Dim tolEXT As Double = PP.Parameters("PP_PHFELT")
 
             Dim Tmin, Tmax As Double
 
@@ -688,7 +688,7 @@ out:        Return result
 
         End Function
 
-        Public Overrides Function Flash_PS(ByVal Vz As Double(), ByVal P As Double, ByVal S As Double, ByVal Tref As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
+        Public Overrides Function Flash_PS(ByVal Vz As Double(), ByVal P As Double, ByVal S As Double, ByVal Tref As Double, ByVal PP As PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
 
             Dim doparallel As Boolean = My.MyApplication._EnableParallelProcessing
 
@@ -713,10 +713,10 @@ out:        Return result
             Vn = PP.RET_VNAMES()
             fi = Vz.Clone
 
-            Dim maxitINT As Integer = CInt(PP.Parameters("PP_PSFMII"))
-            Dim maxitEXT As Integer = CInt(PP.Parameters("PP_PSFMEI"))
-            Dim tolINT As Double = CDbl(PP.Parameters("PP_PSFILT"))
-            Dim tolEXT As Double = CDbl(PP.Parameters("PP_PSFELT"))
+            Dim maxitINT As Integer = PP.Parameters("PP_PSFMII")
+            Dim maxitEXT As Integer = PP.Parameters("PP_PSFMEI")
+            Dim tolINT As Double = PP.Parameters("PP_PSFILT")
+            Dim tolEXT As Double = PP.Parameters("PP_PSFELT")
 
             Dim Tmin, Tmax As Double
 
@@ -861,7 +861,7 @@ out:        Return result
 
         End Function
 
-        Function OBJ_FUNC_PH_FLASH(ByVal Type As String, ByVal X As Double, ByVal P As Double, ByVal Vz() As Double, ByVal PP As PropertyPackages.PropertyPackage) As Object
+        Function OBJ_FUNC_PH_FLASH(ByVal Type As String, ByVal X As Double, ByVal P As Double, ByVal Vz() As Double, ByVal PP As PropertyPackage) As Object
 
             Dim n = UBound(Vz)
             Dim L1, L2, V, Vx1(), Vx2(), Vy() As Double
@@ -932,7 +932,7 @@ out:        Return result
 
         End Function
 
-        Function OBJ_FUNC_PS_FLASH(ByVal Type As String, ByVal X As Double, ByVal P As Double, ByVal Vz() As Double, ByVal PP As PropertyPackages.PropertyPackage) As Object
+        Function OBJ_FUNC_PS_FLASH(ByVal Type As String, ByVal X As Double, ByVal P As Double, ByVal Vz() As Double, ByVal PP As PropertyPackage) As Object
 
             Dim n = UBound(Vz)
             Dim L1, L2, V, Vx1(), Vx2(), Vy() As Double
@@ -1005,8 +1005,8 @@ out:        Return result
 
         Function ESTIMAR_T_H(ByVal HT As Double, ByVal Tref As Double, ByVal TIPO As String, ByVal P As Double, ByVal Vz As Array) As Double
 
-            Dim maxit As Integer = CInt(proppack.Parameters("PP_PHFMII"))
-            Dim tol As Double = CDbl(proppack.Parameters("PP_PHFILT"))
+            Dim maxit As Integer = Me.proppack.Parameters("PP_PHFMII")
+            Dim tol As Double = Me.proppack.Parameters("PP_PHFILT")
 
             Dim cnt As Integer = 0
             Dim Tant, Tant2, fi_, fip_, dfdT, fi_ant, fi_ant2 As Double
@@ -1035,8 +1035,8 @@ out:        Return result
                     Tf = Tant * 1.01
                 End If
                 cnt += 1
-                If cnt >= maxit Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt2"))
-            Loop Until Math.Abs(fi_ / HT) < tol Or Double.IsNaN(Tf) Or Abs(Tf - Tant) < tol
+                If cnt >= maxit Then Throw New Exception(App.GetLocalString("PropPack_FlashMaxIt2"))
+            Loop Until Abs(fi_ / HT) < tol Or Double.IsNaN(Tf) Or Abs(Tf - Tant) < tol
 
             Return Tf
 
@@ -1044,8 +1044,8 @@ out:        Return result
 
         Function ESTIMAR_T_S(ByVal ST As Double, ByVal Tref As Double, ByVal TIPO As String, ByVal P As Double, ByVal Vz As Array) As Double
 
-            Dim maxit As Integer = CInt(proppack.Parameters("PP_PSFMII"))
-            Dim tol As Double = CDbl(proppack.Parameters("PP_PSFILT"))
+            Dim maxit As Integer = Me.proppack.Parameters("PP_PSFMII")
+            Dim tol As Double = Me.proppack.Parameters("PP_PSFILT")
 
             Dim cnt As Integer = 0
             Dim Tant, Tant2, fi_, fip_, dfdT, fi_ant, fi_ant2 As Double
@@ -1074,22 +1074,22 @@ out:        Return result
                     Tf = Tant * 1.01
                 End If
                 cnt += 1
-                If cnt >= maxit Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt2"))
-            Loop Until Math.Abs(fi_ / ST) < tol Or Double.IsNaN(Tf) Or Abs(Tf - Tant) < tol
+                If cnt >= maxit Then Throw New Exception(App.GetLocalString("PropPack_FlashMaxIt2"))
+            Loop Until Abs(fi_ / ST) < tol Or Double.IsNaN(Tf) Or Abs(Tf - Tant) < tol
 
             Return Tf
 
         End Function
 
-        Function Herror(ByVal type As String, ByVal X As Double, ByVal P As Double, ByVal Vz() As Double, ByVal PP As PropertyPackages.PropertyPackage) As Object
+        Function Herror(ByVal type As String, ByVal X As Double, ByVal P As Double, ByVal Vz() As Double, ByVal PP As PropertyPackage) As Object
             Return OBJ_FUNC_PH_FLASH(type, X, P, Vz, PP)
         End Function
 
-        Function Serror(ByVal type As String, ByVal X As Double, ByVal P As Double, ByVal Vz() As Double, ByVal PP As PropertyPackages.PropertyPackage) As Object
+        Function Serror(ByVal type As String, ByVal X As Double, ByVal P As Double, ByVal Vz() As Double, ByVal PP As PropertyPackage) As Object
             Return OBJ_FUNC_PS_FLASH(type, X, P, Vz, PP)
         End Function
 
-        Public Overrides Function Flash_TV(ByVal Vz As Double(), ByVal T As Double, ByVal V As Double, ByVal Pref As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
+        Public Overrides Function Flash_TV(ByVal Vz As Double(), ByVal T As Double, ByVal V As Double, ByVal Pref As Double, ByVal PP As PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
 
             Dim i, j, k As Integer
 
@@ -1210,7 +1210,7 @@ out:        Return result
 
         End Function
 
-        Public Overrides Function Flash_PV(ByVal Vz As Double(), ByVal P As Double, ByVal V As Double, ByVal Tref As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
+        Public Overrides Function Flash_PV(ByVal Vz As Double(), ByVal P As Double, ByVal V As Double, ByVal Tref As Double, ByVal PP As PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
 
             Dim i, j, k As Integer
 
@@ -1335,10 +1335,10 @@ out:        Return result
 
             Dim i As Integer
 
-            etol = CDbl(PP.Parameters("PP_PTFELT"))
-            maxit_e = CInt(PP.Parameters("PP_PTFMEI"))
-            itol = CDbl(PP.Parameters("PP_PTFILT"))
-            maxit_i = CInt(PP.Parameters("PP_PTFMII"))
+            Me.etol = PP.Parameters("PP_PTFELT")
+            Me.maxit_e = CInt(PP.Parameters("PP_PTFMEI"))
+            Me.itol = PP.Parameters("PP_PTFILT")
+            Me.maxit_i = CInt(PP.Parameters("PP_PTFMII"))
 
             n = UBound(Vz)
 
@@ -1387,20 +1387,20 @@ out:        Return result
             Loop Until i = n + 1
 
             i = 0
-            soma_x1 = 0
-            soma_x2 = 0
-            soma_y = 0
+            sum_x1 = 0
+            sum_x2 = 0
+            sum_y = 0
             Do
-                soma_x1 = soma_x1 + Vx1(i)
-                soma_x2 = soma_x2 + Vx2(i)
-                soma_y = soma_y + Vy(i)
+                sum_x1 = sum_x1 + Vx1(i)
+                sum_x2 = sum_x2 + Vx2(i)
+                sum_y = sum_y + Vy(i)
                 i = i + 1
             Loop Until i = n + 1
             i = 0
             Do
-                Vx1(i) = Vx1(i) / soma_x1
-                Vx2(i) = Vx2(i) / soma_x2
-                Vy(i) = Vy(i) / soma_y
+                Vx1(i) = Vx1(i) / sum_x1
+                Vx2(i) = Vx2(i) / sum_x2
+                Vy(i) = Vy(i) / sum_y
                 i = i + 1
             Loop Until i = n + 1
 
@@ -1426,21 +1426,21 @@ out:        Return result
             Loop Until i = n + 1
 
             i = 0
-            soma_x1 = 0
-            soma_x2 = 0
-            soma_y = 0
+            sum_x1 = 0
+            sum_x2 = 0
+            sum_y = 0
             Do
-                soma_x1 = soma_x1 + Vx1(i)
-                soma_x2 = soma_x2 + Vx2(i)
-                soma_y = soma_y + Vy(i)
+                sum_x1 = sum_x1 + Vx1(i)
+                sum_x2 = sum_x2 + Vx2(i)
+                sum_y = sum_y + Vy(i)
                 i = i + 1
             Loop Until i = n + 1
 
             i = 0
             Do
-                Vx1(i) = Vx1(i) / soma_x1
-                Vx2(i) = Vx2(i) / soma_x2
-                Vy(i) = Vy(i) / soma_y
+                Vx1(i) = Vx1(i) / sum_x1
+                Vx2(i) = Vx2(i) / sum_x2
+                Vy(i) = Vy(i) / sum_y
                 i = i + 1
             Loop Until i = n + 1
 
@@ -1483,21 +1483,21 @@ out:        Return result
                 Loop Until i = n + 1
 
                 i = 0
-                soma_x1 = 0
-                soma_x2 = 0
-                soma_y = 0
+                sum_x1 = 0
+                sum_x2 = 0
+                sum_y = 0
                 Do
-                    soma_x1 = soma_x1 + Vx1(i)
-                    soma_x2 = soma_x2 + Vx2(i)
-                    soma_y = soma_y + Vy(i)
+                    sum_x1 = sum_x1 + Vx1(i)
+                    sum_x2 = sum_x2 + Vx2(i)
+                    sum_y = sum_y + Vy(i)
                     i = i + 1
                 Loop Until i = n + 1
 
                 i = 0
                 Do
-                    Vx1(i) = Vx1(i) / soma_x1
-                    Vx2(i) = Vx2(i) / soma_x2
-                    Vy(i) = Vy(i) / soma_y
+                    Vx1(i) = Vx1(i) / sum_x1
+                    Vx2(i) = Vx2(i) / sum_x2
+                    Vy(i) = Vy(i) / sum_y
                     i = i + 1
                 Loop Until i = n + 1
 
@@ -1515,13 +1515,13 @@ out:        Return result
 
                 e3 = (T - Tant) + (L1 - L1ant) + (L2 - L2ant)
 
-                If (Math.Abs(e1) + Math.Abs(e4) + Math.Abs(e3) + Math.Abs(e2) + Math.Abs(L1ant - L1) + Math.Abs(L2ant - L2)) < etol Then
+                If (Abs(e1) + Abs(e4) + Abs(e3) + Abs(e2) + Abs(L1ant - L1) + Abs(L2ant - L2)) < etol Then
 
                     Exit Do
 
-                ElseIf Double.IsNaN(Math.Abs(e1) + Math.Abs(e4) + Math.Abs(e2)) Then
+                ElseIf Double.IsNaN(Abs(e1) + Abs(e4) + Abs(e2)) Then
 
-                    Throw New Exception(DTL.App.GetLocalString("PropPack_FlashTPVapFracError"))
+                    Throw New Exception(App.GetLocalString("PropPack_FlashTPVapFracError"))
 
                 Else
 
@@ -1596,7 +1596,7 @@ out:        Return result
 
                 End If
 
-                If ecount > maxit_e Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt"))
+                If ecount > maxit_e Then Throw New Exception(App.GetLocalString("PropPack_FlashMaxIt"))
 
                 ecount += 1
 
@@ -1612,10 +1612,10 @@ out:        Return New Object() {L1, V, Vx1, Vy, T, ecount, Ki1, L2, Vx2, 0.0#, 
 
             Dim i As Integer
 
-            etol = CDbl(PP.Parameters("PP_PTFELT"))
-            maxit_e = CInt(PP.Parameters("PP_PTFMEI"))
-            itol = CDbl(PP.Parameters("PP_PTFILT"))
-            maxit_i = CInt(PP.Parameters("PP_PTFMII"))
+            Me.etol = PP.Parameters("PP_PTFELT")
+            Me.maxit_e = CInt(PP.Parameters("PP_PTFMEI"))
+            Me.itol = PP.Parameters("PP_PTFILT")
+            Me.maxit_i = CInt(PP.Parameters("PP_PTFMII"))
 
             n = UBound(Vz)
 
@@ -1664,20 +1664,20 @@ out:        Return New Object() {L1, V, Vx1, Vy, T, ecount, Ki1, L2, Vx2, 0.0#, 
             Loop Until i = n + 1
 
             i = 0
-            soma_x1 = 0
-            soma_x2 = 0
-            soma_y = 0
+            sum_x1 = 0
+            sum_x2 = 0
+            sum_y = 0
             Do
-                soma_x1 = soma_x1 + Vx1(i)
-                soma_x2 = soma_x2 + Vx2(i)
-                soma_y = soma_y + Vy(i)
+                sum_x1 = sum_x1 + Vx1(i)
+                sum_x2 = sum_x2 + Vx2(i)
+                sum_y = sum_y + Vy(i)
                 i = i + 1
             Loop Until i = n + 1
             i = 0
             Do
-                Vx1(i) = Vx1(i) / soma_x1
-                Vx2(i) = Vx2(i) / soma_x2
-                Vy(i) = Vy(i) / soma_y
+                Vx1(i) = Vx1(i) / sum_x1
+                Vx2(i) = Vx2(i) / sum_x2
+                Vy(i) = Vy(i) / sum_y
                 i = i + 1
             Loop Until i = n + 1
 
@@ -1703,21 +1703,21 @@ out:        Return New Object() {L1, V, Vx1, Vy, T, ecount, Ki1, L2, Vx2, 0.0#, 
             Loop Until i = n + 1
 
             i = 0
-            soma_x1 = 0
-            soma_x2 = 0
-            soma_y = 0
+            sum_x1 = 0
+            sum_x2 = 0
+            sum_y = 0
             Do
-                soma_x1 = soma_x1 + Vx1(i)
-                soma_x2 = soma_x2 + Vx2(i)
-                soma_y = soma_y + Vy(i)
+                sum_x1 = sum_x1 + Vx1(i)
+                sum_x2 = sum_x2 + Vx2(i)
+                sum_y = sum_y + Vy(i)
                 i = i + 1
             Loop Until i = n + 1
 
             i = 0
             Do
-                Vx1(i) = Vx1(i) / soma_x1
-                Vx2(i) = Vx2(i) / soma_x2
-                Vy(i) = Vy(i) / soma_y
+                Vx1(i) = Vx1(i) / sum_x1
+                Vx2(i) = Vx2(i) / sum_x2
+                Vy(i) = Vy(i) / sum_y
                 i = i + 1
             Loop Until i = n + 1
 
@@ -1760,21 +1760,21 @@ out:        Return New Object() {L1, V, Vx1, Vy, T, ecount, Ki1, L2, Vx2, 0.0#, 
                 Loop Until i = n + 1
 
                 i = 0
-                soma_x1 = 0
-                soma_x2 = 0
-                soma_y = 0
+                sum_x1 = 0
+                sum_x2 = 0
+                sum_y = 0
                 Do
-                    soma_x1 = soma_x1 + Vx1(i)
-                    soma_x2 = soma_x2 + Vx2(i)
-                    soma_y = soma_y + Vy(i)
+                    sum_x1 = sum_x1 + Vx1(i)
+                    sum_x2 = sum_x2 + Vx2(i)
+                    sum_y = sum_y + Vy(i)
                     i = i + 1
                 Loop Until i = n + 1
 
                 i = 0
                 Do
-                    Vx1(i) = Vx1(i) / soma_x1
-                    Vx2(i) = Vx2(i) / soma_x2
-                    Vy(i) = Vy(i) / soma_y
+                    Vx1(i) = Vx1(i) / sum_x1
+                    Vx2(i) = Vx2(i) / sum_x2
+                    Vy(i) = Vy(i) / sum_y
                     i = i + 1
                 Loop Until i = n + 1
 
@@ -1791,13 +1791,13 @@ out:        Return New Object() {L1, V, Vx1, Vy, T, ecount, Ki1, L2, Vx2, 0.0#, 
                 Loop Until i = n + 1
                 e3 = (T - Tant) + (L1 - L1ant) + (L2 - L2ant)
 
-                If (Math.Abs(e1) + Math.Abs(e4) + Math.Abs(e3) + Math.Abs(e2) + Math.Abs(L1ant - L1) + Math.Abs(L2ant - L2)) < etol Then
+                If (Abs(e1) + Abs(e4) + Abs(e3) + Abs(e2) + Abs(L1ant - L1) + Abs(L2ant - L2)) < etol Then
 
                     Exit Do
 
-                ElseIf Double.IsNaN(Math.Abs(e1) + Math.Abs(e4) + Math.Abs(e2)) Then
+                ElseIf Double.IsNaN(Abs(e1) + Abs(e4) + Abs(e2)) Then
 
-                    Throw New Exception(DTL.App.GetLocalString("PropPack_FlashTPVapFracError"))
+                    Throw New Exception(App.GetLocalString("PropPack_FlashTPVapFracError"))
 
                 Else
 
@@ -1871,7 +1871,7 @@ out:        Return New Object() {L1, V, Vx1, Vy, T, ecount, Ki1, L2, Vx2, 0.0#, 
 
                 End If
 
-                If ecount > maxit_e Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt"))
+                If ecount > maxit_e Then Throw New Exception(App.GetLocalString("PropPack_FlashMaxIt"))
 
                 ecount += 1
 
@@ -1898,9 +1898,9 @@ out:        Return New Object() {L1, V, Vx1, Vy, P, ecount, Ki1, L2, Vx2, 0.0#, 
 
                     If Not ThreePhase Then
 
-                        soma_y = MathEx.Common.Sum(x)
-                        V = soma_y
-                        L = 1 - soma_y
+                        sum_y = MathEx.Common.Sum(x)
+                        V = sum_y
+                        L = 1 - sum_y
 
                         For i = 0 To x.Length - 1
                             If V <> 0.0# Then Vy(i) = Abs(x(i) / V) Else Vy(i) = 0.0#
@@ -1937,17 +1937,17 @@ out:        Return New Object() {L1, V, Vx1, Vy, P, ecount, Ki1, L2, Vx2, 0.0#, 
 
                     Else
 
-                        soma_y = 0
+                        sum_y = 0
                         For i = 0 To x.Length - n - 2
-                            soma_y += x(i)
+                            sum_y += x(i)
                         Next
-                        soma_x2 = 0
+                        sum_x2 = 0
                         For i = x.Length - n - 1 To x.Length - 1
-                            soma_x2 += x(i)
+                            sum_x2 += x(i)
                         Next
-                        V = soma_y
-                        L = F - soma_y
-                        L2 = soma_x2
+                        V = sum_y
+                        L = F - sum_y
+                        L2 = sum_x2
                         L1 = F - V - L2
 
                         pval = 0.0#
@@ -1960,12 +1960,12 @@ out:        Return New Object() {L1, V, Vx1, Vy, P, ecount, Ki1, L2, Vx2, 0.0#, 
                             If Vx2(i) < 0.0# Then Vx2(i) = 1.0E-20
                         Next
 
-                        soma_x1 = 0
+                        sum_x1 = 0
                         For i = 0 To n
-                            soma_x1 += Vx1(i)
+                            sum_x1 += Vx1(i)
                         Next
                         For i = 0 To n
-                            If soma_x1 <> 0.0# Then Vx1(i) /= soma_x1
+                            If sum_x1 <> 0.0# Then Vx1(i) /= sum_x1
                         Next
 
                         If My.MyApplication._EnableParallelProcessing Then
@@ -2047,12 +2047,12 @@ out:        Return New Object() {L1, V, Vx1, Vy, P, ecount, Ki1, L2, Vx2, 0.0#, 
                         If Vx2(i) <= 0 Then Vx2(i) = 1.0E-20
                     Next
 
-                    soma_x2 = 0
+                    sum_x2 = 0
                     For i = 0 To n
-                        soma_x2 += Vx2(i)
+                        sum_x2 += Vx2(i)
                     Next
                     For i = 0 To n
-                        Vx2(i) /= soma_x2
+                        Vx2(i) /= sum_x2
                     Next
 
                     If My.MyApplication._EnableParallelProcessing Then
@@ -2111,9 +2111,9 @@ out:        Return New Object() {L1, V, Vx1, Vy, P, ecount, Ki1, L2, Vx2, 0.0#, 
 
                     If Not ThreePhase Then
 
-                        soma_y = MathEx.Common.Sum(x)
-                        V = soma_y
-                        L = 1 - soma_y
+                        sum_y = MathEx.Common.Sum(x)
+                        V = sum_y
+                        L = 1 - sum_y
 
                         For i = 0 To x.Length - 1
                             Vy(i) = Abs(x(i) / V)
@@ -2143,17 +2143,17 @@ out:        Return New Object() {L1, V, Vx1, Vy, P, ecount, Ki1, L2, Vx2, 0.0#, 
 
                     Else
 
-                        soma_y = 0
+                        sum_y = 0
                         For i = 0 To x.Length - n - 2
-                            soma_y += x(i)
+                            sum_y += x(i)
                         Next
-                        soma_x2 = 0
+                        sum_x2 = 0
                         For i = x.Length - n - 1 To x.Length - 1
-                            soma_x2 += x(i)
+                            sum_x2 += x(i)
                         Next
-                        V = soma_y
-                        L = F - soma_y
-                        L2 = soma_x2
+                        V = sum_y
+                        L = F - sum_y
+                        L2 = sum_x2
                         L1 = F - V - L2
 
                         For i = 0 To n
@@ -2165,12 +2165,12 @@ out:        Return New Object() {L1, V, Vx1, Vy, P, ecount, Ki1, L2, Vx2, 0.0#, 
                             If Vx2(i) < 0.0# Then Vx2(i) = 1.0E-20
                         Next
 
-                        soma_x1 = 0
+                        sum_x1 = 0
                         For i = 0 To n
-                            soma_x1 += Vx1(i)
+                            sum_x1 += Vx1(i)
                         Next
                         For i = 0 To n
-                            Vx1(i) /= soma_x1
+                            Vx1(i) /= sum_x1
                         Next
 
                         If My.MyApplication._EnableParallelProcessing Then
@@ -2244,12 +2244,12 @@ out:        Return New Object() {L1, V, Vx1, Vy, P, ecount, Ki1, L2, Vx2, 0.0#, 
                         If Vx2(i) <= 0 Then Vx2(i) = 1.0E-20
                     Next
 
-                    soma_x2 = 0
+                    sum_x2 = 0
                     For i = 0 To n
-                        soma_x2 += Vx2(i)
+                        sum_x2 += Vx2(i)
                     Next
                     For i = 0 To n
-                        Vx2(i) /= soma_x2
+                        Vx2(i) /= sum_x2
                     Next
 
                     If My.MyApplication._EnableParallelProcessing Then
