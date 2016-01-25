@@ -28,7 +28,7 @@ Namespace DTL.MathEx.BrentOpt
         End Sub
 
         Sub DefineFuncDelegate(ByVal fg As funcdelegate)
-            Me.fc = fg
+            fc = fg
         End Sub
 
         Function func(ByVal x As Double, ByVal otherargs As Object) As Double
@@ -130,7 +130,6 @@ Final3:
             Return bbb
 
         End Function
-
 
     End Class
 
