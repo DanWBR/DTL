@@ -16,7 +16,7 @@
 '    You should have received a copy of the GNU General Public License
 '    along with DTL.  If not, see <http://www.gnu.org/licenses/>.
 
-Imports DTL.DTL.ClassesBasicasTermodinamica
+Imports DTL.DTL.BaseThermoClasses
 Imports CapeOpen = CAPEOPEN110
 Imports DTL.DTL.SimulationObjects.PropertyPackages
 Imports System.Runtime.InteropServices
@@ -41,7 +41,7 @@ Namespace DTL.SimulationObjects.Streams
         Private _ppid As String = ""
 
         Protected m_compositionbasis As CompBasis = CompBasis.Molar_Fractions
-        Protected m_Phases As New Dictionary(Of String, DTL.ClassesBasicasTermodinamica.Fase)
+        Protected m_Phases As New Dictionary(Of String, DTL.BaseThermoClasses.Fase)
 
         Private _inequilibrium As Boolean = False
 
@@ -109,18 +109,18 @@ Namespace DTL.SimulationObjects.Streams
             Me.m_ComponentName = nome
             Me.m_ComponentDescription = descricao
 
-            Me.Fases.Add("0", New DTL.ClassesBasicasTermodinamica.Fase(DTL.App.GetLocalString("Mistura"), ""))
-            Me.Fases.Add("1", New DTL.ClassesBasicasTermodinamica.Fase(DTL.App.GetLocalString("OverallLiquid"), ""))
-            Me.Fases.Add("2", New DTL.ClassesBasicasTermodinamica.Fase(DTL.App.GetLocalString("Vapor"), ""))
-            Me.Fases.Add("3", New DTL.ClassesBasicasTermodinamica.Fase(DTL.App.GetLocalString("Liquid1"), ""))
-            Me.Fases.Add("4", New DTL.ClassesBasicasTermodinamica.Fase(DTL.App.GetLocalString("Liquid2"), ""))
-            Me.Fases.Add("5", New DTL.ClassesBasicasTermodinamica.Fase(DTL.App.GetLocalString("Liquid3"), ""))
-            Me.Fases.Add("6", New DTL.ClassesBasicasTermodinamica.Fase(DTL.App.GetLocalString("Aqueous"), ""))
-            Me.Fases.Add("7", New DTL.ClassesBasicasTermodinamica.Fase(DTL.App.GetLocalString("Solid"), ""))
+            Me.Phases.Add("0", New DTL.BaseThermoClasses.Fase(DTL.App.GetLocalString("Mistura"), ""))
+            Me.Phases.Add("1", New DTL.BaseThermoClasses.Fase(DTL.App.GetLocalString("OverallLiquid"), ""))
+            Me.Phases.Add("2", New DTL.BaseThermoClasses.Fase(DTL.App.GetLocalString("Vapor"), ""))
+            Me.Phases.Add("3", New DTL.BaseThermoClasses.Fase(DTL.App.GetLocalString("Liquid1"), ""))
+            Me.Phases.Add("4", New DTL.BaseThermoClasses.Fase(DTL.App.GetLocalString("Liquid2"), ""))
+            Me.Phases.Add("5", New DTL.BaseThermoClasses.Fase(DTL.App.GetLocalString("Liquid3"), ""))
+            Me.Phases.Add("6", New DTL.BaseThermoClasses.Fase(DTL.App.GetLocalString("Aqueous"), ""))
+            Me.Phases.Add("7", New DTL.BaseThermoClasses.Fase(DTL.App.GetLocalString("Solid"), ""))
 
         End Sub
 
-        Public ReadOnly Property Fases() As Dictionary(Of String, DTL.ClassesBasicasTermodinamica.Fase)
+        Public ReadOnly Property Phases() As Dictionary(Of String, DTL.BaseThermoClasses.Fase)
             Get
                 Return m_Phases
             End Get
@@ -136,26 +136,26 @@ Namespace DTL.SimulationObjects.Streams
 
             For i = 0 To 7
 
-                If ASource.Fases.ContainsKey(i) Then
+                If ASource.Phases.ContainsKey(i) Then
 
-                    Fases(i).SPMProperties.temperature = ASource.Fases(i).SPMProperties.temperature
-                    Fases(i).SPMProperties.pressure = ASource.Fases(i).SPMProperties.pressure
-                    Fases(i).SPMProperties.enthalpy = ASource.Fases(i).SPMProperties.enthalpy
+                    Phases(i).SPMProperties.temperature = ASource.Phases(i).SPMProperties.temperature
+                    Phases(i).SPMProperties.pressure = ASource.Phases(i).SPMProperties.pressure
+                    Phases(i).SPMProperties.enthalpy = ASource.Phases(i).SPMProperties.enthalpy
 
                     'Copy component properties.
-                    Dim comp As DTL.ClassesBasicasTermodinamica.Substancia
+                    Dim comp As DTL.BaseThermoClasses.Substance
 
-                    For Each comp In Fases(i).Componentes.Values
-                        comp.FracaoMolar = ASource.Fases(i).Componentes(comp.Nome).FracaoMolar
-                        comp.FracaoMassica = ASource.Fases(i).Componentes(comp.Nome).FracaoMassica
+                    For Each comp In Phases(i).Components.Values
+                        comp.FracaoMolar = ASource.Phases(i).Components(comp.Nome).FracaoMolar
+                        comp.FracaoMassica = ASource.Phases(i).Components(comp.Nome).FracaoMassica
                     Next
 
                     'Should be defined after concentrations?!?! [yes, no, maybe... whatever]
-                    Fases(i).SPMProperties.massflow = ASource.Fases(i).SPMProperties.massflow
-                    Fases(i).SPMProperties.molarflow = ASource.Fases(i).SPMProperties.molarflow
+                    Phases(i).SPMProperties.massflow = ASource.Phases(i).SPMProperties.massflow
+                    Phases(i).SPMProperties.molarflow = ASource.Phases(i).SPMProperties.molarflow
 
-                    Fases(i).SPMProperties.massfraction = ASource.Fases(i).SPMProperties.massfraction
-                    Fases(i).SPMProperties.molarfraction = ASource.Fases(i).SPMProperties.molarfraction
+                    Phases(i).SPMProperties.massfraction = ASource.Phases(i).SPMProperties.massfraction
+                    Phases(i).SPMProperties.molarfraction = ASource.Phases(i).SPMProperties.molarfraction
 
                 End If
 
@@ -171,36 +171,36 @@ Namespace DTL.SimulationObjects.Streams
 
             For i = 0 To 7
 
-                If ASource.Fases.ContainsKey(i) Then
+                If ASource.Phases.ContainsKey(i) Then
 
-                    Fases(i).SPMProperties.temperature = ASource.Fases(i).SPMProperties.temperature
-                    Fases(i).SPMProperties.pressure = ASource.Fases(i).SPMProperties.pressure
-                    Fases(i).SPMProperties.density = ASource.Fases(i).SPMProperties.density
-                    Fases(i).SPMProperties.enthalpy = ASource.Fases(i).SPMProperties.enthalpy
-                    Fases(i).SPMProperties.entropy = ASource.Fases(i).SPMProperties.entropy
-                    Fases(i).SPMProperties.molar_enthalpy = ASource.Fases(i).SPMProperties.molar_enthalpy
-                    Fases(i).SPMProperties.molar_entropy = ASource.Fases(i).SPMProperties.molar_entropy
-                    Fases(i).SPMProperties.compressibilityFactor = ASource.Fases(i).SPMProperties.compressibilityFactor
-                    Fases(i).SPMProperties.heatCapacityCp = ASource.Fases(i).SPMProperties.heatCapacityCp
-                    Fases(i).SPMProperties.heatCapacityCv = ASource.Fases(i).SPMProperties.heatCapacityCv
-                    Fases(i).SPMProperties.molecularWeight = ASource.Fases(i).SPMProperties.molecularWeight
-                    Fases(i).SPMProperties.thermalConductivity = ASource.Fases(i).SPMProperties.thermalConductivity
-                    Fases(i).SPMProperties.speedOfSound = ASource.Fases(i).SPMProperties.speedOfSound
-                    Fases(i).SPMProperties.volumetric_flow = ASource.Fases(i).SPMProperties.volumetric_flow
-                    Fases(i).SPMProperties.jouleThomsonCoefficient = ASource.Fases(i).SPMProperties.jouleThomsonCoefficient
-                    Fases(i).SPMProperties.excessEnthalpy = ASource.Fases(i).SPMProperties.excessEnthalpy
-                    Fases(i).SPMProperties.excessEntropy = ASource.Fases(i).SPMProperties.excessEntropy
-                    Fases(i).SPMProperties.compressibility = ASource.Fases(i).SPMProperties.compressibility
-                    Fases(i).SPMProperties.bubbleTemperature = ASource.Fases(i).SPMProperties.bubbleTemperature
-                    Fases(i).SPMProperties.bubblePressure = ASource.Fases(i).SPMProperties.bubblePressure
-                    Fases(i).SPMProperties.dewTemperature = ASource.Fases(i).SPMProperties.dewTemperature
-                    Fases(i).SPMProperties.dewPressure = ASource.Fases(i).SPMProperties.dewPressure
-                    Fases(i).SPMProperties.viscosity = ASource.Fases(i).SPMProperties.viscosity
-                    Fases(i).SPMProperties.kinematic_viscosity = ASource.Fases(i).SPMProperties.kinematic_viscosity
-                    Fases(i).SPMProperties.molarflow = ASource.Fases(i).SPMProperties.molarflow
-                    Fases(i).SPMProperties.massflow = ASource.Fases(i).SPMProperties.massflow
-                    Fases(i).SPMProperties.massfraction = ASource.Fases(i).SPMProperties.massfraction
-                    Fases(i).SPMProperties.molarfraction = ASource.Fases(i).SPMProperties.molarfraction
+                    Phases(i).SPMProperties.temperature = ASource.Phases(i).SPMProperties.temperature
+                    Phases(i).SPMProperties.pressure = ASource.Phases(i).SPMProperties.pressure
+                    Phases(i).SPMProperties.density = ASource.Phases(i).SPMProperties.density
+                    Phases(i).SPMProperties.enthalpy = ASource.Phases(i).SPMProperties.enthalpy
+                    Phases(i).SPMProperties.entropy = ASource.Phases(i).SPMProperties.entropy
+                    Phases(i).SPMProperties.molar_enthalpy = ASource.Phases(i).SPMProperties.molar_enthalpy
+                    Phases(i).SPMProperties.molar_entropy = ASource.Phases(i).SPMProperties.molar_entropy
+                    Phases(i).SPMProperties.compressibilityFactor = ASource.Phases(i).SPMProperties.compressibilityFactor
+                    Phases(i).SPMProperties.heatCapacityCp = ASource.Phases(i).SPMProperties.heatCapacityCp
+                    Phases(i).SPMProperties.heatCapacityCv = ASource.Phases(i).SPMProperties.heatCapacityCv
+                    Phases(i).SPMProperties.molecularWeight = ASource.Phases(i).SPMProperties.molecularWeight
+                    Phases(i).SPMProperties.thermalConductivity = ASource.Phases(i).SPMProperties.thermalConductivity
+                    Phases(i).SPMProperties.speedOfSound = ASource.Phases(i).SPMProperties.speedOfSound
+                    Phases(i).SPMProperties.volumetric_flow = ASource.Phases(i).SPMProperties.volumetric_flow
+                    Phases(i).SPMProperties.jouleThomsonCoefficient = ASource.Phases(i).SPMProperties.jouleThomsonCoefficient
+                    Phases(i).SPMProperties.excessEnthalpy = ASource.Phases(i).SPMProperties.excessEnthalpy
+                    Phases(i).SPMProperties.excessEntropy = ASource.Phases(i).SPMProperties.excessEntropy
+                    Phases(i).SPMProperties.compressibility = ASource.Phases(i).SPMProperties.compressibility
+                    Phases(i).SPMProperties.bubbleTemperature = ASource.Phases(i).SPMProperties.bubbleTemperature
+                    Phases(i).SPMProperties.bubblePressure = ASource.Phases(i).SPMProperties.bubblePressure
+                    Phases(i).SPMProperties.dewTemperature = ASource.Phases(i).SPMProperties.dewTemperature
+                    Phases(i).SPMProperties.dewPressure = ASource.Phases(i).SPMProperties.dewPressure
+                    Phases(i).SPMProperties.viscosity = ASource.Phases(i).SPMProperties.viscosity
+                    Phases(i).SPMProperties.kinematic_viscosity = ASource.Phases(i).SPMProperties.kinematic_viscosity
+                    Phases(i).SPMProperties.molarflow = ASource.Phases(i).SPMProperties.molarflow
+                    Phases(i).SPMProperties.massflow = ASource.Phases(i).SPMProperties.massflow
+                    Phases(i).SPMProperties.massfraction = ASource.Phases(i).SPMProperties.massfraction
+                    Phases(i).SPMProperties.molarfraction = ASource.Phases(i).SPMProperties.molarfraction
 
                 End If
 
@@ -212,25 +212,25 @@ Namespace DTL.SimulationObjects.Streams
 
             Dim i As Integer
 
-            For i = 0 To Fases.Count - 1
+            For i = 0 To Phases.Count - 1
 
-                Fases(i).SPMProperties.temperature = Nothing
-                Fases(i).SPMProperties.pressure = Nothing
-                Fases(i).SPMProperties.enthalpy = Nothing
-                Fases(i).SPMProperties.molarfraction = Nothing
-                Fases(i).SPMProperties.massfraction = Nothing
+                Phases(i).SPMProperties.temperature = Nothing
+                Phases(i).SPMProperties.pressure = Nothing
+                Phases(i).SPMProperties.enthalpy = Nothing
+                Phases(i).SPMProperties.molarfraction = Nothing
+                Phases(i).SPMProperties.massfraction = Nothing
 
                 'Copy component properties.
-                Dim comp As DTL.ClassesBasicasTermodinamica.Substancia
+                Dim comp As DTL.BaseThermoClasses.Substance
 
-                For Each comp In Fases(i).Componentes.Values
+                For Each comp In Phases(i).Components.Values
                     comp.FracaoMolar = Nothing
                     comp.FracaoMassica = Nothing
                 Next
 
                 'Should be define after concentrations?!?!
-                Fases(i).SPMProperties.massflow = Nothing
-                Fases(i).SPMProperties.molarflow = Nothing
+                Phases(i).SPMProperties.massflow = Nothing
+                Phases(i).SPMProperties.molarflow = Nothing
 
             Next
 
@@ -239,7 +239,7 @@ Namespace DTL.SimulationObjects.Streams
         Public Sub SetOverallComposition(ByVal Vx As Array)
 
             Dim i As Integer = 0
-            For Each c As Substancia In Me.Fases(0).Componentes.Values
+            For Each c As Substance In Me.Phases(0).Components.Values
                 c.FracaoMolar = Vx(i)
                 i += 1
             Next
@@ -267,7 +267,7 @@ Namespace DTL.SimulationObjects.Streams
                 Case PropertyPackages.Fase.Vapor
                     idx = 2
             End Select
-            For Each c As Substancia In Me.Fases(idx).Componentes.Values
+            For Each c As Substance In Me.Phases(idx).Components.Values
                 c.FracaoMolar = Vx(i)
                 i += 1
             Next
@@ -299,13 +299,13 @@ Namespace DTL.SimulationObjects.Streams
 
             Dim mol_x_mm As Double
 
-            Dim sub1 As DTL.ClassesBasicasTermodinamica.Substancia
+            Dim sub1 As DTL.BaseThermoClasses.Substance
 
-            For Each sub1 In Fases(idx).Componentes.Values
+            For Each sub1 In Phases(idx).Components.Values
                 mol_x_mm += sub1.FracaoMolar.GetValueOrDefault * sub1.ConstantProperties.Molar_Weight
             Next
 
-            For Each sub1 In Fases(idx).Componentes.Values
+            For Each sub1 In Phases(idx).Components.Values
                 sub1.FracaoMassica = sub1.FracaoMolar.GetValueOrDefault * sub1.ConstantProperties.Molar_Weight / mol_x_mm
             Next
 
@@ -326,466 +326,466 @@ Namespace DTL.SimulationObjects.Streams
 
                 Case 0
                     'PROP_MS_0 Temperature
-                    value = cv.ConverterDoSI(su.spmp_temperature, Me.Fases(0).SPMProperties.temperature.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_temperature, Me.Phases(0).SPMProperties.temperature.GetValueOrDefault)
                 Case 1
                     'PROP_MS_1 Pressure
-                    value = cv.ConverterDoSI(su.spmp_pressure, Me.Fases(0).SPMProperties.pressure.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_pressure, Me.Phases(0).SPMProperties.pressure.GetValueOrDefault)
                 Case 2
                     'PROP_MS_2	Mass Flow
-                    value = cv.ConverterDoSI(su.spmp_massflow, Me.Fases(0).SPMProperties.massflow.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_massflow, Me.Phases(0).SPMProperties.massflow.GetValueOrDefault)
                 Case 3
                     'PROP_MS_3	Molar Flow
-                    value = cv.ConverterDoSI(su.spmp_molarflow, Me.Fases(0).SPMProperties.molarflow.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_molarflow, Me.Phases(0).SPMProperties.molarflow.GetValueOrDefault)
                 Case 4
                     'PROP_MS_4	Volumetric Flow
-                    value = cv.ConverterDoSI(su.spmp_volumetricFlow, Me.Fases(0).SPMProperties.volumetric_flow.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_volumetricFlow, Me.Phases(0).SPMProperties.volumetric_flow.GetValueOrDefault)
                 Case 5
                     'PROP_MS_5	Mixture Density
-                    value = cv.ConverterDoSI(su.spmp_density, Me.Fases(0).SPMProperties.density.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_density, Me.Phases(0).SPMProperties.density.GetValueOrDefault)
                 Case 6
                     'PROP_MS_6	Mixture Molar Weight
-                    value = cv.ConverterDoSI(su.spmp_molecularWeight, Me.Fases(0).SPMProperties.molecularWeight.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_molecularWeight, Me.Phases(0).SPMProperties.molecularWeight.GetValueOrDefault)
                 Case 7
                     'PROP_MS_7	Mixture Specific Enthalpy
-                    value = cv.ConverterDoSI(su.spmp_enthalpy, Me.Fases(0).SPMProperties.enthalpy.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_enthalpy, Me.Phases(0).SPMProperties.enthalpy.GetValueOrDefault)
                 Case 8
                     'PROP_MS_8	Mixture Specific Entropy
-                    value = cv.ConverterDoSI(su.spmp_entropy, Me.Fases(0).SPMProperties.entropy.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_entropy, Me.Phases(0).SPMProperties.entropy.GetValueOrDefault)
                 Case 9
                     'PROP_MS_9	Mixture Molar Enthalpy
-                    value = cv.ConverterDoSI(su.molar_enthalpy, Me.Fases(0).SPMProperties.molar_enthalpy.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.molar_enthalpy, Me.Phases(0).SPMProperties.molar_enthalpy.GetValueOrDefault)
                 Case 10
                     'PROP_MS_10	Mixture Molar Entropy
-                    value = cv.ConverterDoSI(su.molar_entropy, Me.Fases(0).SPMProperties.molar_entropy.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.molar_entropy, Me.Phases(0).SPMProperties.molar_entropy.GetValueOrDefault)
                 Case 11
                     'PROP_MS_11	Mixture Thermal Conductivity
-                    value = cv.ConverterDoSI(su.spmp_thermalConductivity, Me.Fases(0).SPMProperties.thermalConductivity.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_thermalConductivity, Me.Phases(0).SPMProperties.thermalConductivity.GetValueOrDefault)
                 Case 12
                     'PROP_MS_12	Vapor Phase Density
-                    value = cv.ConverterDoSI(su.spmp_density, Me.Fases(2).SPMProperties.density.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_density, Me.Phases(2).SPMProperties.density.GetValueOrDefault)
                 Case 13
                     'PROP_MS_13	Vapor Phase Molar Weight
-                    value = cv.ConverterDoSI(su.spmp_molecularWeight, Me.Fases(2).SPMProperties.molecularWeight.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_molecularWeight, Me.Phases(2).SPMProperties.molecularWeight.GetValueOrDefault)
                 Case 14
                     'PROP_MS_14	Vapor Phase Specific Enthalpy
-                    value = cv.ConverterDoSI(su.spmp_enthalpy, Me.Fases(2).SPMProperties.enthalpy.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_enthalpy, Me.Phases(2).SPMProperties.enthalpy.GetValueOrDefault)
                 Case 15
                     'PROP_MS_15	Vapor Phase Specific Entropy
-                    value = cv.ConverterDoSI(su.spmp_entropy, Me.Fases(2).SPMProperties.entropy.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_entropy, Me.Phases(2).SPMProperties.entropy.GetValueOrDefault)
                 Case 16
                     'PROP_MS_16	Vapor Phase Molar Enthalpy
-                    value = cv.ConverterDoSI(su.molar_enthalpy, Me.Fases(2).SPMProperties.molar_enthalpy.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.molar_enthalpy, Me.Phases(2).SPMProperties.molar_enthalpy.GetValueOrDefault)
                 Case 17
                     'PROP_MS_17	Vapor Phase Molar Entropy
-                    value = cv.ConverterDoSI(su.molar_entropy, Me.Fases(2).SPMProperties.molar_entropy.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.molar_entropy, Me.Phases(2).SPMProperties.molar_entropy.GetValueOrDefault)
                 Case 18
                     'PROP_MS_18	Vapor Phase Thermal Conductivity
-                    value = cv.ConverterDoSI(su.spmp_thermalConductivity, Me.Fases(2).SPMProperties.thermalConductivity.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_thermalConductivity, Me.Phases(2).SPMProperties.thermalConductivity.GetValueOrDefault)
                 Case 19
                     'PROP_MS_19	Vapor Phase Kinematic Viscosity
-                    value = cv.ConverterDoSI(su.spmp_cinematic_viscosity, Me.Fases(2).SPMProperties.kinematic_viscosity.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_cinematic_viscosity, Me.Phases(2).SPMProperties.kinematic_viscosity.GetValueOrDefault)
                 Case 20
                     'PROP_MS_20	Vapor Phase Dynamic Viscosity
-                    value = cv.ConverterDoSI(su.spmp_viscosity, Me.Fases(2).SPMProperties.viscosity.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_viscosity, Me.Phases(2).SPMProperties.viscosity.GetValueOrDefault)
                 Case 21
                     'PROP_MS_21	Vapor Phase Heat Capacity (Cp)
-                    value = cv.ConverterDoSI(su.spmp_heatCapacityCp, Me.Fases(2).SPMProperties.heatCapacityCp.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_heatCapacityCp, Me.Phases(2).SPMProperties.heatCapacityCp.GetValueOrDefault)
                 Case 22
                     'PROP_MS_22	Vapor Phase Heat Capacity Ratio (Cp/Cv)
-                    value = Me.Fases(2).SPMProperties.heatCapacityCp.GetValueOrDefault / Me.Fases(2).SPMProperties.heatCapacityCv.GetValueOrDefault
+                    value = Me.Phases(2).SPMProperties.heatCapacityCp.GetValueOrDefault / Me.Phases(2).SPMProperties.heatCapacityCv.GetValueOrDefault
                 Case 23
                     'PROP_MS_23	Vapor Phase Mass Flow
-                    value = cv.ConverterDoSI(su.spmp_massflow, Me.Fases(2).SPMProperties.massflow.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_massflow, Me.Phases(2).SPMProperties.massflow.GetValueOrDefault)
                 Case 24
                     'PROP_MS_24	Vapor Phase Molar Flow
-                    value = cv.ConverterDoSI(su.spmp_molarflow, Me.Fases(2).SPMProperties.molarflow.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_molarflow, Me.Phases(2).SPMProperties.molarflow.GetValueOrDefault)
                 Case 25
                     'PROP_MS_25	Vapor Phase Volumetric Flow
-                    value = cv.ConverterDoSI(su.spmp_volumetricFlow, Me.Fases(2).SPMProperties.volumetric_flow.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_volumetricFlow, Me.Phases(2).SPMProperties.volumetric_flow.GetValueOrDefault)
                 Case 26
                     'PROP_MS_26	Vapor Phase Compressibility Factor
-                    value = Me.Fases(2).SPMProperties.compressibilityFactor.GetValueOrDefault
+                    value = Me.Phases(2).SPMProperties.compressibilityFactor.GetValueOrDefault
                 Case 27
                     'PROP_MS_27	Vapor Phase Molar Fraction
-                    value = Me.Fases(2).SPMProperties.molarfraction.GetValueOrDefault
+                    value = Me.Phases(2).SPMProperties.molarfraction.GetValueOrDefault
                 Case 28
                     'PROP_MS_28	Vapor Phase Mass Fraction
-                    value = Me.Fases(2).SPMProperties.massfraction.GetValueOrDefault
+                    value = Me.Phases(2).SPMProperties.massfraction.GetValueOrDefault
                 Case 29
                     'PROP_MS_29	Vapor Phase Volumetric Fraction
-                    value = Me.Fases(2).SPMProperties.volumetric_flow.GetValueOrDefault / Me.Fases(0).SPMProperties.volumetric_flow.GetValueOrDefault
+                    value = Me.Phases(2).SPMProperties.volumetric_flow.GetValueOrDefault / Me.Phases(0).SPMProperties.volumetric_flow.GetValueOrDefault
                 Case 30
                     'PROP_MS_30	Liquid Phase (Mixture) Density
-                    value = cv.ConverterDoSI(su.spmp_density, Me.Fases(1).SPMProperties.density.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_density, Me.Phases(1).SPMProperties.density.GetValueOrDefault)
                 Case 31
                     'PROP_MS_31	Liquid Phase (Mixture) Molar Weight
-                    value = cv.ConverterDoSI(su.spmp_molecularWeight, Me.Fases(1).SPMProperties.molecularWeight.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_molecularWeight, Me.Phases(1).SPMProperties.molecularWeight.GetValueOrDefault)
                 Case 32
                     'PROP_MS_32	Liquid Phase (Mixture) Specific Enthalpy
-                    value = cv.ConverterDoSI(su.spmp_enthalpy, Me.Fases(1).SPMProperties.enthalpy.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_enthalpy, Me.Phases(1).SPMProperties.enthalpy.GetValueOrDefault)
                 Case 33
                     'PROP_MS_33	Liquid Phase (Mixture) Specific Entropy
-                    value = cv.ConverterDoSI(su.spmp_entropy, Me.Fases(1).SPMProperties.entropy.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_entropy, Me.Phases(1).SPMProperties.entropy.GetValueOrDefault)
                 Case 34
                     'PROP_MS_34	Liquid Phase (Mixture) Molar Enthalpy
-                    value = cv.ConverterDoSI(su.molar_enthalpy, Me.Fases(1).SPMProperties.molar_enthalpy.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.molar_enthalpy, Me.Phases(1).SPMProperties.molar_enthalpy.GetValueOrDefault)
                 Case 35
                     'PROP_MS_35	Liquid Phase (Mixture) Molar Entropy
-                    value = cv.ConverterDoSI(su.molar_entropy, Me.Fases(1).SPMProperties.molar_entropy.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.molar_entropy, Me.Phases(1).SPMProperties.molar_entropy.GetValueOrDefault)
                 Case 36
                     'PROP_MS_36	Liquid Phase (Mixture) Thermal Conductivity
-                    value = cv.ConverterDoSI(su.spmp_thermalConductivity, Me.Fases(1).SPMProperties.thermalConductivity.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_thermalConductivity, Me.Phases(1).SPMProperties.thermalConductivity.GetValueOrDefault)
                 Case 37
                     'PROP_MS_37	Liquid Phase (Mixture) Kinematic Viscosity
-                    value = cv.ConverterDoSI(su.spmp_cinematic_viscosity, Me.Fases(1).SPMProperties.kinematic_viscosity.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_cinematic_viscosity, Me.Phases(1).SPMProperties.kinematic_viscosity.GetValueOrDefault)
                 Case 38
                     'PROP_MS_38	Liquid Phase (Mixture) Dynamic Viscosity
-                    value = cv.ConverterDoSI(su.spmp_viscosity, Me.Fases(1).SPMProperties.viscosity.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_viscosity, Me.Phases(1).SPMProperties.viscosity.GetValueOrDefault)
                 Case 39
                     'PROP_MS_39	Liquid Phase (Mixture) Heat Capacity (Cp)
-                    value = cv.ConverterDoSI(su.spmp_heatCapacityCp, Me.Fases(1).SPMProperties.heatCapacityCp.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_heatCapacityCp, Me.Phases(1).SPMProperties.heatCapacityCp.GetValueOrDefault)
                 Case 40
                     'PROP_MS_40	Liquid Phase (Mixture) Heat Capacity Ratio (Cp/Cv)
-                    value = Me.Fases(1).SPMProperties.heatCapacityCp.GetValueOrDefault / Me.Fases(1).SPMProperties.heatCapacityCv.GetValueOrDefault
+                    value = Me.Phases(1).SPMProperties.heatCapacityCp.GetValueOrDefault / Me.Phases(1).SPMProperties.heatCapacityCv.GetValueOrDefault
                 Case 41
                     'PROP_MS_41	Liquid Phase (Mixture) Mass Flow
-                    value = cv.ConverterDoSI(su.spmp_massflow, Me.Fases(1).SPMProperties.massflow.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_massflow, Me.Phases(1).SPMProperties.massflow.GetValueOrDefault)
                 Case 42
                     'PROP_MS_42	Liquid Phase (Mixture) Molar Flow
-                    value = cv.ConverterDoSI(su.spmp_molarflow, Me.Fases(1).SPMProperties.molarflow.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_molarflow, Me.Phases(1).SPMProperties.molarflow.GetValueOrDefault)
                 Case 43
                     'PROP_MS_43	Liquid Phase (Mixture) Volumetric Flow
-                    value = cv.ConverterDoSI(su.spmp_volumetricFlow, Me.Fases(1).SPMProperties.volumetric_flow.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_volumetricFlow, Me.Phases(1).SPMProperties.volumetric_flow.GetValueOrDefault)
                 Case 44
                     'PROP_MS_44	Liquid Phase (Mixture) Compressibility Factor
-                    value = Me.Fases(1).SPMProperties.compressibilityFactor.GetValueOrDefault
+                    value = Me.Phases(1).SPMProperties.compressibilityFactor.GetValueOrDefault
                 Case 45
                     'PROP_MS_45	Liquid Phase (Mixture) Molar Fraction
-                    value = Me.Fases(1).SPMProperties.molarfraction.GetValueOrDefault
+                    value = Me.Phases(1).SPMProperties.molarfraction.GetValueOrDefault
                 Case 46
                     'PROP_MS_46	Liquid Phase (Mixture) Mass Fraction
-                    value = Me.Fases(1).SPMProperties.massfraction.GetValueOrDefault
+                    value = Me.Phases(1).SPMProperties.massfraction.GetValueOrDefault
                 Case 47
                     'PROP_MS_47	Liquid Phase (Mixture) Volumetric Fraction
-                    value = Me.Fases(1).SPMProperties.volumetric_flow.GetValueOrDefault / Me.Fases(0).SPMProperties.volumetric_flow.GetValueOrDefault
+                    value = Me.Phases(1).SPMProperties.volumetric_flow.GetValueOrDefault / Me.Phases(0).SPMProperties.volumetric_flow.GetValueOrDefault
                 Case 48
                     'PROP_MS_48	Liquid Phase (1) Density
-                    value = cv.ConverterDoSI(su.spmp_density, Me.Fases(3).SPMProperties.density.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_density, Me.Phases(3).SPMProperties.density.GetValueOrDefault)
                 Case 49
                     'PROP_MS_49	Liquid Phase (1) Molar Weight
-                    value = cv.ConverterDoSI(su.spmp_molecularWeight, Me.Fases(3).SPMProperties.molecularWeight.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_molecularWeight, Me.Phases(3).SPMProperties.molecularWeight.GetValueOrDefault)
                 Case 50
                     'PROP_MS_50	Liquid Phase (1) Specific Enthalpy
-                    value = cv.ConverterDoSI(su.spmp_enthalpy, Me.Fases(3).SPMProperties.enthalpy.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_enthalpy, Me.Phases(3).SPMProperties.enthalpy.GetValueOrDefault)
                 Case 51
                     'PROP_MS_51	Liquid Phase (1) Specific Entropy
-                    value = cv.ConverterDoSI(su.spmp_entropy, Me.Fases(3).SPMProperties.entropy.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_entropy, Me.Phases(3).SPMProperties.entropy.GetValueOrDefault)
                 Case 52
                     'PROP_MS_52	Liquid Phase (1) Molar Enthalpy
-                    value = cv.ConverterDoSI(su.molar_enthalpy, Me.Fases(3).SPMProperties.molar_enthalpy.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.molar_enthalpy, Me.Phases(3).SPMProperties.molar_enthalpy.GetValueOrDefault)
                 Case 53
                     'PROP_MS_53	Liquid Phase (1) Molar Entropy
-                    value = cv.ConverterDoSI(su.molar_entropy, Me.Fases(3).SPMProperties.molar_entropy.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.molar_entropy, Me.Phases(3).SPMProperties.molar_entropy.GetValueOrDefault)
                 Case 54
                     'PROP_MS_54	Liquid Phase (1) Thermal Conductivity
-                    value = cv.ConverterDoSI(su.spmp_thermalConductivity, Me.Fases(3).SPMProperties.thermalConductivity.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_thermalConductivity, Me.Phases(3).SPMProperties.thermalConductivity.GetValueOrDefault)
                 Case 55
                     'PROP_MS_55	Liquid Phase (1) Kinematic Viscosity
-                    value = cv.ConverterDoSI(su.spmp_cinematic_viscosity, Me.Fases(3).SPMProperties.kinematic_viscosity.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_cinematic_viscosity, Me.Phases(3).SPMProperties.kinematic_viscosity.GetValueOrDefault)
                 Case 56
                     'PROP_MS_56	Liquid Phase (1) Dynamic Viscosity
-                    value = cv.ConverterDoSI(su.spmp_viscosity, Me.Fases(3).SPMProperties.viscosity.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_viscosity, Me.Phases(3).SPMProperties.viscosity.GetValueOrDefault)
                 Case 57
                     'PROP_MS_57	Liquid Phase (1) Heat Capacity (Cp)
-                    value = cv.ConverterDoSI(su.spmp_heatCapacityCp, Me.Fases(3).SPMProperties.heatCapacityCp.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_heatCapacityCp, Me.Phases(3).SPMProperties.heatCapacityCp.GetValueOrDefault)
                 Case 58
                     'PROP_MS_58	Liquid Phase (1) Heat Capacity Ratio (Cp/Cv)
-                    value = Me.Fases(3).SPMProperties.heatCapacityCp.GetValueOrDefault / Me.Fases(3).SPMProperties.heatCapacityCv.GetValueOrDefault
+                    value = Me.Phases(3).SPMProperties.heatCapacityCp.GetValueOrDefault / Me.Phases(3).SPMProperties.heatCapacityCv.GetValueOrDefault
                 Case 59
                     'PROP_MS_59	Liquid Phase (1) Mass Flow
-                    value = cv.ConverterDoSI(su.spmp_massflow, Me.Fases(3).SPMProperties.massflow.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_massflow, Me.Phases(3).SPMProperties.massflow.GetValueOrDefault)
                 Case 60
                     'PROP_MS_60	Liquid Phase (1) Molar Flow
-                    value = cv.ConverterDoSI(su.spmp_molarflow, Me.Fases(3).SPMProperties.molarflow.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_molarflow, Me.Phases(3).SPMProperties.molarflow.GetValueOrDefault)
                 Case 61
                     'PROP_MS_61	Liquid Phase (1) Volumetric Flow
-                    value = cv.ConverterDoSI(su.spmp_volumetricFlow, Me.Fases(3).SPMProperties.volumetric_flow.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_volumetricFlow, Me.Phases(3).SPMProperties.volumetric_flow.GetValueOrDefault)
                 Case 62
                     'PROP_MS_62	Liquid Phase (1) Compressibility Factor
-                    value = Me.Fases(3).SPMProperties.compressibilityFactor.GetValueOrDefault
+                    value = Me.Phases(3).SPMProperties.compressibilityFactor.GetValueOrDefault
                 Case 63
                     'PROP_MS_63	Liquid Phase (1) Molar Fraction
-                    value = Me.Fases(3).SPMProperties.molarfraction.GetValueOrDefault
+                    value = Me.Phases(3).SPMProperties.molarfraction.GetValueOrDefault
                 Case 64
                     'PROP_MS_64	Liquid Phase (1) Mass Fraction
-                    value = Me.Fases(3).SPMProperties.massfraction.GetValueOrDefault
+                    value = Me.Phases(3).SPMProperties.massfraction.GetValueOrDefault
                 Case 65
                     'PROP_MS_65	Liquid Phase (1) Volumetric Fraction
-                    value = Me.Fases(3).SPMProperties.volumetric_flow.GetValueOrDefault / Me.Fases(0).SPMProperties.volumetric_flow.GetValueOrDefault
+                    value = Me.Phases(3).SPMProperties.volumetric_flow.GetValueOrDefault / Me.Phases(0).SPMProperties.volumetric_flow.GetValueOrDefault
                 Case 66
                     'PROP_MS_66	Liquid Phase (2) Density
-                    value = cv.ConverterDoSI(su.spmp_density, Me.Fases(4).SPMProperties.density.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_density, Me.Phases(4).SPMProperties.density.GetValueOrDefault)
                 Case 67
                     'PROP_MS_67	Liquid Phase (2) Molar Weight
-                    value = cv.ConverterDoSI(su.spmp_molecularWeight, Me.Fases(4).SPMProperties.molecularWeight.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_molecularWeight, Me.Phases(4).SPMProperties.molecularWeight.GetValueOrDefault)
                 Case 68
                     'PROP_MS_68	Liquid Phase (2) Specific Enthalpy
-                    value = cv.ConverterDoSI(su.spmp_enthalpy, Me.Fases(4).SPMProperties.enthalpy.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_enthalpy, Me.Phases(4).SPMProperties.enthalpy.GetValueOrDefault)
                 Case 69
                     'PROP_MS_69	Liquid Phase (2) Specific Entropy
-                    value = cv.ConverterDoSI(su.spmp_entropy, Me.Fases(4).SPMProperties.entropy.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_entropy, Me.Phases(4).SPMProperties.entropy.GetValueOrDefault)
                 Case 70
                     'PROP_MS_70	Liquid Phase (2) Molar Enthalpy
-                    value = cv.ConverterDoSI(su.molar_enthalpy, Me.Fases(4).SPMProperties.molar_enthalpy.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.molar_enthalpy, Me.Phases(4).SPMProperties.molar_enthalpy.GetValueOrDefault)
                 Case 71
                     'PROP_MS_71	Liquid Phase (2) Molar Entropy
-                    value = cv.ConverterDoSI(su.molar_entropy, Me.Fases(4).SPMProperties.molar_entropy.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.molar_entropy, Me.Phases(4).SPMProperties.molar_entropy.GetValueOrDefault)
                 Case 72
                     'PROP_MS_72	Liquid Phase (2) Thermal Conductivity
-                    value = cv.ConverterDoSI(su.spmp_thermalConductivity, Me.Fases(4).SPMProperties.thermalConductivity.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_thermalConductivity, Me.Phases(4).SPMProperties.thermalConductivity.GetValueOrDefault)
                 Case 73
                     'PROP_MS_73	Liquid Phase (2) Kinematic Viscosity
-                    value = cv.ConverterDoSI(su.spmp_cinematic_viscosity, Me.Fases(4).SPMProperties.kinematic_viscosity.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_cinematic_viscosity, Me.Phases(4).SPMProperties.kinematic_viscosity.GetValueOrDefault)
                 Case 74
                     'PROP_MS_74	Liquid Phase (2) Dynamic Viscosity
-                    value = cv.ConverterDoSI(su.spmp_viscosity, Me.Fases(4).SPMProperties.viscosity.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_viscosity, Me.Phases(4).SPMProperties.viscosity.GetValueOrDefault)
                 Case 75
                     'PROP_MS_75	Liquid Phase (2) Heat Capacity (Cp)
-                    value = cv.ConverterDoSI(su.spmp_heatCapacityCp, Me.Fases(4).SPMProperties.heatCapacityCp.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_heatCapacityCp, Me.Phases(4).SPMProperties.heatCapacityCp.GetValueOrDefault)
                 Case 76
                     'PROP_MS_76	Liquid Phase (2) Heat Capacity Ratio (Cp/Cv)
-                    value = Me.Fases(4).SPMProperties.heatCapacityCp.GetValueOrDefault / Me.Fases(4).SPMProperties.heatCapacityCv.GetValueOrDefault
+                    value = Me.Phases(4).SPMProperties.heatCapacityCp.GetValueOrDefault / Me.Phases(4).SPMProperties.heatCapacityCv.GetValueOrDefault
                 Case 77
                     'PROP_MS_77	Liquid Phase (2) Mass Flow
-                    value = cv.ConverterDoSI(su.spmp_massflow, Me.Fases(4).SPMProperties.massflow.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_massflow, Me.Phases(4).SPMProperties.massflow.GetValueOrDefault)
                 Case 78
                     'PROP_MS_78	Liquid Phase (2) Molar Flow
-                    value = cv.ConverterDoSI(su.spmp_molarflow, Me.Fases(4).SPMProperties.molarflow.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_molarflow, Me.Phases(4).SPMProperties.molarflow.GetValueOrDefault)
                 Case 79
                     'PROP_MS_79	Liquid Phase (2) Volumetric Flow
-                    value = cv.ConverterDoSI(su.spmp_volumetricFlow, Me.Fases(4).SPMProperties.volumetric_flow.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_volumetricFlow, Me.Phases(4).SPMProperties.volumetric_flow.GetValueOrDefault)
                 Case 80
                     'PROP_MS_80	Liquid Phase (2) Compressibility Factor
-                    value = Me.Fases(4).SPMProperties.compressibilityFactor.GetValueOrDefault
+                    value = Me.Phases(4).SPMProperties.compressibilityFactor.GetValueOrDefault
                 Case 81
                     'PROP_MS_81	Liquid Phase (2) Molar Fraction
-                    value = Me.Fases(4).SPMProperties.molarfraction.GetValueOrDefault
+                    value = Me.Phases(4).SPMProperties.molarfraction.GetValueOrDefault
                 Case 82
                     'PROP_MS_82	Liquid Phase (2) Mass Fraction
-                    value = Me.Fases(4).SPMProperties.massfraction.GetValueOrDefault
+                    value = Me.Phases(4).SPMProperties.massfraction.GetValueOrDefault
                 Case 83
                     'PROP_MS_83	Liquid Phase (2) Volumetric Fraction
-                    value = Me.Fases(4).SPMProperties.volumetric_flow.GetValueOrDefault / Me.Fases(0).SPMProperties.volumetric_flow.GetValueOrDefault
+                    value = Me.Phases(4).SPMProperties.volumetric_flow.GetValueOrDefault / Me.Phases(0).SPMProperties.volumetric_flow.GetValueOrDefault
                 Case 84
                     'PROP_MS_84	Aqueous Phase Density
-                    If Me.Fases.ContainsKey(6) Then
-                        value = cv.ConverterDoSI(su.spmp_density, Me.Fases(6).SPMProperties.density.GetValueOrDefault)
+                    If Me.Phases.ContainsKey(6) Then
+                        value = cv.ConverterDoSI(su.spmp_density, Me.Phases(6).SPMProperties.density.GetValueOrDefault)
                     Else
                         value = 0
                     End If
                 Case 85
                     'PROP_MS_85	Aqueous Phase Molar Weight
-                    If Me.Fases.ContainsKey(6) Then
-                        value = cv.ConverterDoSI(su.spmp_molecularWeight, Me.Fases(6).SPMProperties.molecularWeight.GetValueOrDefault)
+                    If Me.Phases.ContainsKey(6) Then
+                        value = cv.ConverterDoSI(su.spmp_molecularWeight, Me.Phases(6).SPMProperties.molecularWeight.GetValueOrDefault)
                     Else
                         value = 0
                     End If
                 Case 86
                     'PROP_MS_86	Aqueous Phase Specific Enthalpy
-                    If Me.Fases.ContainsKey(6) Then
-                        value = cv.ConverterDoSI(su.spmp_enthalpy, Me.Fases(6).SPMProperties.enthalpy.GetValueOrDefault)
+                    If Me.Phases.ContainsKey(6) Then
+                        value = cv.ConverterDoSI(su.spmp_enthalpy, Me.Phases(6).SPMProperties.enthalpy.GetValueOrDefault)
                     Else
                         value = 0
                     End If
                 Case 87
                     'PROP_MS_87	Aqueous Phase Specific Entropy
-                    If Me.Fases.ContainsKey(6) Then
-                        value = cv.ConverterDoSI(su.spmp_entropy, Me.Fases(6).SPMProperties.entropy.GetValueOrDefault)
+                    If Me.Phases.ContainsKey(6) Then
+                        value = cv.ConverterDoSI(su.spmp_entropy, Me.Phases(6).SPMProperties.entropy.GetValueOrDefault)
                     Else
                         value = 0
                     End If
                 Case 88
                     'PROP_MS_88	Aqueous Phase Molar Enthalpy
-                    If Me.Fases.ContainsKey(6) Then
-                        value = cv.ConverterDoSI(su.molar_enthalpy, Me.Fases(6).SPMProperties.molar_enthalpy.GetValueOrDefault)
+                    If Me.Phases.ContainsKey(6) Then
+                        value = cv.ConverterDoSI(su.molar_enthalpy, Me.Phases(6).SPMProperties.molar_enthalpy.GetValueOrDefault)
                     Else
                         value = 0
                     End If
                 Case 89
                     'PROP_MS_89	Aqueous Phase Molar Entropy
-                    If Me.Fases.ContainsKey(6) Then
-                        value = cv.ConverterDoSI(su.molar_entropy, Me.Fases(6).SPMProperties.molar_entropy.GetValueOrDefault)
+                    If Me.Phases.ContainsKey(6) Then
+                        value = cv.ConverterDoSI(su.molar_entropy, Me.Phases(6).SPMProperties.molar_entropy.GetValueOrDefault)
                     Else
                         value = 0
                     End If
                 Case 90
                     'PROP_MS_90	Aqueous Phase Thermal Conductivity
-                    If Me.Fases.ContainsKey(6) Then
-                        value = cv.ConverterDoSI(su.spmp_thermalConductivity, Me.Fases(6).SPMProperties.thermalConductivity.GetValueOrDefault)
+                    If Me.Phases.ContainsKey(6) Then
+                        value = cv.ConverterDoSI(su.spmp_thermalConductivity, Me.Phases(6).SPMProperties.thermalConductivity.GetValueOrDefault)
                     Else
                         value = 0
                     End If
                 Case 91
                     'PROP_MS_91	Aqueous Phase Kinematic Viscosity
-                    If Me.Fases.ContainsKey(6) Then
-                        value = cv.ConverterDoSI(su.spmp_cinematic_viscosity, Me.Fases(6).SPMProperties.kinematic_viscosity.GetValueOrDefault)
+                    If Me.Phases.ContainsKey(6) Then
+                        value = cv.ConverterDoSI(su.spmp_cinematic_viscosity, Me.Phases(6).SPMProperties.kinematic_viscosity.GetValueOrDefault)
                     Else
                         value = 0
                     End If
                 Case 92
                     'PROP_MS_92	Aqueous Phase Dynamic Viscosity
-                    If Me.Fases.ContainsKey(6) Then
-                        value = cv.ConverterDoSI(su.spmp_viscosity, Me.Fases(6).SPMProperties.viscosity.GetValueOrDefault)
+                    If Me.Phases.ContainsKey(6) Then
+                        value = cv.ConverterDoSI(su.spmp_viscosity, Me.Phases(6).SPMProperties.viscosity.GetValueOrDefault)
                     Else
                         value = 0
                     End If
                 Case 93
                     'PROP_MS_93	Aqueous Phase Heat Capacity (Cp)
-                    If Me.Fases.ContainsKey(6) Then
-                        value = cv.ConverterDoSI(su.spmp_heatCapacityCp, Me.Fases(6).SPMProperties.heatCapacityCp.GetValueOrDefault)
+                    If Me.Phases.ContainsKey(6) Then
+                        value = cv.ConverterDoSI(su.spmp_heatCapacityCp, Me.Phases(6).SPMProperties.heatCapacityCp.GetValueOrDefault)
                     Else
                         value = 0
                     End If
                 Case 94
                     'PROP_MS_94	Aqueous Phase Heat Capacity Ratio (Cp/Cv)
-                    If Me.Fases.ContainsKey(6) Then
-                        value = Me.Fases(6).SPMProperties.heatCapacityCp.GetValueOrDefault / Me.Fases(6).SPMProperties.heatCapacityCv.GetValueOrDefault
+                    If Me.Phases.ContainsKey(6) Then
+                        value = Me.Phases(6).SPMProperties.heatCapacityCp.GetValueOrDefault / Me.Phases(6).SPMProperties.heatCapacityCv.GetValueOrDefault
                     Else
                         value = 0
                     End If
                 Case 95
                     'PROP_MS_95	Aqueous Phase Mass Flow
-                    If Me.Fases.ContainsKey(6) Then
-                        value = cv.ConverterDoSI(su.spmp_massflow, Me.Fases(6).SPMProperties.massflow.GetValueOrDefault)
+                    If Me.Phases.ContainsKey(6) Then
+                        value = cv.ConverterDoSI(su.spmp_massflow, Me.Phases(6).SPMProperties.massflow.GetValueOrDefault)
                     Else
                         value = 0
                     End If
                 Case 96
                     'PROP_MS_96	Aqueous Phase Molar Flow
-                    If Me.Fases.ContainsKey(6) Then
-                        value = cv.ConverterDoSI(su.spmp_molarflow, Me.Fases(6).SPMProperties.molarflow.GetValueOrDefault)
+                    If Me.Phases.ContainsKey(6) Then
+                        value = cv.ConverterDoSI(su.spmp_molarflow, Me.Phases(6).SPMProperties.molarflow.GetValueOrDefault)
                     Else
                         value = 0
                     End If
                 Case 97
                     'PROP_MS_97	Aqueous Phase Volumetric Flow
-                    If Me.Fases.ContainsKey(6) Then
-                        value = cv.ConverterDoSI(su.spmp_volumetricFlow, Me.Fases(6).SPMProperties.volumetric_flow.GetValueOrDefault)
+                    If Me.Phases.ContainsKey(6) Then
+                        value = cv.ConverterDoSI(su.spmp_volumetricFlow, Me.Phases(6).SPMProperties.volumetric_flow.GetValueOrDefault)
                     Else
                         value = 0
                     End If
                 Case 98
                     'PROP_MS_98	Aqueous Phase Compressibility Factor
-                    If Me.Fases.ContainsKey(6) Then
-                        value = Me.Fases(6).SPMProperties.compressibilityFactor.GetValueOrDefault
+                    If Me.Phases.ContainsKey(6) Then
+                        value = Me.Phases(6).SPMProperties.compressibilityFactor.GetValueOrDefault
                     Else
                         value = 0
                     End If
                 Case 99
                     'PROP_MS_99	Aqueous Phase Molar Fraction
-                    If Me.Fases.ContainsKey(6) Then
-                        value = Me.Fases(6).SPMProperties.molarfraction.GetValueOrDefault
+                    If Me.Phases.ContainsKey(6) Then
+                        value = Me.Phases(6).SPMProperties.molarfraction.GetValueOrDefault
                     Else
                         value = 0
                     End If
                 Case 100
                     'PROP_MS_100	Aqueous Phase Mass Fraction
-                    If Me.Fases.ContainsKey(6) Then
-                        value = Me.Fases(6).SPMProperties.massfraction.GetValueOrDefault
+                    If Me.Phases.ContainsKey(6) Then
+                        value = Me.Phases(6).SPMProperties.massfraction.GetValueOrDefault
                     Else
                         value = 0
                     End If
                 Case 101
                     'PROP_MS_101	Aqueous Phase Volumetric Fraction
-                    If Me.Fases.ContainsKey(6) Then
-                        value = Me.Fases(6).SPMProperties.volumetric_flow.GetValueOrDefault / Me.Fases(0).SPMProperties.volumetric_flow.GetValueOrDefault
+                    If Me.Phases.ContainsKey(6) Then
+                        value = Me.Phases(6).SPMProperties.volumetric_flow.GetValueOrDefault / Me.Phases(0).SPMProperties.volumetric_flow.GetValueOrDefault
                     Else
                         value = 0
                     End If
                 Case 103, 111, 112, 113, 114, 115
-                    If Me.Fases(0).Componentes.ContainsKey(sname) Then
+                    If Me.Phases(0).Components.ContainsKey(sname) Then
                         If propidx = 103 Then
-                            value = Me.Fases(0).Componentes(sname).FracaoMassica.GetValueOrDefault
+                            value = Me.Phases(0).Components(sname).FracaoMassica.GetValueOrDefault
                         ElseIf propidx = 111 Then
-                            value = Me.Fases(2).Componentes(sname).FracaoMassica.GetValueOrDefault
+                            value = Me.Phases(2).Components(sname).FracaoMassica.GetValueOrDefault
                         ElseIf propidx = 112 Then
-                            value = Me.Fases(1).Componentes(sname).FracaoMassica.GetValueOrDefault
+                            value = Me.Phases(1).Components(sname).FracaoMassica.GetValueOrDefault
                         ElseIf propidx = 113 Then
-                            value = Me.Fases(3).Componentes(sname).FracaoMassica.GetValueOrDefault
+                            value = Me.Phases(3).Components(sname).FracaoMassica.GetValueOrDefault
                         ElseIf propidx = 114 Then
-                            value = Me.Fases(4).Componentes(sname).FracaoMassica.GetValueOrDefault
+                            value = Me.Phases(4).Components(sname).FracaoMassica.GetValueOrDefault
                         ElseIf propidx = 115 Then
-                            value = Me.Fases(5).Componentes(sname).FracaoMassica.GetValueOrDefault
+                            value = Me.Phases(5).Components(sname).FracaoMassica.GetValueOrDefault
                         End If
                     Else
                         value = 0
                     End If
                 Case 102, 106, 107, 108, 109, 110
-                    If Me.Fases(0).Componentes.ContainsKey(sname) Then
+                    If Me.Phases(0).Components.ContainsKey(sname) Then
                         If propidx = 102 Then
-                            value = Me.Fases(0).Componentes(sname).FracaoMolar.GetValueOrDefault
+                            value = Me.Phases(0).Components(sname).FracaoMolar.GetValueOrDefault
                         ElseIf propidx = 106 Then
-                            value = Me.Fases(2).Componentes(sname).FracaoMolar.GetValueOrDefault
+                            value = Me.Phases(2).Components(sname).FracaoMolar.GetValueOrDefault
                         ElseIf propidx = 107 Then
-                            value = Me.Fases(1).Componentes(sname).FracaoMolar.GetValueOrDefault
+                            value = Me.Phases(1).Components(sname).FracaoMolar.GetValueOrDefault
                         ElseIf propidx = 108 Then
-                            value = Me.Fases(3).Componentes(sname).FracaoMolar.GetValueOrDefault
+                            value = Me.Phases(3).Components(sname).FracaoMolar.GetValueOrDefault
                         ElseIf propidx = 109 Then
-                            value = Me.Fases(4).Componentes(sname).FracaoMolar.GetValueOrDefault
+                            value = Me.Phases(4).Components(sname).FracaoMolar.GetValueOrDefault
                         ElseIf propidx = 110 Then
-                            value = Me.Fases(5).Componentes(sname).FracaoMolar.GetValueOrDefault
+                            value = Me.Phases(5).Components(sname).FracaoMolar.GetValueOrDefault
                         End If
                     Else
                         value = 0
                     End If
                 Case 104, 116, 117, 118, 119, 120
-                    If Me.Fases(0).Componentes.ContainsKey(sname) Then
+                    If Me.Phases(0).Components.ContainsKey(sname) Then
                         If propidx = 104 Then
-                            value = Me.Fases(0).Componentes(sname).MolarFlow.GetValueOrDefault
+                            value = Me.Phases(0).Components(sname).MolarFlow.GetValueOrDefault
                         ElseIf propidx = 116 Then
-                            value = Me.Fases(2).Componentes(sname).MolarFlow.GetValueOrDefault
+                            value = Me.Phases(2).Components(sname).MolarFlow.GetValueOrDefault
                         ElseIf propidx = 117 Then
-                            value = Me.Fases(1).Componentes(sname).MolarFlow.GetValueOrDefault
+                            value = Me.Phases(1).Components(sname).MolarFlow.GetValueOrDefault
                         ElseIf propidx = 118 Then
-                            value = Me.Fases(3).Componentes(sname).MolarFlow.GetValueOrDefault
+                            value = Me.Phases(3).Components(sname).MolarFlow.GetValueOrDefault
                         ElseIf propidx = 119 Then
-                            value = Me.Fases(4).Componentes(sname).MolarFlow.GetValueOrDefault
+                            value = Me.Phases(4).Components(sname).MolarFlow.GetValueOrDefault
                         ElseIf propidx = 120 Then
-                            value = Me.Fases(5).Componentes(sname).MolarFlow.GetValueOrDefault
+                            value = Me.Phases(5).Components(sname).MolarFlow.GetValueOrDefault
                         End If
                     Else
                         value = 0
                     End If
                 Case 105, 121, 122, 123, 124, 125
-                    If Me.Fases(0).Componentes.ContainsKey(sname) Then
+                    If Me.Phases(0).Components.ContainsKey(sname) Then
                         If propidx = 105 Then
-                            value = Me.Fases(0).Componentes(sname).MassFlow.GetValueOrDefault
+                            value = Me.Phases(0).Components(sname).MassFlow.GetValueOrDefault
                         ElseIf propidx = 121 Then
-                            value = Me.Fases(2).Componentes(sname).MassFlow.GetValueOrDefault
+                            value = Me.Phases(2).Components(sname).MassFlow.GetValueOrDefault
                         ElseIf propidx = 122 Then
-                            value = Me.Fases(1).Componentes(sname).MassFlow.GetValueOrDefault
+                            value = Me.Phases(1).Components(sname).MassFlow.GetValueOrDefault
                         ElseIf propidx = 123 Then
-                            value = Me.Fases(3).Componentes(sname).MassFlow.GetValueOrDefault
+                            value = Me.Phases(3).Components(sname).MassFlow.GetValueOrDefault
                         ElseIf propidx = 124 Then
-                            value = Me.Fases(4).Componentes(sname).MassFlow.GetValueOrDefault
+                            value = Me.Phases(4).Components(sname).MassFlow.GetValueOrDefault
                         ElseIf propidx = 125 Then
-                            value = Me.Fases(5).Componentes(sname).MassFlow.GetValueOrDefault
+                            value = Me.Phases(5).Components(sname).MassFlow.GetValueOrDefault
                         End If
                     Else
                         value = 0
                     End If
                 Case 126
-                    value = cv.ConverterDoSI(su.spmp_pressure, Me.Fases(0).SPMProperties.bubblePressure.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_pressure, Me.Phases(0).SPMProperties.bubblePressure.GetValueOrDefault)
                 Case 127
-                    value = cv.ConverterDoSI(su.spmp_pressure, Me.Fases(0).SPMProperties.dewPressure.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_pressure, Me.Phases(0).SPMProperties.dewPressure.GetValueOrDefault)
                 Case 128
-                    value = cv.ConverterDoSI(su.spmp_temperature, Me.Fases(0).SPMProperties.bubbleTemperature.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_temperature, Me.Phases(0).SPMProperties.bubbleTemperature.GetValueOrDefault)
                 Case 129
-                    value = cv.ConverterDoSI(su.spmp_temperature, Me.Fases(0).SPMProperties.dewTemperature.GetValueOrDefault)
+                    value = cv.ConverterDoSI(su.spmp_temperature, Me.Phases(0).SPMProperties.dewTemperature.GetValueOrDefault)
                 Case 130
-                    If Me.Fases(1).SPMProperties.molarfraction.GetValueOrDefault = 1.0# Then
+                    If Me.Phases(1).SPMProperties.molarfraction.GetValueOrDefault = 1.0# Then
                         value = "Liquid Only"
-                    ElseIf Me.Fases(2).SPMProperties.molarfraction.GetValueOrDefault = 1.0# Then
+                    ElseIf Me.Phases(2).SPMProperties.molarfraction.GetValueOrDefault = 1.0# Then
                         value = "Vapor Only"
                     Else
                         value = "Mixed"
@@ -818,105 +818,105 @@ Namespace DTL.SimulationObjects.Streams
             Select Case propidx
                 Case 0
                     'PROP_MS_0 Temperature
-                    Me.Fases(0).SPMProperties.temperature = cv.ConverterParaSI(su.spmp_temperature, propval)
+                    Me.Phases(0).SPMProperties.temperature = cv.ConverterParaSI(su.spmp_temperature, propval)
                 Case 1
                     'PROP_MS_1 Pressure
-                    Me.Fases(0).SPMProperties.pressure = cv.ConverterParaSI(su.spmp_pressure, propval)
+                    Me.Phases(0).SPMProperties.pressure = cv.ConverterParaSI(su.spmp_pressure, propval)
                 Case 2
                     'PROP_MS_2	Mass Flow
-                    Me.Fases(0).SPMProperties.massflow = cv.ConverterParaSI(su.spmp_massflow, propval)
+                    Me.Phases(0).SPMProperties.massflow = cv.ConverterParaSI(su.spmp_massflow, propval)
                     Me.PropertyPackage.DW_CalcVazaoMolar()
                     Me.PropertyPackage.DW_CalcVazaoVolumetrica()
                 Case 3
                     'PROP_MS_3	Molar Flow
-                    Me.Fases(0).SPMProperties.molarflow = cv.ConverterParaSI(su.spmp_molarflow, propval)
+                    Me.Phases(0).SPMProperties.molarflow = cv.ConverterParaSI(su.spmp_molarflow, propval)
                     Me.PropertyPackage.DW_CalcVazaoMassica()
                     Me.PropertyPackage.DW_CalcVazaoVolumetrica()
                 Case 4
                     'PROP_MS_4	Volumetric Flow
-                    Me.Fases(0).SPMProperties.volumetric_flow = cv.ConverterParaSI(su.spmp_volumetricFlow, propval)
-                    Me.Fases(0).SPMProperties.massflow = Me.Fases(0).SPMProperties.volumetric_flow * Me.Fases(0).SPMProperties.density.GetValueOrDefault
+                    Me.Phases(0).SPMProperties.volumetric_flow = cv.ConverterParaSI(su.spmp_volumetricFlow, propval)
+                    Me.Phases(0).SPMProperties.massflow = Me.Phases(0).SPMProperties.volumetric_flow * Me.Phases(0).SPMProperties.density.GetValueOrDefault
                     Me.PropertyPackage.DW_CalcVazaoMolar()
                 Case 102
-                    If Me.Fases(0).Componentes.ContainsKey(sname) Then
-                        Me.Fases(0).Componentes(sname).FracaoMolar = propval
+                    If Me.Phases(0).Components.ContainsKey(sname) Then
+                        Me.Phases(0).Components(sname).FracaoMolar = propval
                         Dim sumfm As Double = 0
-                        For Each comp As Substancia In Me.Fases(0).Componentes.Values
+                        For Each comp As Substance In Me.Phases(0).Components.Values
                             sumfm += comp.FracaoMolar
                         Next
-                        For Each comp As Substancia In Me.Fases(0).Componentes.Values
+                        For Each comp As Substance In Me.Phases(0).Components.Values
                             comp.FracaoMolar /= sumfm
                         Next
                         Dim mtotal As Double = 0
                         Me.PropertyPackage.DW_CalcCompMolarFlow(0)
-                        For Each comp As Substancia In Me.Fases(0).Componentes.Values
+                        For Each comp As Substance In Me.Phases(0).Components.Values
                             mtotal += comp.FracaoMolar.GetValueOrDefault * comp.ConstantProperties.Molar_Weight
                         Next
-                        For Each comp As Substancia In Me.Fases(0).Componentes.Values
+                        For Each comp As Substance In Me.Phases(0).Components.Values
                             comp.FracaoMassica = comp.FracaoMolar.GetValueOrDefault * comp.ConstantProperties.Molar_Weight / mtotal
                         Next
                         Me.PropertyPackage.DW_CalcCompMassFlow(0)
                     End If
                 Case 103
-                    If Me.Fases(0).Componentes.ContainsKey(sname) Then
-                        Me.Fases(0).Componentes(sname).FracaoMassica = propval
+                    If Me.Phases(0).Components.ContainsKey(sname) Then
+                        Me.Phases(0).Components(sname).FracaoMassica = propval
                         Dim sumfm As Double = 0
-                        For Each comp As Substancia In Me.Fases(0).Componentes.Values
+                        For Each comp As Substance In Me.Phases(0).Components.Values
                             sumfm += comp.FracaoMassica
                         Next
-                        For Each comp As Substancia In Me.Fases(0).Componentes.Values
+                        For Each comp As Substance In Me.Phases(0).Components.Values
                             comp.FracaoMassica /= sumfm
                         Next
                         Dim mtotal As Double = 0
                         Me.PropertyPackage.DW_CalcCompMassFlow(0)
-                        For Each comp As Substancia In Me.Fases(0).Componentes.Values
+                        For Each comp As Substance In Me.Phases(0).Components.Values
                             mtotal += comp.FracaoMassica.GetValueOrDefault / comp.ConstantProperties.Molar_Weight
                         Next
-                        For Each comp As Substancia In Me.Fases(0).Componentes.Values
+                        For Each comp As Substance In Me.Phases(0).Components.Values
                             comp.FracaoMolar = comp.FracaoMassica.GetValueOrDefault / comp.ConstantProperties.Molar_Weight / mtotal
                         Next
                         Me.PropertyPackage.DW_CalcCompMolarFlow(0)
                     End If
                 Case 104
-                    If Me.Fases(0).Componentes.ContainsKey(sname) Then
-                        Me.Fases(0).Componentes(sname).MolarFlow = cv.ConverterParaSI(su.spmp_molarflow, propval)
-                        Me.Fases(0).Componentes(sname).MassFlow = cv.ConverterParaSI(su.spmp_molarflow, propval) / 1000 * Me.Fases(0).Componentes(sname).ConstantProperties.Molar_Weight
+                    If Me.Phases(0).Components.ContainsKey(sname) Then
+                        Me.Phases(0).Components(sname).MolarFlow = cv.ConverterParaSI(su.spmp_molarflow, propval)
+                        Me.Phases(0).Components(sname).MassFlow = cv.ConverterParaSI(su.spmp_molarflow, propval) / 1000 * Me.Phases(0).Components(sname).ConstantProperties.Molar_Weight
                         Dim summ As Double = 0
-                        For Each comp As Substancia In Me.Fases(0).Componentes.Values
+                        For Each comp As Substance In Me.Phases(0).Components.Values
                             summ += comp.MolarFlow
                         Next
-                        Me.Fases(0).SPMProperties.molarflow = summ
-                        For Each comp As Substancia In Me.Fases(0).Componentes.Values
+                        Me.Phases(0).SPMProperties.molarflow = summ
+                        For Each comp As Substance In Me.Phases(0).Components.Values
                             comp.FracaoMolar = comp.MolarFlow / summ
                         Next
                         Dim mtotal As Double = 0
-                        For Each comp As Substancia In Me.Fases(0).Componentes.Values
+                        For Each comp As Substance In Me.Phases(0).Components.Values
                             mtotal += comp.FracaoMolar.GetValueOrDefault * comp.ConstantProperties.Molar_Weight
                         Next
-                        Me.Fases(0).SPMProperties.massflow = mtotal * summ / 1000
-                        For Each comp As Substancia In Me.Fases(0).Componentes.Values
-                            comp.FracaoMassica = comp.MolarFlow.GetValueOrDefault * Me.Fases(0).SPMProperties.massflow.GetValueOrDefault
+                        Me.Phases(0).SPMProperties.massflow = mtotal * summ / 1000
+                        For Each comp As Substance In Me.Phases(0).Components.Values
+                            comp.FracaoMassica = comp.MolarFlow.GetValueOrDefault * Me.Phases(0).SPMProperties.massflow.GetValueOrDefault
                         Next
                     End If
                 Case 105
-                    If Me.Fases(0).Componentes.ContainsKey(sname) Then
-                        Me.Fases(0).Componentes(sname).MassFlow = cv.ConverterParaSI(su.spmp_massflow, propval)
-                        Me.Fases(0).Componentes(sname).MolarFlow = cv.ConverterParaSI(su.spmp_massflow, propval) / Me.Fases(0).Componentes(sname).ConstantProperties.Molar_Weight * 1000
+                    If Me.Phases(0).Components.ContainsKey(sname) Then
+                        Me.Phases(0).Components(sname).MassFlow = cv.ConverterParaSI(su.spmp_massflow, propval)
+                        Me.Phases(0).Components(sname).MolarFlow = cv.ConverterParaSI(su.spmp_massflow, propval) / Me.Phases(0).Components(sname).ConstantProperties.Molar_Weight * 1000
                         Dim mtotal As Double = 0
-                        For Each comp As Substancia In Me.Fases(0).Componentes.Values
+                        For Each comp As Substance In Me.Phases(0).Components.Values
                             mtotal += comp.MassFlow
                         Next
-                        Me.Fases(0).SPMProperties.massflow = mtotal
-                        For Each comp As Substancia In Me.Fases(0).Componentes.Values
+                        Me.Phases(0).SPMProperties.massflow = mtotal
+                        For Each comp As Substance In Me.Phases(0).Components.Values
                             comp.FracaoMassica = comp.MassFlow / mtotal
                         Next
                         Dim summ As Double = 0
-                        For Each comp As Substancia In Me.Fases(0).Componentes.Values
+                        For Each comp As Substance In Me.Phases(0).Components.Values
                             summ += comp.FracaoMassica.GetValueOrDefault / comp.ConstantProperties.Molar_Weight / 1000
                         Next
-                        Me.Fases(0).SPMProperties.molarflow = mtotal / summ
-                        For Each comp As Substancia In Me.Fases(0).Componentes.Values
-                            comp.FracaoMolar = comp.MolarFlow.GetValueOrDefault * Me.Fases(0).SPMProperties.molarflow.GetValueOrDefault
+                        Me.Phases(0).SPMProperties.molarflow = mtotal / summ
+                        For Each comp As Substance In Me.Phases(0).Components.Values
+                            comp.FracaoMolar = comp.MolarFlow.GetValueOrDefault * Me.Phases(0).SPMProperties.molarflow.GetValueOrDefault
                         Next
                     End If
             End Select
@@ -1449,7 +1449,7 @@ Namespace DTL.SimulationObjects.Streams
         ''' <remarks></remarks>
         Public Function GetNumComponents() As Integer Implements CapeOpen.ICapeThermoMaterialObject.GetNumComponents
             Me.PropertyPackage.CurrentMaterialStream = Me
-            Return Me.Fases(0).Componentes.Count
+            Return Me.Phases(0).Components.Count
         End Function
 
         ''' <summary>
@@ -1475,7 +1475,7 @@ Namespace DTL.SimulationObjects.Streams
             End If
             Dim res As New ArrayList
             Dim comps As New ArrayList
-            For Each c As Substancia In Me.Fases(0).Componentes.Values
+            For Each c As Substance In Me.Phases(0).Components.Values
                 comps.Add(c.Nome)
             Next
             Dim f As Integer = 0
@@ -1495,198 +1495,198 @@ Namespace DTL.SimulationObjects.Streams
             End Select
             Select Case [property].ToLower
                 Case "compressibilityfactor"
-                    res.Add(Me.Fases(f).SPMProperties.compressibilityFactor.GetValueOrDefault)
+                    res.Add(Me.Phases(f).SPMProperties.compressibilityFactor.GetValueOrDefault)
                 Case "heatofvaporization"
                 Case "heatcapacity", "heatcapacitycp"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
-                            res.Add(Me.Fases(f).SPMProperties.heatCapacityCp * Me.PropertyPackage.AUX_MMM(phs))
+                            res.Add(Me.Phases(f).SPMProperties.heatCapacityCp * Me.PropertyPackage.AUX_MMM(phs))
                         Case "Mass", "mass"
-                            res.Add(Me.Fases(f).SPMProperties.heatCapacityCp * 1000)
+                            res.Add(Me.Phases(f).SPMProperties.heatCapacityCp * 1000)
                     End Select
                 Case "heatcapacitycv"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
-                            res.Add(Me.Fases(f).SPMProperties.heatCapacityCv * Me.PropertyPackage.AUX_MMM(phs))
+                            res.Add(Me.Phases(f).SPMProperties.heatCapacityCv * Me.PropertyPackage.AUX_MMM(phs))
                         Case "Mass", "mass"
-                            res.Add(Me.Fases(f).SPMProperties.heatCapacityCv * 1000)
+                            res.Add(Me.Phases(f).SPMProperties.heatCapacityCv * 1000)
                     End Select
                 Case "idealgasheatcapacity"
                     If f = 1 Then
-                        res.Add(Me.PropertyPackage.AUX_CPm(PropertyPackages.Fase.Liquid, Me.Fases(0).SPMProperties.temperature * 1000))
+                        res.Add(Me.PropertyPackage.AUX_CPm(PropertyPackages.Fase.Liquid, Me.Phases(0).SPMProperties.temperature * 1000))
                     Else
-                        res.Add(Me.PropertyPackage.AUX_CPm(PropertyPackages.Fase.Vapor, Me.Fases(0).SPMProperties.temperature * 1000))
+                        res.Add(Me.PropertyPackage.AUX_CPm(PropertyPackages.Fase.Vapor, Me.Phases(0).SPMProperties.temperature * 1000))
                     End If
                 Case "idealgasenthalpy"
                     If f = 1 Then
-                        res.Add(Me.PropertyPackage.RET_Hid(298.15, Me.Fases(0).SPMProperties.temperature.GetValueOrDefault * 1000, PropertyPackages.Fase.Liquid))
+                        res.Add(Me.PropertyPackage.RET_Hid(298.15, Me.Phases(0).SPMProperties.temperature.GetValueOrDefault * 1000, PropertyPackages.Fase.Liquid))
                     Else
-                        res.Add(Me.PropertyPackage.RET_Hid(298.15, Me.Fases(0).SPMProperties.temperature.GetValueOrDefault * 1000, PropertyPackages.Fase.Vapor))
+                        res.Add(Me.PropertyPackage.RET_Hid(298.15, Me.Phases(0).SPMProperties.temperature.GetValueOrDefault * 1000, PropertyPackages.Fase.Vapor))
                     End If
                 Case "excessenthalpy"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
-                            res.Add(Me.Fases(f).SPMProperties.excessEnthalpy.GetValueOrDefault * Me.PropertyPackage.AUX_MMM(phs))
+                            res.Add(Me.Phases(f).SPMProperties.excessEnthalpy.GetValueOrDefault * Me.PropertyPackage.AUX_MMM(phs))
                         Case "Mass", "mass"
-                            res.Add(Me.Fases(f).SPMProperties.excessEnthalpy.GetValueOrDefault * 1000)
+                            res.Add(Me.Phases(f).SPMProperties.excessEnthalpy.GetValueOrDefault * 1000)
                     End Select
                 Case "excessentropy"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
-                            res.Add(Me.Fases(f).SPMProperties.excessEntropy.GetValueOrDefault * Me.PropertyPackage.AUX_MMM(phs))
+                            res.Add(Me.Phases(f).SPMProperties.excessEntropy.GetValueOrDefault * Me.PropertyPackage.AUX_MMM(phs))
                         Case "Mass", "mass"
-                            res.Add(Me.Fases(f).SPMProperties.excessEntropy.GetValueOrDefault * 1000)
+                            res.Add(Me.Phases(f).SPMProperties.excessEntropy.GetValueOrDefault * 1000)
                     End Select
                 Case "viscosity"
-                    res.Add(Me.Fases(f).SPMProperties.viscosity.GetValueOrDefault)
+                    res.Add(Me.Phases(f).SPMProperties.viscosity.GetValueOrDefault)
                 Case "thermalconductivity"
-                    res.Add(Me.Fases(f).SPMProperties.thermalConductivity.GetValueOrDefault)
+                    res.Add(Me.Phases(f).SPMProperties.thermalConductivity.GetValueOrDefault)
                 Case "fugacity"
                     For Each c As String In comps
-                        res.Add(Me.Fases(f).Componentes(c).FracaoMolar.GetValueOrDefault * Me.Fases(f).Componentes(c).FugacityCoeff.GetValueOrDefault * Me.Fases(0).SPMProperties.pressure.GetValueOrDefault)
+                        res.Add(Me.Phases(f).Components(c).FracaoMolar.GetValueOrDefault * Me.Phases(f).Components(c).FugacityCoeff.GetValueOrDefault * Me.Phases(0).SPMProperties.pressure.GetValueOrDefault)
                     Next
                 Case "activity"
                     For Each c As String In comps
-                        res.Add(Me.Fases(f).Componentes(c).ActivityCoeff.GetValueOrDefault * Me.Fases(f).Componentes(c).FracaoMolar.GetValueOrDefault)
+                        res.Add(Me.Phases(f).Components(c).ActivityCoeff.GetValueOrDefault * Me.Phases(f).Components(c).FracaoMolar.GetValueOrDefault)
                     Next
                 Case "fugacitycoefficient"
                     For Each c As String In comps
-                        res.Add(Me.Fases(f).Componentes(c).FugacityCoeff)
+                        res.Add(Me.Phases(f).Components(c).FugacityCoeff)
                     Next
                 Case "activitycoefficient"
                     For Each c As String In comps
-                        res.Add(Me.Fases(f).Componentes(c).ActivityCoeff)
+                        res.Add(Me.Phases(f).Components(c).ActivityCoeff)
                     Next
                 Case "logfugacitycoefficient"
                     For Each c As String In comps
-                        res.Add(Math.Log(Me.Fases(f).Componentes(c).FugacityCoeff))
+                        res.Add(Math.Log(Me.Phases(f).Components(c).FugacityCoeff))
                     Next
                 Case "volume"
-                    res.Add(Me.Fases(f).SPMProperties.molecularWeight / Me.Fases(f).SPMProperties.density / 1000)
+                    res.Add(Me.Phases(f).SPMProperties.molecularWeight / Me.Phases(f).SPMProperties.density / 1000)
                 Case "density"
-                    res.Add(Me.Fases(f).SPMProperties.density)
+                    res.Add(Me.Phases(f).SPMProperties.density)
                 Case "enthalpy", "enthalpynf"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
-                            Dim val = Me.Fases(f).SPMProperties.molecularWeight.GetValueOrDefault
+                            Dim val = Me.Phases(f).SPMProperties.molecularWeight.GetValueOrDefault
                             If val = 0.0# Then
-                                res.Add(Me.Fases(f).SPMProperties.molar_enthalpy.GetValueOrDefault)
+                                res.Add(Me.Phases(f).SPMProperties.molar_enthalpy.GetValueOrDefault)
                             Else
-                                res.Add(Me.Fases(f).SPMProperties.enthalpy.GetValueOrDefault * val)
+                                res.Add(Me.Phases(f).SPMProperties.enthalpy.GetValueOrDefault * val)
                             End If
                         Case "Mass", "mass"
-                            res.Add(Me.Fases(f).SPMProperties.enthalpy.GetValueOrDefault * 1000)
+                            res.Add(Me.Phases(f).SPMProperties.enthalpy.GetValueOrDefault * 1000)
                     End Select
                 Case "entropy", "entropynf"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
-                            Dim val = Me.Fases(f).SPMProperties.molecularWeight.GetValueOrDefault
+                            Dim val = Me.Phases(f).SPMProperties.molecularWeight.GetValueOrDefault
                             If val = 0.0# Then
-                                res.Add(Me.Fases(f).SPMProperties.molar_entropy.GetValueOrDefault)
+                                res.Add(Me.Phases(f).SPMProperties.molar_entropy.GetValueOrDefault)
                             Else
-                                res.Add(Me.Fases(f).SPMProperties.entropy.GetValueOrDefault * val)
+                                res.Add(Me.Phases(f).SPMProperties.entropy.GetValueOrDefault * val)
                             End If
                         Case "Mass", "mass"
-                            res.Add(Me.Fases(f).SPMProperties.entropy.GetValueOrDefault * 1000)
+                            res.Add(Me.Phases(f).SPMProperties.entropy.GetValueOrDefault * 1000)
                     End Select
                 Case "enthalpyf"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
-                            Dim val = Me.Fases(f).SPMProperties.molecularWeight.GetValueOrDefault
+                            Dim val = Me.Phases(f).SPMProperties.molecularWeight.GetValueOrDefault
                             If val = 0.0# Then
-                                res.Add(Me.Fases(f).SPMProperties.molar_enthalpyF.GetValueOrDefault)
+                                res.Add(Me.Phases(f).SPMProperties.molar_enthalpyF.GetValueOrDefault)
                             Else
-                                res.Add(Me.Fases(f).SPMProperties.enthalpyF.GetValueOrDefault * val)
+                                res.Add(Me.Phases(f).SPMProperties.enthalpyF.GetValueOrDefault * val)
                             End If
                         Case "Mass", "mass"
-                            res.Add(Me.Fases(f).SPMProperties.enthalpyF.GetValueOrDefault * 1000)
+                            res.Add(Me.Phases(f).SPMProperties.enthalpyF.GetValueOrDefault * 1000)
                     End Select
                 Case "entropyf"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
-                            Dim val = Me.Fases(f).SPMProperties.molecularWeight.GetValueOrDefault
+                            Dim val = Me.Phases(f).SPMProperties.molecularWeight.GetValueOrDefault
                             If val = 0.0# Then
-                                res.Add(Me.Fases(f).SPMProperties.molar_entropyF.GetValueOrDefault)
+                                res.Add(Me.Phases(f).SPMProperties.molar_entropyF.GetValueOrDefault)
                             Else
-                                res.Add(Me.Fases(f).SPMProperties.entropyF.GetValueOrDefault * val)
+                                res.Add(Me.Phases(f).SPMProperties.entropyF.GetValueOrDefault * val)
                             End If
                         Case "Mass", "mass"
-                            res.Add(Me.Fases(f).SPMProperties.entropy.GetValueOrDefault * 1000)
+                            res.Add(Me.Phases(f).SPMProperties.entropy.GetValueOrDefault * 1000)
                     End Select
                 Case "moles"
-                    res.Add(Me.Fases(f).SPMProperties.molarflow.GetValueOrDefault)
+                    res.Add(Me.Phases(f).SPMProperties.molarflow.GetValueOrDefault)
                 Case "mass"
-                    res.Add(Me.Fases(f).SPMProperties.massflow.GetValueOrDefault)
+                    res.Add(Me.Phases(f).SPMProperties.massflow.GetValueOrDefault)
                 Case "molecularweight"
-                    res.Add(Me.Fases(f).SPMProperties.molecularWeight)
+                    res.Add(Me.Phases(f).SPMProperties.molecularWeight)
                 Case "temperature"
-                    res.Add(Me.Fases(0).SPMProperties.temperature.GetValueOrDefault)
+                    res.Add(Me.Phases(0).SPMProperties.temperature.GetValueOrDefault)
                 Case "pressure"
-                    res.Add(Me.Fases(0).SPMProperties.pressure.GetValueOrDefault)
+                    res.Add(Me.Phases(0).SPMProperties.pressure.GetValueOrDefault)
                 Case "flow"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
                             For Each c As String In comps
-                                res.Add(Me.Fases(f).Componentes(c).MolarFlow.GetValueOrDefault)
+                                res.Add(Me.Phases(f).Components(c).MolarFlow.GetValueOrDefault)
                             Next
                         Case "Mass", "mass"
                             For Each c As String In comps
-                                res.Add(Me.Fases(f).Componentes(c).MassFlow.GetValueOrDefault)
+                                res.Add(Me.Phases(f).Components(c).MassFlow.GetValueOrDefault)
                             Next
                     End Select
                 Case "fraction", "massfraction", "molarfraction"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole", ""
                             For Each c As String In comps
-                                res.Add(Me.Fases(f).Componentes(c).FracaoMolar.GetValueOrDefault)
+                                res.Add(Me.Phases(f).Components(c).FracaoMolar.GetValueOrDefault)
                             Next
                         Case "Mass", "mass"
                             For Each c As String In comps
-                                res.Add(Me.Fases(f).Componentes(c).FracaoMassica.GetValueOrDefault)
+                                res.Add(Me.Phases(f).Components(c).FracaoMassica.GetValueOrDefault)
                             Next
                         Case ""
                             If [property].ToLower.Contains("mole") Then
                                 For Each c As String In comps
-                                    res.Add(Me.Fases(f).Componentes(c).FracaoMolar.GetValueOrDefault)
+                                    res.Add(Me.Phases(f).Components(c).FracaoMolar.GetValueOrDefault)
                                 Next
                             ElseIf [property].ToLower.Contains("mass") Then
                                 For Each c As String In comps
-                                    res.Add(Me.Fases(f).Componentes(c).FracaoMassica.GetValueOrDefault)
+                                    res.Add(Me.Phases(f).Components(c).FracaoMassica.GetValueOrDefault)
                                 Next
                             End If
                     End Select
                 Case "concentration"
                     For Each c As String In comps
-                        res.Add(Me.Fases(f).Componentes(c).MassFlow.GetValueOrDefault / Me.Fases(f).SPMProperties.volumetric_flow.GetValueOrDefault)
+                        res.Add(Me.Phases(f).Components(c).MassFlow.GetValueOrDefault / Me.Phases(f).SPMProperties.volumetric_flow.GetValueOrDefault)
                     Next
                 Case "molarity"
                     For Each c As String In comps
-                        res.Add(Me.Fases(f).Componentes(c).MolarFlow.GetValueOrDefault / Me.Fases(f).SPMProperties.volumetric_flow.GetValueOrDefault)
+                        res.Add(Me.Phases(f).Components(c).MolarFlow.GetValueOrDefault / Me.Phases(f).SPMProperties.volumetric_flow.GetValueOrDefault)
                     Next
                 Case "phasefraction"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
-                            res.Add(Me.Fases(f).SPMProperties.molarfraction.GetValueOrDefault)
+                            res.Add(Me.Phases(f).SPMProperties.molarfraction.GetValueOrDefault)
                         Case "Mass", "mass"
-                            res.Add(Me.Fases(f).SPMProperties.massfraction.GetValueOrDefault)
+                            res.Add(Me.Phases(f).SPMProperties.massfraction.GetValueOrDefault)
                     End Select
                 Case "totalflow"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
-                            res.Add(Me.Fases(f).SPMProperties.molarflow.GetValueOrDefault)
+                            res.Add(Me.Phases(f).SPMProperties.molarflow.GetValueOrDefault)
                         Case "Mass", "mass"
-                            res.Add(Me.Fases(f).SPMProperties.massflow.GetValueOrDefault)
+                            res.Add(Me.Phases(f).SPMProperties.massflow.GetValueOrDefault)
                     End Select
                 Case "kvalue"
                     For Each c As String In comps
-                        res.Add(Me.Fases(0).Componentes(c).Kvalue)
+                        res.Add(Me.Phases(0).Components(c).Kvalue)
                     Next
                 Case "logkvalue"
                     For Each c As String In comps
-                        res.Add(Me.Fases(0).Componentes(c).lnKvalue)
+                        res.Add(Me.Phases(0).Components(c).lnKvalue)
                     Next
                 Case "surfacetension"
-                    res.Add(Me.Fases(1).TPMProperties.surfaceTension)
+                    res.Add(Me.Phases(1).TPMProperties.surfaceTension)
                 Case Else
                     Dim ex As New Exception
                     Dim hcode As Integer = 0
@@ -1729,7 +1729,7 @@ Namespace DTL.SimulationObjects.Streams
             Get
                 Dim pl As New ArrayList
                 For Each pi As PhaseInfo In Me.PropertyPackage.PhaseMappings.Values
-                    If pi.PhaseLabel <> "Disabled" And Me.Fases(pi.DWPhaseIndex).SPMProperties.molarfraction > 0 Then
+                    If pi.PhaseLabel <> "Disabled" And Me.Phases(pi.DWPhaseIndex).SPMProperties.molarfraction > 0 Then
                         pl.Add(pi.PhaseLabel)
                     End If
                 Next
@@ -1798,7 +1798,7 @@ Namespace DTL.SimulationObjects.Streams
                     comps.Add(compIds(i))
                 Next
             Else
-                For Each c As Substancia In Me.Fases(0).Componentes.Values
+                For Each c As Substance In Me.Phases(0).Components.Values
                     comps.Add(c.Nome)
                 Next
             End If
@@ -1819,140 +1819,140 @@ Namespace DTL.SimulationObjects.Streams
             End Select
             Select Case [property].ToLower
                 Case "compressibilityfactor"
-                    Me.Fases(f).SPMProperties.compressibilityFactor = values(0)
+                    Me.Phases(f).SPMProperties.compressibilityFactor = values(0)
                 Case "heatcapacity", "heatcapacitycp"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
-                            Me.Fases(f).SPMProperties.heatCapacityCp = values(0) / Me.PropertyPackage.AUX_MMM(phs)
+                            Me.Phases(f).SPMProperties.heatCapacityCp = values(0) / Me.PropertyPackage.AUX_MMM(phs)
                         Case "Mass", "mass"
-                            Me.Fases(f).SPMProperties.heatCapacityCp = values(0) / 1000
+                            Me.Phases(f).SPMProperties.heatCapacityCp = values(0) / 1000
                     End Select
                 Case "heatcapacitycv"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
-                            Me.Fases(f).SPMProperties.heatCapacityCv = values(0) / Me.PropertyPackage.AUX_MMM(phs)
+                            Me.Phases(f).SPMProperties.heatCapacityCv = values(0) / Me.PropertyPackage.AUX_MMM(phs)
                         Case "Mass", "mass"
-                            Me.Fases(f).SPMProperties.heatCapacityCv = values(0) / 1000
+                            Me.Phases(f).SPMProperties.heatCapacityCv = values(0) / 1000
                     End Select
                 Case "excessenthalpy"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
-                            Me.Fases(f).SPMProperties.excessEnthalpy = values(0) / Me.PropertyPackage.AUX_MMM(phs)
+                            Me.Phases(f).SPMProperties.excessEnthalpy = values(0) / Me.PropertyPackage.AUX_MMM(phs)
                         Case "Mass", "mass"
-                            Me.Fases(f).SPMProperties.excessEnthalpy = values(0) / 1000
+                            Me.Phases(f).SPMProperties.excessEnthalpy = values(0) / 1000
                     End Select
                 Case "excessentropy"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
-                            Me.Fases(f).SPMProperties.excessEntropy = values(0) / Me.PropertyPackage.AUX_MMM(phs)
+                            Me.Phases(f).SPMProperties.excessEntropy = values(0) / Me.PropertyPackage.AUX_MMM(phs)
                         Case "Mass", "mass"
-                            Me.Fases(f).SPMProperties.excessEntropy = values(0) / 1000
+                            Me.Phases(f).SPMProperties.excessEntropy = values(0) / 1000
                     End Select
                 Case "viscosity"
-                    Me.Fases(f).SPMProperties.viscosity = values(0)
-                    Me.Fases(f).SPMProperties.kinematic_viscosity = values(0) / Me.Fases(f).SPMProperties.density.GetValueOrDefault
+                    Me.Phases(f).SPMProperties.viscosity = values(0)
+                    Me.Phases(f).SPMProperties.kinematic_viscosity = values(0) / Me.Phases(f).SPMProperties.density.GetValueOrDefault
                 Case "thermalconductivity"
-                    Me.Fases(f).SPMProperties.thermalConductivity = values(0)
+                    Me.Phases(f).SPMProperties.thermalConductivity = values(0)
                 Case "fugacity"
                     i = 0
                     For Each c As String In comps
-                        Me.Fases(f).Componentes(c).FugacityCoeff = values(comps.IndexOf(c)) / (Me.Fases(0).SPMProperties.pressure.GetValueOrDefault * Me.Fases(f).Componentes(c).FracaoMolar.GetValueOrDefault)
+                        Me.Phases(f).Components(c).FugacityCoeff = values(comps.IndexOf(c)) / (Me.Phases(0).SPMProperties.pressure.GetValueOrDefault * Me.Phases(f).Components(c).FracaoMolar.GetValueOrDefault)
                         i += 1
                     Next
                 Case "fugacitycoefficient"
                     i = 0
                     For Each c As String In comps
-                        Me.Fases(f).Componentes(c).FugacityCoeff = values(comps.IndexOf(c))
+                        Me.Phases(f).Components(c).FugacityCoeff = values(comps.IndexOf(c))
                         i += 1
                     Next
                 Case "activitycoefficient"
                     i = 0
                     For Each c As String In comps
-                        Me.Fases(f).Componentes(c).ActivityCoeff = values(comps.IndexOf(c))
+                        Me.Phases(f).Components(c).ActivityCoeff = values(comps.IndexOf(c))
                         i += 1
                     Next
                 Case "logfugacitycoefficient"
                     i = 0
                     For Each c As String In comps
-                        Me.Fases(f).Componentes(c).FugacityCoeff = Math.Exp(values(comps.IndexOf(c)))
+                        Me.Phases(f).Components(c).FugacityCoeff = Math.Exp(values(comps.IndexOf(c)))
                         i += 1
                     Next
                 Case "density"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
-                            Me.Fases(f).SPMProperties.density = values(0) / 1000 * Me.PropertyPackage.AUX_MMM(phs)
+                            Me.Phases(f).SPMProperties.density = values(0) / 1000 * Me.PropertyPackage.AUX_MMM(phs)
                         Case "Mass", "mass"
-                            Me.Fases(f).SPMProperties.density = values(0)
+                            Me.Phases(f).SPMProperties.density = values(0)
                     End Select
                 Case "volume"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
-                            Me.Fases(f).SPMProperties.density = 1 / values(0) / 1000 * Me.PropertyPackage.AUX_MMM(phs)
+                            Me.Phases(f).SPMProperties.density = 1 / values(0) / 1000 * Me.PropertyPackage.AUX_MMM(phs)
                         Case "Mass", "mass"
-                            Me.Fases(f).SPMProperties.density = 1 / values(0)
+                            Me.Phases(f).SPMProperties.density = 1 / values(0)
                     End Select
                 Case "enthalpy", "enthalpynf"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
-                            Me.Fases(f).SPMProperties.molar_enthalpy = values(0)
+                            Me.Phases(f).SPMProperties.molar_enthalpy = values(0)
                             Dim val = Me.PropertyPackage.AUX_MMM(phs)
-                            If val <> 0.0# Then Me.Fases(f).SPMProperties.enthalpy = values(0) / val
+                            If val <> 0.0# Then Me.Phases(f).SPMProperties.enthalpy = values(0) / val
                         Case "Mass", "mass"
-                            Me.Fases(f).SPMProperties.enthalpy = values(0) / 1000
-                            Me.Fases(f).SPMProperties.molar_enthalpy = values(0) * Me.PropertyPackage.AUX_MMM(phs)
+                            Me.Phases(f).SPMProperties.enthalpy = values(0) / 1000
+                            Me.Phases(f).SPMProperties.molar_enthalpy = values(0) * Me.PropertyPackage.AUX_MMM(phs)
                     End Select
                 Case "entropy", "entropynf"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
-                            Me.Fases(f).SPMProperties.molar_entropy = values(0)
+                            Me.Phases(f).SPMProperties.molar_entropy = values(0)
                             Dim val = Me.PropertyPackage.AUX_MMM(phs)
-                            If val <> 0.0# Then Me.Fases(f).SPMProperties.entropy = values(0) / val
+                            If val <> 0.0# Then Me.Phases(f).SPMProperties.entropy = values(0) / val
                         Case "Mass", "mass"
-                            Me.Fases(f).SPMProperties.entropy = values(0) / 1000
-                            Me.Fases(f).SPMProperties.molar_entropy = values(0) * Me.PropertyPackage.AUX_MMM(phs)
+                            Me.Phases(f).SPMProperties.entropy = values(0) / 1000
+                            Me.Phases(f).SPMProperties.molar_entropy = values(0) * Me.PropertyPackage.AUX_MMM(phs)
                     End Select
                 Case "enthalpyf"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
                             Dim val = Me.PropertyPackage.AUX_MMM(phs)
-                            Me.Fases(f).SPMProperties.molar_enthalpyF = values(0)
-                            If val <> 0.0# Then Me.Fases(f).SPMProperties.enthalpyF = values(0) / val
+                            Me.Phases(f).SPMProperties.molar_enthalpyF = values(0)
+                            If val <> 0.0# Then Me.Phases(f).SPMProperties.enthalpyF = values(0) / val
                         Case "Mass", "mass"
-                            Me.Fases(f).SPMProperties.enthalpyF = values(0) / 1000
-                            Me.Fases(f).SPMProperties.molar_enthalpyF = values(0) * Me.PropertyPackage.AUX_MMM(phs)
+                            Me.Phases(f).SPMProperties.enthalpyF = values(0) / 1000
+                            Me.Phases(f).SPMProperties.molar_enthalpyF = values(0) * Me.PropertyPackage.AUX_MMM(phs)
                     End Select
                 Case "entropyf"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
                             Dim val = Me.PropertyPackage.AUX_MMM(phs)
-                            Me.Fases(f).SPMProperties.molar_entropyF = values(0)
-                            If val <> 0.0# Then Me.Fases(f).SPMProperties.entropyF = values(0) / val
+                            Me.Phases(f).SPMProperties.molar_entropyF = values(0)
+                            If val <> 0.0# Then Me.Phases(f).SPMProperties.entropyF = values(0) / val
                         Case "Mass", "mass"
-                            Me.Fases(f).SPMProperties.entropyF = values(0) / 1000
-                            Me.Fases(f).SPMProperties.molar_entropyF = values(0) * Me.PropertyPackage.AUX_MMM(phs)
+                            Me.Phases(f).SPMProperties.entropyF = values(0) / 1000
+                            Me.Phases(f).SPMProperties.molar_entropyF = values(0) * Me.PropertyPackage.AUX_MMM(phs)
                     End Select
                 Case "moles"
-                    Me.Fases(f).SPMProperties.molarflow = values(0)
+                    Me.Phases(f).SPMProperties.molarflow = values(0)
                 Case "mass"
-                    Me.Fases(f).SPMProperties.massflow = values(0)
+                    Me.Phases(f).SPMProperties.massflow = values(0)
                 Case "molecularweight"
-                    Me.Fases(f).SPMProperties.molecularWeight = values(0)
+                    Me.Phases(f).SPMProperties.molecularWeight = values(0)
                 Case "temperature"
-                    Me.Fases(0).SPMProperties.temperature = values(0)
+                    Me.Phases(0).SPMProperties.temperature = values(0)
                 Case "pressure"
-                    Me.Fases(0).SPMProperties.pressure = values(0)
+                    Me.Phases(0).SPMProperties.pressure = values(0)
                 Case "flow"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
                             i = 0
                             For Each c As String In comps
-                                Me.Fases(f).Componentes(c).MolarFlow = values(comps.IndexOf(c))
+                                Me.Phases(f).Components(c).MolarFlow = values(comps.IndexOf(c))
                                 i += 1
                             Next
                         Case "Mass", "mass"
                             i = 0
                             For Each c As String In comps
-                                Me.Fases(f).Componentes(c).MassFlow = values(comps.IndexOf(c))
+                                Me.Phases(f).Components(c).MassFlow = values(comps.IndexOf(c))
                                 i += 1
                             Next
                     End Select
@@ -1961,46 +1961,46 @@ Namespace DTL.SimulationObjects.Streams
                         Case "Molar", "molar", "mole", "Mole"
                             i = 0
                             For Each c As String In comps
-                                Me.Fases(f).Componentes(c).FracaoMolar = values(comps.IndexOf(c))
+                                Me.Phases(f).Components(c).FracaoMolar = values(comps.IndexOf(c))
                                 i += 1
                             Next
                         Case "Mass", "mass"
                             i = 0
                             For Each c As String In comps
-                                Me.Fases(f).Componentes(c).FracaoMassica = values(comps.IndexOf(c))
+                                Me.Phases(f).Components(c).FracaoMassica = values(comps.IndexOf(c))
                                 i += 1
                             Next
                     End Select
                 Case "phasefraction"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
-                            Me.Fases(f).SPMProperties.molarfraction = values(0)
+                            Me.Phases(f).SPMProperties.molarfraction = values(0)
                         Case "Mass", "mass"
-                            Me.Fases(f).SPMProperties.massfraction = values(0)
+                            Me.Phases(f).SPMProperties.massfraction = values(0)
                     End Select
                 Case "totalflow"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
-                            Me.Fases(f).SPMProperties.molarflow = values(0)
-                            'Me.Fases(f).SPMProperties.massflow = values(0) / 1000 * Me.PropertyPackage.AUX_MMM(phs)
+                            Me.Phases(f).SPMProperties.molarflow = values(0)
+                            'Me.Phases(f).SPMProperties.massflow = values(0) / 1000 * Me.PropertyPackage.AUX_MMM(phs)
                         Case "Mass", "mass"
-                            Me.Fases(f).SPMProperties.massflow = values(0)
-                            'Me.Fases(f).SPMProperties.molarflow = values(0)
+                            Me.Phases(f).SPMProperties.massflow = values(0)
+                            'Me.Phases(f).SPMProperties.molarflow = values(0)
                     End Select
                 Case "kvalue"
                     i = 0
                     For Each c As String In comps
-                        Me.Fases(0).Componentes(c).Kvalue = values(comps.IndexOf(c))
+                        Me.Phases(0).Components(c).Kvalue = values(comps.IndexOf(c))
                         i += 1
                     Next
                 Case "logkvalue"
                     i = 0
                     For Each c As String In comps
-                        Me.Fases(0).Componentes(c).lnKvalue = values(comps.IndexOf(c))
+                        Me.Phases(0).Components(c).lnKvalue = values(comps.IndexOf(c))
                         i += 1
                     Next
                 Case "surfacetension"
-                    Me.Fases(0).TPMProperties.surfaceTension = values(0)
+                    Me.Phases(0).TPMProperties.surfaceTension = values(0)
                 Case Else
                     Dim ex As New Exception
                     Dim hcode As Integer = 0
@@ -2270,7 +2270,7 @@ Namespace DTL.SimulationObjects.Streams
         ''' Compound identifiers that are returned by the GetCompoundList method of this interface. It
         ''' must be zero or a positive number.</remarks>
         Public Function GetNumCompounds() As Integer Implements ICapeThermoCompounds.GetNumCompounds
-            Return Me.Fases(0).Componentes.Count
+            Return Me.Phases(0).Components.Count
         End Function
 
         ''' <summary>
@@ -2590,7 +2590,7 @@ Namespace DTL.SimulationObjects.Streams
             If AtEquilibrium Then
                 For Each pi As PhaseInfo In Me.PropertyPackage.PhaseMappings.Values
                     If pi.PhaseLabel <> "Disabled" Then
-                        If Me.Fases(pi.DWPhaseIndex).SPMProperties.molarfraction.HasValue Then
+                        If Me.Phases(pi.DWPhaseIndex).SPMProperties.molarfraction.HasValue Then
                             pl.Add(pi.PhaseLabel)
                             stat.Add(CapeOpen.eCapePhaseStatus.CAPE_ATEQUILIBRIUM)
                         End If
@@ -2659,7 +2659,7 @@ Namespace DTL.SimulationObjects.Streams
 
             Dim res As New ArrayList
             Dim comps As New ArrayList
-            For Each c As Substancia In Me.Fases(0).Componentes.Values
+            For Each c As Substance In Me.Phases(0).Components.Values
                 comps.Add(c.Nome)
             Next
             Dim f As Integer = -1
@@ -2686,187 +2686,187 @@ Namespace DTL.SimulationObjects.Streams
 
             Select Case [property].ToLower
                 Case "compressibilityfactor"
-                    res.Add(Me.Fases(f).SPMProperties.compressibilityFactor.GetValueOrDefault)
+                    res.Add(Me.Phases(f).SPMProperties.compressibilityFactor.GetValueOrDefault)
                 Case "heatofvaporization"
                 Case "heatcapacity", "heatcapacitycp"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
-                            res.Add(Me.Fases(f).SPMProperties.heatCapacityCp.GetValueOrDefault * Me.PropertyPackage.AUX_MMM(phs))
+                            res.Add(Me.Phases(f).SPMProperties.heatCapacityCp.GetValueOrDefault * Me.PropertyPackage.AUX_MMM(phs))
                         Case "Mass", "mass"
-                            res.Add(Me.Fases(f).SPMProperties.heatCapacityCp.GetValueOrDefault * 1000)
+                            res.Add(Me.Phases(f).SPMProperties.heatCapacityCp.GetValueOrDefault * 1000)
                     End Select
                 Case "heatcapacitycv"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
-                            res.Add(Me.Fases(f).SPMProperties.heatCapacityCv.GetValueOrDefault * Me.PropertyPackage.AUX_MMM(phs))
+                            res.Add(Me.Phases(f).SPMProperties.heatCapacityCv.GetValueOrDefault * Me.PropertyPackage.AUX_MMM(phs))
                         Case "Mass", "mass"
-                            res.Add(Me.Fases(f).SPMProperties.heatCapacityCv.GetValueOrDefault * 1000)
+                            res.Add(Me.Phases(f).SPMProperties.heatCapacityCv.GetValueOrDefault * 1000)
                     End Select
                 Case "idealgasheatcapacity"
                     If f = 1 Then
-                        res.Add(Me.PropertyPackage.AUX_CPm(PropertyPackages.Fase.Liquid, Me.Fases(0).SPMProperties.temperature * 1000))
+                        res.Add(Me.PropertyPackage.AUX_CPm(PropertyPackages.Fase.Liquid, Me.Phases(0).SPMProperties.temperature * 1000))
                     Else
-                        res.Add(Me.PropertyPackage.AUX_CPm(PropertyPackages.Fase.Vapor, Me.Fases(0).SPMProperties.temperature * 1000))
+                        res.Add(Me.PropertyPackage.AUX_CPm(PropertyPackages.Fase.Vapor, Me.Phases(0).SPMProperties.temperature * 1000))
                     End If
                 Case "idealgasenthalpy"
                     If f = 1 Then
-                        res.Add(Me.PropertyPackage.RET_Hid(298.15, Me.Fases(0).SPMProperties.temperature.GetValueOrDefault * 1000, PropertyPackages.Fase.Liquid))
+                        res.Add(Me.PropertyPackage.RET_Hid(298.15, Me.Phases(0).SPMProperties.temperature.GetValueOrDefault * 1000, PropertyPackages.Fase.Liquid))
                     Else
-                        res.Add(Me.PropertyPackage.RET_Hid(298.15, Me.Fases(0).SPMProperties.temperature.GetValueOrDefault * 1000, PropertyPackages.Fase.Vapor))
+                        res.Add(Me.PropertyPackage.RET_Hid(298.15, Me.Phases(0).SPMProperties.temperature.GetValueOrDefault * 1000, PropertyPackages.Fase.Vapor))
                     End If
                 Case "excessenthalpy"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
-                            res.Add(Me.Fases(f).SPMProperties.excessEnthalpy.GetValueOrDefault * Me.PropertyPackage.AUX_MMM(phs))
+                            res.Add(Me.Phases(f).SPMProperties.excessEnthalpy.GetValueOrDefault * Me.PropertyPackage.AUX_MMM(phs))
                         Case "Mass", "mass"
-                            res.Add(Me.Fases(f).SPMProperties.excessEnthalpy.GetValueOrDefault * 1000)
+                            res.Add(Me.Phases(f).SPMProperties.excessEnthalpy.GetValueOrDefault * 1000)
                     End Select
                 Case "excessentropy"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
-                            res.Add(Me.Fases(f).SPMProperties.excessEntropy.GetValueOrDefault * Me.PropertyPackage.AUX_MMM(phs))
+                            res.Add(Me.Phases(f).SPMProperties.excessEntropy.GetValueOrDefault * Me.PropertyPackage.AUX_MMM(phs))
                         Case "Mass", "mass"
-                            res.Add(Me.Fases(f).SPMProperties.excessEntropy.GetValueOrDefault * 1000)
+                            res.Add(Me.Phases(f).SPMProperties.excessEntropy.GetValueOrDefault * 1000)
                     End Select
                 Case "viscosity"
-                    res.Add(Me.Fases(f).SPMProperties.viscosity.GetValueOrDefault)
+                    res.Add(Me.Phases(f).SPMProperties.viscosity.GetValueOrDefault)
                 Case "thermalconductivity"
-                    res.Add(Me.Fases(f).SPMProperties.thermalConductivity.GetValueOrDefault)
+                    res.Add(Me.Phases(f).SPMProperties.thermalConductivity.GetValueOrDefault)
                 Case "fugacity"
                     For Each c As String In comps
-                        res.Add(Me.Fases(f).Componentes(c).FracaoMolar.GetValueOrDefault * Me.Fases(f).Componentes(c).FugacityCoeff.GetValueOrDefault * Me.Fases(0).SPMProperties.pressure.GetValueOrDefault)
+                        res.Add(Me.Phases(f).Components(c).FracaoMolar.GetValueOrDefault * Me.Phases(f).Components(c).FugacityCoeff.GetValueOrDefault * Me.Phases(0).SPMProperties.pressure.GetValueOrDefault)
                     Next
                 Case "activity"
                     For Each c As String In comps
-                        res.Add(Me.Fases(f).Componentes(c).ActivityCoeff.GetValueOrDefault * Me.Fases(f).Componentes(c).FracaoMolar.GetValueOrDefault)
+                        res.Add(Me.Phases(f).Components(c).ActivityCoeff.GetValueOrDefault * Me.Phases(f).Components(c).FracaoMolar.GetValueOrDefault)
                     Next
                 Case "fugacitycoefficient"
                     For Each c As String In comps
-                        res.Add(Me.Fases(f).Componentes(c).FugacityCoeff.GetValueOrDefault)
+                        res.Add(Me.Phases(f).Components(c).FugacityCoeff.GetValueOrDefault)
                     Next
                 Case "activitycoefficient"
                     For Each c As String In comps
-                        res.Add(Me.Fases(f).Componentes(c).ActivityCoeff.GetValueOrDefault)
+                        res.Add(Me.Phases(f).Components(c).ActivityCoeff.GetValueOrDefault)
                     Next
                 Case "logfugacitycoefficient"
                     For Each c As String In comps
-                        res.Add(Math.Log(Me.Fases(f).Componentes(c).FugacityCoeff.GetValueOrDefault))
+                        res.Add(Math.Log(Me.Phases(f).Components(c).FugacityCoeff.GetValueOrDefault))
                     Next
                 Case "volume"
-                    res.Add(Me.Fases(f).SPMProperties.molecularWeight / Me.Fases(f).SPMProperties.density / 1000)
+                    res.Add(Me.Phases(f).SPMProperties.molecularWeight / Me.Phases(f).SPMProperties.density / 1000)
                 Case "density"
-                    res.Add(Me.Fases(f).SPMProperties.density.GetValueOrDefault)
+                    res.Add(Me.Phases(f).SPMProperties.density.GetValueOrDefault)
                 Case "enthalpy", "enthalpynf"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
-                            Dim val = Me.Fases(f).SPMProperties.molecularWeight.GetValueOrDefault
+                            Dim val = Me.Phases(f).SPMProperties.molecularWeight.GetValueOrDefault
                             If val = 0.0# Then
-                                res.Add(Me.Fases(f).SPMProperties.molar_enthalpy.GetValueOrDefault)
+                                res.Add(Me.Phases(f).SPMProperties.molar_enthalpy.GetValueOrDefault)
                             Else
-                                res.Add(Me.Fases(f).SPMProperties.enthalpy.GetValueOrDefault * val)
+                                res.Add(Me.Phases(f).SPMProperties.enthalpy.GetValueOrDefault * val)
                             End If
                         Case "Mass", "mass"
-                            res.Add(Me.Fases(f).SPMProperties.enthalpy.GetValueOrDefault * 1000)
+                            res.Add(Me.Phases(f).SPMProperties.enthalpy.GetValueOrDefault * 1000)
                     End Select
                 Case "entropy", "entropynf"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
-                            Dim val = Me.Fases(f).SPMProperties.molecularWeight.GetValueOrDefault
+                            Dim val = Me.Phases(f).SPMProperties.molecularWeight.GetValueOrDefault
                             If val = 0.0# Then
-                                res.Add(Me.Fases(f).SPMProperties.molar_entropy.GetValueOrDefault)
+                                res.Add(Me.Phases(f).SPMProperties.molar_entropy.GetValueOrDefault)
                             Else
-                                res.Add(Me.Fases(f).SPMProperties.entropy.GetValueOrDefault * val)
+                                res.Add(Me.Phases(f).SPMProperties.entropy.GetValueOrDefault * val)
                             End If
                         Case "Mass", "mass"
-                            res.Add(Me.Fases(f).SPMProperties.entropy.GetValueOrDefault * 1000)
+                            res.Add(Me.Phases(f).SPMProperties.entropy.GetValueOrDefault * 1000)
                     End Select
                 Case "enthalpyf"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
-                            Dim val = Me.Fases(f).SPMProperties.molecularWeight.GetValueOrDefault
+                            Dim val = Me.Phases(f).SPMProperties.molecularWeight.GetValueOrDefault
                             If val = 0.0# Then
-                                res.Add(Me.Fases(f).SPMProperties.molar_enthalpyF.GetValueOrDefault)
+                                res.Add(Me.Phases(f).SPMProperties.molar_enthalpyF.GetValueOrDefault)
                             Else
-                                res.Add(Me.Fases(f).SPMProperties.enthalpyF.GetValueOrDefault * val)
+                                res.Add(Me.Phases(f).SPMProperties.enthalpyF.GetValueOrDefault * val)
                             End If
                         Case "Mass", "mass"
-                            res.Add(Me.Fases(f).SPMProperties.enthalpyF.GetValueOrDefault * 1000)
+                            res.Add(Me.Phases(f).SPMProperties.enthalpyF.GetValueOrDefault * 1000)
                     End Select
                 Case "entropyf"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
-                            Dim val = Me.Fases(f).SPMProperties.molecularWeight.GetValueOrDefault
+                            Dim val = Me.Phases(f).SPMProperties.molecularWeight.GetValueOrDefault
                             If val = 0.0# Then
-                                res.Add(Me.Fases(f).SPMProperties.molar_entropyF.GetValueOrDefault)
+                                res.Add(Me.Phases(f).SPMProperties.molar_entropyF.GetValueOrDefault)
                             Else
-                                res.Add(Me.Fases(f).SPMProperties.entropyF.GetValueOrDefault * val)
+                                res.Add(Me.Phases(f).SPMProperties.entropyF.GetValueOrDefault * val)
                             End If
                         Case "Mass", "mass"
-                            res.Add(Me.Fases(f).SPMProperties.entropy.GetValueOrDefault * 1000)
+                            res.Add(Me.Phases(f).SPMProperties.entropy.GetValueOrDefault * 1000)
                     End Select
                 Case "moles"
-                    res.Add(Me.Fases(f).SPMProperties.molarflow.GetValueOrDefault)
+                    res.Add(Me.Phases(f).SPMProperties.molarflow.GetValueOrDefault)
                 Case "mass"
-                    res.Add(Me.Fases(f).SPMProperties.massflow.GetValueOrDefault)
+                    res.Add(Me.Phases(f).SPMProperties.massflow.GetValueOrDefault)
                 Case "molecularweight"
-                    res.Add(Me.Fases(f).SPMProperties.molecularWeight.GetValueOrDefault)
+                    res.Add(Me.Phases(f).SPMProperties.molecularWeight.GetValueOrDefault)
                 Case "temperature"
-                    res.Add(Me.Fases(0).SPMProperties.temperature.GetValueOrDefault)
+                    res.Add(Me.Phases(0).SPMProperties.temperature.GetValueOrDefault)
                 Case "pressure"
-                    res.Add(Me.Fases(0).SPMProperties.pressure.GetValueOrDefault)
+                    res.Add(Me.Phases(0).SPMProperties.pressure.GetValueOrDefault)
                 Case "flow"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
                             For Each c As String In comps
-                                res.Add(Me.Fases(f).Componentes(c).MolarFlow.GetValueOrDefault)
+                                res.Add(Me.Phases(f).Components(c).MolarFlow.GetValueOrDefault)
                             Next
                         Case "Mass", "mass"
                             For Each c As String In comps
-                                res.Add(Me.Fases(f).Componentes(c).MassFlow.GetValueOrDefault)
+                                res.Add(Me.Phases(f).Components(c).MassFlow.GetValueOrDefault)
                             Next
                     End Select
                 Case "fraction", "massfraction", "molarfraction"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
                             For Each c As String In comps
-                                res.Add(Me.Fases(f).Componentes(c).FracaoMolar.GetValueOrDefault)
+                                res.Add(Me.Phases(f).Components(c).FracaoMolar.GetValueOrDefault)
                             Next
                         Case "Mass", "mass"
                             For Each c As String In comps
-                                res.Add(Me.Fases(f).Componentes(c).FracaoMassica.GetValueOrDefault)
+                                res.Add(Me.Phases(f).Components(c).FracaoMassica.GetValueOrDefault)
                             Next
                         Case ""
                             If [property].ToLower.Contains("mole") Then
                                 For Each c As String In comps
-                                    res.Add(Me.Fases(f).Componentes(c).FracaoMolar.GetValueOrDefault)
+                                    res.Add(Me.Phases(f).Components(c).FracaoMolar.GetValueOrDefault)
                                 Next
                             ElseIf [property].ToLower.Contains("mass") Then
                                 For Each c As String In comps
-                                    res.Add(Me.Fases(f).Componentes(c).FracaoMassica.GetValueOrDefault)
+                                    res.Add(Me.Phases(f).Components(c).FracaoMassica.GetValueOrDefault)
                                 Next
                             End If
                     End Select
                 Case "concentration"
                     For Each c As String In comps
-                        res.Add(Me.Fases(f).Componentes(c).MassFlow.GetValueOrDefault / Me.Fases(f).SPMProperties.volumetric_flow.GetValueOrDefault)
+                        res.Add(Me.Phases(f).Components(c).MassFlow.GetValueOrDefault / Me.Phases(f).SPMProperties.volumetric_flow.GetValueOrDefault)
                     Next
                 Case "molarity"
                     For Each c As String In comps
-                        res.Add(Me.Fases(f).Componentes(c).MolarFlow.GetValueOrDefault / Me.Fases(f).SPMProperties.volumetric_flow.GetValueOrDefault)
+                        res.Add(Me.Phases(f).Components(c).MolarFlow.GetValueOrDefault / Me.Phases(f).SPMProperties.volumetric_flow.GetValueOrDefault)
                     Next
                 Case "phasefraction"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
-                            res.Add(Me.Fases(f).SPMProperties.molarfraction.GetValueOrDefault)
+                            res.Add(Me.Phases(f).SPMProperties.molarfraction.GetValueOrDefault)
                         Case "Mass", "mass"
-                            res.Add(Me.Fases(f).SPMProperties.massfraction.GetValueOrDefault)
+                            res.Add(Me.Phases(f).SPMProperties.massfraction.GetValueOrDefault)
                     End Select
                 Case "totalflow"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
-                            res.Add(Me.Fases(f).SPMProperties.molarflow.GetValueOrDefault)
+                            res.Add(Me.Phases(f).SPMProperties.molarflow.GetValueOrDefault)
                         Case "Mass", "mass"
-                            res.Add(Me.Fases(f).SPMProperties.massflow.GetValueOrDefault)
+                            res.Add(Me.Phases(f).SPMProperties.massflow.GetValueOrDefault)
                     End Select
                 Case Else
                     Dim ex = New Exception
@@ -2895,28 +2895,28 @@ Namespace DTL.SimulationObjects.Streams
         ''' of the ICapeThermoMaterial interface should be used.</remarks>
         Public Sub GetTPFraction(ByVal phaseLabel As String, ByRef temperature As Double, ByRef pressure As Double, ByRef composition As Object) Implements ICapeThermoMaterial.GetTPFraction
 
-            If Me.Fases(0).SPMProperties.temperature Is Nothing Or Me.Fases(0).SPMProperties.pressure Is Nothing Then
+            If Me.Phases(0).SPMProperties.temperature Is Nothing Or Me.Phases(0).SPMProperties.pressure Is Nothing Then
                 Throw New ArgumentException("Temperature and/or Pressure not set.")
             End If
 
-            temperature = Me.Fases(0).SPMProperties.temperature
-            pressure = Me.Fases(0).SPMProperties.pressure
+            temperature = Me.Phases(0).SPMProperties.temperature
+            pressure = Me.Phases(0).SPMProperties.pressure
 
             Dim arr As New ArrayList
             Dim comps As New ArrayList
-            For Each c As Substancia In Me.Fases(0).Componentes.Values
+            For Each c As Substance In Me.Phases(0).Components.Values
                 comps.Add(c.Nome)
             Next
             Select Case phaseLabel.ToLower
                 Case "overall"
                     For Each c As String In comps
-                        arr.Add(Me.Fases(0).Componentes(c).FracaoMolar)
+                        arr.Add(Me.Phases(0).Components(c).FracaoMolar)
                     Next
                 Case Else
                     For Each pi As PhaseInfo In Me.PropertyPackage.PhaseMappings.Values
                         If phaseLabel = pi.PhaseLabel Then
                             For Each c As String In comps
-                                arr.Add(Me.Fases(pi.DWPhaseIndex).Componentes(c).FracaoMolar)
+                                arr.Add(Me.Phases(pi.DWPhaseIndex).Components(c).FracaoMolar)
                             Next
                             Exit For
                         End If
@@ -2978,7 +2978,7 @@ Namespace DTL.SimulationObjects.Streams
             Dim f1 As Integer = -1
             Dim f2 As Integer = -1
             Dim comps As New ArrayList
-            For Each c As Substancia In Me.Fases(0).Componentes.Values
+            For Each c As Substance In Me.Phases(0).Components.Values
                 comps.Add(c.Nome)
             Next
 
@@ -3009,14 +3009,14 @@ Namespace DTL.SimulationObjects.Streams
             Select Case [property].ToLower
                 Case "kvalue"
                     For Each c As String In comps
-                        res.Add(Me.Fases(f1).Componentes(c).FracaoMolar.GetValueOrDefault / Me.Fases(f2).Componentes(c).FracaoMolar.GetValueOrDefault)
+                        res.Add(Me.Phases(f1).Components(c).FracaoMolar.GetValueOrDefault / Me.Phases(f2).Components(c).FracaoMolar.GetValueOrDefault)
                     Next
                 Case "logkvalue"
                     For Each c As String In comps
-                        res.Add(Math.Log(Me.Fases(f1).Componentes(c).FracaoMolar.GetValueOrDefault / Me.Fases(f2).Componentes(c).FracaoMolar.GetValueOrDefault))
+                        res.Add(Math.Log(Me.Phases(f1).Components(c).FracaoMolar.GetValueOrDefault / Me.Phases(f2).Components(c).FracaoMolar.GetValueOrDefault))
                     Next
                 Case "surfacetension"
-                    res.Add(Me.Fases(f2).TPMProperties.surfaceTension.GetValueOrDefault)
+                    res.Add(Me.Phases(f2).TPMProperties.surfaceTension.GetValueOrDefault)
                 Case Else
                     Throw New Exception
             End Select
@@ -3131,7 +3131,7 @@ Namespace DTL.SimulationObjects.Streams
         Public Sub SetSinglePhaseProp(ByVal [property] As String, ByVal phaseLabel As String, ByVal basis As String, ByVal values As Object) Implements ICapeThermoMaterial.SetSinglePhaseProp
 
             Dim comps As New ArrayList
-            For Each c As Substancia In Me.Fases(0).Componentes.Values
+            For Each c As Substance In Me.Phases(0).Components.Values
                 comps.Add(c.Nome)
             Next
             Dim f As Integer = -1
@@ -3158,140 +3158,140 @@ Namespace DTL.SimulationObjects.Streams
 
             Select Case [property].ToLower
                 Case "compressibilityfactor"
-                    Me.Fases(f).SPMProperties.compressibilityFactor = values(0)
+                    Me.Phases(f).SPMProperties.compressibilityFactor = values(0)
                 Case "heatcapacity", "heatcapacitycp"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
-                            Me.Fases(f).SPMProperties.heatCapacityCp = values(0) / Me.PropertyPackage.AUX_MMM(phs)
+                            Me.Phases(f).SPMProperties.heatCapacityCp = values(0) / Me.PropertyPackage.AUX_MMM(phs)
                         Case "Mass", "mass"
-                            Me.Fases(f).SPMProperties.heatCapacityCp = values(0) / 1000
+                            Me.Phases(f).SPMProperties.heatCapacityCp = values(0) / 1000
                     End Select
                 Case "heatcapacitycv"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
-                            Me.Fases(f).SPMProperties.heatCapacityCv = values(0) / Me.PropertyPackage.AUX_MMM(phs)
+                            Me.Phases(f).SPMProperties.heatCapacityCv = values(0) / Me.PropertyPackage.AUX_MMM(phs)
                         Case "Mass", "mass"
-                            Me.Fases(f).SPMProperties.heatCapacityCv = values(0) / 1000
+                            Me.Phases(f).SPMProperties.heatCapacityCv = values(0) / 1000
                     End Select
                 Case "excessenthalpy"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
-                            Me.Fases(f).SPMProperties.excessEnthalpy = values(0) / Me.PropertyPackage.AUX_MMM(phs)
+                            Me.Phases(f).SPMProperties.excessEnthalpy = values(0) / Me.PropertyPackage.AUX_MMM(phs)
                         Case "Mass", "mass"
-                            Me.Fases(f).SPMProperties.excessEnthalpy = values(0) / 1000
+                            Me.Phases(f).SPMProperties.excessEnthalpy = values(0) / 1000
                     End Select
                 Case "excessentropy"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
-                            Me.Fases(f).SPMProperties.excessEntropy = values(0) / Me.PropertyPackage.AUX_MMM(phs)
+                            Me.Phases(f).SPMProperties.excessEntropy = values(0) / Me.PropertyPackage.AUX_MMM(phs)
                         Case "Mass", "mass"
-                            Me.Fases(f).SPMProperties.excessEntropy = values(0) / 1000
+                            Me.Phases(f).SPMProperties.excessEntropy = values(0) / 1000
                     End Select
                 Case "viscosity"
-                    Me.Fases(f).SPMProperties.viscosity = values(0)
-                    Me.Fases(f).SPMProperties.kinematic_viscosity = values(0) / Me.Fases(f).SPMProperties.density.GetValueOrDefault
+                    Me.Phases(f).SPMProperties.viscosity = values(0)
+                    Me.Phases(f).SPMProperties.kinematic_viscosity = values(0) / Me.Phases(f).SPMProperties.density.GetValueOrDefault
                 Case "thermalconductivity"
-                    Me.Fases(f).SPMProperties.thermalConductivity = values(0)
+                    Me.Phases(f).SPMProperties.thermalConductivity = values(0)
                 Case "fugacity"
                     Dim i As Integer = 0
                     For Each c As String In comps
-                        Me.Fases(f).Componentes(c).FugacityCoeff = values(comps.IndexOf(c)) / (Me.Fases(0).SPMProperties.pressure.GetValueOrDefault * Me.Fases(f).Componentes(c).FracaoMolar.GetValueOrDefault)
+                        Me.Phases(f).Components(c).FugacityCoeff = values(comps.IndexOf(c)) / (Me.Phases(0).SPMProperties.pressure.GetValueOrDefault * Me.Phases(f).Components(c).FracaoMolar.GetValueOrDefault)
                         i += 1
                     Next
                 Case "fugacitycoefficient"
                     Dim i As Integer = 0
                     For Each c As String In comps
-                        Me.Fases(f).Componentes(c).FugacityCoeff = values(comps.IndexOf(c))
+                        Me.Phases(f).Components(c).FugacityCoeff = values(comps.IndexOf(c))
                         i += 1
                     Next
                 Case "activitycoefficient"
                     Dim i As Integer = 0
                     For Each c As String In comps
-                        Me.Fases(f).Componentes(c).ActivityCoeff = values(comps.IndexOf(c))
+                        Me.Phases(f).Components(c).ActivityCoeff = values(comps.IndexOf(c))
                         i += 1
                     Next
                 Case "logfugacitycoefficient"
                     Dim i As Integer = 0
                     For Each c As String In comps
-                        Me.Fases(f).Componentes(c).FugacityCoeff = Math.Exp(values(comps.IndexOf(c)))
+                        Me.Phases(f).Components(c).FugacityCoeff = Math.Exp(values(comps.IndexOf(c)))
                         i += 1
                     Next
                 Case "density"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
-                            Me.Fases(f).SPMProperties.density = values(0) / 1000 * Me.PropertyPackage.AUX_MMM(phs)
+                            Me.Phases(f).SPMProperties.density = values(0) / 1000 * Me.PropertyPackage.AUX_MMM(phs)
                         Case "Mass", "mass"
-                            Me.Fases(f).SPMProperties.density = values(0)
+                            Me.Phases(f).SPMProperties.density = values(0)
                     End Select
                 Case "volume"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
-                            Me.Fases(f).SPMProperties.density = 1 / values(0) / 1000 * Me.PropertyPackage.AUX_MMM(phs)
+                            Me.Phases(f).SPMProperties.density = 1 / values(0) / 1000 * Me.PropertyPackage.AUX_MMM(phs)
                         Case "Mass", "mass"
-                            Me.Fases(f).SPMProperties.density = 1 / values(0)
+                            Me.Phases(f).SPMProperties.density = 1 / values(0)
                     End Select
                 Case "enthalpy", "enthalpynf"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
-                            Me.Fases(f).SPMProperties.molar_enthalpy = values(0)
+                            Me.Phases(f).SPMProperties.molar_enthalpy = values(0)
                             Dim val = Me.PropertyPackage.AUX_MMM(phs)
-                            If val <> 0.0# Then Me.Fases(f).SPMProperties.enthalpy = values(0) / val
+                            If val <> 0.0# Then Me.Phases(f).SPMProperties.enthalpy = values(0) / val
                         Case "Mass", "mass"
-                            Me.Fases(f).SPMProperties.enthalpy = values(0) / 1000
-                            Me.Fases(f).SPMProperties.molar_enthalpy = values(0) * Me.PropertyPackage.AUX_MMM(phs)
+                            Me.Phases(f).SPMProperties.enthalpy = values(0) / 1000
+                            Me.Phases(f).SPMProperties.molar_enthalpy = values(0) * Me.PropertyPackage.AUX_MMM(phs)
                     End Select
                 Case "entropy", "entropynf"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
-                            Me.Fases(f).SPMProperties.molar_entropy = values(0)
+                            Me.Phases(f).SPMProperties.molar_entropy = values(0)
                             Dim val = Me.PropertyPackage.AUX_MMM(phs)
-                            If val <> 0.0# Then Me.Fases(f).SPMProperties.entropy = values(0) / val
+                            If val <> 0.0# Then Me.Phases(f).SPMProperties.entropy = values(0) / val
                         Case "Mass", "mass"
-                            Me.Fases(f).SPMProperties.entropy = values(0) / 1000
-                            Me.Fases(f).SPMProperties.molar_entropy = values(0) * Me.PropertyPackage.AUX_MMM(phs)
+                            Me.Phases(f).SPMProperties.entropy = values(0) / 1000
+                            Me.Phases(f).SPMProperties.molar_entropy = values(0) * Me.PropertyPackage.AUX_MMM(phs)
                     End Select
                 Case "enthalpyf"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
                             Dim val = Me.PropertyPackage.AUX_MMM(phs)
-                            Me.Fases(f).SPMProperties.molar_enthalpyF = values(0)
-                            If val <> 0.0# Then Me.Fases(f).SPMProperties.enthalpyF = values(0) / val
+                            Me.Phases(f).SPMProperties.molar_enthalpyF = values(0)
+                            If val <> 0.0# Then Me.Phases(f).SPMProperties.enthalpyF = values(0) / val
                         Case "Mass", "mass"
-                            Me.Fases(f).SPMProperties.enthalpyF = values(0) / 1000
-                            Me.Fases(f).SPMProperties.molar_enthalpyF = values(0) * Me.PropertyPackage.AUX_MMM(phs)
+                            Me.Phases(f).SPMProperties.enthalpyF = values(0) / 1000
+                            Me.Phases(f).SPMProperties.molar_enthalpyF = values(0) * Me.PropertyPackage.AUX_MMM(phs)
                     End Select
                 Case "entropyf"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
                             Dim val = Me.PropertyPackage.AUX_MMM(phs)
-                            Me.Fases(f).SPMProperties.molar_entropyF = values(0)
-                            If val <> 0.0# Then Me.Fases(f).SPMProperties.entropyF = values(0) / val
+                            Me.Phases(f).SPMProperties.molar_entropyF = values(0)
+                            If val <> 0.0# Then Me.Phases(f).SPMProperties.entropyF = values(0) / val
                         Case "Mass", "mass"
-                            Me.Fases(f).SPMProperties.entropyF = values(0) / 1000
-                            Me.Fases(f).SPMProperties.molar_entropyF = values(0) * Me.PropertyPackage.AUX_MMM(phs)
+                            Me.Phases(f).SPMProperties.entropyF = values(0) / 1000
+                            Me.Phases(f).SPMProperties.molar_entropyF = values(0) * Me.PropertyPackage.AUX_MMM(phs)
                     End Select
                 Case "moles"
-                    Me.Fases(f).SPMProperties.molarflow = values(0)
+                    Me.Phases(f).SPMProperties.molarflow = values(0)
                 Case "Mass"
-                    Me.Fases(f).SPMProperties.massflow = values(0)
+                    Me.Phases(f).SPMProperties.massflow = values(0)
                 Case "molecularweight"
-                    Me.Fases(f).SPMProperties.molecularWeight = values(0)
+                    Me.Phases(f).SPMProperties.molecularWeight = values(0)
                 Case "temperature"
-                    Me.Fases(0).SPMProperties.temperature = values(0)
+                    Me.Phases(0).SPMProperties.temperature = values(0)
                 Case "pressure"
-                    Me.Fases(0).SPMProperties.pressure = values(0)
+                    Me.Phases(0).SPMProperties.pressure = values(0)
                 Case "flow"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
                             Dim i As Integer = 0
                             For Each c As String In comps
-                                Me.Fases(f).Componentes(c).MolarFlow = values(comps.IndexOf(c))
+                                Me.Phases(f).Components(c).MolarFlow = values(comps.IndexOf(c))
                                 i += 1
                             Next
                         Case "Mass", "mass"
                             Dim i As Integer = 0
                             For Each c As String In comps
-                                Me.Fases(f).Componentes(c).MassFlow = values(comps.IndexOf(c))
+                                Me.Phases(f).Components(c).MassFlow = values(comps.IndexOf(c))
                                 i += 1
                             Next
                     End Select
@@ -3300,31 +3300,31 @@ Namespace DTL.SimulationObjects.Streams
                         Case "Molar", "molar", "mole", "Mole"
                             Dim i As Integer = 0
                             For Each c As String In comps
-                                Me.Fases(f).Componentes(c).FracaoMolar = values(comps.IndexOf(c))
+                                Me.Phases(f).Components(c).FracaoMolar = values(comps.IndexOf(c))
                                 i += 1
                             Next
                         Case "Mass", "mass"
                             Dim i As Integer = 0
                             For Each c As String In comps
-                                Me.Fases(f).Componentes(c).FracaoMassica = values(comps.IndexOf(c))
+                                Me.Phases(f).Components(c).FracaoMassica = values(comps.IndexOf(c))
                                 i += 1
                             Next
                     End Select
                 Case "phasefraction"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
-                            Me.Fases(f).SPMProperties.molarfraction = values(0)
+                            Me.Phases(f).SPMProperties.molarfraction = values(0)
                         Case "Mass", "mass"
-                            Me.Fases(f).SPMProperties.massfraction = values(0)
+                            Me.Phases(f).SPMProperties.massfraction = values(0)
                     End Select
                 Case "totalflow"
                     Select Case basis
                         Case "Molar", "molar", "mole", "Mole"
-                            Me.Fases(f).SPMProperties.molarflow = values(0)
-                            'Me.Fases(f).SPMProperties.massflow = values(0) / 1000 * Me.PropertyPackage.AUX_MMM(phs)
+                            Me.Phases(f).SPMProperties.molarflow = values(0)
+                            'Me.Phases(f).SPMProperties.massflow = values(0) / 1000 * Me.PropertyPackage.AUX_MMM(phs)
                         Case "Mass", "mass"
-                            Me.Fases(f).SPMProperties.massflow = values(0)
-                            'Me.Fases(f).SPMProperties.molarflow = values(0)
+                            Me.Phases(f).SPMProperties.massflow = values(0)
+                            'Me.Phases(f).SPMProperties.molarflow = values(0)
                     End Select
                 Case Else
                     Dim ex = New Exception
@@ -3371,24 +3371,24 @@ Namespace DTL.SimulationObjects.Streams
         ''' be called before calling SetTwoPhaseProp.</remarks>
         Public Sub SetTwoPhaseProp(ByVal [property] As String, ByVal phaseLabels As Object, ByVal basis As String, ByVal values As Object) Implements ICapeThermoMaterial.SetTwoPhaseProp
             Dim comps As New ArrayList
-            For Each c As Substancia In Me.Fases(0).Componentes.Values
+            For Each c As Substance In Me.Phases(0).Components.Values
                 comps.Add(c.Nome)
             Next
             Select Case [property].ToLower
                 Case "kvalue"
                     Dim i As Integer = 0
                     For Each c As String In comps
-                        Me.Fases(0).Componentes(c).Kvalue = values(i)
+                        Me.Phases(0).Components(c).Kvalue = values(i)
                         i += 1
                     Next
                 Case "logkvalue"
                     Dim i As Integer = 0
                     For Each c As String In comps
-                        Me.Fases(0).Componentes(c).lnKvalue = values(i)
+                        Me.Phases(0).Components(c).lnKvalue = values(i)
                         i += 1
                     Next
                 Case "surfacetension"
-                    Me.Fases(0).TPMProperties.surfaceTension = values(0)
+                    Me.Phases(0).TPMProperties.surfaceTension = values(0)
                 Case Else
                     Dim ex = New Exception
                     Dim hcode As Integer = 0

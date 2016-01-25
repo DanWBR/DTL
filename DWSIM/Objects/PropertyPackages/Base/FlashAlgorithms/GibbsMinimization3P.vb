@@ -325,7 +325,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                             idx(i) = i
                         Else
                             j = 0
-                            For Each subst As DTL.ClassesBasicasTermodinamica.Substancia In PP.CurrentMaterialStream.Fases(0).Componentes.Values
+                            For Each subst As DTL.BaseThermoClasses.Substance In PP.CurrentMaterialStream.Phases(0).Components.Values
                                 If subst.Nome = Me.StabSearchCompIDs(i) Then
                                     idx(i) = j
                                     Exit For
@@ -451,8 +451,8 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
                             Solver = numsolver.IPOPT
 
-                            Using problem As New Ipopt(initval2.Length, lconstr2, uconstr2, n + 1, glow, gup, (n + 1) * 2, 0, _
-                                    AddressOf eval_f, AddressOf eval_g, _
+                            Using problem As New Ipopt(initval2.Length, lconstr2, uconstr2, n + 1, glow, gup, (n + 1) * 2, 0,
+                                    AddressOf eval_f, AddressOf eval_g,
                                     AddressOf eval_grad_f, AddressOf eval_jac_g, AddressOf eval_h)
                                 problem.AddOption("tol", etol)
                                 problem.AddOption("max_iter", maxit_e)
@@ -1119,7 +1119,7 @@ out:        Return result
                         idx(i) = i
                     Else
                         j = 0
-                        For Each subst As DTL.ClassesBasicasTermodinamica.Substancia In PP.CurrentMaterialStream.Fases(0).Componentes.Values
+                        For Each subst As DTL.BaseThermoClasses.Substance In PP.CurrentMaterialStream.Phases(0).Components.Values
                             If subst.Nome = Me.StabSearchCompIDs(i) Then
                                 idx(i) = j
                                 Exit For
@@ -1240,7 +1240,7 @@ out:        Return result
                         idx(i) = i
                     Else
                         j = 0
-                        For Each subst As DTL.ClassesBasicasTermodinamica.Substancia In PP.CurrentMaterialStream.Fases(0).Componentes.Values
+                        For Each subst As DTL.BaseThermoClasses.Substance In PP.CurrentMaterialStream.Phases(0).Components.Values
                             If subst.Nome = Me.StabSearchCompIDs(i) Then
                                 idx(i) = j
                                 Exit For

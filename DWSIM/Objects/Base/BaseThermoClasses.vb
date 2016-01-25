@@ -27,9 +27,9 @@ Imports DTL.DTL.SimulationObjects.Streams
 Imports System.Reflection
 Imports System.Globalization
 
-Namespace DTL.ClassesBasicasTermodinamica
+Namespace DTL.BaseThermoClasses
 
-    <System.Serializable()> Public Class Substancia
+    <System.Serializable()> Public Class Substance
 
         Protected m_ComponentDescription As String = ""
         Protected m_ComponentName As String = ""
@@ -218,7 +218,7 @@ Namespace DTL.ClassesBasicasTermodinamica
             End Set
         End Property
 
-        Public Componentes As Dictionary(Of String, Substancia)
+        Public Components As Dictionary(Of String, Substance)
 
         Public SPMProperties As New SinglePhaseMixtureProperties
         Public TPMProperties As New TwoPhaseMixtureProperties
@@ -227,15 +227,15 @@ Namespace DTL.ClassesBasicasTermodinamica
 
             Me.m_ComponentName = nome
             Me.m_ComponentDescription = descricao
-            Me.Componentes = New Dictionary(Of String, Substancia)
+            Me.Components = New Dictionary(Of String, Substance)
 
         End Sub
 
-        Public Sub New(ByVal nome As String, ByVal descricao As String, ByVal substancias As Dictionary(Of String, Substancia))
+        Public Sub New(ByVal nome As String, ByVal descricao As String, ByVal Substances As Dictionary(Of String, Substance))
 
             Me.m_ComponentName = nome
             Me.m_ComponentDescription = descricao
-            Me.Componentes = substancias
+            Me.Components = Substances
 
         End Sub
 
