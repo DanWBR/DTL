@@ -46,13 +46,11 @@ Namespace DTL.SimulationObjects.PropertyPackages
         Public thermobase As ThermoPlug
         Public ppbase As PropertyPackage
 
-#Region "        Enums"
+#Region "Enums"
 
         Public Enum ErrorCode
-
             MaximumIterationsReached = 0
             IterationDiverged = 1
-
         End Enum
 
         Public Enum FallbackType
@@ -62,7 +60,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
 #End Region
 
-#Region "        Properties"
+#Region "Properties"
 
         Private m_flashtype As String = "LL"
         Private m_flashfallback As FallbackType = FallbackType.VLL
@@ -133,7 +131,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
 #End Region
 
-#Region "        Base Flash and Stability Codes"
+#Region "Base Flash and Stability Codes"
 
         Private Function StabTest(ByVal T As Double, ByVal P As Double, ByVal Vz As Array, ByVal VKij As Object, ByVal VTc As Array, ByVal VPc As Array, ByVal Vw As Array, Optional ByVal VzArray(,) As Double = Nothing, Optional ByVal otherargs As Object = Nothing)
 
@@ -1032,7 +1030,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
             Vsup = Vinf
             Vinf = Vinf - delta_V
 
-            'método de Brent para encontrar Vc
+            'Brent method to find Vc
 
             Dim aaa, bbb, ccc, ddd, eee, min11, min22, faa, fbb, fcc, ppp, qqq, rrr, sss, tol11, xmm As Double
             Dim ITMAX2 As Integer = 100
@@ -1131,7 +1129,7 @@ Final3:
 
 #End Region
 
-#Region "        Bubble/Dew Point Functions"
+#Region "Bubble/Dew Point Functions"
 
         Function _dKdT(ByVal T As Double, ByVal P As Double, ByVal Vx As Object, ByVal Vy As Object, ByVal VKij As Object, ByVal VTc As Object, ByVal VPc As Object, ByVal Vw As Object, Optional ByVal otherargs As Object = Nothing) As Object
 
@@ -1357,25 +1355,6 @@ Final:
             Loop Until Abs(F) < m_tolerance
 
             'check for trivial solution
-
-            'Dim sumk As Double = 0
-            'i = 0
-            'Do
-            '    sumk += KI(i) / n
-            '    i = i + 1
-            'Loop Until i = n + 1
-
-            'If Abs(sumk - 1) < 0.1 Then
-
-            '    i = 0
-            '    P = 0
-            '    Do
-            '        P = P + Vy(i) / Vp(i)
-            '        i = i + 1
-            '    Loop Until i = n + 1
-            '    P = 1 / P
-            'End If
-
             Dim tmp2(n + 1)
             tmp2(0) = Pant
             i = 0
@@ -1523,25 +1502,6 @@ Final:
             Loop Until Abs(F) < m_tolerance
 
             ''check for trivial solution
-
-            'Dim sumk As Double = 0
-            'i = 0
-            'Do
-            '    sumk += KI(i) / n
-            '    i = i + 1
-            'Loop Until i = n + 1
-
-            'If Abs(sumk - 1) < 0.1 Then
-
-            '    i = 0
-            '    P = 0
-            '    Do
-            '        P = P + Vx(i) * Vp(i)
-            '        i = i + 1
-            '    Loop Until i = n + 1
-
-            'End If
-
             Dim tmp2(n + 1)
             tmp2(0) = P
             i = 0
@@ -1691,25 +1651,6 @@ Final:
             Loop Until Abs(F) < m_tolerance
 
             'check for trivial solution
-
-            'Dim sumk As Double = 0
-            'i = 0
-            'Do
-            '    sumk += KI(i) / n
-            '    i = i + 1
-            'Loop Until i = n + 1
-
-            'If Abs(sumk - 1) < 0.1 Then
-
-            '    i = 0
-            '    T = 0
-            '    Do
-            '        T = T + Vy(i) * ppbase.AUX_TSATi(P, i)
-            '        i = i + 1
-            '    Loop Until i = n + 1
-
-            'End If
-
             Dim tmp2(n + 1)
             tmp2(0) = T
             i = 0
@@ -1857,25 +1798,6 @@ Final:
             Loop Until Abs(F) < m_tolerance
 
             'check for trivial solution
-
-            'Dim sumk As Double = 0
-            'i = 0
-            'Do
-            '    sumk += KI(i) / n
-            '    i = i + 1
-            'Loop Until i = n + 1
-
-            'If Abs(sumk - 1) < 0.1 Then
-
-            '    i = 0
-            '    T = 0
-            '    Do
-            '        T = T + Vx(i) * ppbase.AUX_TSATi(P, i)
-            '        i = i + 1
-            '    Loop Until i = n + 1
-
-            'End If
-
             Dim tmp2(n + 1)
             tmp2(0) = Tant
             i = 0
@@ -1890,7 +1812,7 @@ Final:
 
 #End Region
 
-#Region "        Critical Point General Calculation Routines (EXPERIMENTAL)"
+#Region "Critical Point General Calculation Routines (EXPERIMENTAL)"
 
         Public Function dlnfug_i_dn_j(ByVal jidx As Integer, ByVal T As Double, ByVal V As Double, ByVal Vz As Array, ByVal VKij As Object, ByVal VTc As Array, ByVal VPc As Array, ByVal Vw As Array, Optional ByVal otherargs As Object = Nothing)
 
@@ -2012,9 +1934,6 @@ Final:
         Private Function QijDetBrent(ByVal x As Double, ByVal otherargs As Object) As Double
 
             Dim T As Double = x
-
-            'ByVal T As Double, ByVal V As Double, ByVal Vz As Array, ByVal VTc As Array, 
-            'ByVal VPc As Array, ByVal Vw As Array, ByVal VKIj As Array, Optional ByVal otherargs
 
             Dim V As Double = otherargs(0)
             Dim Vz As Array = otherargs(1)
