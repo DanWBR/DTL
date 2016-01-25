@@ -70,7 +70,7 @@ Module Module1
         'dtlc.EnableGPUProcessing()
         'dtlc.InitComputeDevice(Cudafy.eLanguage.Cuda, 0)
 
-        Dim ip As DTL.DTL.ClassesBasicasTermodinamica.InteractionParameter = dtlc.GetInteractionParameterSet("NRTL", "Water", "Ethanol")
+        Dim ip As DTL.DTL.BaseThermoClasses.InteractionParameter = dtlc.GetInteractionParameterSet("NRTL", "Water", "Ethanol")
         Console.WriteLine("A12 = " & ip.Parameters("A12").ToString & " cal/mol")
         Console.WriteLine("A21 = " & ip.Parameters("A21").ToString & " cal/mol")
         Console.WriteLine("alpha = " & ip.Parameters("alpha").ToString)

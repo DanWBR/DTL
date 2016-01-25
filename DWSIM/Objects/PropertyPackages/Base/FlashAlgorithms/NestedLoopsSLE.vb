@@ -21,7 +21,7 @@ Imports DTL.DTL.SimulationObjects
 Imports DTL.DTL.MathEx
 Imports DTL.DTL.MathEx.Common
 Imports System.Threading.Tasks
-Imports DTL.DTL.ClassesBasicasTermodinamica
+Imports DTL.DTL.BaseThermoClasses
 Imports System.Linq
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms

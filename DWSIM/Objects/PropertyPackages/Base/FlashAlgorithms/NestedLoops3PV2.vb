@@ -334,7 +334,7 @@ out:
                         idx(i) = i
                     Else
                         j = 0
-                        For Each subst As DTL.ClassesBasicasTermodinamica.Substancia In PP.CurrentMaterialStream.Fases(0).Componentes.Values
+                        For Each subst As DTL.BaseThermoClasses.Substance In PP.CurrentMaterialStream.Phases(0).Components.Values
                             If subst.Nome = Me.StabSearchCompIDs(i) Then
                                 idx(i) = j
                                 Exit For
@@ -801,19 +801,19 @@ out:
 
                     If My.MyApplication._EnableParallelProcessing Then
                         My.MyApplication.IsRunningParallelTasks = True
-                           Dim task1 As Task = New Task(Sub()
-                                                             fx = Herror(x1, {P, Vz, PP})
-                                                         End Sub)
-                            Dim task2 As Task = New Task(Sub()
-                                                             fx2 = Herror(x1 + epsilon(j), {P, Vz, PP})
-                                                         End Sub)
-                            task1.Start()
-                            task2.Start()
-                            Task.WaitAll(task1, task2)
-                            My.MyApplication.IsRunningParallelTasks = False
+                        Dim task1 As Task = New Task(Sub()
+                                                         fx = Herror(x1, {P, Vz, PP})
+                                                     End Sub)
+                        Dim task2 As Task = New Task(Sub()
+                                                         fx2 = Herror(x1 + epsilon(j), {P, Vz, PP})
+                                                     End Sub)
+                        task1.Start()
+                        task2.Start()
+                        Task.WaitAll(task1, task2)
+                        My.MyApplication.IsRunningParallelTasks = False
                     Else
-                            fx = Herror(x1, {P, Vz, PP})
-                            fx2 = Herror(x1 + epsilon(j), {P, Vz, PP})
+                        fx = Herror(x1, {P, Vz, PP})
+                        fx2 = Herror(x1 + epsilon(j), {P, Vz, PP})
                     End If
 
                     If Abs(fx) < tolEXT Then Exit Do
@@ -922,16 +922,16 @@ alt:
 
                     If My.MyApplication._EnableParallelProcessing Then
                         My.MyApplication.IsRunningParallelTasks = True
-                      
-                            Dim task1 As Task = New Task(Sub()
-                                                             fx = Serror(x1, {P, Vz, PP})
-                                                         End Sub)
-                            Dim task2 As Task = New Task(Sub()
-                                                             fx2 = Serror(x1 + epsilon(j), {P, Vz, PP})
-                                                         End Sub)
-                            task1.Start()
-                            task2.Start()
-                            Task.WaitAll(task1, task2)
+
+                        Dim task1 As Task = New Task(Sub()
+                                                         fx = Serror(x1, {P, Vz, PP})
+                                                     End Sub)
+                        Dim task2 As Task = New Task(Sub()
+                                                         fx2 = Serror(x1 + epsilon(j), {P, Vz, PP})
+                                                     End Sub)
+                        task1.Start()
+                        task2.Start()
+                        Task.WaitAll(task1, task2)
                         My.MyApplication.IsRunningParallelTasks = False
                     Else
                         fx = Serror(x1, {P, Vz, PP})
@@ -1108,7 +1108,7 @@ alt:
                         idx(i) = i
                     Else
                         j = 0
-                        For Each subst As DTL.ClassesBasicasTermodinamica.Substancia In PP.CurrentMaterialStream.Fases(0).Componentes.Values
+                        For Each subst As DTL.BaseThermoClasses.Substance In PP.CurrentMaterialStream.Phases(0).Components.Values
                             If subst.Nome = Me.StabSearchCompIDs(i) Then
                                 idx(i) = j
                                 Exit For
@@ -1228,7 +1228,7 @@ alt:
                         idx(i) = i
                     Else
                         j = 0
-                        For Each subst As DTL.ClassesBasicasTermodinamica.Substancia In PP.CurrentMaterialStream.Fases(0).Componentes.Values
+                        For Each subst As DTL.BaseThermoClasses.Substance In PP.CurrentMaterialStream.Phases(0).Components.Values
                             If subst.Nome = Me.StabSearchCompIDs(i) Then
                                 idx(i) = j
                                 Exit For

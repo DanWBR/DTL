@@ -317,7 +317,7 @@ out:
                 Dim ff As Integer
 
                 i = 0
-                For Each subst As DTL.ClassesBasicasTermodinamica.Substancia In PP.CurrentMaterialStream.Fases(0).Componentes.Values
+                For Each subst As DTL.BaseThermoClasses.Substance In PP.CurrentMaterialStream.Phases(0).Components.Values
                     ff = Array.IndexOf(StabSearchCompIDs, subst.Nome)
                     If ff >= 0 And Vz(i) > 0 And T < subst.ConstantProperties.Critical_Temperature Then nt += 1
                     i += 1
@@ -329,7 +329,7 @@ out:
 
                 i = 0
                 j = 0
-                For Each subst As DTL.ClassesBasicasTermodinamica.Substancia In PP.CurrentMaterialStream.Fases(0).Componentes.Values
+                For Each subst As DTL.BaseThermoClasses.Substance In PP.CurrentMaterialStream.Phases(0).Components.Values
                     ff = Array.IndexOf(StabSearchCompIDs, subst.Nome)
                     If ff >= 0 And Vz(i) > 0 And T < subst.ConstantProperties.Critical_Temperature Then
                         idx(j) = i
@@ -478,12 +478,12 @@ out:
                 Dim task1 As Task = New Task(Sub()
                                                  Ki1 = PP.DW_CalcKvalue(Vx1EST, VyEST, T, P)
                                              End Sub)
-                    Dim task2 As Task = New Task(Sub()
-                                                     Ki2 = PP.DW_CalcKvalue(Vx2EST, VyEST, T, P)
-                                                 End Sub)
-                    task1.Start()
-                    task2.Start()
-                    Task.WaitAll(task1, task2)
+                Dim task2 As Task = New Task(Sub()
+                                                 Ki2 = PP.DW_CalcKvalue(Vx2EST, VyEST, T, P)
+                                             End Sub)
+                task1.Start()
+                task2.Start()
+                Task.WaitAll(task1, task2)
                 My.MyApplication.IsRunningParallelTasks = False
             Else
                 Ki1 = PP.DW_CalcKvalue(Vx1EST, VyEST, T, P)
@@ -595,16 +595,16 @@ out:
                     Dim task1 As Task = New Task(Sub()
                                                      CFL1 = proppack.DW_CalcFugCoeff(Vx1, T, P, State.Liquid)
                                                  End Sub)
-                        Dim task2 As Task = New Task(Sub()
-                                                         CFL2 = proppack.DW_CalcFugCoeff(Vx2, T, P, State.Liquid)
-                                                     End Sub)
-                        Dim task3 As Task = New Task(Sub()
-                                                         CFV = proppack.DW_CalcFugCoeff(Vy, T, P, State.Vapor)
-                                                     End Sub)
-                        task1.Start()
-                        task2.Start()
-                        task3.Start()
-                        Task.WaitAll(task1, task2, task3)
+                    Dim task2 As Task = New Task(Sub()
+                                                     CFL2 = proppack.DW_CalcFugCoeff(Vx2, T, P, State.Liquid)
+                                                 End Sub)
+                    Dim task3 As Task = New Task(Sub()
+                                                     CFV = proppack.DW_CalcFugCoeff(Vy, T, P, State.Vapor)
+                                                 End Sub)
+                    task1.Start()
+                    task2.Start()
+                    task3.Start()
+                    Task.WaitAll(task1, task2, task3)
                     My.MyApplication.IsRunningParallelTasks = False
                 Else
                     CFL1 = proppack.DW_CalcFugCoeff(Vx1, T, P, State.Liquid)
@@ -1007,12 +1007,12 @@ out:
                         Dim task1 As Task = New Task(Sub()
                                                          fx = Serror(x1, {P, Vz, PP})
                                                      End Sub)
-                            Dim task2 As Task = New Task(Sub()
-                                                             fx2 = Serror(x1 + epsilon(j), {P, Vz, PP})
-                                                         End Sub)
-                            task1.Start()
-                            task2.Start()
-                            Task.WaitAll(task1, task2)
+                        Dim task2 As Task = New Task(Sub()
+                                                         fx2 = Serror(x1 + epsilon(j), {P, Vz, PP})
+                                                     End Sub)
+                        task1.Start()
+                        task2.Start()
+                        Task.WaitAll(task1, task2)
                         My.MyApplication.IsRunningParallelTasks = False
                     Else
                         fx = Serror(x1, {P, Vz, PP})
@@ -1114,16 +1114,16 @@ alt:
                 Dim task1 As Task = New Task(Sub()
                                                  If V > 0 Then _Hv = proppack.DW_CalcEnthalpy(Vy, T, P, State.Vapor)
                                              End Sub)
-                    Dim task2 As Task = New Task(Sub()
-                                                     If L1 > 0 Then _Hl1 = proppack.DW_CalcEnthalpy(Vx1, T, P, State.Liquid)
-                                                 End Sub)
-                    Dim task3 As Task = New Task(Sub()
-                                                     If L2 > 0 Then _Hl2 = proppack.DW_CalcEnthalpy(Vx2, T, P, State.Liquid)
-                                                 End Sub)
-                    task1.Start()
-                    task2.Start()
-                    task3.Start()
-                    Task.WaitAll(task1, task2, task3)
+                Dim task2 As Task = New Task(Sub()
+                                                 If L1 > 0 Then _Hl1 = proppack.DW_CalcEnthalpy(Vx1, T, P, State.Liquid)
+                                             End Sub)
+                Dim task3 As Task = New Task(Sub()
+                                                 If L2 > 0 Then _Hl2 = proppack.DW_CalcEnthalpy(Vx2, T, P, State.Liquid)
+                                             End Sub)
+                task1.Start()
+                task2.Start()
+                task3.Start()
+                Task.WaitAll(task1, task2, task3)
                 My.MyApplication.IsRunningParallelTasks = False
             Else
                 If V > 0 Then _Hv = proppack.DW_CalcEnthalpy(Vy, T, P, State.Vapor)
@@ -1181,11 +1181,11 @@ alt:
         End Function
 
         Function Herror(ByVal type As String, ByVal X As Double, ByVal P As Double, ByVal Vz() As Double, ByVal PP As PropertyPackages.PropertyPackage) As Object
-             Return OBJ_FUNC_PH_FLASH(type, X, P, Vz, PP)
+            Return OBJ_FUNC_PH_FLASH(type, X, P, Vz, PP)
         End Function
 
         Function Serror(ByVal Tt As Double, ByVal otherargs As Object) As Double
-             Return OBJ_FUNC_PS_FLASH(Tt, Sf, Pf, fi)
+            Return OBJ_FUNC_PS_FLASH(Tt, Sf, Pf, fi)
         End Function
 
         Public Overrides Function Flash_TV(ByVal Vz As Double(), ByVal T As Double, ByVal V As Double, ByVal Pref As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
@@ -1207,7 +1207,7 @@ alt:
                 Dim nc As Integer = UBound(Vz)
 
                 i = 0
-                For Each subst As DTL.ClassesBasicasTermodinamica.Substancia In PP.CurrentMaterialStream.Fases(0).Componentes.Values
+                For Each subst As DTL.BaseThermoClasses.Substance In PP.CurrentMaterialStream.Phases(0).Components.Values
                     ff = Array.IndexOf(StabSearchCompIDs, subst.Nome)
                     If ff >= 0 And Vz(i) > 0 And T < subst.ConstantProperties.Critical_Temperature Then nt += 1
                     i += 1
@@ -1219,7 +1219,7 @@ alt:
 
                 i = 0
                 j = 0
-                For Each subst As DTL.ClassesBasicasTermodinamica.Substancia In PP.CurrentMaterialStream.Fases(0).Componentes.Values
+                For Each subst As DTL.BaseThermoClasses.Substance In PP.CurrentMaterialStream.Phases(0).Components.Values
                     ff = Array.IndexOf(StabSearchCompIDs, subst.Nome)
                     If ff >= 0 And Vz(i) > 0 And T < subst.ConstantProperties.Critical_Temperature Then
                         idx(j) = i
@@ -1328,7 +1328,7 @@ alt:
                 Dim nc As Integer = UBound(Vz)
 
                 i = 0
-                For Each subst As DTL.ClassesBasicasTermodinamica.Substancia In PP.CurrentMaterialStream.Fases(0).Componentes.Values
+                For Each subst As DTL.BaseThermoClasses.Substance In PP.CurrentMaterialStream.Phases(0).Components.Values
                     ff = Array.IndexOf(StabSearchCompIDs, subst.Nome)
                     If ff >= 0 And Vz(i) > 0 And T < subst.ConstantProperties.Critical_Temperature Then nt += 1
                     i += 1
@@ -1340,7 +1340,7 @@ alt:
 
                 i = 0
                 j = 0
-                For Each subst As DTL.ClassesBasicasTermodinamica.Substancia In PP.CurrentMaterialStream.Fases(0).Componentes.Values
+                For Each subst As DTL.BaseThermoClasses.Substance In PP.CurrentMaterialStream.Phases(0).Components.Values
                     ff = Array.IndexOf(StabSearchCompIDs, subst.Nome)
                     If ff >= 0 And Vz(i) > 0 And T < subst.ConstantProperties.Critical_Temperature Then
                         idx(j) = i

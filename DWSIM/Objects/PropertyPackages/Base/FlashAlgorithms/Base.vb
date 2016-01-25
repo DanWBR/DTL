@@ -19,7 +19,7 @@
 Imports System.Math
 Imports System.Threading.Tasks
 Imports DTL.DTL.SimulationObjects.PropertyPackages.ThermoPlugs
-Imports DTL.DTL.ClassesBasicasTermodinamica
+Imports DTL.DTL.BaseThermoClasses
 Imports System.Linq
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms

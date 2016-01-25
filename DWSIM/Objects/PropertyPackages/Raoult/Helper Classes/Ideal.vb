@@ -19,7 +19,7 @@
 Imports System.Collections.Generic
 Imports FileHelpers
 Imports System.Math
-Imports DTL.DTL.ClassesBasicasTermodinamica
+Imports DTL.DTL.BaseThermoClasses
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 

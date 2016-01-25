@@ -78,7 +78,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                         idx(i) = i
                     Else
                         j = 0
-                        For Each subst As DTL.ClassesBasicasTermodinamica.Substancia In PP.CurrentMaterialStream.Fases(0).Componentes.Values
+                        For Each subst As DTL.BaseThermoClasses.Substance In PP.CurrentMaterialStream.Phases(0).Components.Values
                             If subst.Nome = Me.StabSearchCompIDs(i) Then
                                 idx(i) = j
                                 Exit For
@@ -227,7 +227,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                         idx(i) = i
                     Else
                         j = 0
-                        For Each subst As DTL.ClassesBasicasTermodinamica.Substancia In PP.CurrentMaterialStream.Fases(0).Componentes.Values
+                        For Each subst As DTL.BaseThermoClasses.Substance In PP.CurrentMaterialStream.Phases(0).Components.Values
                             If subst.Nome = Me.StabSearchCompIDs(i) Then
                                 idx(i) = j
                                 Exit For
@@ -364,7 +364,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                         idx(i) = i
                     Else
                         j = 0
-                        For Each subst As DTL.ClassesBasicasTermodinamica.Substancia In PP.CurrentMaterialStream.Fases(0).Componentes.Values
+                        For Each subst As DTL.BaseThermoClasses.Substance In PP.CurrentMaterialStream.Phases(0).Components.Values
                             If subst.Nome = Me.StabSearchCompIDs(i) Then
                                 idx(i) = j
                                 Exit For
@@ -503,7 +503,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                         idx(i) = i
                     Else
                         j = 0
-                        For Each subst As DTL.ClassesBasicasTermodinamica.Substancia In PP.CurrentMaterialStream.Fases(0).Componentes.Values
+                        For Each subst As DTL.BaseThermoClasses.Substance In PP.CurrentMaterialStream.Phases(0).Components.Values
                             If subst.Nome = Me.StabSearchCompIDs(i) Then
                                 idx(i) = j
                                 Exit For
@@ -622,7 +622,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                         idx(i) = i
                     Else
                         j = 0
-                        For Each subst As DTL.ClassesBasicasTermodinamica.Substancia In PP.CurrentMaterialStream.Fases(0).Componentes.Values
+                        For Each subst As DTL.BaseThermoClasses.Substance In PP.CurrentMaterialStream.Phases(0).Components.Values
                             If subst.Nome = Me.StabSearchCompIDs(i) Then
                                 idx(i) = j
                                 Exit For

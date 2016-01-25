@@ -40,7 +40,7 @@ Namespace DTL
             Return UniqueName
         End Function
 
-        Public Shared Function GetComponentType(ByRef comp As DTL.ClassesBasicasTermodinamica.ConstantProperties) As String
+        Public Shared Function GetComponentType(ByRef comp As DTL.BaseThermoClasses.ConstantProperties) As String
             If comp.IsHYPO Then
                 Return GetLocalString("CompHypo")
             ElseIf comp.IsPF Then
