@@ -105,18 +105,18 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                 i += 1
             Next
 
-            Dim soma_xq = 0.0#
+            Dim sum_xq = 0.0#
             i = 0
             Do
                 Q(i) = VQ(i)
-                soma_xq = soma_xq + Vx(i) * Q(i)
+                sum_xq = sum_xq + Vx(i) * Q(i)
                 i = i + 1
             Loop Until i = n + 1
 
             i = 0
             For Each item In VEKI
                 For Each item2 In item
-                    val = Vx(i) * Q(i) * VEKI(i)(item2.Key) / soma_xq
+                    val = Vx(i) * Q(i) * VEKI(i)(item2.Key) / sum_xq
                     If Not teta.ContainsKey(item2.Key) Then teta.Add(item2.Key, val) Else teta(item2.Key) += val
                 Next
                 i += 1
@@ -129,21 +129,21 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                 Next
             Next
 
-            Dim soma_xr = 0.0#
-            Dim soma_xr_ = 0.0#
+            Dim sum_xr = 0.0#
+            Dim sum_xr_ = 0.0#
             i = 0
             Do
                 R(i) = VR(i)
-                soma_xr = soma_xr + Vx(i) * R(i)
-                soma_xr_ = soma_xr_ + Vx(i) * R(i) ^ (3 / 4)
+                sum_xr = sum_xr + Vx(i) * R(i)
+                sum_xr_ = sum_xr_ + Vx(i) * R(i) ^ (3 / 4)
                 i = i + 1
             Loop Until i = n + 1
 
             i = 0
             Do
-                j(i) = R(i) / soma_xr
-                j_(i) = R(i) ^ (3 / 4) / soma_xr_
-                L(i) = Q(i) / soma_xq
+                j(i) = R(i) / sum_xr
+                j_(i) = R(i) ^ (3 / 4) / sum_xr_
+                L(i) = Q(i) / sum_xq
                 Vgammac(i) = 1 - j_(i) + Math.Log(j_(i)) - 5 * Q(i) * (1 - j(i) / L(i) + Math.Log(j(i) / L(i)))
                 k = 0
                 Dim tmpsum = 0.0#

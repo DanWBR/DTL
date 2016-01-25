@@ -954,7 +954,7 @@ Final3:
             Dim beta As Double
             Dim criterioOK As Boolean = False
             Dim hbcIndex, counter As Integer
-            Dim soma_x As Double
+            Dim sum_x As Double
             Dim ZV As Double
             Dim AG, BG, aml, bml As Double
 
@@ -1140,14 +1140,14 @@ Final3:
                         Vx(hbcIndex) += 1
                         'e em seguida normaliza-se a composição.
                         i = 0
-                        soma_x = 0
+                        sum_x = 0
                         Do
-                            soma_x = soma_x + Vx(i)
+                            sum_x = sum_x + Vx(i)
                             i = i + 1
                         Loop Until i = n + 1
                         i = 0
                         Do
-                            Vx(i) = Vx(i) / soma_x
+                            Vx(i) = Vx(i) / sum_x
                             i = i + 1
                         Loop Until i = n + 1
                     Else

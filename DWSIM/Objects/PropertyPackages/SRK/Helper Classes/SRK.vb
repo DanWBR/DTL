@@ -86,8 +86,8 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         Function Z_SRK(ByVal T, ByVal P, ByVal Vx, ByVal VKij, ByVal VTc, ByVal VPc, ByVal Vw, ByVal TIPO)
 
-            DTL.App.WriteToConsole("SRK cubic equation root finder (Z) for T = " & T & " K, P = " & P & " Pa and Phase = " & TIPO, 3)
-            DTL.App.WriteToConsole("Mole fractions: " & DirectCast(Vx, Double()).ToArrayString, 3)
+            App.WriteToConsole("SRK cubic equation root finder (Z) for T = " & T & " K, P = " & P & " Pa and Phase = " & TIPO, 3)
+            App.WriteToConsole("Mole fractions: " & DirectCast(Vx, Double()).ToArrayString, 3)
 
             Dim ai(), bi(), aml2(), amv2() As Double
             Dim n, R, coeff(3), tmp() As Double
@@ -224,7 +224,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                 Z_SRK = temp1(2, 0)
             End If
 
-            DTL.App.WriteToConsole("Result: Z = " & Z_SRK, 3)
+            App.WriteToConsole("Result: Z = " & Z_SRK, 3)
 
         End Function
 
@@ -725,7 +725,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                     Do
                         findZ = coeff(3) * Z ^ 3 + coeff(2) * Z ^ 2 + coeff(1) * Z + coeff(0)
                         Z -= 0.00001
-                        If Z < 0 Then Throw New Exception(DTL.App.GetLocalString("PropPack_ZError"))
+                        If Z < 0 Then Throw New Exception(App.GetLocalString("PropPack_ZError"))
                     Loop Until Math.Abs(findZ) < 0.0001
 
                 Else
@@ -734,7 +734,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                     Do
                         findZ = coeff(3) * Z ^ 3 + coeff(2) * Z ^ 2 + coeff(1) * Z + coeff(0)
                         Z += 0.00001
-                        If Z > 1 Then Throw New Exception(DTL.App.GetLocalString("PropPack_ZError"))
+                        If Z > 1 Then Throw New Exception(App.GetLocalString("PropPack_ZError"))
                     Loop Until Math.Abs(findZ) < 0.0001
 
                 End If
@@ -991,7 +991,7 @@ Final3:
             Dim beta As Double
             Dim criterioOK As Boolean = False
             Dim hbcIndex, counter As Integer
-            Dim soma_x As Double
+            Dim sum_x As Double
             Dim ZV As Double
             Dim AG, BG, aml, bml As Double
 
@@ -1153,14 +1153,14 @@ Final3:
                         Vx(hbcIndex) += 1
                         'e em seguida normaliza-se a composição.
                         i = 0
-                        soma_x = 0
+                        sum_x = 0
                         Do
-                            soma_x = soma_x + Vx(i)
+                            sum_x = sum_x + Vx(i)
                             i = i + 1
                         Loop Until i = n + 1
                         i = 0
                         Do
-                            Vx(i) = Vx(i) / soma_x
+                            Vx(i) = Vx(i) / sum_x
                             i = i + 1
                         Loop Until i = n + 1
                     Else

@@ -519,7 +519,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
                     End If
                     i = i + 1
                 Loop Until i = n + 1
-                If Math.Abs(F / dF) > 1 Then
+                If Abs(F / dF) > 1 Then
                     v = -F / dF * 0.5 * v + v
                 Else
                     v = -F / dF + v
@@ -929,7 +929,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
                 End If
                 i = i + 1
             Loop Until i = n + 1
-            If Math.Abs(F / dF) > 1 Then
+            If Abs(F / dF) > 1 Then
                 v = -F / dF * 0.5 * v + v
             Else
                 v = -F / dF + v
@@ -1054,7 +1054,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
                     ddd = bbb - aaa
                     eee = ddd
                 End If
-                If Math.Abs(fcc) < Math.Abs(fbb) Then
+                If Abs(fcc) < Abs(fbb) Then
                     aaa = bbb
                     bbb = ccc
                     ccc = aaa
@@ -1064,8 +1064,8 @@ Namespace DTL.SimulationObjects.PropertyPackages
                 End If
                 tol11 = 0.000001
                 xmm = 0.5 * (ccc - bbb)
-                If (Math.Abs(xmm) <= tol11) Or (fbb = 0) Then GoTo Final3
-                If (Math.Abs(eee) >= tol11) And (Math.Abs(faa) > Math.Abs(fbb)) Then
+                If (Abs(xmm) <= tol11) Or (fbb = 0) Then GoTo Final3
+                If (Abs(eee) >= tol11) And (Abs(faa) > Abs(fbb)) Then
                     sss = fbb / faa
                     If aaa = ccc Then
                         ppp = 2 * xmm * sss
@@ -1077,9 +1077,9 @@ Namespace DTL.SimulationObjects.PropertyPackages
                         qqq = (qqq - 1) * (rrr - 1) * (sss - 1)
                     End If
                     If ppp > 0 Then qqq = -qqq
-                    ppp = Math.Abs(ppp)
-                    min11 = 3 * xmm * qqq - Math.Abs(tol11 * qqq)
-                    min22 = Math.Abs(eee * qqq)
+                    ppp = Abs(ppp)
+                    min11 = 3 * xmm * qqq - Abs(tol11 * qqq)
+                    min22 = Abs(eee * qqq)
                     Dim tvar2 As Double
                     If min11 < min22 Then tvar2 = min11
                     If min11 > min22 Then tvar2 = min22
@@ -1096,7 +1096,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
                 End If
                 aaa = bbb
                 faa = fbb
-                If (Math.Abs(ddd) > tol11) Then
+                If (Abs(ddd) > tol11) Then
                     bbb += ddd
                 Else
                     bbb += Math.Sign(xmm) * tol11
@@ -1241,7 +1241,7 @@ Final:
             Dim Vx(n), LN_CFL(n), LN_CFV(n) As Double
             Dim Vp(n), R, coeff(3) As Double
             Dim i As Integer
-            Dim soma_x As Double
+            Dim sum_x As Double
             Dim marcador
             Dim stmp4_ant, stmp4, Pant As Double
             stmp4_ant = 0
@@ -1275,15 +1275,15 @@ Final:
             Loop Until i = n + 1
 
             i = 0
-            soma_x = 0
+            sum_x = 0
             Do
-                soma_x = soma_x + Vx(i)
+                sum_x = sum_x + Vx(i)
                 i = i + 1
             Loop Until i = n + 1
 
             i = 0
             Do
-                Vx(i) = Vx(i) / soma_x
+                Vx(i) = Vx(i) / sum_x
                 i = i + 1
             Loop Until i = n + 1
 
@@ -1323,7 +1323,7 @@ Final:
 
                     marcador2 = 0
                     If marcador = 1 Then
-                        If Math.Abs(stmp4_ant - stmp4) < m_tolerance Then
+                        If Abs(stmp4_ant - stmp4) < m_tolerance Then
                             marcador2 = 1
                         End If
                     End If
@@ -1354,7 +1354,7 @@ Final:
                 If cnt >= m_mite Then Throw New Exception(ErrorCode.MaximumIterationsReached)
                 If Double.IsNaN(P) Then Throw New Exception(ErrorCode.IterationDiverged)
 
-            Loop Until Math.Abs(F) < m_tolerance
+            Loop Until Abs(F) < m_tolerance
 
             'check for trivial solution
 
@@ -1403,7 +1403,7 @@ Final:
             Dim Vy(n), Vx_ant(n), Vy_ant(n), LN_CFL(n), LN_CFV(n) As Double
             Dim Vp(n), R, coeff(3), tmp(2, 2) As Double
             Dim i As Integer
-            Dim soma_y As Double
+            Dim sum_y As Double
             Dim marcador3, marcador
             Dim stmp4_ant, stmp4, Pant As Double
             stmp4_ant = 0
@@ -1438,15 +1438,15 @@ Final:
             Loop Until i = n + 1
 
             i = 0
-            soma_y = 0
+            sum_y = 0
             Do
-                soma_y = soma_y + Vy(i)
+                sum_y = sum_y + Vy(i)
                 i = i + 1
             Loop Until i = n + 1
 
             i = 0
             Do
-                Vy(i) = Vy(i) / soma_y
+                Vy(i) = Vy(i) / sum_y
                 i = i + 1
             Loop Until i = n + 1
 
@@ -1489,7 +1489,7 @@ Final:
 
                     marcador2 = 0
                     If marcador = 1 Then
-                        If Math.Abs(stmp4_ant - stmp4) < m_tolerance Then
+                        If Abs(stmp4_ant - stmp4) < m_tolerance Then
                             marcador2 = 1
                         End If
                     End If
@@ -1520,7 +1520,7 @@ Final:
                 If cnt >= m_mite Then Throw New Exception(ErrorCode.MaximumIterationsReached)
                 If Double.IsNaN(P) Then Throw New Exception(ErrorCode.IterationDiverged)
 
-            Loop Until Math.Abs(F) < m_tolerance
+            Loop Until Abs(F) < m_tolerance
 
             ''check for trivial solution
 
@@ -1569,7 +1569,7 @@ Final:
             Dim Vx(n), LN_CFL(n), LN_CFV(n) As Double
             Dim Vp(n) As Double
             Dim i As Integer
-            Dim soma_x As Double
+            Dim sum_x As Double
             Dim marcador
             Dim stmp4_ant, stmp4, Tant As Double
             stmp4_ant = 0
@@ -1601,15 +1601,15 @@ Final:
             Loop Until i = n + 1
 
             i = 0
-            soma_x = 0
+            sum_x = 0
             Do
-                soma_x = soma_x + Vx(i)
+                sum_x = sum_x + Vx(i)
                 i = i + 1
             Loop Until i = n + 1
 
             i = 0
             Do
-                Vx(i) = Vx(i) / soma_x
+                Vx(i) = Vx(i) / sum_x
                 i = i + 1
             Loop Until i = n + 1
 
@@ -1657,7 +1657,7 @@ Final:
 
                     marcador2 = 0
                     If marcador = 1 Then
-                        If Math.Abs(stmp4_ant - stmp4) < m_tolerance Then
+                        If Abs(stmp4_ant - stmp4) < m_tolerance Then
                             marcador2 = 1
                         End If
                     End If
@@ -1688,7 +1688,7 @@ Final:
                 If cnt >= m_mite Then Throw New Exception(ErrorCode.MaximumIterationsReached)
                 If Double.IsNaN(T) Then Throw New Exception(ErrorCode.IterationDiverged)
 
-            Loop Until Math.Abs(F) < m_tolerance
+            Loop Until Abs(F) < m_tolerance
 
             'check for trivial solution
 
@@ -1738,7 +1738,7 @@ Final:
             Dim Vy(n), Vx_ant(n), Vy_ant(n), LN_CFL(n), LN_CFV(n) As Double
             Dim Vp(n) As Double
             Dim i As Integer
-            Dim soma_y As Double
+            Dim sum_y As Double
             Dim marcador
             Dim stmp4_ant, stmp4, Tant As Double
             stmp4_ant = 0
@@ -1769,15 +1769,15 @@ Final:
             Loop Until i = n + 1
 
             i = 0
-            soma_y = 0
+            sum_y = 0
             Do
-                soma_y = soma_y + Vy(i)
+                sum_y = sum_y + Vy(i)
                 i = i + 1
             Loop Until i = n + 1
 
             i = 0
             Do
-                Vy(i) = Vy(i) / soma_y
+                Vy(i) = Vy(i) / sum_y
                 i = i + 1
             Loop Until i = n + 1
 
@@ -1823,7 +1823,7 @@ Final:
 
                     marcador2 = 0
                     If marcador = 1 Then
-                        If Math.Abs(stmp4_ant - stmp4) < m_tolerance Then
+                        If Abs(stmp4_ant - stmp4) < m_tolerance Then
                             marcador2 = 1
                         End If
                     End If
@@ -1854,7 +1854,7 @@ Final:
                 If cnt >= m_mite Then Throw New Exception(ErrorCode.MaximumIterationsReached)
                 If Double.IsNaN(T) Then Throw New Exception(ErrorCode.IterationDiverged)
 
-            Loop Until Math.Abs(F) < m_tolerance
+            Loop Until Abs(F) < m_tolerance
 
             'check for trivial solution
 
@@ -2124,16 +2124,16 @@ Final:
                 Loop Until i = n + 1
             End Try
 
-            Dim soma_Dn = 0
+            Dim sum_Dn = 0
             i = 0
             Do
-                soma_Dn += (Dn0(i) ^ 2) ^ 0.5
+                sum_Dn += (Dn0(i) ^ 2) ^ 0.5
                 i = i + 1
             Loop Until i = n + 1
 
             i = 0
             Do
-                Dn(i) = Dn0(i) / soma_Dn
+                Dn(i) = Dn0(i) / sum_Dn
                 i = i + 1
             Loop Until i = n + 1
 

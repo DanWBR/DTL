@@ -125,7 +125,7 @@ Namespace DTL.MathEx.ODESolver
                         d(l) = (m * m)
                     End If
                     m = (m * 2)
-                    g = (ho / CDbl(m))
+                    g = (ho / m)
                     b = (g * 2)
                     If (bh And (j < 9)) Then
                         i = 1
@@ -193,10 +193,10 @@ Namespace DTL.MathEx.ODESolver
                                 k += 1
                             Loop
                         End If
-                        If (Not isabserr And (Math.Abs(CDbl((y(i) - ta))) > (err * s(i)))) Then
+                        If (Not isabserr And (Math.Abs(y(i) - ta) > (err * s(i)))) Then
                             konv = False
                         End If
-                        If (isabserr And (Math.Abs(CDbl((y(i) - ta))) > err)) Then
+                        If (isabserr And (Math.Abs(y(i) - ta) > err)) Then
                             konv = False
                         End If
                         y(i) = ta

@@ -250,7 +250,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                 err -= Vx2(i) * act2(i) * Vp(i)
             Next
 
-            Return Math.Abs(err)
+            Return Abs(err)
 
         End Function
 
@@ -739,7 +739,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                     dfdx = (fx - fx2)
                     Tinv = Tinv - fx / dfdx
                     i += 1
-                Loop Until Math.Abs(fx) < 0.000001 Or i = 25
+                Loop Until Abs(fx) < 0.000001 Or i = 25
             End If
 
             If Double.IsNaN(Tinv) Or Double.IsInfinity(Tinv) Then Tinv = 2000

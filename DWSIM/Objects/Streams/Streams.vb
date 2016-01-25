@@ -109,14 +109,14 @@ Namespace DTL.SimulationObjects.Streams
             Me.m_ComponentName = Name
             Me.m_ComponentDescription = Description
 
-            Me.Phases.Add("0", New DTL.BaseThermoClasses.Phase(DTL.App.GetLocalString("Mistura"), ""))
-            Me.Phases.Add("1", New DTL.BaseThermoClasses.Phase(DTL.App.GetLocalString("OverallLiquid"), ""))
-            Me.Phases.Add("2", New DTL.BaseThermoClasses.Phase(DTL.App.GetLocalString("Vapor"), ""))
-            Me.Phases.Add("3", New DTL.BaseThermoClasses.Phase(DTL.App.GetLocalString("Liquid1"), ""))
-            Me.Phases.Add("4", New DTL.BaseThermoClasses.Phase(DTL.App.GetLocalString("Liquid2"), ""))
-            Me.Phases.Add("5", New DTL.BaseThermoClasses.Phase(DTL.App.GetLocalString("Liquid3"), ""))
-            Me.Phases.Add("6", New DTL.BaseThermoClasses.Phase(DTL.App.GetLocalString("Aqueous"), ""))
-            Me.Phases.Add("7", New DTL.BaseThermoClasses.Phase(DTL.App.GetLocalString("Solid"), ""))
+            Me.Phases.Add("0", New DTL.BaseThermoClasses.Phase(App.GetLocalString("Mistura"), ""))
+            Me.Phases.Add("1", New DTL.BaseThermoClasses.Phase(App.GetLocalString("OverallLiquid"), ""))
+            Me.Phases.Add("2", New DTL.BaseThermoClasses.Phase(App.GetLocalString("Vapor"), ""))
+            Me.Phases.Add("3", New DTL.BaseThermoClasses.Phase(App.GetLocalString("Liquid1"), ""))
+            Me.Phases.Add("4", New DTL.BaseThermoClasses.Phase(App.GetLocalString("Liquid2"), ""))
+            Me.Phases.Add("5", New DTL.BaseThermoClasses.Phase(App.GetLocalString("Liquid3"), ""))
+            Me.Phases.Add("6", New DTL.BaseThermoClasses.Phase(App.GetLocalString("Aqueous"), ""))
+            Me.Phases.Add("7", New DTL.BaseThermoClasses.Phase(App.GetLocalString("Solid"), ""))
 
         End Sub
 
@@ -317,7 +317,7 @@ Namespace DTL.SimulationObjects.Streams
             Dim cv As New DTL.UnitsOfMeasure.Converter
             Dim value As String = ""
             Dim sname As String = ""
-            Dim propidx As Integer = CInt(prop.Split(",")(0).Split("_")(2))
+            Dim propidx As Integer = prop.Split(",")(0).Split("_")(2)
             If prop.Split(",").Length = 2 Then
                 sname = prop.Split(",")(1)
             End If
@@ -807,7 +807,7 @@ Namespace DTL.SimulationObjects.Streams
 
             If su Is Nothing Then su = New DTL.UnitsOfMeasure.UnitsSI
             Dim cv As New DTL.UnitsOfMeasure.Converter
-            Dim propidx As Integer = CInt(prop.Split(",")(0).Split("_")(2))
+            Dim propidx As Integer = prop.Split(",")(0).Split("_")(2)
             Dim sname As String = ""
             If prop.Split(",").Length = 2 Then
                 sname = prop.Split(",")(1)
@@ -927,7 +927,7 @@ Namespace DTL.SimulationObjects.Streams
 
             If su Is Nothing Then su = New DTL.UnitsOfMeasure.UnitsSI
             Dim value As String = ""
-            Dim propidx As Integer = CInt(prop.Split(",")(0).Split("_")(2))
+            Dim propidx As Integer = prop.Split(",")(0).Split("_")(2)
 
             Select Case propidx
 

@@ -121,7 +121,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
 
         Shared Function ZtoMinG(ByVal Z_ As Array, ByVal T As Double, ByVal P As Double, ByVal Vz As Array, ByVal VKij As Object, ByVal VTc As Array, ByVal VPc As Array, ByVal Vw As Array) As Object
 
-            DTL.App.WriteToConsole("SRK min-G root finder (Z) for T = " & T & " K, P = " & P & " Pa and Z = " & DirectCast(Z_, Object()).ToArrayString, 3)
+            App.WriteToConsole("SRK min-G root finder (Z) for T = " & T & " K, P = " & P & " Pa and Z = " & DirectCast(Z_, Object()).ToArrayString, 3)
 
             Dim S, H, Z As Double
 
@@ -238,7 +238,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
 
             Next
 
-            DTL.App.WriteToConsole("Result: Min-G Z Index = " & k, 3)
+            App.WriteToConsole("Result: Min-G Z Index = " & k, 3)
 
             Return New Object() {k, G(k)}
 
@@ -708,7 +708,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
                     Do
                         findZ = coeff(3) * Z ^ 3 + coeff(2) * Z ^ 2 + coeff(1) * Z + coeff(0)
                         Z -= 0.00001
-                        If Z < 0 Then Throw New Exception(DTL.App.GetLocalString("PropPack_ZError"))
+                        If Z < 0 Then Throw New Exception(App.GetLocalString("PropPack_ZError"))
                     Loop Until Math.Abs(findZ) < 0.0001
 
                 Else
@@ -717,7 +717,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
                     Do
                         findZ = coeff(3) * Z ^ 3 + coeff(2) * Z ^ 2 + coeff(1) * Z + coeff(0)
                         Z += 0.00001
-                        If Z > 1 Then Throw New Exception(DTL.App.GetLocalString("PropPack_ZError"))
+                        If Z > 1 Then Throw New Exception(App.GetLocalString("PropPack_ZError"))
                     Loop Until Math.Abs(findZ) < 0.0001
 
                 End If
@@ -879,7 +879,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
                     Do
                         findZ = coeff(3) * Z ^ 3 + coeff(2) * Z ^ 2 + coeff(1) * Z + coeff(0)
                         Z -= 0.00001
-                        If Z < 0 Then Throw New Exception(DTL.App.GetLocalString("PropPack_ZError"))
+                        If Z < 0 Then Throw New Exception(App.GetLocalString("PropPack_ZError"))
                     Loop Until Math.Abs(findZ) < 0.0001
 
                 Else
@@ -888,7 +888,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
                     Do
                         findZ = coeff(3) * Z ^ 3 + coeff(2) * Z ^ 2 + coeff(1) * Z + coeff(0)
                         Z += 0.00001
-                        If Z > 1 Then Throw New Exception(DTL.App.GetLocalString("PropPack_ZError"))
+                        If Z > 1 Then Throw New Exception(App.GetLocalString("PropPack_ZError"))
                     Loop Until Math.Abs(findZ) < 0.0001
 
                 End If
@@ -1050,7 +1050,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
                     Do
                         findZ = coeff(3) * Z ^ 3 + coeff(2) * Z ^ 2 + coeff(1) * Z + coeff(0)
                         Z -= 0.00001
-                        If Z < 0 Then Throw New Exception(DTL.App.GetLocalString("PropPack_ZError"))
+                        If Z < 0 Then Throw New Exception(App.GetLocalString("PropPack_ZError"))
                     Loop Until Math.Abs(findZ) < 0.0001
 
                 Else
@@ -1059,7 +1059,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
                     Do
                         findZ = coeff(3) * Z ^ 3 + coeff(2) * Z ^ 2 + coeff(1) * Z + coeff(0)
                         Z += 0.00001
-                        If Z > 1 Then Throw New Exception(DTL.App.GetLocalString("PropPack_ZError"))
+                        If Z > 1 Then Throw New Exception(App.GetLocalString("PropPack_ZError"))
                     Loop Until Math.Abs(findZ) < 0.0001
 
                 End If
@@ -1221,7 +1221,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
                     Do
                         findZ = coeff(3) * Z ^ 3 + coeff(2) * Z ^ 2 + coeff(1) * Z + coeff(0)
                         Z -= 0.00001
-                        If Z < 0 Then Throw New Exception(DTL.App.GetLocalString("PropPack_ZError"))
+                        If Z < 0 Then Throw New Exception(App.GetLocalString("PropPack_ZError"))
                     Loop Until Math.Abs(findZ) < 0.0001
 
                 Else
@@ -1230,7 +1230,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
                     Do
                         findZ = coeff(3) * Z ^ 3 + coeff(2) * Z ^ 2 + coeff(1) * Z + coeff(0)
                         Z += 0.00001
-                        If Z > 1 Then Throw New Exception(DTL.App.GetLocalString("PropPack_ZError"))
+                        If Z > 1 Then Throw New Exception(App.GetLocalString("PropPack_ZError"))
                     Loop Until Math.Abs(findZ) < 0.0001
 
                 End If

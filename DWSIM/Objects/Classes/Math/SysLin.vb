@@ -489,11 +489,11 @@ Namespace DTL.MathEx.SysLin
             Dim t1 As Double() = New Double(0) {}
             Dim s As Double = 0
             Dim i_ As Integer = 0
-            pivots = New Integer((Math.Min(CInt((m - 1)), CInt((n - 1))) + 1)) {}
-            t1 = New Double((Math.Max(CInt((m - 1)), CInt((n - 1))) + 1)) {}
+            pivots = (New Integer((Math.Min(m - 1, n - 1) + 1)) {})
+            t1 = (New Double((Math.Max(m - 1, n - 1) + 1)) {})
             If Not ((m = 0) Or (n = 0)) Then
                 j = 0
-                Do While (j <= Math.Min(CInt((m - 1)), CInt((n - 1))))
+                Do While (j <= Math.Min(m - 1, n - 1))
                     jp = j
                     i = (j + 1)
                     Do While (i <= (m - 1))
