@@ -22,7 +22,7 @@ Imports System.Linq
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
-    <System.Serializable()> Public Class Unifac
+    <Serializable()> Public Class Unifac
 
         Public UnifGroups As UnifacGroups
 
@@ -313,7 +313,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
     End Class
 
-    <System.Serializable()> Public Class UnifacLL
+    <Serializable()> Public Class UnifacLL
 
         Public UnifGroups As UnifacGroupsLL
 
@@ -697,7 +697,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
     End Class
 
-    <System.Serializable()> Public Class UnifacGroups
+    <Serializable()> Public Class UnifacGroups
 
         Public InteracParam As System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))
         Protected m_groups As System.Collections.Generic.Dictionary(Of Integer, UnifacGroup)
@@ -770,7 +770,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
     End Class
 
-    <System.Serializable()> Public Class UnifacGroupsLL
+    <Serializable()> Public Class UnifacGroupsLL
 
         Public InteracParam As System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))
         Protected m_groups As System.Collections.Generic.Dictionary(Of Integer, UnifacGroup)
@@ -842,7 +842,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
     End Class
 
-    <System.Serializable()> Public Class UnifacGroup
+    <Serializable()> Public Class UnifacGroup
 
         Protected m_primarygroupname As String
         Protected m_groupname As String

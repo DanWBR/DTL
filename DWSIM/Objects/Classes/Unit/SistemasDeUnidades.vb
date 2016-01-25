@@ -18,7 +18,7 @@
 
 Namespace DTL.UnitsOfMeasure
 
-    <System.Serializable()> <Xml.Serialization.XmlRoot(ElementName:="Component")> Public Class Units
+    <Serializable()> <Xml.Serialization.XmlRoot(ElementName:="Component")> Public Class Units
 
         Public Name As String
 
@@ -80,7 +80,7 @@ Namespace DTL.UnitsOfMeasure
         End Sub
     End Class
 
-    <System.Serializable()> Public Class UnitsSI
+    <Serializable()> Public Class UnitsSI
 
         Inherits Units
 
@@ -159,7 +159,7 @@ Namespace DTL.UnitsOfMeasure
 
     End Class
 
-    <System.Serializable()> Public Class UnitsSI_Deriv1
+    <Serializable()> Public Class UnitsSI_Deriv1
 
         Inherits Units
 
@@ -238,7 +238,7 @@ Namespace DTL.UnitsOfMeasure
 
     End Class
 
-    <System.Serializable()> Public Class UnitsSI_Deriv2
+    <Serializable()> Public Class UnitsSI_Deriv2
 
         Inherits Units
 
@@ -317,7 +317,7 @@ Namespace DTL.UnitsOfMeasure
 
     End Class
 
-    <System.Serializable()> Public Class UnitsSI_Deriv3
+    <Serializable()> Public Class UnitsSI_Deriv3
 
         Inherits Units
 
@@ -396,7 +396,7 @@ Namespace DTL.UnitsOfMeasure
 
     End Class
 
-    <System.Serializable()> Public Class UnitsSI_Deriv4
+    <Serializable()> Public Class UnitsSI_Deriv4
 
         Inherits Units
 
@@ -475,7 +475,7 @@ Namespace DTL.UnitsOfMeasure
 
     End Class
 
-    <System.Serializable()> Public Class UnitsINGLES
+    <Serializable()> Public Class UnitsINGLES
 
         Inherits Units
 
@@ -554,7 +554,7 @@ Namespace DTL.UnitsOfMeasure
 
     End Class
 
-    <System.Serializable()> Public Class UnitsCGS
+    <Serializable()> Public Class UnitsCGS
 
         Inherits Units
 
@@ -633,7 +633,7 @@ Namespace DTL.UnitsOfMeasure
 
     End Class
 
-    <System.Serializable()> Public Class Conversor
+    <Serializable()> Public Class Conversor
 
         Public Function ConverterParaSI(ByVal unidade As String, ByVal valor As Double)
 

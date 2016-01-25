@@ -19,7 +19,7 @@ Imports FileHelpers
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
-    <System.Serializable()> Public Class SRK
+    <Serializable()> Public Class SRK
 
         Dim m_pr As New DTL.SimulationObjects.PropertyPackages.Auxiliary.PROPS
         Private _ip As Dictionary(Of String, Dictionary(Of String, PR_IPData))

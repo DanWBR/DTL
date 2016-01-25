@@ -24,7 +24,7 @@ Imports DTL.DTL.BaseThermoClasses
 Namespace DTL.SimulationObjects.PropertyPackages
 
     <System.Runtime.InteropServices.Guid(PengRobinsonPropertyPackage.ClassId)> _
- <System.Serializable()> Public Class PengRobinsonPropertyPackage
+ <Serializable()> Public Class PengRobinsonPropertyPackage
 
         Inherits DTL.SimulationObjects.PropertyPackages.PropertyPackage
 

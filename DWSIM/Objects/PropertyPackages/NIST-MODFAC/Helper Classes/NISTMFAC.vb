@@ -25,7 +25,7 @@ Imports System.Linq
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
-    <System.Serializable()> Public Class NISTMFAC
+    <Serializable()> Public Class NISTMFAC
 
         Public Shadows ModfGroups As NistModfacGroups
 
@@ -368,7 +368,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
     End Class
 
-    <System.Serializable()> Public Class NistModfacGroups
+    <Serializable()> Public Class NistModfacGroups
 
         Public InteracParam_aij As System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))
         Public InteracParam_bij As System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))

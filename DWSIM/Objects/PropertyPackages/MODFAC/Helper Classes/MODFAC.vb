@@ -21,7 +21,7 @@ Imports System.Linq
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
-    <System.Serializable()> Public Class Modfac
+    <Serializable()> Public Class Modfac
 
         Public ModfGroups As ModfacGroups
 
@@ -354,7 +354,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
     End Class
 
-    <System.Serializable()> Public Class ModfacGroups
+    <Serializable()> Public Class ModfacGroups
 
         Public InteracParam_aij As System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))
         Public InteracParam_bij As System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))
@@ -458,7 +458,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
     End Class
 
-    <System.Serializable()> Public Class ModfacGroup
+    <Serializable()> Public Class ModfacGroup
 
         Protected m_groupname As String
         Protected m_maingroupname As String

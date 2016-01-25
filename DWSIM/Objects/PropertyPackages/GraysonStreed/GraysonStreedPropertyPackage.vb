@@ -25,7 +25,7 @@ Imports System.Math
 Namespace DTL.SimulationObjects.PropertyPackages
 
     <System.Runtime.InteropServices.Guid(GraysonStreedPropertyPackage.ClassId)> _
-      <System.Serializable()> Public Class GraysonStreedPropertyPackage
+      <Serializable()> Public Class GraysonStreedPropertyPackage
 
         Inherits DTL.SimulationObjects.PropertyPackages.PropertyPackage
 

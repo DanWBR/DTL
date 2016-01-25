@@ -24,7 +24,7 @@ Imports System.Math
 Namespace DTL.SimulationObjects.PropertyPackages
 
     <System.Runtime.InteropServices.Guid(MODFACPropertyPackage.ClassId)> _
-     <System.Serializable()> Public Class MODFACPropertyPackage
+     <Serializable()> Public Class MODFACPropertyPackage
 
         Inherits DTL.SimulationObjects.PropertyPackages.PropertyPackage
 

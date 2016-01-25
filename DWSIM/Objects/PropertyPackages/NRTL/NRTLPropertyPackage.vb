@@ -22,7 +22,7 @@ Imports System.Math
 Namespace DTL.SimulationObjects.PropertyPackages
 
     <System.Runtime.InteropServices.Guid(NRTLPropertyPackage.ClassId)> _
-   <System.Serializable()> Public Class NRTLPropertyPackage
+   <Serializable()> Public Class NRTLPropertyPackage
 
         Inherits DTL.SimulationObjects.PropertyPackages.PropertyPackage
 

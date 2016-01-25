@@ -24,7 +24,7 @@ Imports System.Math
 Namespace DTL.SimulationObjects.PropertyPackages
 
     <System.Runtime.InteropServices.Guid(UNIFACPropertyPackage.ClassId)> _
-<System.Serializable()> Public Class UNIFACPropertyPackage
+<Serializable()> Public Class UNIFACPropertyPackage
 
         Inherits DTL.SimulationObjects.PropertyPackages.PropertyPackage
 

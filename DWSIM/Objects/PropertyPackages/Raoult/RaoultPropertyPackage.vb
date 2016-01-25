@@ -24,7 +24,7 @@ Imports System.Math
 Namespace DTL.SimulationObjects.PropertyPackages
 
     <System.Runtime.InteropServices.Guid(RaoultPropertyPackage.ClassId)> _
-<System.Serializable()> Public Class RaoultPropertyPackage
+<Serializable()> Public Class RaoultPropertyPackage
 
         Inherits DTL.SimulationObjects.PropertyPackages.PropertyPackage
 

@@ -22,7 +22,7 @@ Imports System.Runtime.Serialization
 Imports System.IO
 Imports System.Runtime.InteropServices
 
-<System.Serializable()> <ComVisible(True)> Friend MustInherit Class SimulationObjects_BaseClass
+<Serializable()> <ComVisible(True)> Friend MustInherit Class SimulationObjects_BaseClass
 
     Implements ICloneable, IDisposable
 

@@ -21,7 +21,7 @@ Imports FileHelpers
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
-    <DelimitedRecord(";")> <IgnoreFirst()> <System.Serializable()> _
+    <DelimitedRecord(";")> <IgnoreFirst()> <Serializable()> _
     Public Class UNIQUAC_IPData
 
         Implements ICloneable
@@ -47,7 +47,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
     End Class
 
-    <System.Serializable()> Public Class UNIQUAC
+    <Serializable()> Public Class UNIQUAC
 
         Private _ip As Dictionary(Of String, Dictionary(Of String, UNIQUAC_IPData))
         'Private _ip2 As Dictionary(Of String, Dictionary(Of String, UNIQUAC_IPData))

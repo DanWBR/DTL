@@ -18,7 +18,7 @@
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
-    <System.Serializable()> Public Class LeeKesler
+    <Serializable()> Public Class LeeKesler
 
         Dim m_pr As New DTL.SimulationObjects.PropertyPackages.Auxiliary.PROPS
         '<System.NonSerialized()> Dim m_xn As DLLXnumbers.Xnumbers

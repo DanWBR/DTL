@@ -108,7 +108,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
     ''' The Property Package Class contains methods to do thermodynamic calculations for all supported phases in DTL.
     ''' </summary>
     ''' <remarks>The base class is inherited by each implemented property package, which contains its own methods.</remarks>
-    <System.Serializable()> Public MustInherit Class PropertyPackage
+    <Serializable()> Public MustInherit Class PropertyPackage
 
         'CAPE-OPEN 1.0 Interfaces
         Implements ICloneable, ICapeIdentification, ICapeThermoPropertyPackage, ICapeUtilities, ICapeThermoEquilibriumServer, ICapeThermoCalculationRoutine
@@ -929,7 +929,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
         Public Overridable Sub DW_CalcOverallProps()
 
-            Dim HL, HV, HS, SL, SV, SS, DL, DV, DS, CPL, CPV, CPS, KL, KV, KS, CVL, CVV, CSV As Nullable(Of Double)
+            Dim HL, HV, HS, SL, SV, SS, DL, DV, DS, CPL, CPV, CPS, KL, KV, KS, CVL, CVV, CSV As Double?
             Dim xl, xv, xs, wl, wv, ws, vl, vv, vs, result As Double
 
             xl = Me.CurrentMaterialStream.Phases(1).SPMProperties.molarfraction.GetValueOrDefault
@@ -7444,7 +7444,7 @@ Final3:
     ''' Class to store Phase Info and mapping for CAPE-OPEN Property Packages
     ''' </summary>
     ''' <remarks>Used only in the context of CAPE-OPEN Objects.</remarks>
-    <System.Serializable()> Public Class PhaseInfo
+    <Serializable()> Public Class PhaseInfo
 
         Public PhaseLabel As String = ""
         Public DWPhaseIndex As Integer
@@ -7462,7 +7462,7 @@ Final3:
     ''' COM IStream Class Implementation
     ''' </summary>
     ''' <remarks></remarks>
-    <System.Serializable()> Public Class ComStreamWrapper
+    <Serializable()> Public Class ComStreamWrapper
         Inherits System.IO.Stream
         Private mSource As IStream
         Private mInt64 As IntPtr
@@ -7546,7 +7546,7 @@ Final3:
 
     End Class
 
-    <System.Serializable()> Public Class HenryParam
+    <Serializable()> Public Class HenryParam
         Public Component As String
         Public CAS As String
         Public KHcp As Double

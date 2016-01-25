@@ -24,7 +24,7 @@ Imports CAPEOPEN110
 
 Namespace DTL.SimulationObjects.Streams
 
-    <System.Serializable()> Friend Class MaterialStream
+    <Serializable()> Friend Class MaterialStream
 
         Inherits SimulationObjects_BaseClass
 

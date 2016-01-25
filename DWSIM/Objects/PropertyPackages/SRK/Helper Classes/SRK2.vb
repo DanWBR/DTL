@@ -20,7 +20,7 @@ Imports DTL.DTL.MathEx
 
 Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
 
-    <System.Serializable()> Public Class SRK
+    <Serializable()> Public Class SRK
 
         Inherits DTL.SimulationObjects.PropertyPackages.ThermoPlug
 

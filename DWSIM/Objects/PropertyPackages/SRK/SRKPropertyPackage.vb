@@ -24,7 +24,7 @@ Imports System.Math
 Namespace DTL.SimulationObjects.PropertyPackages
 
     <System.Runtime.InteropServices.Guid(SRKPropertyPackage.ClassId)> _
- <System.Serializable()> Public Class SRKPropertyPackage
+ <Serializable()> Public Class SRKPropertyPackage
 
         Inherits DTL.SimulationObjects.PropertyPackages.PropertyPackage
 

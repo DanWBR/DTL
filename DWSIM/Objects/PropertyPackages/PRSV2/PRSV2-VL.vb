@@ -21,7 +21,7 @@ Imports DTL.DTL.MathEx
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
-    <System.Serializable()> Public Class PRSV2VL
+    <Serializable()> Public Class PRSV2VL
 
         Dim m_pr As New DTL.SimulationObjects.PropertyPackages.Auxiliary.PROPS
         Private _ip As Dictionary(Of String, Dictionary(Of String, PRSV2_IPData))

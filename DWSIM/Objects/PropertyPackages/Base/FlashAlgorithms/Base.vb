@@ -28,7 +28,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
     ''' This is the base class for the flash algorithms.
     ''' </summary>
     ''' <remarks></remarks>
-    <System.Serializable()> Public MustInherit Class FlashAlgorithm
+    <Serializable()> Public MustInherit Class FlashAlgorithm
 
         Public Property StabSearchSeverity As Integer = 0
         Public Property StabSearchCompIDs As String() = New String() {}
@@ -854,7 +854,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
     ''' Class to store flash calculation results.
     ''' </summary>
     ''' <remarks></remarks>
-    <System.Serializable> Public Class FlashCalculationResult
+    <Serializable> Public Class FlashCalculationResult
 
         ''' <summary>
         ''' Defines the base mole amount for determination of phase/compound fractions. Default is 1.
@@ -868,8 +868,8 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
         Public Property LiquidPhase1MoleAmounts As New List(Of Double)
         Public Property LiquidPhase2MoleAmounts As New List(Of Double)
         Public Property SolidPhaseMoleAmounts As New List(Of Double)
-        Public Property CalculatedTemperature As Nullable(Of Double)
-        Public Property CalculatedPressure As Nullable(Of Double)
+        Public Property CalculatedTemperature As Double?
+        Public Property CalculatedPressure As Double?
         Public Property CompoundProperties As List(Of ConstantProperties)
         Public Property FlashAlgorithmType As String = ""
         Public Property FlashSpecification1 As PropertyPackages.FlashSpec
@@ -1092,7 +1092,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
         End Function
 
     End Class
-    <System.Serializable()> Public Class FlashResult
+    <Serializable()> Public Class FlashResult
         Public P, T, H, S As Double 'pressure, temperature, enthalpy, entropy
         Public LF, L1F, L2F, VF, SF As Double 'molar fraction of phases
         Public Vx(), Vx1(), Vx2(), Vy(), Vs() As Double 'molar fractions in each phase
