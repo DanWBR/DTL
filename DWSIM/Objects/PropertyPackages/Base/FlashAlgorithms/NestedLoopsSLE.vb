@@ -773,14 +773,14 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
                 i = i + 1
             Loop Until i = n + 1
 
-            Dim marcador3, marcador2, marcador As Integer
+            Dim marker3, marker2, marker As Integer
             Dim stmp4_ant, stmp4, Tant, fval As Double
             Dim chk As Boolean = False
 
             ecount = 0
             Do
 
-                marcador3 = 0
+                marker3 = 0
 
                 Dim cont_int = 0
                 Do
@@ -799,9 +799,9 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
                         End If
                     Next
 
-                    marcador = 0
+                    marker = 0
                     If stmp4_ant <> 0 Then
-                        marcador = 1
+                        marker = 1
                     End If
                     stmp4_ant = stmp4
 
@@ -837,22 +837,22 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
                         Loop Until i = n + 1
                     End If
 
-                    marcador2 = 0
-                    If marcador = 1 Then
+                    marker2 = 0
+                    If marker = 1 Then
                         If L = 0 Then
                             If Abs(Vx(0) - Vx_ant(0)) < itol Then
-                                marcador2 = 1
+                                marker2 = 1
                             End If
                         Else
                             If Abs(Vs(0) - Vs_ant(0)) < itol Then
-                                marcador2 = 1
+                                marker2 = 1
                             End If
                         End If
                     End If
 
                     cont_int = cont_int + 1
 
-                Loop Until marcador2 = 1 Or Double.IsNaN(stmp4) Or cont_int > maxit_i
+                Loop Until marker2 = 1 Or Double.IsNaN(stmp4) Or cont_int > maxit_i
 
                 Dim K1(n), K2(n), dKdT(n) As Double
 
