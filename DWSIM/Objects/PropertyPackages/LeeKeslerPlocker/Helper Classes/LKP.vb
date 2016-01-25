@@ -21,7 +21,7 @@ Imports FileHelpers
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
 
-    <DelimitedRecord(vbTab)> <IgnoreFirst()> <System.Serializable()> _
+    <DelimitedRecord(vbTab)> <IgnoreFirst()> <Serializable()> _
     Public Class LKP_IPData
 
         Implements ICloneable
@@ -43,7 +43,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
     End Class
 
-    <System.Serializable()> Public Class LeeKeslerPlocker
+    <Serializable()> Public Class LeeKeslerPlocker
 
         Dim m_pr As New DTL.SimulationObjects.PropertyPackages.Auxiliary.PROPS
 

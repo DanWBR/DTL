@@ -20,7 +20,7 @@ Imports System.Linq
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
-    <DelimitedRecord(";")> <IgnoreFirst()> <System.Serializable()> _
+    <DelimitedRecord(";")> <IgnoreFirst()> <Serializable()> _
     Public Class PR_IPData
 
         Implements ICloneable
@@ -44,7 +44,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
     End Class
 
-    <System.Serializable()> Public Class PengRobinson
+    <Serializable()> Public Class PengRobinson
 
         Dim m_pr As New DTL.SimulationObjects.PropertyPackages.Auxiliary.PROPS
         Private _ip As Dictionary(Of String, Dictionary(Of String, PR_IPData))

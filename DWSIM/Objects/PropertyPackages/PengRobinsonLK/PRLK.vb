@@ -25,7 +25,7 @@ Imports System.Math
 Namespace DTL.SimulationObjects.PropertyPackages
 
     <System.Runtime.InteropServices.Guid(PengRobinsonLKPropertyPackage.ClassId)> _
-<System.Serializable()> Public Class PengRobinsonLKPropertyPackage
+<Serializable()> Public Class PengRobinsonLKPropertyPackage
 
         Inherits DTL.SimulationObjects.PropertyPackages.PropertyPackage
 

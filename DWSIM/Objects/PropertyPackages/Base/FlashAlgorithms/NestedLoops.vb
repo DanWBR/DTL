@@ -29,7 +29,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
     ''' The Flash algorithms in this class are based on the Nested Loops approach to solve equilibrium calculations.
     ''' </summary>
     ''' <remarks></remarks>
-    <System.Serializable()> Public Class DWSIMDefault
+    <Serializable()> Public Class DWSIMDefault
 
         Inherits FlashAlgorithm
 

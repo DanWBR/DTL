@@ -23,20 +23,20 @@ Imports System.IO
 
 Namespace DTL.BaseThermoClasses
 
-    <System.Serializable()> Public Class Substance
+    <Serializable()> Public Class Substance
 
         Protected m_componentdescription As String = ""
         Protected m_componentname As String = ""
-        Protected m_molarfraction As Nullable(Of Double) = 0
-        Protected m_massfraction As Nullable(Of Double) = 0
-        Protected m_molarflow As Nullable(Of Double) = 0
-        Protected m_massflow As Nullable(Of Double) = 0
-        Protected m_fugacitycoeff As Nullable(Of Double) = 0
-        Protected m_activitycoeff As Nullable(Of Double) = 0
-        Protected m_partialvolume As Nullable(Of Double) = 0
-        Protected m_partialpressure As Nullable(Of Double) = 0
-        Protected m_volumetricflow As Nullable(Of Double) = 0
-        Protected m_volumetricfraction As Nullable(Of Double) = 0
+        Protected m_molarfraction As Double? = 0
+        Protected m_massfraction As Double? = 0
+        Protected m_molarflow As Double? = 0
+        Protected m_massflow As Double? = 0
+        Protected m_fugacitycoeff As Double? = 0
+        Protected m_activitycoeff As Double? = 0
+        Protected m_partialvolume As Double? = 0
+        Protected m_partialpressure As Double? = 0
+        Protected m_volumetricflow As Double? = 0
+        Protected m_volumetricfraction As Double? = 0
         Protected m_isPF As Boolean = False
         Protected m_lnKval As Double = 0
         Protected m_Kval As Double = 0
@@ -68,111 +68,111 @@ Namespace DTL.BaseThermoClasses
             End Set
         End Property
 
-        Public Property MolarFraction() As Nullable(Of Double)
+        Public Property MolarFraction() As Double?
             Get
                 Return m_molarfraction
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 m_molarfraction = value
             End Set
         End Property
 
-        Public Property MassFraction() As Nullable(Of Double)
+        Public Property MassFraction() As Double?
             Get
                 Return m_massfraction
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 m_massfraction = value
             End Set
         End Property
 
-        Public Property MolarFlow() As Nullable(Of Double)
+        Public Property MolarFlow() As Double?
             Get
                 Return Me.m_molarflow
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 Me.m_molarflow = value
             End Set
         End Property
 
-        Public Property MassFlow() As Nullable(Of Double)
+        Public Property MassFlow() As Double?
             Get
                 Return Me.m_massflow
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 Me.m_massflow = value
             End Set
         End Property
 
-        Public Property FugacityCoeff() As Nullable(Of Double)
+        Public Property FugacityCoeff() As Double?
             Get
                 Return Me.m_fugacitycoeff
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 Me.m_fugacitycoeff = value
             End Set
         End Property
 
-        Public Property ActivityCoeff() As Nullable(Of Double)
+        Public Property ActivityCoeff() As Double?
             Get
                 Return Me.m_activitycoeff
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 Me.m_activitycoeff = value
             End Set
         End Property
 
-        Public Property PartialVolume() As Nullable(Of Double)
+        Public Property PartialVolume() As Double?
             Get
                 Return Me.m_partialvolume
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 Me.m_partialvolume = value
             End Set
         End Property
 
-        Public Property PartialPressure() As Nullable(Of Double)
+        Public Property PartialPressure() As Double?
             Get
                 Return Me.m_partialpressure
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 Me.m_partialpressure = value
             End Set
         End Property
 
-        Public Property VolumetricFlow() As Nullable(Of Double)
+        Public Property VolumetricFlow() As Double?
             Get
                 Return Me.m_volumetricflow
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 Me.m_volumetricflow = value
             End Set
         End Property
 
-        Public Property VolumetricFraction() As Nullable(Of Double)
+        Public Property VolumetricFraction() As Double?
             Get
                 Return Me.m_volumetricfraction
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 Me.m_volumetricfraction = value
             End Set
         End Property
 
         Public Property Description() As String
             Get
-                Return m_ComponentDescription
+                Return m_componentdescription
             End Get
             Set(ByVal value As String)
-                m_ComponentDescription = value
+                m_componentdescription = value
             End Set
         End Property
 
         Public Property Name() As String
             Get
-                Return m_ComponentName
+                Return m_componentname
             End Get
             Set(ByVal value As String)
-                m_ComponentName = value
+                m_componentname = value
             End Set
         End Property
 
@@ -182,14 +182,14 @@ Namespace DTL.BaseThermoClasses
 
         Public Sub New(ByVal name As String, ByVal description As String)
 
-            Me.m_ComponentName = name
-            Me.m_ComponentDescription = description
+            Me.m_componentname = name
+            Me.m_componentdescription = description
 
         End Sub
 
     End Class
 
-    <System.Serializable()> Public Class Phase
+    <Serializable()> Public Class Phase
 
         Protected m_ComponentDescription As String
         Protected m_ComponentName As String
@@ -260,479 +260,478 @@ Namespace DTL.BaseThermoClasses
 
 #Region "Subclasses"
 
-    <System.Serializable()> Public Class TemperatureDependentProperties
+    <Serializable()> Public Class TemperatureDependentProperties
 
-        Protected tdp_idealGasHeatCapacity As Nullable(Of Double) = Nothing
-        Protected tdp_surfaceTension As Nullable(Of Double) = Nothing
-        Protected tdp_thermalConductivityOfLiquid As Nullable(Of Double) = Nothing
-        Protected tdp_thermalConductivityOfVapor As Nullable(Of Double) = Nothing
-        Protected tdp_vaporPressure As Nullable(Of Double) = Nothing
-        Protected tdp_viscosityOfLiquid As Nullable(Of Double) = Nothing
-        Protected tdp_viscosityOfVapor As Nullable(Of Double) = Nothing
+        Protected tdp_idealGasHeatCapacity As Double? = Nothing
+        Protected tdp_surfaceTension As Double? = Nothing
+        Protected tdp_thermalConductivityOfLiquid As Double? = Nothing
+        Protected tdp_thermalConductivityOfVapor As Double? = Nothing
+        Protected tdp_vaporPressure As Double? = Nothing
+        Protected tdp_viscosityOfLiquid As Double? = Nothing
+        Protected tdp_viscosityOfVapor As Double? = Nothing
 
-        Public Property idealGasHeatCapacity() As Nullable(Of Double)
+        Public Property idealGasHeatCapacity() As Double?
             Get
                 Return tdp_idealGasHeatCapacity
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 tdp_idealGasHeatCapacity = value
             End Set
         End Property
 
-        Public Property thermalConductivityOfLiquid() As Nullable(Of Double)
+        Public Property thermalConductivityOfLiquid() As Double?
             Get
                 Return tdp_thermalConductivityOfLiquid
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 tdp_thermalConductivityOfLiquid = value
             End Set
         End Property
 
-        Public Property thermalConductivityOfVapor() As Nullable(Of Double)
+        Public Property thermalConductivityOfVapor() As Double?
             Get
                 Return tdp_thermalConductivityOfVapor
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 tdp_thermalConductivityOfVapor = value
             End Set
         End Property
 
-        Public Property vaporPressure() As Nullable(Of Double)
+        Public Property vaporPressure() As Double?
             Get
                 Return tdp_vaporPressure
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 tdp_vaporPressure = value
             End Set
         End Property
 
-        Public Property viscosityOfLiquid() As Nullable(Of Double)
+        Public Property viscosityOfLiquid() As Double?
             Get
                 Return tdp_viscosityOfLiquid
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 tdp_viscosityOfLiquid = value
             End Set
         End Property
 
-        Public Property viscosityOfVapor() As Nullable(Of Double)
+        Public Property viscosityOfVapor() As Double?
             Get
                 Return tdp_viscosityOfVapor
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 tdp_viscosityOfVapor = value
             End Set
         End Property
 
-        Public Property surfaceTension() As Nullable(Of Double)
+        Public Property surfaceTension() As Double?
             Get
                 Return tdp_surfaceTension
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 tdp_surfaceTension = value
             End Set
         End Property
 
     End Class
 
-    <System.Serializable()> Public Class PressureDependentProperties
+    <Serializable()> Public Class PressureDependentProperties
 
-        Protected pdp_boilingPointTemperature As Nullable(Of Double) = Nothing
-        Public Property boilingPointTemperature() As Nullable(Of Double)
+        Protected pdp_boilingPointTemperature As Double? = Nothing
+        Public Property boilingPointTemperature() As Double?
             Get
                 Return pdp_boilingPointTemperature
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 pdp_boilingPointTemperature = value
             End Set
         End Property
 
-        Protected pdp_meltingTemperature As Nullable(Of Double) = Nothing
-        Public Property meltingTemperature() As Nullable(Of Double)
+        Protected pdp_meltingTemperature As Double? = Nothing
+        Public Property meltingTemperature() As Double?
             Get
                 Return pdp_meltingTemperature
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 pdp_meltingTemperature = value
             End Set
         End Property
 
     End Class
 
-    <System.Serializable()> Public Class SinglePhaseMixtureProperties
+    <Serializable()> Public Class SinglePhaseMixtureProperties
 
-        Public Property osmoticCoefficient As Nullable(Of Double)
-        Public Property freezingPointDepression As Nullable(Of Double)
-        Public Property freezingPoint As Nullable(Of Double)
-        Public Property ionicStrength As Nullable(Of Double)
-        Public Property pH As Nullable(Of Double)
-
-        Protected _dewtemperature As Nullable(Of Double) = Nothing
-        Public Property dewTemperature() As Nullable(Of Double)
+        Public Property osmoticCoefficient As Double?
+        Public Property freezingPointDepression As Double?
+        Public Property freezingPoint As Double?
+        Public Property ionicStrength As Double?
+        Public Property pH As Double?
+        Protected _dewtemperature As Double? = Nothing
+        Public Property dewTemperature() As Double?
             Get
                 Return _dewtemperature
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 _dewtemperature = value
             End Set
         End Property
 
-        Protected _dewpressure As Nullable(Of Double) = Nothing
-        Public Property dewPressure() As Nullable(Of Double)
+        Protected _dewpressure As Double? = Nothing
+        Public Property dewPressure() As Double?
             Get
                 Return _dewpressure
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 _dewpressure = value
             End Set
         End Property
 
-        Protected _bubbletemperature As Nullable(Of Double) = Nothing
-        Public Property bubbleTemperature() As Nullable(Of Double)
+        Protected _bubbletemperature As Double? = Nothing
+        Public Property bubbleTemperature() As Double?
             Get
                 Return _bubbletemperature
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 _bubbletemperature = value
             End Set
         End Property
 
-        Protected _bubblepressure As Nullable(Of Double) = Nothing
-        Public Property bubblePressure() As Nullable(Of Double)
+        Protected _bubblepressure As Double? = Nothing
+        Public Property bubblePressure() As Double?
             Get
                 Return _bubblepressure
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 _bubblepressure = value
             End Set
         End Property
 
-        Protected spmp_activity As Nullable(Of Double) = Nothing
-        Public Property activity() As Nullable(Of Double)
+        Protected spmp_activity As Double? = Nothing
+        Public Property activity() As Double?
             Get
                 Return spmp_activity
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 spmp_activity = value
             End Set
         End Property
 
-        Protected spmp_activityCoefficient As Nullable(Of Double) = Nothing
-        Public Property activityCoefficient() As Nullable(Of Double)
+        Protected spmp_activityCoefficient As Double? = Nothing
+        Public Property activityCoefficient() As Double?
             Get
                 Return spmp_activityCoefficient
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 spmp_activityCoefficient = value
             End Set
         End Property
 
-        Protected spmp_compressibility As Nullable(Of Double) = Nothing
-        Public Property compressibility() As Nullable(Of Double)
+        Protected spmp_compressibility As Double? = Nothing
+        Public Property compressibility() As Double?
             Get
                 Return spmp_compressibility
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 spmp_compressibility = value
             End Set
         End Property
 
-        Protected spmp_compressibilityFactor As Nullable(Of Double) = Nothing
-        Public Property compressibilityFactor() As Nullable(Of Double)
+        Protected spmp_compressibilityFactor As Double? = Nothing
+        Public Property compressibilityFactor() As Double?
             Get
                 Return spmp_compressibilityFactor
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 spmp_compressibilityFactor = value
             End Set
         End Property
 
-        Protected spmp_density As Nullable(Of Double) = Nothing
-        Public Property density() As Nullable(Of Double)
+        Protected spmp_density As Double? = Nothing
+        Public Property density() As Double?
             Get
                 Return spmp_density
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 spmp_density = value
             End Set
         End Property
 
-        Protected spmp_enthalpy As Nullable(Of Double) = Nothing
-        Public Property enthalpy() As Nullable(Of Double)
+        Protected spmp_enthalpy As Double? = Nothing
+        Public Property enthalpy() As Double?
             Get
                 Return spmp_enthalpy
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 spmp_enthalpy = value
             End Set
         End Property
 
-        Protected spmp_entropy As Nullable(Of Double) = Nothing
-        Public Property entropy() As Nullable(Of Double)
+        Protected spmp_entropy As Double? = Nothing
+        Public Property entropy() As Double?
             Get
                 Return spmp_entropy
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 spmp_entropy = value
             End Set
         End Property
 
-        Protected spmp_enthalpyF As Nullable(Of Double) = Nothing
-        Public Property enthalpyF() As Nullable(Of Double)
+        Protected spmp_enthalpyF As Double? = Nothing
+        Public Property enthalpyF() As Double?
             Get
                 Return spmp_enthalpyF
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 spmp_enthalpyF = value
             End Set
         End Property
 
-        Protected spmp_entropyF As Nullable(Of Double) = Nothing
-        Public Property entropyF() As Nullable(Of Double)
+        Protected spmp_entropyF As Double? = Nothing
+        Public Property entropyF() As Double?
             Get
                 Return spmp_entropyF
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 spmp_entropyF = value
             End Set
         End Property
 
-        Protected spmp_excessEnthalpy As Nullable(Of Double) = Nothing
-        Public Property excessEnthalpy() As Nullable(Of Double)
+        Protected spmp_excessEnthalpy As Double? = Nothing
+        Public Property excessEnthalpy() As Double?
             Get
                 Return spmp_excessEnthalpy
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 spmp_excessEnthalpy = value
             End Set
         End Property
 
-        Protected spmp_excessEntropy As Nullable(Of Double) = Nothing
-        Public Property excessEntropy() As Nullable(Of Double)
+        Protected spmp_excessEntropy As Double? = Nothing
+        Public Property excessEntropy() As Double?
             Get
                 Return spmp_excessEntropy
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 spmp_excessEntropy = value
             End Set
         End Property
 
-        Protected spmp_molarflow As Nullable(Of Double) = Nothing
-        Public Property molarflow() As Nullable(Of Double)
+        Protected spmp_molarflow As Double? = Nothing
+        Public Property molarflow() As Double?
             Get
                 Return spmp_molarflow
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 spmp_molarflow = value
             End Set
         End Property
 
-        Protected spmp_massflow As Nullable(Of Double) = Nothing
-        Public Property massflow() As Nullable(Of Double)
+        Protected spmp_massflow As Double? = Nothing
+        Public Property massflow() As Double?
             Get
                 Return spmp_massflow
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 spmp_massflow = value
             End Set
         End Property
 
-        Protected spmp_molarfraction As Nullable(Of Double) = Nothing
-        Public Property molarfraction() As Nullable(Of Double)
+        Protected spmp_molarfraction As Double? = Nothing
+        Public Property molarfraction() As Double?
             Get
                 Return spmp_molarfraction
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 spmp_molarfraction = value
             End Set
         End Property
 
-        Protected spmp_massfraction As Nullable(Of Double) = Nothing
-        Public Property massfraction() As Nullable(Of Double)
+        Protected spmp_massfraction As Double? = Nothing
+        Public Property massfraction() As Double?
             Get
                 Return spmp_massfraction
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 spmp_massfraction = value
             End Set
         End Property
 
-        Protected spmp_fugacity As Nullable(Of Double) = Nothing
-        Public Property fugacity() As Nullable(Of Double)
+        Protected spmp_fugacity As Double? = Nothing
+        Public Property fugacity() As Double?
             Get
                 Return spmp_fugacity
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 spmp_fugacity = value
             End Set
         End Property
 
-        Protected spmp_fugacityCoefficient As Nullable(Of Double) = Nothing
-        Public Property fugacityCoefficient() As Nullable(Of Double)
+        Protected spmp_fugacityCoefficient As Double? = Nothing
+        Public Property fugacityCoefficient() As Double?
             Get
                 Return spmp_fugacityCoefficient
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 spmp_fugacityCoefficient = value
             End Set
         End Property
 
-        Protected spmp_heatCapacityCp As Nullable(Of Double) = Nothing
-        Public Property heatCapacityCp() As Nullable(Of Double)
+        Protected spmp_heatCapacityCp As Double? = Nothing
+        Public Property heatCapacityCp() As Double?
             Get
                 Return spmp_heatCapacityCp
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 spmp_heatCapacityCp = value
             End Set
         End Property
 
-        Protected spmp_heatCapacityCv As Nullable(Of Double) = Nothing
-        Public Property heatCapacityCv() As Nullable(Of Double)
+        Protected spmp_heatCapacityCv As Double? = Nothing
+        Public Property heatCapacityCv() As Double?
             Get
                 Return spmp_heatCapacityCv
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 spmp_heatCapacityCv = value
             End Set
         End Property
 
-        Protected spmp_jouleThomsonCoefficient As Nullable(Of Double) = Nothing
-        Public Property jouleThomsonCoefficient() As Nullable(Of Double)
+        Protected spmp_jouleThomsonCoefficient As Double? = Nothing
+        Public Property jouleThomsonCoefficient() As Double?
             Get
                 Return spmp_jouleThomsonCoefficient
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 spmp_jouleThomsonCoefficient = value
             End Set
         End Property
 
-        Protected spmp_logFugacityCoefficient As Nullable(Of Double) = Nothing
-        Public Property logFugacityCoefficient() As Nullable(Of Double)
+        Protected spmp_logFugacityCoefficient As Double? = Nothing
+        Public Property logFugacityCoefficient() As Double?
             Get
                 Return spmp_logFugacityCoefficient
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 spmp_logFugacityCoefficient = value
             End Set
         End Property
 
-        Protected spmp_molecularWeight As Nullable(Of Double) = Nothing
-        Public Property molecularWeight() As Nullable(Of Double)
+        Protected spmp_molecularWeight As Double? = Nothing
+        Public Property molecularWeight() As Double?
             Get
                 Return spmp_molecularWeight
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 spmp_molecularWeight = value
             End Set
         End Property
 
-        Protected spmp_pressure As Nullable(Of Double) = Nothing
-        Public Property pressure() As Nullable(Of Double)
+        Protected spmp_pressure As Double? = Nothing
+        Public Property pressure() As Double?
             Get
                 Return spmp_pressure
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 spmp_pressure = value
             End Set
         End Property
 
-        Protected spmp_temperature As Nullable(Of Double) = Nothing
-        Public Property temperature() As Nullable(Of Double)
+        Protected spmp_temperature As Double? = Nothing
+        Public Property temperature() As Double?
             Get
                 Return spmp_temperature
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 spmp_temperature = value
             End Set
         End Property
 
-        Protected spmp_speedOfSound As Nullable(Of Double) = Nothing
-        Public Property speedOfSound() As Nullable(Of Double)
+        Protected spmp_speedOfSound As Double? = Nothing
+        Public Property speedOfSound() As Double?
             Get
                 Return spmp_speedOfSound
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 spmp_speedOfSound = value
             End Set
         End Property
 
-        Protected spmp_thermalConductivity As Nullable(Of Double) = Nothing
-        Public Property thermalConductivity() As Nullable(Of Double)
+        Protected spmp_thermalConductivity As Double? = Nothing
+        Public Property thermalConductivity() As Double?
             Get
                 Return spmp_thermalConductivity
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 spmp_thermalConductivity = value
             End Set
         End Property
 
-        Protected spmp_dynamic_viscosity As Nullable(Of Double) = Nothing
-        Public Property viscosity() As Nullable(Of Double)
+        Protected spmp_dynamic_viscosity As Double? = Nothing
+        Public Property viscosity() As Double?
             Get
                 Return spmp_dynamic_viscosity
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 spmp_dynamic_viscosity = value
             End Set
         End Property
 
-        Protected spmp_kinematic_viscosity As Nullable(Of Double) = Nothing
-        Public Property kinematic_viscosity() As Nullable(Of Double)
+        Protected spmp_kinematic_viscosity As Double? = Nothing
+        Public Property kinematic_viscosity() As Double?
             Get
                 Return spmp_kinematic_viscosity
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 spmp_kinematic_viscosity = value
             End Set
         End Property
 
-        Protected spmp_volumetric_flow As Nullable(Of Double) = Nothing
-        Public Property volumetric_flow() As Nullable(Of Double)
+        Protected spmp_volumetric_flow As Double? = Nothing
+        Public Property volumetric_flow() As Double?
             Get
                 Return spmp_volumetric_flow
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 spmp_volumetric_flow = value
             End Set
         End Property
 
-        Protected spmp_molarenthalpy As Nullable(Of Double) = Nothing
-        Public Property molar_enthalpy() As Nullable(Of Double)
+        Protected spmp_molarenthalpy As Double? = Nothing
+        Public Property molar_enthalpy() As Double?
             Get
                 Return spmp_molarenthalpy
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 spmp_molarenthalpy = value
             End Set
         End Property
 
-        Protected spmp_molarentropy As Nullable(Of Double) = Nothing
-        Public Property molar_entropy() As Nullable(Of Double)
+        Protected spmp_molarentropy As Double? = Nothing
+        Public Property molar_entropy() As Double?
             Get
                 Return spmp_molarentropy
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 spmp_molarentropy = value
             End Set
         End Property
 
-        Protected spmp_molarenthalpyF As Nullable(Of Double) = Nothing
-        Public Property molar_enthalpyF() As Nullable(Of Double)
+        Protected spmp_molarenthalpyF As Double? = Nothing
+        Public Property molar_enthalpyF() As Double?
             Get
                 Return spmp_molarenthalpyF
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 spmp_molarenthalpyF = value
             End Set
         End Property
 
-        Protected spmp_molarentropyF As Nullable(Of Double) = Nothing
-        Public Property molar_entropyF() As Nullable(Of Double)
+        Protected spmp_molarentropyF As Double? = Nothing
+        Public Property molar_entropyF() As Double?
             Get
                 Return spmp_molarentropyF
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 spmp_molarentropyF = value
             End Set
         End Property
@@ -743,41 +742,41 @@ Namespace DTL.BaseThermoClasses
 
     End Class
 
-    <System.Serializable()> Public Class TwoPhaseMixtureProperties
+    <Serializable()> Public Class TwoPhaseMixtureProperties
 
-        Protected tpmp_kvalue As Nullable(Of Double) = Nothing
-        Public Property kvalue() As Nullable(Of Double)
+        Protected tpmp_kvalue As Double? = Nothing
+        Public Property kvalue() As Double?
             Get
                 Return tpmp_kvalue
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 tpmp_kvalue = value
             End Set
         End Property
 
-        Protected tpmp_logKvalue As Nullable(Of Double) = Nothing
-        Public Property logKvalue() As Nullable(Of Double)
+        Protected tpmp_logKvalue As Double? = Nothing
+        Public Property logKvalue() As Double?
             Get
                 Return tpmp_logKvalue
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 tpmp_logKvalue = value
             End Set
         End Property
 
-        Protected tpmp_surfaceTension As Nullable(Of Double) = Nothing
-        Public Property surfaceTension() As Nullable(Of Double)
+        Protected tpmp_surfaceTension As Double? = Nothing
+        Public Property surfaceTension() As Double?
             Get
                 Return tpmp_surfaceTension
             End Get
-            Set(ByVal value As Nullable(Of Double))
+            Set(ByVal value As Double?)
                 tpmp_surfaceTension = value
             End Set
         End Property
 
     End Class
 
-    <System.Serializable()> Public Class InteractionParameter
+    <Serializable()> Public Class InteractionParameter
 
         Implements ICloneable
         Public Comp1 As String = ""
@@ -813,7 +812,7 @@ Namespace DTL.BaseThermoClasses
 
     End Class
 
-    <System.Serializable()> Public Class ConstantProperties
+    <Serializable()> Public Class ConstantProperties
 
         Implements ICloneable
 
@@ -948,16 +947,16 @@ Namespace DTL.BaseThermoClasses
         Public PC_SAFT_epsilon_k As Double = 0.0#
         Public PC_SAFT_m As Double = 0.0#
 
-        Public PF_MM As Nullable(Of Double) = Nothing
-        Public NBP As Nullable(Of Double) = Nothing
-        Public PF_vA As Nullable(Of Double) = Nothing
-        Public PF_vB As Nullable(Of Double) = Nothing
-        Public PF_Watson_K As Nullable(Of Double) = Nothing
-        Public PF_SG As Nullable(Of Double) = Nothing
-        Public PF_v1 As Nullable(Of Double) = Nothing
-        Public PF_Tv1 As Nullable(Of Double) = Nothing
-        Public PF_v2 As Nullable(Of Double) = Nothing
-        Public PF_Tv2 As Nullable(Of Double) = Nothing
+        Public PF_MM As Double? = Nothing
+        Public NBP As Double? = Nothing
+        Public PF_vA As Double? = Nothing
+        Public PF_vB As Double? = Nothing
+        Public PF_Watson_K As Double? = Nothing
+        Public PF_SG As Double? = Nothing
+        Public PF_v1 As Double? = Nothing
+        Public PF_Tv1 As Double? = Nothing
+        Public PF_v2 As Double? = Nothing
+        Public PF_Tv2 As Double? = Nothing
 
         'Databases: 'DWSIM', 'CheResources', 'ChemSep' OR 'User'
         'User databases are XML-serialized versions of this base class, and they may include hypos and pseudos.
@@ -1049,11 +1048,11 @@ Namespace DTL.BaseThermoClasses
 
     End Class
 
-    <System.Serializable()> Public Class ConstantPropertiesCollection
+    <Serializable()> Public Class ConstantPropertiesCollection
         Public Collection() As ConstantProperties
     End Class
 
-    <System.Serializable()> Public Class UNIFACGroupCollection
+    <Serializable()> Public Class UNIFACGroupCollection
 
         Public Collection As System.Collections.SortedList
 
@@ -1063,7 +1062,7 @@ Namespace DTL.BaseThermoClasses
 
     End Class
 
-    <System.Serializable()> Public Class ElementCollection
+    <Serializable()> Public Class ElementCollection
 
         Public Collection As New System.Collections.SortedList
 

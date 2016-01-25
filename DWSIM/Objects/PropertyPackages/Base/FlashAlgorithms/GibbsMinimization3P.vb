@@ -25,7 +25,7 @@ Imports System.Threading.Tasks
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
-    <System.Serializable()> Public Class GibbsMinimization3P
+    <Serializable()> Public Class GibbsMinimization3P
 
         Inherits FlashAlgorithm
 

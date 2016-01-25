@@ -25,7 +25,7 @@ Imports System.Math
 Namespace DTL.SimulationObjects.PropertyPackages
 
     <System.Runtime.InteropServices.Guid(ChaoSeaderPropertyPackage.ClassId)> _
-    <System.Serializable()> Public Class ChaoSeaderPropertyPackage
+    <Serializable()> Public Class ChaoSeaderPropertyPackage
 
         Inherits DTL.SimulationObjects.PropertyPackages.PropertyPackage
 

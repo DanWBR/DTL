@@ -19,7 +19,7 @@ Imports filehelpers
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
-    <System.Serializable()> Public Class CS
+    <Serializable()> Public Class CS
 
         Sub New()
 

@@ -25,7 +25,7 @@ Imports System.Linq
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
-    <System.Serializable()> Public Class SimpleLLE
+    <Serializable()> Public Class SimpleLLE
 
         Inherits FlashAlgorithm
 

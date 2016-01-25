@@ -23,7 +23,7 @@ Imports DTL.DTL.BaseThermoClasses
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
-    <System.Serializable()> Public Class Ideal
+    <Serializable()> Public Class Ideal
 
         Function H_RA_MIX(ByVal TIPO As String, ByVal T As Double, ByVal P As Double, ByVal Vz As Object, ByVal VKij As Object, ByVal VTc As Object, ByVal VPc As Object, ByVal Vw As Object, ByVal VMM As Object, ByVal Hid As Double, ByVal HVap As Array) As Double
 

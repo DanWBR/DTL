@@ -24,7 +24,7 @@ Imports DTL.DTL.MathEx
 Namespace DTL.SimulationObjects.PropertyPackages
 
     <System.Runtime.InteropServices.Guid(SteamTablesPropertyPackage.ClassId)> _
-<System.Serializable()> Public Class SteamTablesPropertyPackage
+<Serializable()> Public Class SteamTablesPropertyPackage
 
         Inherits DTL.SimulationObjects.PropertyPackages.PropertyPackage
 

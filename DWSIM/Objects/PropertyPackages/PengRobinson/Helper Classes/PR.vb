@@ -21,7 +21,7 @@ Imports System.Math
 
 Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
 
-    <System.Serializable()> Public Class PR
+    <Serializable()> Public Class PR
 
         Inherits DTL.SimulationObjects.PropertyPackages.ThermoPlug
 

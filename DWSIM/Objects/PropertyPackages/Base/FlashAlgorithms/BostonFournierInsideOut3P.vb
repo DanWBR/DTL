@@ -24,7 +24,7 @@ Imports System.Linq
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
-    <System.Serializable()> Public Class BostonFournierInsideOut3P
+    <Serializable()> Public Class BostonFournierInsideOut3P
 
         Inherits FlashAlgorithm
 

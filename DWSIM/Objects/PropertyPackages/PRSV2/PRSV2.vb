@@ -21,7 +21,7 @@ Imports DTL.DTL.MathEx
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
-    <DelimitedRecord(vbTab)> <IgnoreFirst()> <System.Serializable()> Public Class PRSV2Param
+    <DelimitedRecord(vbTab)> <IgnoreFirst()> <Serializable()> Public Class PRSV2Param
 
         Public compound As String = ""
         <FieldNullValue(0.0#)> Public kappa1 As Double = 0.0#
@@ -30,7 +30,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
     End Class
 
-    <DelimitedRecord(vbTab)> <IgnoreFirst()> <System.Serializable()> _
+    <DelimitedRecord(vbTab)> <IgnoreFirst()> <Serializable()> _
     Public Class PRSV2_IPData
 
         Implements ICloneable
@@ -56,7 +56,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
     End Class
 
-    <System.Serializable()> Public Class PRSV2
+    <Serializable()> Public Class PRSV2
 
         Dim m_pr As New DTL.SimulationObjects.PropertyPackages.Auxiliary.PROPS
         Private _ip As Dictionary(Of String, Dictionary(Of String, PRSV2_IPData))

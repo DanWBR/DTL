@@ -21,7 +21,7 @@ Imports DTL.DTL.MathEx
 
 Namespace DTL.SimulationObjects.PropertyPackages
 
-    <System.Serializable()> Public MustInherit Class ThermoPlug
+    <Serializable()> Public MustInherit Class ThermoPlug
 
         Public MustOverride Function CalcP(ByVal V As Double, ByVal T As Double, ByVal Vx As Array, ByVal VKij As Object, ByVal VTc As Array, ByVal VPc As Array, ByVal Vw As Array, Optional ByVal otherargs As Object = Nothing)
 
@@ -41,7 +41,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
     End Class
 
-    <System.Serializable()> Public Class MichelsenFlash
+    <Serializable()> Public Class MichelsenFlash
 
         Public thermobase As ThermoPlug
         Public ppbase As PropertyPackage

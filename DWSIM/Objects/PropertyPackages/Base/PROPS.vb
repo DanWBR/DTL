@@ -18,7 +18,7 @@
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
-    <System.Serializable()> Class PROPS
+    <Serializable()> Class PROPS
 
         Sub New()
 

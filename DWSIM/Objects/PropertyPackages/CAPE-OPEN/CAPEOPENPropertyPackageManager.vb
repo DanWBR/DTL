@@ -2,7 +2,7 @@
 Imports DTL.DTL.SimulationObjects.PropertyPackages
 Imports CAPEOPEN110
 
-<System.Serializable()> _
+<Serializable()> _
 Friend Class CAPEOPENPropertyPackageManager
 
     Implements ICapeIdentification, ICapeThermoPropertyPackageManager, ICapeUtilities

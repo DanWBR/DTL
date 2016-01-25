@@ -21,7 +21,7 @@ Imports FileHelpers
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
-    <DelimitedRecord(";")> <IgnoreFirst()> <System.Serializable()> _
+    <DelimitedRecord(";")> <IgnoreFirst()> <Serializable()> _
     Public Class NRTL_IPData
 
         Implements ICloneable
@@ -49,7 +49,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
     End Class
 
-    <System.Serializable()> Public Class ObjectConverter
+    <Serializable()> Public Class ObjectConverter
 
         Inherits ConverterBase
 
@@ -66,7 +66,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
     End Class
 
-    <System.Serializable()> Public Class NRTL
+    <Serializable()> Public Class NRTL
 
         Private _ip As Dictionary(Of String, Dictionary(Of String, NRTL_IPData))
 

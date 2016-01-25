@@ -27,7 +27,7 @@ Imports DTL.DTL.BaseThermoClasses
 Namespace DTL.SimulationObjects.PropertyPackages
 
     <System.Runtime.InteropServices.Guid(NISTMFACPropertyPackage.ClassId)> _
-     <System.Serializable()> Public Class NISTMFACPropertyPackage
+     <Serializable()> Public Class NISTMFACPropertyPackage
 
         Inherits DTL.SimulationObjects.PropertyPackages.PropertyPackage
 

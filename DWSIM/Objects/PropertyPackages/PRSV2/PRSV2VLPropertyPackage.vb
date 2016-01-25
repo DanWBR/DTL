@@ -23,7 +23,7 @@ Imports DTL.DTL.BaseThermoClasses
 
 Namespace DTL.SimulationObjects.PropertyPackages
 
-    <System.Serializable()> Public Class PRSV2VLPropertyPackage
+    <Serializable()> Public Class PRSV2VLPropertyPackage
 
         Inherits DTL.SimulationObjects.PropertyPackages.PropertyPackage
 

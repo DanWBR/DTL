@@ -1,6 +1,6 @@
 ﻿Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
-    <System.Serializable()> Public Class IAPWS_IF97
+    <Serializable()> Public Class IAPWS_IF97
 
         '  water97_v13: A collection of Visual Basic functions
         '  for calculating properties of water and steam.
