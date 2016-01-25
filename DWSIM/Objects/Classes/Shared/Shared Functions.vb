@@ -1,6 +1,4 @@
-﻿Imports System.IO
-
-'    Shared Functions
+﻿'    Shared Functions
 '    Copyright 2008 Daniel Wagner O. de Medeiros
 '
 '    This file is part of DTL.
@@ -20,7 +18,7 @@
 
 Namespace DTL
 
-    <System.Serializable()> Public Class App
+    <Serializable()> Public Class App
 
         Public Shared Sub WriteToConsole(text As String, minlevel As Integer)
 
@@ -40,7 +38,7 @@ Namespace DTL
             Return UniqueName
         End Function
 
-        Public Shared Function GetComponentType(ByRef comp As DTL.BaseThermoClasses.ConstantProperties) As String
+        Public Shared Function GetComponentType(ByRef comp As BaseThermoClasses.ConstantProperties) As String
             If comp.IsHYPO Then
                 Return GetLocalString("CompHypo")
             ElseIf comp.IsPF Then
