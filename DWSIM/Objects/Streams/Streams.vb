@@ -311,10 +311,10 @@ Namespace DTL.SimulationObjects.Streams
 
         End Sub
 
-        Public Overrides Function GetPropertyValue(ByVal prop As String, Optional ByVal su As SistemasDeUnidades.Unidades = Nothing) As Object
+        Public Overrides Function GetPropertyValue(ByVal prop As String, Optional ByVal su As UnitsOfMeasure.Units = Nothing) As Object
 
-            If su Is Nothing Then su = New DTL.SistemasDeUnidades.UnidadesSI
-            Dim cv As New DTL.SistemasDeUnidades.Conversor
+            If su Is Nothing Then su = New DTL.UnitsOfMeasure.UnitsSI
+            Dim cv As New DTL.UnitsOfMeasure.Conversor
             Dim value As String = ""
             Dim sname As String = ""
             Dim propidx As Integer = CInt(prop.Split(",")(0).Split("_")(2))
@@ -803,10 +803,10 @@ Namespace DTL.SimulationObjects.Streams
             proplist = Nothing
         End Function
 
-        Public Overrides Function SetPropertyValue(ByVal prop As String, ByVal propval As Object, Optional ByVal su As DTL.SistemasDeUnidades.Unidades = Nothing) As Object
+        Public Overrides Function SetPropertyValue(ByVal prop As String, ByVal propval As Object, Optional ByVal su As DTL.UnitsOfMeasure.Units = Nothing) As Object
 
-            If su Is Nothing Then su = New DTL.SistemasDeUnidades.UnidadesSI
-            Dim cv As New DTL.SistemasDeUnidades.Conversor
+            If su Is Nothing Then su = New DTL.UnitsOfMeasure.UnitsSI
+            Dim cv As New DTL.UnitsOfMeasure.Conversor
             Dim propidx As Integer = CInt(prop.Split(",")(0).Split("_")(2))
             Dim sname As String = ""
             If prop.Split(",").Length = 2 Then
@@ -923,9 +923,9 @@ Namespace DTL.SimulationObjects.Streams
             Return 1
         End Function
 
-        Public Overrides Function GetPropertyUnit(ByVal prop As String, Optional ByVal su As SistemasDeUnidades.Unidades = Nothing) As Object
+        Public Overrides Function GetPropertyUnit(ByVal prop As String, Optional ByVal su As UnitsOfMeasure.Units = Nothing) As Object
 
-            If su Is Nothing Then su = New DTL.SistemasDeUnidades.UnidadesSI
+            If su Is Nothing Then su = New DTL.UnitsOfMeasure.UnitsSI
             Dim value As String = ""
             Dim propidx As Integer = CInt(prop.Split(",")(0).Split("_")(2))
 

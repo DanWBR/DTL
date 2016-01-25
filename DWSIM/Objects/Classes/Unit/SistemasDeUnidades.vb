@@ -16,9 +16,9 @@
 '    You should have received a copy of the GNU General Public License
 '    along with DTL.  If not, see <http://www.gnu.org/licenses/>.
 
-Namespace DTL.SistemasDeUnidades
+Namespace DTL.UnitsOfMeasure
 
-    <System.Serializable()> <Xml.Serialization.XmlRoot(ElementName:="Component")> Public Class Unidades
+    <System.Serializable()> <Xml.Serialization.XmlRoot(ElementName:="Component")> Public Class Units
 
         Public nome As String
 
@@ -80,9 +80,9 @@ Namespace DTL.SistemasDeUnidades
         End Sub
     End Class
 
-    <System.Serializable()> Public Class UnidadesSI
+    <System.Serializable()> Public Class UnitsSI
 
-        Inherits Unidades
+        Inherits Units
 
         Public Sub New()
 
@@ -159,9 +159,9 @@ Namespace DTL.SistemasDeUnidades
 
     End Class
 
-    <System.Serializable()> Public Class UnidadesSI_Deriv1
+    <System.Serializable()> Public Class UnitsSI_Deriv1
 
-        Inherits Unidades
+        Inherits Units
 
         Public Sub New()
 
@@ -238,9 +238,9 @@ Namespace DTL.SistemasDeUnidades
 
     End Class
 
-    <System.Serializable()> Public Class UnidadesSI_Deriv2
+    <System.Serializable()> Public Class UnitsSI_Deriv2
 
-        Inherits Unidades
+        Inherits Units
 
         Public Sub New()
 
@@ -317,9 +317,9 @@ Namespace DTL.SistemasDeUnidades
 
     End Class
 
-    <System.Serializable()> Public Class UnidadesSI_Deriv3
+    <System.Serializable()> Public Class UnitsSI_Deriv3
 
-        Inherits Unidades
+        Inherits Units
 
         Public Sub New()
 
@@ -396,9 +396,9 @@ Namespace DTL.SistemasDeUnidades
 
     End Class
 
-    <System.Serializable()> Public Class UnidadesSI_Deriv4
+    <System.Serializable()> Public Class UnitsSI_Deriv4
 
-        Inherits Unidades
+        Inherits Units
 
         Public Sub New()
 
@@ -475,9 +475,9 @@ Namespace DTL.SistemasDeUnidades
 
     End Class
 
-    <System.Serializable()> Public Class UnidadesINGLES
+    <System.Serializable()> Public Class UnitsINGLES
 
-        Inherits Unidades
+        Inherits Units
 
         Public Sub New()
 
@@ -554,9 +554,9 @@ Namespace DTL.SistemasDeUnidades
 
     End Class
 
-    <System.Serializable()> Public Class UnidadesCGS
+    <System.Serializable()> Public Class UnitsCGS
 
-        Inherits Unidades
+        Inherits Units
 
         Public Sub New()
 
