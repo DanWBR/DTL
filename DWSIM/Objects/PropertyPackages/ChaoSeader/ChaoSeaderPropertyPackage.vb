@@ -19,15 +19,14 @@
 'Imports CAPEOPEN_PD.CAPEOPEN
 'Imports DTL.SimulationObjects
 
-Imports DTL.DTL.SimulationObjects.PropertyPackages
 Imports System.Math
 
 Namespace DTL.SimulationObjects.PropertyPackages
 
-    <System.Runtime.InteropServices.Guid(ChaoSeaderPropertyPackage.ClassId)> _
+    <Runtime.InteropServices.Guid(ChaoSeaderPropertyPackage.ClassId)>
     <Serializable()> Public Class ChaoSeaderPropertyPackage
 
-        Inherits DTL.SimulationObjects.PropertyPackages.PropertyPackage
+        Inherits PropertyPackage
 
         Public Shadows Const ClassId As String = "8079D263-219C-4df6-BB7D-D034DEE9C464"
 
@@ -37,7 +36,6 @@ Namespace DTL.SimulationObjects.PropertyPackages
         Public m_pr As New Auxiliary.PengRobinson
         Public m_lk As New Auxiliary.LeeKesler
         Public m_cs As New Auxiliary.CS
-        '<System.NonSerialized()> Private m_xn As DLLXnumbers.Xnumbers
 
         Public Sub New(ByVal comode As Boolean)
             MyBase.New(comode)
@@ -53,7 +51,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
             Me.IsConfigurable = True
 
-            Me._packagetype = PropertyPackages.PackageType.ChaoSeader
+            Me._packagetype = PackageType.ChaoSeader
 
         End Sub
 
@@ -61,7 +59,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
             MyBase.ReconfigureConfigForm()
         End Sub
 
-#Region "    DWSIM Functions"
+#Region "DWSIM Functions"
 
         Public Function RET_VVL() As Double()
 
@@ -381,7 +379,6 @@ Namespace DTL.SimulationObjects.PropertyPackages
                 Me.CurrentMaterialStream.Phases(phaseID).SPMProperties.enthalpy = result
                 result = Me.m_lk.S_LK_MIX("L", T, P, RET_VMOL(dwpl), RET_VKij, RET_VTC(), RET_VPC(), RET_VW(), RET_VMM(), Me.RET_Sid(298.15, T, P, dwpl))
                 Me.CurrentMaterialStream.Phases(phaseID).SPMProperties.entropy = result
-                'result = Me.m_pr.Z_PR(T, P, RET_VMOL(dwpl), RET_VKij(), RET_VTC, RET_VPC, RET_VW, "L")
                 result = Me.m_lk.Z_LK("L", T / Me.AUX_TCM(dwpl), P / Me.AUX_PCM(dwpl), Me.AUX_WM(dwpl))(0)
                 Me.CurrentMaterialStream.Phases(phaseID).SPMProperties.compressibilityFactor = result
                 resultObj = Me.m_lk.CpCvR_LK("L", T, P, RET_VMOL(dwpl), RET_VKij(), RET_VMAS(dwpl), RET_VTC(), RET_VPC(), RET_VCP(T), RET_VMM(), RET_VW(), RET_VZRa())
@@ -407,7 +404,6 @@ Namespace DTL.SimulationObjects.PropertyPackages
                 Me.CurrentMaterialStream.Phases(phaseID).SPMProperties.enthalpy = result
                 result = Me.m_lk.S_LK_MIX("V", T, P, RET_VMOL(Phase.Vapor), RET_VKij, RET_VTC(), RET_VPC(), RET_VW(), RET_VMM(), Me.RET_Sid(298.15, T, P, Phase.Vapor))
                 Me.CurrentMaterialStream.Phases(phaseID).SPMProperties.entropy = result
-                'result = Me.m_pr.Z_PR(T, P, RET_VMOL(Phase.Vapor), RET_VKij, RET_VTC, RET_VPC, RET_VW, "V")
                 result = Me.m_lk.Z_LK("V", T / Me.AUX_TCM(Phase.Vapor), P / Me.AUX_PCM(Phase.Vapor), Me.AUX_WM(Phase.Vapor))(0)
                 Me.CurrentMaterialStream.Phases(phaseID).SPMProperties.compressibilityFactor = result
                 result = Me.AUX_CPm(Phase.Vapor, T)
@@ -425,7 +421,6 @@ Namespace DTL.SimulationObjects.PropertyPackages
                 result = Me.AUX_VAPVISCm(T, Me.CurrentMaterialStream.Phases(phaseID).SPMProperties.density.GetValueOrDefault, Me.AUX_MMM(Phase))
                 Me.CurrentMaterialStream.Phases(phaseID).SPMProperties.viscosity = result
                 Me.CurrentMaterialStream.Phases(phaseID).SPMProperties.kinematic_viscosity = result / Me.CurrentMaterialStream.Phases(phaseID).SPMProperties.density.Value
-
 
             ElseIf phaseID = 1 Then
 
@@ -534,7 +529,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
 #End Region
 
-#Region "    Métodos Numéricos"
+#Region "Numerical Methods"
 
         Public Function IntegralSimpsonCp(ByVal a As Double,
                  ByVal b As Double,
