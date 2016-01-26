@@ -1,5 +1,4 @@
-﻿Imports CapeOpen = CAPEOPEN110
-Imports DTL.DTL.SimulationObjects.PropertyPackages
+﻿Imports DTL.DTL.SimulationObjects.PropertyPackages
 Imports CAPEOPEN110
 
 <Serializable()> _
