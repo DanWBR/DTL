@@ -45,7 +45,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
             MyBase.New()
 
             Me.IsConfigurable = True
-            Me._packagetype = PropertyPackages.PackageType.ActivityCoefficient
+            Me._packagetype = PackageType.ActivityCoefficient
 
         End Sub
 

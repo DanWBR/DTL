@@ -43,7 +43,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
             MyBase.New()
 
             Me.IsConfigurable = True
-            Me._packagetype = PropertyPackages.PackageType.VaporPressure
+            Me._packagetype = PackageType.VaporPressure
 
         End Sub
 
