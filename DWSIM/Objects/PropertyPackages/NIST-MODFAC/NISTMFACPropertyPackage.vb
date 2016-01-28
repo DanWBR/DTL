@@ -20,16 +20,15 @@
 '    You should have received a copy of the GNU General Public License
 '    along with DWSIM.  If not, see <http://www.gnu.org/licenses/>.
 
-Imports DTL.DTL.SimulationObjects.PropertyPackages
 Imports System.Math
 Imports DTL.DTL.BaseThermoClasses
 
 Namespace DTL.SimulationObjects.PropertyPackages
 
-    <System.Runtime.InteropServices.Guid(NISTMFACPropertyPackage.ClassId)> _
-     <Serializable()> Public Class NISTMFACPropertyPackage
+    <Runtime.InteropServices.Guid(NISTMFACPropertyPackage.ClassId)> _
+    <Serializable()> Public Class NISTMFACPropertyPackage
 
-        Inherits DTL.SimulationObjects.PropertyPackages.PropertyPackage
+        Inherits PropertyPackage
 
         Public Shadows Const ClassId As String = "519EB917-0B2E-4ac1-9AF2-2D1A2A55067F"
 
@@ -920,7 +919,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
             App.WriteToConsole("Compounds: " & Me.RET_VNAMES.ToArrayString, 2)
             App.WriteToConsole("Mole fractions: " & Vx.ToArrayString(), 2)
 
-            Dim prn As New PropertyPackages.ThermoPlugs.PR
+            Dim prn As New ThermoPlugs.PR
 
             Dim n As Integer = UBound(Vx)
             Dim lnfug(n), ativ(n) As Double

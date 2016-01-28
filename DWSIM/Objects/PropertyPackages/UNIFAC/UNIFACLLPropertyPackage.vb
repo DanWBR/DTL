@@ -18,15 +18,14 @@
 
 'Imports CAPEOPEN_PD.CAPEOPEN
 'Imports DTL.SimulationObjects
-Imports DTL.DTL.SimulationObjects.PropertyPackages
 Imports System.Math
 
 Namespace DTL.SimulationObjects.PropertyPackages
 
-    <System.Runtime.InteropServices.Guid(UNIFACPropertyPackage.ClassId)> _
-<Serializable()> Public Class UNIFACPropertyPackage
+    <Runtime.InteropServices.Guid(UNIFACPropertyPackage.ClassId)> _
+    <Serializable()> Public Class UNIFACPropertyPackage
 
-        Inherits DTL.SimulationObjects.PropertyPackages.PropertyPackage
+        Inherits PropertyPackage
 
         Public Shadows Const ClassId As String = "B20E8A1D-6CB5-43a1-87E2-148EBB25235A"
 
@@ -779,7 +778,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
         Public Overrides Function DW_CalcFugCoeff(ByVal Vx As Array, ByVal T As Double, ByVal P As Double, ByVal st As State) As Double()
 
-            Dim prn As New PropertyPackages.ThermoPlugs.PR
+            Dim prn As New ThermoPlugs.PR
 
             Dim n As Integer = UBound(Vx)
             Dim lnfug(n), ativ(n) As Double

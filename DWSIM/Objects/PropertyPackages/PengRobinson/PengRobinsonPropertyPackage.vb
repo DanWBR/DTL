@@ -16,17 +16,15 @@
 '    You should have received a copy of the GNU General Public License
 '    along with DTL.  If not, see <http://www.gnu.org/licenses/>.
 
-Imports DTL.DTL.SimulationObjects.PropertyPackages
 Imports System.Math
-Imports DTL.DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 Imports DTL.DTL.BaseThermoClasses
 
 Namespace DTL.SimulationObjects.PropertyPackages
 
-    <System.Runtime.InteropServices.Guid(PengRobinsonPropertyPackage.ClassId)> _
- <Serializable()> Public Class PengRobinsonPropertyPackage
+    <Runtime.InteropServices.Guid(PengRobinsonPropertyPackage.ClassId)> _
+    <Serializable()> Public Class PengRobinsonPropertyPackage
 
-        Inherits DTL.SimulationObjects.PropertyPackages.PropertyPackage
+        Inherits PropertyPackage
 
         Public Shadows Const ClassId As String = "2A322AB7-2256-495d-86C7-797AD19FDE22"
 
@@ -692,7 +690,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
         Public Overrides Function DW_CalcFugCoeff(ByVal Vx As Array, ByVal T As Double, ByVal P As Double, ByVal st As State) As Double()
 
-            Dim prn As New PropertyPackages.ThermoPlugs.PR
+            Dim prn As New ThermoPlugs.PR
 
             Dim lnfug As Object
 

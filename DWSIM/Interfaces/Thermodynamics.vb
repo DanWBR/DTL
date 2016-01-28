@@ -42,7 +42,7 @@ Namespace Thermodynamics
         ''' Initializes the calculator and loads the compound databases into memory.
         ''' </summary>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(1)> Sub Initialize()
+        <Runtime.InteropServices.DispId(1)> Sub Initialize()
 
             'load databases
             _availablecomps = New Dictionary(Of String, ConstantProperties)
@@ -60,7 +60,7 @@ Namespace Thermodynamics
         ''' </summary>
         ''' <param name="userdbs">A string array containing the full path of DWSIM-generated user databases to load.</param>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(2)> Sub Initialize(ByVal userdbs() As String)
+        <Runtime.InteropServices.DispId(2)> Sub Initialize(ByVal userdbs() As String)
 
             Initialize()
 
@@ -74,7 +74,7 @@ Namespace Thermodynamics
         ''' Enables CPU parallel processing for some tasks.
         ''' </summary>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(3)> Sub EnableParallelProcessing()
+        <Runtime.InteropServices.DispId(3)> Sub EnableParallelProcessing()
 
             My.MyApplication._EnableParallelProcessing = True
 
@@ -84,7 +84,7 @@ Namespace Thermodynamics
         ''' Disables CPU parallel processing.
         ''' </summary>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(4)> Sub DisableParallelProcessing()
+        <Runtime.InteropServices.DispId(4)> Sub DisableParallelProcessing()
 
             My.MyApplication._EnableParallelProcessing = False
 
@@ -95,7 +95,7 @@ Namespace Thermodynamics
         ''' </summary>
         ''' <param name="level">Debug level: 0 = none, 1 = low, 2 = medium, 3 = high</param>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(38)> Public Sub SetDebugLevel(level As Integer)
+        <Runtime.InteropServices.DispId(38)> Public Sub SetDebugLevel(level As Integer)
 
             My.MyApplication._DebugLevel = level
 
@@ -105,7 +105,7 @@ Namespace Thermodynamics
         ''' Activates CPU-accelerated SIMD vector operations.
         ''' </summary>
         ''' <remarks>This uses the routines implemented in the Yeppp! (http://www.yeppp.info) library, which must be in the same directory as DTL's.</remarks>
-        <System.Runtime.InteropServices.DispId(40)> Public Sub EnableSIMDExtensions()
+        <Runtime.InteropServices.DispId(40)> Public Sub EnableSIMDExtensions()
             My.MyApplication.UseSIMDExtensions = True
         End Sub
 
@@ -113,7 +113,7 @@ Namespace Thermodynamics
         ''' Deactivates CPU-accelerated SIMD vector operations.
         ''' </summary>
         ''' <remarks>This uses the routines implemented in the Yeppp! (http://www.yeppp.info) library, which must be in the same directory as DTL's.</remarks>
-        <System.Runtime.InteropServices.DispId(41)> Public Sub DisableSIMDExtensions()
+        <Runtime.InteropServices.DispId(41)> Public Sub DisableSIMDExtensions()
             My.MyApplication.UseSIMDExtensions = False
         End Sub
 
@@ -423,7 +423,7 @@ Namespace Thermodynamics
         ''' <param name="prop">Property identifier.</param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(10)> Public Function GetCompoundConstProp(
+        <Runtime.InteropServices.DispId(10)> Public Function GetCompoundConstProp(
             ByVal compound As String,
             ByVal prop As String) As String
 
@@ -465,7 +465,7 @@ Namespace Thermodynamics
         ''' <param name="temperature">Temperature in K.</param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(11)> Public Function GetCompoundTDepProp(
+        <Runtime.InteropServices.DispId(11)> Public Function GetCompoundTDepProp(
             ByVal compound As String,
             ByVal prop As String,
             ByVal temperature As Double) As String
@@ -509,7 +509,7 @@ Namespace Thermodynamics
         ''' <param name="pressure">Pressure in Pa.</param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(12)> Public Function GetCompoundPDepProp(
+        <Runtime.InteropServices.DispId(12)> Public Function GetCompoundPDepProp(
             ByVal compound As String,
             ByVal prop As String,
             ByVal pressure As Double) As String
@@ -549,7 +549,7 @@ Namespace Thermodynamics
         ''' </summary>
         ''' <returns>A list of the available single compound properties</returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(13)> Public Function GetCompoundConstPropList() As String()
+        <Runtime.InteropServices.DispId(13)> Public Function GetCompoundConstPropList() As String()
 
             Dim pp As New RaoultPropertyPackage(True)
 
@@ -578,7 +578,7 @@ Namespace Thermodynamics
         ''' </summary>
         ''' <returns>A list of the available single compound properties</returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(14)> Public Function GetCompoundTDepPropList() As String()
+        <Runtime.InteropServices.DispId(14)> Public Function GetCompoundTDepPropList() As String()
 
             Dim pp As New RaoultPropertyPackage(True)
 
@@ -607,7 +607,7 @@ Namespace Thermodynamics
         ''' </summary>
         ''' <returns>A list of the available single compound properties</returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(15)> Public Function GetCompoundPDepPropList() As String()
+        <Runtime.InteropServices.DispId(15)> Public Function GetCompoundPDepPropList() As String()
 
             Dim pp As New RaoultPropertyPackage(True)
 
@@ -648,7 +648,7 @@ Namespace Thermodynamics
         ''' <param name="ip4">Interaction Parameters Set #4.</param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(16)> Public Function CalcProp(
+        <Runtime.InteropServices.DispId(16)> Public Function CalcProp(
             ByVal proppack As String,
             ByVal prop As String,
             ByVal basis As String,
@@ -751,7 +751,7 @@ Namespace Thermodynamics
         ''' <param name="ip4">Interaction Parameters Set #4.</param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(17)> Public Function CalcProp(
+        <Runtime.InteropServices.DispId(17)> Public Function CalcProp(
             ByVal proppack As PropertyPackage,
             ByVal prop As String,
             ByVal basis As String,
@@ -855,7 +855,7 @@ Namespace Thermodynamics
         ''' <param name="ip4">Interaction Parameters Set #4.</param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(18)> Public Function CalcTwoPhaseProp(
+        <Runtime.InteropServices.DispId(18)> Public Function CalcTwoPhaseProp(
             ByVal proppack As String,
             ByVal prop As String,
             ByVal basis As String,
@@ -962,7 +962,7 @@ Namespace Thermodynamics
         ''' <param name="ip4">Interaction Parameters Set #4.</param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(19)> Public Function CalcTwoPhaseProp(
+        <Runtime.InteropServices.DispId(19)> Public Function CalcTwoPhaseProp(
             ByVal proppack As PropertyPackage,
             ByVal prop As String,
             ByVal basis As String,
@@ -1055,7 +1055,7 @@ Namespace Thermodynamics
         ''' </summary>
         ''' <returns>A list of the available Property Packages</returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(20)> Public Function GetPropPackList() As String()
+        <Runtime.InteropServices.DispId(20)> Public Function GetPropPackList() As String()
 
             Dim ppm As New CAPEOPENPropertyPackageManager()
 
@@ -1080,7 +1080,7 @@ Namespace Thermodynamics
         ''' </summary>
         ''' <returns>A Property Package instance.</returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(21)> Public Function GetPropPackInstance(ByVal proppackname As String) As PropertyPackage
+        <Runtime.InteropServices.DispId(21)> Public Function GetPropPackInstance(ByVal proppackname As String) As PropertyPackage
 
             Dim ppm As New CAPEOPENPropertyPackageManager()
 
@@ -1100,7 +1100,7 @@ Namespace Thermodynamics
         ''' </summary>
         ''' <returns>A list of the available single-phase properties</returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(22)> Public Function GetPropList() As String()
+        <Runtime.InteropServices.DispId(22)> Public Function GetPropList() As String()
 
             Dim pp As New RaoultPropertyPackage(True)
 
@@ -1125,7 +1125,7 @@ Namespace Thermodynamics
         ''' </summary>
         ''' <returns>A list of the available two-phase properties</returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(23)> Public Function GetTwoPhasePropList() As String()
+        <Runtime.InteropServices.DispId(23)> Public Function GetTwoPhasePropList() As String()
 
             Dim pp As New RaoultPropertyPackage(True)
 
@@ -1150,7 +1150,7 @@ Namespace Thermodynamics
         ''' </summary>
         ''' <returns>A list of the available phases</returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(24)> Public Function GetPhaseList() As String()
+        <Runtime.InteropServices.DispId(24)> Public Function GetPhaseList() As String()
 
             Dim pp As New RaoultPropertyPackage(True)
 
@@ -1175,7 +1175,7 @@ Namespace Thermodynamics
         ''' </summary>
         ''' <returns>A list of the available compounds</returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(25)> Public Function GetCompoundList() As String()
+        <Runtime.InteropServices.DispId(25)> Public Function GetCompoundList() As String()
 
             Try
 
@@ -1219,7 +1219,7 @@ Namespace Thermodynamics
         ''' <param name="ip4">Interaction Parameters Set #4.</param>
         ''' <returns>A matrix containing phase fractions and compound distribution in mole fractions.</returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(26)> Public Function PTFlash(
+        <Runtime.InteropServices.DispId(26)> Public Function PTFlash(
             ByVal proppack As String,
             ByVal flashalg As Integer,
             ByVal P As Double,
@@ -1329,7 +1329,7 @@ Namespace Thermodynamics
         ''' <param name="InitialTemperatureEstimate">Initial estimate for the temperature, in K.</param>
         ''' <returns>A matrix containing phase fractions and compound distribution in mole fractions.</returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(27)> Public Function PHFlash(
+        <Runtime.InteropServices.DispId(27)> Public Function PHFlash(
             ByVal proppack As String,
             ByVal flashalg As Integer,
             ByVal P As Double,
@@ -1444,7 +1444,7 @@ Namespace Thermodynamics
         ''' <param name="InitialTemperatureEstimate">Initial estimate for the temperature, in K.</param>
         ''' <returns>A matrix containing phase fractions and compound distribution in mole fractions.</returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(28)> Public Function PSFlash(
+        <Runtime.InteropServices.DispId(28)> Public Function PSFlash(
             ByVal proppack As String,
             ByVal flashalg As Integer,
             ByVal P As Double,
@@ -1559,7 +1559,7 @@ Namespace Thermodynamics
         ''' <param name="InitialTemperatureEstimate">Initial estimate for the temperature, in K.</param>
         ''' <returns>A matrix containing phase fractions and compound distribution in mole fractions.</returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(29)> Public Function PVFFlash(
+        <Runtime.InteropServices.DispId(29)> Public Function PVFFlash(
             ByVal proppack As String,
             ByVal flashalg As Integer,
             ByVal P As Double,
@@ -1674,7 +1674,7 @@ Namespace Thermodynamics
         '''<param name="InitialPressureEstimate">Initial estimate for the pressure, in Pa.</param>
         ''' <returns>A matrix containing phase fractions and compound distribution in mole fractions.</returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(30)> Public Function TVFFlash(
+        <Runtime.InteropServices.DispId(30)> Public Function TVFFlash(
             ByVal proppack As String,
             ByVal flashalg As Integer,
             ByVal T As Double,
@@ -1788,7 +1788,7 @@ Namespace Thermodynamics
         ''' <param name="ip4">Interaction Parameters Set #4.</param>
         ''' <returns>A matrix containing phase fractions and compound distribution in mole fractions.</returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(31)> Public Function PTFlash(
+        <Runtime.InteropServices.DispId(31)> Public Function PTFlash(
             ByVal proppack As PropertyPackage,
             ByVal flashalg As Integer,
             ByVal P As Double,
@@ -1884,7 +1884,7 @@ Namespace Thermodynamics
         ''' <param name="InitialTemperatureEstimate">Initial estimate for the temperature, in K.</param>
         ''' <returns>A matrix containing phase fractions and compound distribution in mole fractions.</returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(32)> Public Function PHFlash(
+        <Runtime.InteropServices.DispId(32)> Public Function PHFlash(
             ByVal proppack As PropertyPackage,
             ByVal flashalg As Integer,
             ByVal P As Double,
@@ -1984,7 +1984,7 @@ Namespace Thermodynamics
         ''' <param name="InitialTemperatureEstimate">Initial estimate for the temperature, in K.</param>
         ''' <returns>A matrix containing phase fractions and compound distribution in mole fractions.</returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(33)> Public Function PSFlash(
+        <Runtime.InteropServices.DispId(33)> Public Function PSFlash(
             ByVal proppack As PropertyPackage,
             ByVal flashalg As Integer,
             ByVal P As Double,
@@ -2084,7 +2084,7 @@ Namespace Thermodynamics
         ''' <param name="InitialTemperatureEstimate">Initial estimate for the temperature, in K.</param>
         ''' <returns>A matrix containing phase fractions and compound distribution in mole fractions.</returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(34)> Public Function PVFFlash(
+        <Runtime.InteropServices.DispId(34)> Public Function PVFFlash(
             ByVal proppack As PropertyPackage,
             ByVal flashalg As Integer,
             ByVal P As Double,
@@ -2185,7 +2185,7 @@ Namespace Thermodynamics
         '''<param name="InitialPressureEstimate">Initial estimate for the pressure, in Pa.</param>
         ''' <returns>A matrix containing phase fractions and compound distribution in mole fractions.</returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(35)> Public Function TVFFlash(
+        <Runtime.InteropServices.DispId(35)> Public Function TVFFlash(
             ByVal proppack As PropertyPackage,
             ByVal flashalg As Integer,
             ByVal T As Double,
@@ -2274,7 +2274,7 @@ Namespace Thermodynamics
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(36)> Public Function GetModelList() As ArrayList
+        <Runtime.InteropServices.DispId(36)> Public Function GetModelList() As ArrayList
 
             Dim modellist As New ArrayList
 
@@ -2299,7 +2299,7 @@ Namespace Thermodynamics
         ''' <param name="Compound2">The name of the second compound.</param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(37)> Public Function GetInteractionParameterSet(ByVal Model As String, ByVal Compound1 As String, ByVal Compound2 As String) As InteractionParameter
+        <Runtime.InteropServices.DispId(37)> Public Function GetInteractionParameterSet(ByVal Model As String, ByVal Compound1 As String, ByVal Compound2 As String) As InteractionParameter
 
             Dim pars As New Dictionary(Of String, Object)
 
@@ -2489,7 +2489,7 @@ Namespace Thermodynamics
         ''' <returns>A FlashCalculationResult instance with the results of the calculations</returns>
         ''' <remarks>This function must be used instead of the older type-specific flash functions.
         ''' Check if the 'ResultException' property of the result object is nothing/null before proceeding.</remarks>
-        <System.Runtime.InteropServices.DispId(39)> Public Function CalcEquilibrium(flashtype As FlashCalculationType,
+        <Runtime.InteropServices.DispId(39)> Public Function CalcEquilibrium(flashtype As FlashCalculationType,
                                                                                            flashalg As Integer,
                                                                                            val1 As Double, val2 As Double,
                                                                                            pp As PropertyPackage,

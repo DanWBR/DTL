@@ -1,6 +1,4 @@
 ﻿Imports System.Resources
-
-Imports System
 Imports System.Reflection
 Imports System.Runtime.InteropServices
 
@@ -10,17 +8,17 @@ Imports System.Runtime.InteropServices
 
 ' Review the values of the assembly attributes
 
-<Assembly: AssemblyTitle("DWSIM Thermodynamics Library (DTL)")> 
-<Assembly: AssemblyDescription("DWSIM Thermodynamics Library (DTL)")> 
-<Assembly: AssemblyCompany("DWSIM Project")> 
-<Assembly: AssemblyProduct("DWSIM")> 
-<Assembly: AssemblyCopyright("Copyright 2007-2015 Daniel Wagner O. de Medeiros")> 
-<Assembly: AssemblyTrademark("DWSIM")> 
+<Assembly: AssemblyTitle("DWSIM Thermodynamics Library (DTL)")>
+<Assembly: AssemblyDescription("DWSIM Thermodynamics Library (DTL)")>
+<Assembly: AssemblyCompany("DWSIM Project")>
+<Assembly: AssemblyProduct("DWSIM")>
+<Assembly: AssemblyCopyright("Copyright 2007-2015 Daniel Wagner O. de Medeiros")>
+<Assembly: AssemblyTrademark("DWSIM")>
 
-<Assembly: ComVisible(True)> 
+<Assembly: ComVisible(True)>
 
 'The following GUID is for the ID of the typelib if this project is exposed to COM
-<Assembly: Guid("3fa25e7a-c06d-4743-8e7c-066b82f83210")> 
+<Assembly: Guid("3fa25e7a-c06d-4743-8e7c-066b82f83210")>
 
 ' Version information for an assembly consists of the following four values:
 '
@@ -33,7 +31,7 @@ Imports System.Runtime.InteropServices
 ' by using the '*' as shown below:
 ' <Assembly: AssemblyVersion("1.0.*")> 
 
-<Assembly: AssemblyVersion("3.2.0")> 
+<Assembly: AssemblyVersion("3.2.0")>
 '<Assembly: AssemblyFileVersion("1.6")> 
 
-<Assembly: NeutralResourcesLanguageAttribute("pt-BR")> 
+<Assembly: NeutralResourcesLanguageAttribute("pt-BR")>

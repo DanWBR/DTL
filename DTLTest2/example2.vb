@@ -71,7 +71,7 @@ Module example2
 
     End Sub
 
-    <System.Runtime.CompilerServices.Extension()> _
+    <Runtime.CompilerServices.Extension()> _
     Public Function ToArrayString(vector As Double()) As String
 
         Dim retstr As String = "{ "
@@ -85,7 +85,7 @@ Module example2
 
     End Function
 
-    <System.Runtime.CompilerServices.Extension()> _
+    <Runtime.CompilerServices.Extension()> _
     Public Function ToArrayString(vector As String()) As String
 
         Dim retstr As String = "{ "

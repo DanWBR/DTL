@@ -17,16 +17,15 @@
 '    along with DTL.  If not, see <http://www.gnu.org/licenses/>.
 
 'Imports DTL.SimulationObjects
-Imports DTL.DTL.SimulationObjects.PropertyPackages
 Imports DTL.DTL.SimulationObjects.PropertyPackages.Auxiliary
 Imports DTL.DTL.MathEx
 
 Namespace DTL.SimulationObjects.PropertyPackages
 
-    <System.Runtime.InteropServices.Guid(SteamTablesPropertyPackage.ClassId)> _
-<Serializable()> Public Class SteamTablesPropertyPackage
+    <Runtime.InteropServices.Guid(SteamTablesPropertyPackage.ClassId)> _
+    <Serializable()> Public Class SteamTablesPropertyPackage
 
-        Inherits DTL.SimulationObjects.PropertyPackages.PropertyPackage
+        Inherits PropertyPackage
 
         Public Shadows Const ClassId As String = "170D6E8A-8880-4bf9-B7A0-E4A3FDBFD589"
 

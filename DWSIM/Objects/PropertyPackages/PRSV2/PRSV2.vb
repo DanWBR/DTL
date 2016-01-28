@@ -17,7 +17,6 @@
 '    along with DTL.  If not, see <http://www.gnu.org/licenses/>.
 
 Imports filehelpers
-Imports DTL.DTL.MathEx
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 

@@ -20,10 +20,10 @@ Imports System.Math
 
 Namespace DTL.SimulationObjects.PropertyPackages
 
-    <System.Runtime.InteropServices.Guid(LKPPropertyPackage.ClassId)> _
+    <Runtime.InteropServices.Guid(LKPPropertyPackage.ClassId)> _
       <Serializable()> Public Class LKPPropertyPackage
 
-        Inherits DTL.SimulationObjects.PropertyPackages.PropertyPackage
+        Inherits PropertyPackage
 
         Public Shadows Const ClassId As String = "DF7C2420-1FBB-4b35-9D87-6ECF530FED7A"
 

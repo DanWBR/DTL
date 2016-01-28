@@ -37,7 +37,6 @@
 'OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 '************************************************************************
 
-Imports System
 
 Namespace DTL.MathEx.GammaFunctions
 

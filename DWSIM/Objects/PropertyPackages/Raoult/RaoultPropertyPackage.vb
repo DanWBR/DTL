@@ -18,15 +18,14 @@
 
 'Imports CAPEOPEN_PD.CAPEOPEN
 'Imports DTL.SimulationObjects
-Imports DTL.DTL.SimulationObjects.PropertyPackages
 Imports System.Math
 
 Namespace DTL.SimulationObjects.PropertyPackages
 
-    <System.Runtime.InteropServices.Guid(RaoultPropertyPackage.ClassId)> _
-<Serializable()> Public Class RaoultPropertyPackage
+    <Runtime.InteropServices.Guid(RaoultPropertyPackage.ClassId)> _
+    <Serializable()> Public Class RaoultPropertyPackage
 
-        Inherits DTL.SimulationObjects.PropertyPackages.PropertyPackage
+        Inherits PropertyPackage
 
         Public Shadows Const ClassId As String = "407A13EC-1C55-462a-AEA4-9709B11367B0"
 
