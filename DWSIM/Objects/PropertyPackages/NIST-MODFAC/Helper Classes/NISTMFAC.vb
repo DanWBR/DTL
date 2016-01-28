@@ -370,9 +370,9 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
     <Serializable()> Public Class NistModfacGroups
 
-        Public InteracParam_aij As System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))
-        Public InteracParam_bij As System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))
-        Public InteracParam_cij As System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))
+        Public InteracParam_aij As Dictionary(Of Integer, Dictionary(Of Integer, Double))
+        Public InteracParam_bij As Dictionary(Of Integer, Dictionary(Of Integer, Double))
+        Public InteracParam_cij As Dictionary(Of Integer, Dictionary(Of Integer, Double))
 
         Protected m_groups As System.Collections.Generic.Dictionary(Of Integer, ModfacGroup)
 
@@ -381,9 +381,9 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Dim pathsep = IO.Path.DirectorySeparatorChar
 
             m_groups = New System.Collections.Generic.Dictionary(Of Integer, ModfacGroup)
-            InteracParam_aij = New System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))
-            InteracParam_bij = New System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))
-            InteracParam_cij = New System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))
+            InteracParam_aij = New Dictionary(Of Integer, Dictionary(Of Integer, Double))
+            InteracParam_bij = New Dictionary(Of Integer, Dictionary(Of Integer, Double))
+            InteracParam_cij = New Dictionary(Of Integer, Dictionary(Of Integer, Double))
 
             Dim cult As Globalization.CultureInfo = New Globalization.CultureInfo("en-US")
             Dim fields As String()
@@ -422,11 +422,11 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                         While Not parser.EndOfData
                             fields = parser.ReadFields()
                             If Not Me.InteracParam_aij.ContainsKey(fields(0)) Then
-                                Me.InteracParam_aij.Add(fields(0), New System.Collections.Generic.Dictionary(Of Integer, Double))
+                                Me.InteracParam_aij.Add(fields(0), New Dictionary(Of Integer, Double))
                                 Me.InteracParam_aij(fields(0)).Add(fields(1), Double.Parse(fields(2), cult))
-                                Me.InteracParam_bij.Add(fields(0), New System.Collections.Generic.Dictionary(Of Integer, Double))
+                                Me.InteracParam_bij.Add(fields(0), New Dictionary(Of Integer, Double))
                                 Me.InteracParam_bij(fields(0)).Add(fields(1), Double.Parse(fields(3), cult))
-                                Me.InteracParam_cij.Add(fields(0), New System.Collections.Generic.Dictionary(Of Integer, Double))
+                                Me.InteracParam_cij.Add(fields(0), New Dictionary(Of Integer, Double))
                                 Me.InteracParam_cij(fields(0)).Add(fields(1), Double.Parse(fields(4), cult) / 1000)
                             Else
                                 If Not Me.InteracParam_aij(fields(0)).ContainsKey(fields(1)) Then

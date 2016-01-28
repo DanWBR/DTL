@@ -699,7 +699,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
     <Serializable()> Public Class UnifacGroups
 
-        Public InteracParam As System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))
+        Public InteracParam As Dictionary(Of Integer, Dictionary(Of Integer, Double))
         Protected m_groups As System.Collections.Generic.Dictionary(Of Integer, UnifacGroup)
 
         Sub New()
@@ -707,7 +707,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Dim pathsep = IO.Path.DirectorySeparatorChar
 
             m_groups = New System.Collections.Generic.Dictionary(Of Integer, UnifacGroup)
-            InteracParam = New System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))
+            InteracParam = New Dictionary(Of Integer, Dictionary(Of Integer, Double))
 
             Dim cult As Globalization.CultureInfo = New Globalization.CultureInfo("en-US")
 
@@ -736,7 +736,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                         While Not parser.EndOfData
                             fields = parser.ReadFields()
                             If Not Me.InteracParam.ContainsKey(fields(0)) Then
-                                Me.InteracParam.Add(fields(0), New System.Collections.Generic.Dictionary(Of Integer, Double))
+                                Me.InteracParam.Add(fields(0), New Dictionary(Of Integer, Double))
                                 Me.InteracParam(fields(0)).Add(fields(2), Double.Parse(fields(4), cult))
                             Else
                                 If Not Me.InteracParam(fields(0)).ContainsKey(fields(2)) Then
@@ -746,7 +746,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                                 End If
                             End If
                             If Not Me.InteracParam.ContainsKey(fields(2)) Then
-                                Me.InteracParam.Add(fields(2), New System.Collections.Generic.Dictionary(Of Integer, Double))
+                                Me.InteracParam.Add(fields(2), New Dictionary(Of Integer, Double))
                                 Me.InteracParam(fields(2)).Add(fields(0), Double.Parse(fields(5), cult))
                             Else
                                 If Not Me.InteracParam(fields(2)).ContainsKey(fields(0)) Then
@@ -772,7 +772,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
     <Serializable()> Public Class UnifacGroupsLL
 
-        Public InteracParam As System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))
+        Public InteracParam As Dictionary(Of Integer, Dictionary(Of Integer, Double))
         Protected m_groups As System.Collections.Generic.Dictionary(Of Integer, UnifacGroup)
 
         Sub New()
@@ -780,7 +780,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Dim pathsep = IO.Path.DirectorySeparatorChar
 
             m_groups = New System.Collections.Generic.Dictionary(Of Integer, UnifacGroup)
-            InteracParam = New System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))
+            InteracParam = New Dictionary(Of Integer, Dictionary(Of Integer, Double))
 
             Dim cult As Globalization.CultureInfo = New Globalization.CultureInfo("en-US")
 
@@ -808,7 +808,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                         While Not parser.EndOfData
                             fields = parser.ReadFields()
                             If Not Me.InteracParam.ContainsKey(fields(0)) Then
-                                Me.InteracParam.Add(fields(0), New System.Collections.Generic.Dictionary(Of Integer, Double))
+                                Me.InteracParam.Add(fields(0), New Dictionary(Of Integer, Double))
                                 Me.InteracParam(fields(0)).Add(fields(2), Double.Parse(fields(4), cult))
                             Else
                                 If Not Me.InteracParam(fields(0)).ContainsKey(fields(2)) Then
@@ -818,7 +818,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                                 End If
                             End If
                             If Not Me.InteracParam.ContainsKey(fields(2)) Then
-                                Me.InteracParam.Add(fields(2), New System.Collections.Generic.Dictionary(Of Integer, Double))
+                                Me.InteracParam.Add(fields(2), New Dictionary(Of Integer, Double))
                                 Me.InteracParam(fields(2)).Add(fields(0), Double.Parse(fields(5), cult))
                             Else
                                 If Not Me.InteracParam(fields(2)).ContainsKey(fields(0)) Then
