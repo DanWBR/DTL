@@ -16,15 +16,14 @@
 '    You should have received a copy of the GNU General Public License
 '    along with DTL.  If not, see <http://www.gnu.org/licenses/>.
 
-Imports DTL.DTL.SimulationObjects.PropertyPackages
 Imports System.Math
 
 Namespace DTL.SimulationObjects.PropertyPackages
 
-    <System.Runtime.InteropServices.Guid(NRTLPropertyPackage.ClassId)> _
-   <Serializable()> Public Class NRTLPropertyPackage
+    <Runtime.InteropServices.Guid(NRTLPropertyPackage.ClassId)> _
+    <Serializable()> Public Class NRTLPropertyPackage
 
-        Inherits DTL.SimulationObjects.PropertyPackages.PropertyPackage
+        Inherits PropertyPackage
 
         Public Shadows Const ClassId As String = "D42F0157-5750-4c89-A94E-634A04701568"
 
@@ -756,7 +755,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
         Public Overrides Function DW_CalcFugCoeff(ByVal Vx As Array, ByVal T As Double, ByVal P As Double, ByVal st As State) As Double()
 
-            Dim prn As New PropertyPackages.ThermoPlugs.PR
+            Dim prn As New ThermoPlugs.PR
 
             Dim n As Integer = UBound(Vx)
             Dim lnfug(n), ativ(n) As Double

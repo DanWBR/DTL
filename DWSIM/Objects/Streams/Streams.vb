@@ -37,7 +37,7 @@ Namespace DTL.SimulationObjects.Streams
         'CAPE-OPEN Error Interfaces
         Implements ECapeUser, ECapeUnknown, ECapeRoot
 
-        Friend _pp As DTL.SimulationObjects.PropertyPackages.PropertyPackage
+        Friend _pp As PropertyPackage
         Private _ppid As String = ""
 
         Protected m_compositionbasis As CompBasis = CompBasis.Molar_Fractions
@@ -75,11 +75,11 @@ Namespace DTL.SimulationObjects.Streams
             End Set
         End Property
 
-        Public Property PropertyPackage() As DTL.SimulationObjects.PropertyPackages.PropertyPackage
+        Public Property PropertyPackage() As PropertyPackage
             Get
                 Return _pp
             End Get
-            Set(ByVal value As DTL.SimulationObjects.PropertyPackages.PropertyPackage)
+            Set(ByVal value As PropertyPackage)
                 If value IsNot Nothing Then _ppid = value.UniqueID
             End Set
         End Property

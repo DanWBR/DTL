@@ -16,16 +16,14 @@
 '    You should have received a copy of the GNU General Public License
 '    along with DTL.  If not, see <http://www.gnu.org/licenses/>.
 
-Imports DTL.DTL.SimulationObjects.PropertyPackages
 Imports System.Math
-Imports DTL.DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 Imports DTL.DTL.BaseThermoClasses
 
 Namespace DTL.SimulationObjects.PropertyPackages
 
     <Serializable()> Public Class PRSV2PropertyPackage
 
-        Inherits DTL.SimulationObjects.PropertyPackages.PropertyPackage
+        Inherits PropertyPackage
 
         Private m_props As New Auxiliary.PROPS
         Public m_pr As New Auxiliary.PRSV2
