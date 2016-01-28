@@ -374,13 +374,13 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
         Public InteracParam_bij As Dictionary(Of Integer, Dictionary(Of Integer, Double))
         Public InteracParam_cij As Dictionary(Of Integer, Dictionary(Of Integer, Double))
 
-        Protected m_groups As System.Collections.Generic.Dictionary(Of Integer, ModfacGroup)
+        Protected m_groups As Dictionary(Of Integer, ModfacGroup)
 
         Sub New()
 
             Dim pathsep = IO.Path.DirectorySeparatorChar
 
-            m_groups = New System.Collections.Generic.Dictionary(Of Integer, ModfacGroup)
+            m_groups = New Dictionary(Of Integer, ModfacGroup)
             InteracParam_aij = New Dictionary(Of Integer, Dictionary(Of Integer, Double))
             InteracParam_bij = New Dictionary(Of Integer, Dictionary(Of Integer, Double))
             InteracParam_cij = New Dictionary(Of Integer, Dictionary(Of Integer, Double))
@@ -405,7 +405,6 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                                 maingroup = fields(0).Split(")")(0).Substring(1)
                                 mainname = fields(0).Trim().Split(")")(1).Trim
                             Else
-                                'Me.Groups.Add(i, New ModfacGroup(fields(1), mainname, maingroup, fields(0), Double.Parse(fields(3), cult), Double.Parse(fields(2), cult)))
                                 Me.Groups.Add(fields(0), New ModfacGroup(fields(1), mainname, maingroup, fields(0), Double.Parse(fields(2), cult), Double.Parse(fields(3), cult)))
                                 i += 1
                             End If
@@ -446,7 +445,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         End Sub
 
-        Public ReadOnly Property Groups() As System.Collections.Generic.Dictionary(Of Integer, ModfacGroup)
+        Public ReadOnly Property Groups() As Dictionary(Of Integer, ModfacGroup)
             Get
                 Return m_groups
             End Get
