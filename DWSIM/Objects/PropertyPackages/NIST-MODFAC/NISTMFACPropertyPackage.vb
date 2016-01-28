@@ -60,7 +60,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
             End With
 
             Me.IsConfigurable = True
-            Me._packagetype = DTL.SimulationObjects.PropertyPackages.PackageType.ActivityCoefficient
+            Me._packagetype = PackageType.ActivityCoefficient
 
         End Sub
 
@@ -68,7 +68,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
             MyBase.ReconfigureConfigForm()
         End Sub
 
-#Region "    DWSIM Functions"
+#Region "DWSIM Functions"
 
         Public Function RET_KIJ(ByVal id1 As String, ByVal id2 As String) As Double
             If Me.m_pr.InteractionParameters.ContainsKey(id1) Then
@@ -135,9 +135,9 @@ Namespace DTL.SimulationObjects.PropertyPackages
             HV = Me.m_lk.H_LK_MIX("V", T, P, RET_VMOL(Phase.Vapor), RET_VKij(), RET_VTC, RET_VPC, RET_VW, RET_VMM, Me.RET_Hid(298.15, T, Phase.Vapor))
             HM = Me.CurrentMaterialStream.Phases(1).SPMProperties.massfraction.GetValueOrDefault * HL + Me.CurrentMaterialStream.Phases(2).SPMProperties.massfraction.GetValueOrDefault * HV
 
-            Dim ent_massica = HM
+            Dim ent_mass = HM
             Dim flow = Me.CurrentMaterialStream.Phases(0).SPMProperties.massflow
-            Return ent_massica * flow
+            Return ent_mass * flow
 
         End Function
 
@@ -439,7 +439,6 @@ Namespace DTL.SimulationObjects.PropertyPackages
                 Me.CurrentMaterialStream.Phases(phaseID).SPMProperties.enthalpy = result
                 result = Me.m_lk.S_LK_MIX("V", T, P, RET_VMOL(Phase.Vapor), RET_VKij, RET_VTC(), RET_VPC(), RET_VW(), RET_VMM(), Me.RET_Sid(298.15, T, P, Phase.Vapor))
                 Me.CurrentMaterialStream.Phases(phaseID).SPMProperties.entropy = result
-                'result = Me.m_pr.Z_PR(T, P, RET_VMOL(Phase.Vapor), RET_VKij, RET_VTC, RET_VPC, RET_VW, "V")
                 result = Me.m_lk.Z_LK("V", T / Me.AUX_TCM(Phase.Vapor), P / Me.AUX_PCM(Phase.Vapor), Me.AUX_WM(Phase.Vapor))(0)
                 Me.CurrentMaterialStream.Phases(phaseID).SPMProperties.compressibilityFactor = result
                 result = Me.AUX_CPm(Phase.Vapor, T)
@@ -497,9 +496,6 @@ Namespace DTL.SimulationObjects.PropertyPackages
             If phaseID > 0 Then
                 result = overallmolarflow * phasemolarfrac * Me.AUX_MMM(Phase) / 1000 / Me.CurrentMaterialStream.Phases(phaseID).SPMProperties.density.GetValueOrDefault
                 Me.CurrentMaterialStream.Phases(phaseID).SPMProperties.volumetric_flow = result
-            Else
-                'result = Me.CurrentMaterialStream.Phases(phaseID).SPMProperties.massflow.GetValueOrDefault / Me.CurrentMaterialStream.Phases(phaseID).SPMProperties.density.GetValueOrDefault
-                'Me.CurrentMaterialStream.Phases(phaseID).SPMProperties.volumetric_flow = result
             End If
 
         End Sub
@@ -542,7 +538,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
                 Return Me.AUX_VAPVISCm(T, Me.AUX_VAPDENS(T, P), Me.AUX_MMM(Phase.Vapor))
             End If
         End Function
-        Public Overrides Function SupportsComponent(ByVal comp As BaseThermoClasses.ConstantProperties) As Boolean
+        Public Overrides Function SupportsComponent(ByVal comp As ConstantProperties) As Boolean
 
             If Me.SupportedComponents.Contains(comp.ID) Then
                 Return True
@@ -605,7 +601,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
 #End Region
 
-#Region "    Auxiliary Functions"
+#Region "Auxiliary Functions"
 
         Function RET_VN(ByVal subst As Substance) As Object
 
@@ -672,7 +668,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
 #End Region
 
-#Region "    Métodos Numéricos"
+#Region "Numerical Methods"
 
         Public Function IntegralSimpsonCp(ByVal a As Double,
                  ByVal b As Double,
@@ -726,7 +722,6 @@ Namespace DTL.SimulationObjects.PropertyPackages
          ByVal Epsilon As Double, ByVal subst As String) As Double
 
             'Cp = A + B*T + C*T^2 + D*T^3 + E*T^4 where Cp in kJ/kg-mol , T in K 
-
 
             Dim Result As Double
             Dim h As Double

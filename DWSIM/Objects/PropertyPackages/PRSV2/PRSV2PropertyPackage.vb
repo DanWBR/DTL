@@ -386,7 +386,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
             End If
         End Function
 
-        Public Overrides Function SupportsComponent(ByVal comp As BaseThermoClasses.ConstantProperties) As Boolean
+        Public Overrides Function SupportsComponent(ByVal comp As ConstantProperties) As Boolean
 
             Return True
 
