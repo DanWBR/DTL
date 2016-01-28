@@ -69,7 +69,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             _ip = New Dictionary(Of String, Dictionary(Of String, UNIQUAC_IPData))
             '_ip2 = New Dictionary(Of String, Dictionary(Of String, UNIQUAC_IPData))
 
-            Dim pathsep As Char = System.IO.Path.DirectorySeparatorChar
+            Dim pathsep As Char = IO.Path.DirectorySeparatorChar
 
             Dim uniquacip As UNIQUAC_IPData
             Dim uniquacipc() As UNIQUAC_IPData
@@ -82,7 +82,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             End Using
 
 
-            Dim csdb As New DTL.Databases.ChemSep
+            Dim csdb As New Databases.ChemSep
 
             For Each uniquacip In uniquacipc
                 If Me.InteractionParameters.ContainsKey(csdb.GetDWSIMName(uniquacip.ID1)) Then

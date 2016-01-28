@@ -59,7 +59,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
             _ip = New Dictionary(Of String, Dictionary(Of String, LKP_IPData))
 
-            Dim pathsep As Char = System.IO.Path.DirectorySeparatorChar
+            Dim pathsep As Char = IO.Path.DirectorySeparatorChar
 
             Dim lkpip As LKP_IPData
             Dim lkpipc() As LKP_IPData
@@ -70,7 +70,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                 End Using
             End Using
 
-            Dim csdb As New DTL.Databases.ChemSep
+            Dim csdb As New Databases.ChemSep
             For Each lkpip In lkpipc
                 If Me.InteractionParameters.ContainsKey((lkpip.ID1)) Then
                     If Me.InteractionParameters((lkpip.ID1)).ContainsKey((lkpip.ID2)) Then
@@ -182,7 +182,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             'Dim DHres = R * Tcm * Me.Hlk(T / Tcm, P / Pcm, wm)
             Dim DHres = R * Tcm * Me.H_LK(TIPO, T / Tcm, P / Pcm, wm)
 
-            If DHres = 0 Then Throw New Exception("Erro no cálculo da entalpia [LK].")
+            If DHres = 0 Then Throw New Exception("Error in enthalpy calculation [LK].")
 
             H_LK_MIX = Hid + DHres / MMm '/ 1000
 
@@ -251,7 +251,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             C = c1 - c2 / Tr + c3 / Tr ^ 3
             D = d1 + d2 / Tr
 
-            Vr = Me.ESTIMAR_Vr2(TIPO, Pr, Tr, B, C, D, c4, beta, gamma)
+            Vr = Me.ESTIMATE_Vr2(TIPO, Pr, Tr, B, C, D, c4, beta, gamma)
             zs = Pr * Vr / Tr
 
             b1 = 0.2026579
@@ -271,7 +271,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             C = c1 - c2 / Tr + c3 / Tr ^ 3
             D = d1 + d2 / Tr
 
-            Vr = Me.ESTIMAR_Vr2(TIPO, Pr, Tr, B, C, D, c4, beta, gamma)
+            Vr = Me.ESTIMATE_Vr2(TIPO, Pr, Tr, B, C, D, c4, beta, gamma)
 
             zh = Pr * Vr / Tr
 
@@ -405,7 +405,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         End Function
 
-        Function ESTIMAR_Vr(ByVal TIPO, ByVal Pr, ByVal Tr, ByVal B, ByVal C, ByVal D, ByVal c4, ByVal beta, ByVal gamma)
+        Function ESTIMATE_Vr(ByVal TIPO, ByVal Pr, ByVal Tr, ByVal B, ByVal C, ByVal D, ByVal c4, ByVal beta, ByVal gamma)
 
             Dim cnt As Integer = 0
             Dim Vr, Vrant, Vrant2, fi, fi_ant, fi_ant2, dfidVr As Double
@@ -418,9 +418,9 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                 fi_ant2 = fi_ant
                 fi_ant = fi
                 fi = Pr * Vr / Tr - (1 + B / Vr + C / Vr ^ 2 + D / Vr ^ 5 + c4 / Tr ^ 3 / Vr ^ 2 * (beta + gamma / Vr ^ 2) * Math.Exp(-gamma / Vr ^ 2))
-                dfidVr = -B * Vr ^ -2 - 2 * C * Vr ^ -3 - 5 * D * Vr ^ -6 + _
-                        (-2 * beta * c4 * Vr ^ -3 / Tr ^ 3 * Math.Exp(-gamma * Vr ^ -2) + beta * c4 * Vr ^ -2 / Tr ^ 3 * Math.Exp(-gamma * Vr ^ -2) * (2 * gamma * Vr ^ -3)) + _
-                        (-4 * gamma * c4 / Tr ^ 3 * Vr ^ -5 * Math.Exp(-gamma * Vr ^ -2) + gamma * c4 * Tr ^ -3 * Vr ^ -4 * Math.Exp(-gamma * Vr ^ -2) * (2 * gamma * Vr ^ -3)) + _
+                dfidVr = -B * Vr ^ -2 - 2 * C * Vr ^ -3 - 5 * D * Vr ^ -6 +
+                        (-2 * beta * c4 * Vr ^ -3 / Tr ^ 3 * Math.Exp(-gamma * Vr ^ -2) + beta * c4 * Vr ^ -2 / Tr ^ 3 * Math.Exp(-gamma * Vr ^ -2) * (2 * gamma * Vr ^ -3)) +
+                        (-4 * gamma * c4 / Tr ^ 3 * Vr ^ -5 * Math.Exp(-gamma * Vr ^ -2) + gamma * c4 * Tr ^ -3 * Vr ^ -4 * Math.Exp(-gamma * Vr ^ -2) * (2 * gamma * Vr ^ -3)) +
                         -Pr / Tr
                 dfidVr = -dfidVr
 
@@ -441,7 +441,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         End Function
 
-        Function ESTIMAR_Vr2(ByVal TIPO, ByVal Pr, ByVal Tr, ByVal B, ByVal C, ByVal D, ByVal c4, ByVal beta, ByVal gamma)
+        Function ESTIMATE_Vr2(ByVal TIPO, ByVal Pr, ByVal Tr, ByVal B, ByVal C, ByVal D, ByVal c4, ByVal beta, ByVal gamma)
 
             Dim i As Integer
 

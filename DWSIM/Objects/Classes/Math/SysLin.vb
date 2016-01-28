@@ -1728,7 +1728,7 @@ Namespace DTL.MathEx.SysLin
                 strF = strF & "#"
             Next
 
-            If System.IO.File.Exists(strFile) Then System.IO.File.Delete(strFile)
+            If IO.File.Exists(strFile) Then IO.File.Delete(strFile)
 
             Try
                 FileOpen(5, strFile, OpenMode.Output, OpenAccess.Write)

@@ -378,7 +378,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         Sub New()
 
-            Dim pathsep = System.IO.Path.DirectorySeparatorChar
+            Dim pathsep = IO.Path.DirectorySeparatorChar
 
             m_groups = New System.Collections.Generic.Dictionary(Of Integer, ModfacGroup)
             InteracParam_aij = New System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))

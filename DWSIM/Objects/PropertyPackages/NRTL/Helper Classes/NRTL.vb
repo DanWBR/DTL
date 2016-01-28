@@ -80,7 +80,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
             _ip = New Dictionary(Of String, Dictionary(Of String, NRTL_IPData))
 
-            Dim pathsep As Char = System.IO.Path.DirectorySeparatorChar
+            Dim pathsep As Char = IO.Path.DirectorySeparatorChar
 
             Dim nrtlip As NRTL_IPData
             Dim nrtlipc() As NRTL_IPData
@@ -91,7 +91,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                 End Using
             End Using
 
-            Dim csdb As New DTL.Databases.ChemSep
+            Dim csdb As New Databases.ChemSep
 
             For Each nrtlip In nrtlipc
                 If Me.InteractionParameters.ContainsKey(csdb.GetDWSIMName(nrtlip.ID1)) Then
