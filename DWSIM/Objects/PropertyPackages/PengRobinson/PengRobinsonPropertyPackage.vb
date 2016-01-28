@@ -48,7 +48,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
             End With
 
             Me.IsConfigurable = True
-            Me._packagetype = PropertyPackages.PackageType.EOS
+            Me._packagetype = PackageType.EOS
 
         End Sub
 

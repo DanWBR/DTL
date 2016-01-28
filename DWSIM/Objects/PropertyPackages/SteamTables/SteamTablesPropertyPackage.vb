@@ -40,7 +40,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
         Public Sub New()
 
             Me.SupportedComponents.Add(15)
-            Me._packagetype = PropertyPackages.PackageType.Miscelaneous
+            Me._packagetype = PackageType.Miscelaneous
 
         End Sub
 
