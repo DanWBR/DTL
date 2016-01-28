@@ -58,7 +58,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
         Sub New()
             _ip = New Dictionary(Of String, Dictionary(Of String, PR_IPData))
 
-            Dim pathsep As Char = System.IO.Path.DirectorySeparatorChar
+            Dim pathsep As Char = IO.Path.DirectorySeparatorChar
 
             Dim prip As PR_IPData
             Dim pripc() As PR_IPData
@@ -69,7 +69,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                 End Using
             End Using
 
-            Dim csdb As New DTL.Databases.ChemSep
+            Dim csdb As New Databases.ChemSep
             For Each prip In pripc
                 If Me.InteractionParameters.ContainsKey(csdb.GetCSName(prip.ID1)) Then
                     If Me.InteractionParameters(csdb.GetCSName(prip.ID1)).ContainsKey(csdb.GetCSName(prip.ID2)) Then

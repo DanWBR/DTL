@@ -38,7 +38,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             _data = New Dictionary(Of String, PRSV2Param)
             _ip = New Dictionary(Of String, Dictionary(Of String, PRSV2_IPData))
 
-            Dim pathsep As Char = System.IO.Path.DirectorySeparatorChar
+            Dim pathsep As Char = IO.Path.DirectorySeparatorChar
 
             Dim prsv2data As PRSV2Param
             Dim prsv2datac() As PRSV2Param
