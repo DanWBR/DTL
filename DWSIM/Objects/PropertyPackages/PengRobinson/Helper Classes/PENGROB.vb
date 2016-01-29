@@ -46,7 +46,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
     <Serializable()> Public Class PengRobinson
 
-        Dim m_pr As New DTL.SimulationObjects.PropertyPackages.Auxiliary.PROPS
+        Dim m_pr As New PROPS
         Private _ip As Dictionary(Of String, Dictionary(Of String, PR_IPData))
 
         Public ReadOnly Property InteractionParameters() As Dictionary(Of String, Dictionary(Of String, PR_IPData))
@@ -359,10 +359,6 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             ai = a * alpha
             bi = 0.0778 * R * Tc / Pc
 
-            'Dim dadT = -0.5 * c * a * (Tc ^ 0.5 * (c + 1) - c * T ^ 0.5) / (Tc * T ^ 0.5)
-            'Dim dadT = 2 * a * (1 + c - c * T ^ 0.5 / Tc ^ 0.5) * (-0.5 * c * T ^ -0.5 / Tc ^ 0.5)
-            'Dim dadT = -c * a * (Tc ^ 0.5 * (c + 1) - c * T ^ 0.5) / (Tc * T ^ 0.5)
-            'Dim dadT = -R / 2 * (0.45724 / T) ^ 0.5 * (c * (a * Tc / Pc) ^ 0.5)
             Dim dadT = -a / T * (1 + c * (1 - (T / Tc) ^ 0.5)) * (c * (T / Tc) ^ 0.5)
 
             Dim AG1 = ai * P / (R * T) ^ 2
@@ -424,11 +420,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
         Function H_PR_MIX(ByVal TIPO As String, ByVal T As Double, ByVal P As Double, ByVal Vz As Object, ByVal VKij As Object, ByVal VTc As Object, ByVal VPc As Object, ByVal Vw As Object, ByVal VMM As Object, ByVal Hid As Double) As Double
 
             Dim H As Double = 0.0#
-            'If My.Settings.EnableGPUProcessing Then
-            '    H = H_PR_MIX_GPU(TIPO, T, P, Vz, VKij, VTc, VPc, Vw, VMM, Hid)
-            'Else
             H = H_PR_MIX_CPU(TIPO, T, P, Vz, VKij, VTc, VPc, Vw, VMM, Hid)
-            'End If
 
             Return H
 
@@ -573,7 +565,6 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                     If Z < 0 Then Z = 1
                 Loop Until Math.Abs(findZV) < 0.0001 Or Double.IsNaN(Z)
 
-
             End If
 
             Dim V = (Z * R * T / P) ' m3/mol
@@ -678,8 +669,6 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                 i = i + 1
             Loop Until i = n + 1
 
-            'Dim dadT = 
-
             Dim AG1 = am * P / (R * T) ^ 2
             Dim BG1 = bm * P / (R * T)
 
@@ -771,7 +760,6 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             dadT = aux1 * aux2
 
             Dim V0 As Double = R * 298.15 / 101325
-            'Dim DSres = R * Math.Log((Z - BG1) / Z) + R * Math.Log(V / V0) - 1 / (8 ^ 0.5 * bm) * dadT * Math.Log((2 * Z + BG1 * (2 - 8 ^ 0.5)) / (2 * Z + BG1 * (2 + 8 ^ 0.5)))
             Dim DSres = R * Math.Log((Z - BG1) / Z) + R * Math.Log(Z) - 1 / (8 ^ 0.5 * bm) * dadT * Math.Log((2 * Z + BG1 * (2 - 8 ^ 0.5)) / (2 * Z + BG1 * (2 + 8 ^ 0.5)))
 
             If MathEx.Common.Sum(Vz) = 0.0# Then
@@ -791,7 +779,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         End Function
 
-        Function ESTIMAR_V(ByVal Vz As Object, ByVal KI As Object) As Double
+        Function ESTIMATE_V(ByVal Vz As Object, ByVal KI As Object) As Double
 
             Dim n = UBound(Vz)
 
@@ -818,7 +806,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Vsup = Vinf
             Vinf = Vinf - delta_V
 
-            'método de Brent para encontrar Vc
+            'Brent method to find Vc
 
             Dim aaa, bbb, ccc, ddd, eee, min11, min22, faa, fbb, fcc, ppp, qqq, rrr, sss, tol11, xmm As Double
             Dim ITMAX2 As Integer = 100
@@ -1071,9 +1059,9 @@ Final3:
 
                 If Not criterioOK Then
                     If TIPO = "L" Then
-                        'verificar qual componente é o mais pesado
+                        'check which component is the heaviest
                         i = 1
-                        'hbcindex é o índice do componente mais pesado
+                        'hbc index is the heaviest component of the index
                         hbcIndex = i
                         i = 0
                         Do
@@ -1082,9 +1070,9 @@ Final3:
                             End If
                             i += 1
                         Loop Until i = n + 1
-                        'aumenta-se a fração molar do componente hbc...
+                        'increases the mole fraction of component hbc
                         Vx(hbcIndex) += 1
-                        'e em seguida normaliza-se a composição.
+                        'And then normalizes the composition.
                         i = 0
                         sum_x = 0
                         Do
@@ -1129,7 +1117,6 @@ Final3:
             Dim aml2(n), amv2(n), LN_CF(n), PHI(n)
             Dim Tc(n), Pc(n), W(n), alpha(n), m(n), Tr(n)
             Dim rho, rho0, rho_mc, Tmc, dPdrho, dPdrho_, Zcalc As Double
-            'Dim P_lim, rho_lim, Pcalc, rho_calc, rho_x As Double
 
             R = 8.314
 
@@ -1322,7 +1309,7 @@ Final3:
 
         End Function
 
-        Function ESTIMAR_RhoLim(ByVal am As Double, ByVal bm As Double, ByVal T As Double, ByVal P As Double) As Double
+        Function ESTIMATE_RhoLim(ByVal am As Double, ByVal bm As Double, ByVal T As Double, ByVal P As Double) As Double
 
             Dim i As Integer
 
@@ -1348,7 +1335,7 @@ Final3:
             rsup = rinf
             rinf = rinf - delta_r
 
-            'método de Brent para encontrar Vc
+            'Brent method to find Vc
 
             Dim aaa, bbb, ccc, ddd, eee, min11, min22, faa, fbb, fcc, ppp, qqq, rrr, sss, tol11, xmm As Double
             Dim ITMAX2 As Integer = 100
