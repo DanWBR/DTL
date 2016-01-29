@@ -144,7 +144,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         End Function
 
-        Function H_LK_MIX(ByVal TIPO As String, ByVal T As Double, ByVal P As Double, ByVal Vz As Object, ByVal VKij As Object, ByVal VTc As Object, ByVal VPc As Object, ByVal Vw As Object, ByVal VMM As Object, ByVal Hid As Double, ByVal VVc As Object) As Double
+        Function H_LK_MIX(ByVal TYPE As String, ByVal T As Double, ByVal P As Double, ByVal Vz As Object, ByVal VKij As Object, ByVal VTc As Object, ByVal VPc As Object, ByVal Vw As Object, ByVal VMM As Object, ByVal Hid As Double, ByVal VVc As Object) As Double
 
             Dim n, R As Double
             Dim Tc(), Pc(), w(), Tr() As Double
@@ -180,7 +180,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             wm = obj(3)
 
             'Dim DHres = R * Tcm * Me.Hlk(T / Tcm, P / Pcm, wm)
-            Dim DHres = R * Tcm * Me.H_LK(TIPO, T / Tcm, P / Pcm, wm)
+            Dim DHres = R * Tcm * Me.H_LK(TYPE, T / Tcm, P / Pcm, wm)
 
             If DHres = 0 Then Throw New Exception("Error in enthalpy calculation [LK].")
 
@@ -188,7 +188,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         End Function
 
-        Function S_LK_MIX(ByVal TIPO As String, ByVal T As Double, ByVal P As Double, ByVal Vz As Array, ByVal VKij As Object, ByVal VTc As Array, ByVal VPc As Array, ByVal Vw As Array, ByVal VMM As Array, ByVal Sid As Double, ByVal VVc As Object) As Double
+        Function S_LK_MIX(ByVal TYPE As String, ByVal T As Double, ByVal P As Double, ByVal Vz As Array, ByVal VKij As Object, ByVal VTc As Array, ByVal VPc As Array, ByVal Vw As Array, ByVal VMM As Array, ByVal Sid As Double, ByVal VVc As Object) As Double
 
             Dim n, R As Double
             Dim Tc(), Pc(), w(), Tr() As Double
@@ -223,13 +223,13 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Pcm = obj(1)
             wm = obj(3)
 
-            Dim DSres = R * Me.S_LK(TIPO, T / Tcm, P, Pcm, wm)
+            Dim DSres = R * Me.S_LK(TYPE, T / Tcm, P, Pcm, wm)
 
             S_LK_MIX = Sid + DSres / MMm '/ 1000
 
         End Function
 
-        Function Z_LK(ByVal TIPO As String, ByVal Tr As Double, ByVal Pr As Double, ByVal w As Double)
+        Function Z_LK(ByVal TYPE As String, ByVal Tr As Double, ByVal Pr As Double, ByVal w As Double)
 
             Dim z, zh, zs, wh, Vr As Double
             Dim B, C, D, b1, b2, b3, b4, c1, c2, c3, c4, d1, d2, beta, gamma As Double
@@ -251,7 +251,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             C = c1 - c2 / Tr + c3 / Tr ^ 3
             D = d1 + d2 / Tr
 
-            Vr = Me.ESTIMATE_Vr2(TIPO, Pr, Tr, B, C, D, c4, beta, gamma)
+            Vr = Me.ESTIMATE_Vr2(TYPE, Pr, Tr, B, C, D, c4, beta, gamma)
             zs = Pr * Vr / Tr
 
             b1 = 0.2026579
@@ -271,7 +271,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             C = c1 - c2 / Tr + c3 / Tr ^ 3
             D = d1 + d2 / Tr
 
-            Vr = Me.ESTIMATE_Vr2(TIPO, Pr, Tr, B, C, D, c4, beta, gamma)
+            Vr = Me.ESTIMATE_Vr2(TYPE, Pr, Tr, B, C, D, c4, beta, gamma)
 
             zh = Pr * Vr / Tr
 
@@ -283,7 +283,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         End Function
 
-        Function H_LK(ByVal TIPO As String, ByVal Tr As Double, ByVal Pr As Double, ByVal w As Double)
+        Function H_LK(ByVal TYPE As String, ByVal Tr As Double, ByVal Pr As Double, ByVal w As Double)
 
             Dim zs, zh, wh, Vr, z, DHresS, DHresH, DHres As Double
             Dim E, b1, b2, b3, b4, c1, c2, c3, c4, d1, d2, beta, gamma As Double
@@ -303,7 +303,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
             wh = 0.3978
 
-            Dim tmp = Me.Z_LK(TIPO, Tr, Pr, w)
+            Dim tmp = Me.Z_LK(TYPE, Tr, Pr, w)
             z = tmp(0)
             zs = tmp(1)
 
@@ -342,7 +342,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         End Function
 
-        Function S_LK(ByVal TIPO As String, ByVal Tr As Double, ByVal P As Double, ByVal Pc As Double, ByVal w As Double)
+        Function S_LK(ByVal TYPE As String, ByVal Tr As Double, ByVal P As Double, ByVal Pc As Double, ByVal w As Double)
 
             Dim zs, zh, wh, Vr, z, DSresS, DSresH, DSres, Pr As Double
             Dim E, b1, b2, b3, b4, c1, c2, c3, c4, d1, d2, beta, gamma As Double
@@ -364,7 +364,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
             wh = 0.3978
 
-            Dim tmp = Me.Z_LK(TIPO, Tr, Pr, w)
+            Dim tmp = Me.Z_LK(TYPE, Tr, Pr, w)
             z = tmp(0)
             zs = tmp(1)
 
@@ -405,7 +405,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         End Function
 
-        Function ESTIMATE_Vr(ByVal TIPO, ByVal Pr, ByVal Tr, ByVal B, ByVal C, ByVal D, ByVal c4, ByVal beta, ByVal gamma)
+        Function ESTIMATE_Vr(ByVal TYPE, ByVal Pr, ByVal Tr, ByVal B, ByVal C, ByVal D, ByVal c4, ByVal beta, ByVal gamma)
 
             Dim cnt As Integer = 0
             Dim Vr, Vrant, Vrant2, fi, fi_ant, fi_ant2, dfidVr As Double
@@ -413,7 +413,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             fi_ant2 = 0
             fi_ant = 0
             fi = 0
-            If TIPO = "L" Then Vr = 0.05 Else Vr = Tr / Pr * 0.3
+            If TYPE = "L" Then Vr = 0.05 Else Vr = Tr / Pr * 0.3
             Do
                 fi_ant2 = fi_ant
                 fi_ant = fi
@@ -429,7 +429,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                 Vr = Vr - fi / dfidVr
 
                 If Vr < 0 Then
-                    If TIPO = "L" Then Vr = 0.996 * Vrant Else Vr = Tr / Pr * 0.35
+                    If TYPE = "L" Then Vr = 0.996 * Vrant Else Vr = Tr / Pr * 0.35
                     fi_ant2 = 0
                     fi_ant = 0
                 End If
@@ -441,7 +441,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         End Function
 
-        Function ESTIMATE_Vr2(ByVal TIPO, ByVal Pr, ByVal Tr, ByVal B, ByVal C, ByVal D, ByVal c4, ByVal beta, ByVal gamma)
+        Function ESTIMATE_Vr2(ByVal TYPE, ByVal Pr, ByVal Tr, ByVal B, ByVal C, ByVal D, ByVal c4, ByVal beta, ByVal gamma)
 
             Dim i As Integer
 
@@ -449,7 +449,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
             Dim fT, fT_inf, nsub, delta_T As Double
 
-            If TIPO = "L" Then
+            If TYPE = "L" Then
                 Tinf = 0
                 Tsup = 10
                 nsub = 1000
@@ -552,7 +552,7 @@ Final3:
 
         End Function
 
-        Function CPCV_LK(ByVal TIPO As String, ByVal Tr As Double, ByVal Pr As Double, ByVal w As Double)
+        Function CPCV_LK(ByVal TYPE As String, ByVal Tr As Double, ByVal Pr As Double, ByVal w As Double)
 
             Dim zs, zh, wh, Vr, z, DCvS, DCvH, DCpS, DCpH, DCv, DCp, dPdT, dPdV As Double
             Dim E, B, C, D, b1, b2, b3, b4, c1, c2, c3, c4, d1, d2, beta, gamma As Double
@@ -574,7 +574,7 @@ Final3:
 
             wh = 0.3978
 
-            Dim tmp = Me.Z_LK(TIPO, Tr, Pr, w)
+            Dim tmp = Me.Z_LK(TYPE, Tr, Pr, w)
             z = tmp(0)
             zs = tmp(1)
 
@@ -630,7 +630,7 @@ Final3:
 
         End Function
 
-        Function CpCvR_LK(ByVal TIPO, ByVal T, ByVal P, ByVal Vz, ByVal VKij, ByVal Vzmass, ByVal VTc, ByVal VPc, ByVal VCpig, ByVal VMM, ByVal Vw, ByVal VZRa, ByVal VVc)
+        Function CpCvR_LK(ByVal TYPE, ByVal T, ByVal P, ByVal Vz, ByVal VKij, ByVal Vzmass, ByVal VTc, ByVal VPc, ByVal VCpig, ByVal VMM, ByVal Vw, ByVal VZRa, ByVal VVc)
 
             Dim n, R As Double
             Dim Tc(), Pc(), Vc(), w(), Tr() As Double
@@ -672,7 +672,7 @@ Final3:
             Pcm = obj(1)
             wm = obj(3)
 
-            Dim lkcp = Me.CPCV_LK(TIPO, T / Tcm, P / Pcm, wm)
+            Dim lkcp = Me.CPCV_LK(TYPE, T / Tcm, P / Pcm, wm)
 
             Dim tmp(2) As Double
             tmp(0) = (lkcp(0) * R + Cpm_ig) / (lkcp(1) * R + Cpm_ig - R)
@@ -683,7 +683,7 @@ Final3:
 
         End Function
 
-        Function LnFugM(ByVal TIPO As String, ByVal Tr As Double, ByVal Pr As Double, ByVal w As Double) As Double()
+        Function LnFugM(ByVal TYPE As String, ByVal Tr As Double, ByVal Pr As Double, ByVal w As Double) As Double()
 
             Dim zs, zh, wh, Vr, z, LnFugMS, LnFugMH, LnFugMr As Double
             Dim B, C, D, E, b1, b2, b3, b4, c1, c2, c3, c4, d1, d2, beta, gamma As Double
@@ -703,7 +703,7 @@ Final3:
 
             wh = 0.3978
 
-            Dim tmp = Me.Z_LK(TIPO, Tr, Pr, w)
+            Dim tmp = Me.Z_LK(TYPE, Tr, Pr, w)
             z = tmp(0)
             zs = tmp(1)
 
@@ -748,13 +748,13 @@ Final3:
 
         End Function
 
-        Function CalcLnFug(ByVal TIPO As String, ByVal T As Double, ByVal P As Double, ByVal Vz As Object, ByVal VKij As Object, ByVal VTc As Object, ByVal VPc As Object, ByVal Vw As Object, ByVal VMM As Object, ByVal VVc As Object, ByVal Hid As Double) As Object
+        Function CalcLnFug(ByVal TYPE As String, ByVal T As Double, ByVal P As Double, ByVal Vz As Object, ByVal VKij As Object, ByVal VTc As Object, ByVal VPc As Object, ByVal Vw As Object, ByVal VMM As Object, ByVal VVc As Object, ByVal Hid As Double) As Object
 
-            Return CalcLnFugCPU(TIPO, T, P, Vz, VKij, VTc, VPc, Vw, VMM, VVc, Hid)
+            Return CalcLnFugCPU(TYPE, T, P, Vz, VKij, VTc, VPc, Vw, VMM, VVc, Hid)
 
         End Function
 
-        Function CalcLnFugCPU(ByVal TIPO As String, ByVal T As Double, ByVal P As Double, ByVal Vz As Object, ByVal VKij As Object, ByVal VTc As Object, ByVal VPc As Object, ByVal Vw As Object, ByVal VMM As Object, ByVal VVc As Object, ByVal Hid As Double) As Object
+        Function CalcLnFugCPU(ByVal TYPE As String, ByVal T As Double, ByVal P As Double, ByVal Vz As Object, ByVal VKij As Object, ByVal VTc As Object, ByVal VPc As Object, ByVal Vw As Object, ByVal VMM As Object, ByVal VVc As Object, ByVal Hid As Double) As Object
 
             'mixture critical properties
             Dim Tcm, Pcm, Vcm, wm, Tr, Pr, zcm As Double
@@ -780,12 +780,12 @@ Final3:
 
             Dim dHmRTcm As Double
 
-            dHmRTcm = Me.H_LK_MIX(TIPO, T, P, Vz, VKij, VTc, VPc, Vw, VMM, 0, VVc) / (8.314 * Tcm) * MMm
+            dHmRTcm = Me.H_LK_MIX(TYPE, T, P, Vz, VKij, VTc, VPc, Vw, VMM, 0, VVc) / (8.314 * Tcm) * MMm
 
             Dim dlnfidwm, dTcmdx(n, n), dVcmdx(n, n), dPcmdx(n, n), dZcmdx(n, n), lnfi(n) As Double
             Dim lnfugm, lnfugs, lnfugh As Double, res As Double()
 
-            res = Me.LnFugM(TIPO, Tr, Pr, wm)
+            res = Me.LnFugM(TYPE, Tr, Pr, wm)
             lnfugm = res(0)
             lnfugs = res(1)
             lnfugh = res(2)
@@ -827,7 +827,7 @@ Final3:
 
             Dim suma(n), sumb(n), sumc(n), zm As Double
 
-            zm = Me.Z_LK(TIPO, Tr, Pr, wm)(0)
+            zm = Me.Z_LK(TYPE, Tr, Pr, wm)(0)
 
             For i = 0 To n
                 suma(i) = 0

@@ -204,7 +204,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         End Function
 
-        Function condl_latini(ByVal T As Double, ByVal Tb As Double, ByVal Tc As Double, ByVal M As Double, ByVal Tipo As String) As Double
+        Function condl_latini(ByVal T As Double, ByVal Tb As Double, ByVal Tc As Double, ByVal M As Double, ByVal TYPE As String) As Double
 
             Dim Tr, A, A_, alpha, beta, lambda, gamma As Double
 
@@ -217,7 +217,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             beta = 0.5
             gamma = 0.167
 
-            If Tipo = "O" Then
+            If TYPE = "O" Then
                 'Olefines
 
                 A_ = 0.0361
@@ -225,7 +225,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                 beta = 1
                 gamma = 0.167
 
-            ElseIf Tipo = "C" Then
+            ElseIf TYPE = "C" Then
                 'Ciclo-paraffines
 
                 A_ = 0.031
@@ -233,7 +233,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                 beta = 1.0
                 gamma = 0.167
 
-            ElseIf Tipo = "A" Then
+            ElseIf TYPE = "A" Then
                 'Aromatics
 
                 A_ = 0.0346
@@ -241,7 +241,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                 beta = 1.0
                 gamma = 0.167
 
-            ElseIf Tipo = "X" Then
+            ElseIf TYPE = "X" Then
                 'Others (ex. water)
 
                 A_ = 0.494
@@ -562,7 +562,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         End Function
 
-        Function CpCvR(ByVal TIPO, ByVal T, ByVal P, ByVal Vz, ByVal VKij, ByVal Vzmass, ByVal VTc, ByVal VPc, ByVal VCpig, ByVal VMM, ByVal Vw, ByVal VZRa)
+        Function CpCvR(ByVal TYPE, ByVal T, ByVal P, ByVal Vz, ByVal VKij, ByVal Vzmass, ByVal VTc, ByVal VPc, ByVal VCpig, ByVal VMM, ByVal Vw, ByVal VZRa)
 
             Dim ai(), bi(), ci() As Double
             Dim n, R As Double
@@ -672,7 +672,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                     temp1(1, 1) = tv2
                 End If
 
-                If TIPO = "L" Then
+                If TYPE = "L" Then
                     Z = temp1(0, 0)
                     If temp1(0, 1) <> 0 Then
                         Z = temp1(1, 0)
@@ -681,7 +681,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                         End If
                     End If
                     If Z < 0 Then Z = temp1(1, 0)
-                ElseIf TIPO = "V" Then
+                ElseIf TYPE = "V" Then
                     Z = temp1(2, 0)
                     If temp1(2, 1) <> 0 Then
                         Z = temp1(1, 0)
@@ -694,7 +694,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Else
 
                 Dim findZV, dfdz, zant As Double
-                If TIPO = "V" Then Z = 1 Else Z = 0.05
+                If TYPE = "V" Then Z = 1 Else Z = 0.05
                 Do
                     findZV = coeff(3) * Z ^ 3 + coeff(2) * Z ^ 2 + coeff(1) * Z + coeff(0)
                     dfdz = 3 * coeff(3) * Z ^ 2 + 2 * coeff(2) * Z + coeff(1)
@@ -763,7 +763,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         End Function
 
-        Function JT_PR(ByVal TIPO, ByVal T, ByVal P, ByVal Vz, ByVal Vzmass, ByVal VTc, ByVal VPc, ByVal VCpig, ByVal VMM, ByVal Vw, ByVal VZRa)
+        Function JT_PR(ByVal TYPE, ByVal T, ByVal P, ByVal Vz, ByVal Vzmass, ByVal VTc, ByVal VPc, ByVal VCpig, ByVal VMM, ByVal Vw, ByVal VZRa)
 
             Dim n, R, Cpm_ig As Double
             Dim vetor(8) As Double
@@ -817,11 +817,11 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Dim Pcm = Zcm * R * Tcm / (Vcm)
 
             Dim V = 0.0#
-            If TIPO = "L" Then
+            If TYPE = "L" Then
 
                 'V = (Z_PR(T, P, Vz, VTc, VPc, Vw, "L") * R * T / P) * 1000 ' m3/kgmol
 
-            ElseIf TIPO = "V" Then
+            ElseIf TYPE = "V" Then
 
                 'V = (Z_PR(T, P, Vz, VTc, VPc, Vw, "V") * R * T / P) * 1000 ' m3/kgmol
 

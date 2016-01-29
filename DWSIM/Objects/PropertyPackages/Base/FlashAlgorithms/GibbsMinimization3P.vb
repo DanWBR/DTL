@@ -997,7 +997,7 @@ out:        Return result
 
         End Function
 
-        Function ESTIMATE_T_H(ByVal HT As Double, ByVal Tref As Double, ByVal TIPO As String, ByVal P As Double, ByVal Vz As Array) As Double
+        Function ESTIMATE_T_H(ByVal HT As Double, ByVal Tref As Double, ByVal TYPE As String, ByVal P As Double, ByVal Vz As Array) As Double
 
             Dim maxit As Integer = Me.proppack.Parameters("PP_PHFMII")
             Dim tol As Double = Me.proppack.Parameters("PP_PHFILT")
@@ -1009,7 +1009,7 @@ out:        Return result
             Do
                 fi_ant2 = fi_ant
                 fi_ant = fi_
-                If TIPO = "L" Then
+                If TYPE = "L" Then
                     fi_ = HT - proppack.DW_CalcEnthalpy(Vz, Tf, Pf, State.Liquid)
                 Else
                     fi_ = HT - proppack.DW_CalcEnthalpy(Vz, Tf, Pf, State.Vapor)
@@ -1036,7 +1036,7 @@ out:        Return result
 
         End Function
 
-        Function ESTIMATE_T_S(ByVal ST As Double, ByVal Tref As Double, ByVal TIPO As String, ByVal P As Double, ByVal Vz As Array) As Double
+        Function ESTIMATE_T_S(ByVal ST As Double, ByVal Tref As Double, ByVal TYPE As String, ByVal P As Double, ByVal Vz As Array) As Double
 
             Dim maxit As Integer = Me.proppack.Parameters("PP_PSFMII")
             Dim tol As Double = Me.proppack.Parameters("PP_PSFILT")
@@ -1048,7 +1048,7 @@ out:        Return result
             Do
                 fi_ant2 = fi_ant
                 fi_ant = fi_
-                If TIPO = "L" Then
+                If TYPE = "L" Then
                     fi_ = ST - proppack.DW_CalcEntropy(Vz, Tf, Pf, State.Liquid)
                 Else
                     fi_ = ST - proppack.DW_CalcEntropy(Vz, Tf, Pf, State.Vapor)
