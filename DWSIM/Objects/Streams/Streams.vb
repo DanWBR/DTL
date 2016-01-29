@@ -2609,7 +2609,7 @@ Namespace DTL.SimulationObjects.Streams
             Array.Copy(pl.ToArray, arr, pl.Count)
             phaseLabels = arr
 
-            Dim arr2(stat.Count - 1) As CapeOpen.eCapePhaseStatus
+            Dim arr2(stat.Count - 1) As eCapePhaseStatus
             Array.Copy(stat.ToArray, arr2, stat.Count)
             phaseStatus = arr2
 
