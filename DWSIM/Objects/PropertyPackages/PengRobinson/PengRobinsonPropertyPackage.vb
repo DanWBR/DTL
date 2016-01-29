@@ -54,7 +54,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
             MyBase.ReconfigureConfigForm()
         End Sub
 
-#Region "    DWSIM Functions"
+#Region "DWSIM Functions"
 
         Public Overrides Function DW_CalcCp_ISOL(ByVal Phase1 As Phase, ByVal T As Double, ByVal P As Double) As Double
             Select Case Phase1
@@ -81,9 +81,9 @@ Namespace DTL.SimulationObjects.PropertyPackages
             HV = Me.m_pr.H_PR_MIX("V", T, P, RET_VMOL(Phase.Vapor), RET_VKij(), RET_VTC, RET_VPC, RET_VW, RET_VMM, Me.RET_Hid(298.15, T, Phase.Vapor))
             HM = Me.CurrentMaterialStream.Phases(1).SPMProperties.massfraction.GetValueOrDefault * HL + Me.CurrentMaterialStream.Phases(2).SPMProperties.massfraction.GetValueOrDefault * HV
 
-            Dim ent_massica = HM
+            Dim mass_ent = HM
             Dim flow = Me.CurrentMaterialStream.Phases(0).SPMProperties.massflow
-            Return ent_massica * flow
+            Return mass_ent * flow
 
         End Function
 
@@ -347,15 +347,10 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
             End If
 
-
             If phaseID > 0 Then
                 result = overallmolarflow * phasemolarfrac * Me.AUX_MMM(Phase) / 1000 / Me.CurrentMaterialStream.Phases(phaseID).SPMProperties.density.GetValueOrDefault
                 Me.CurrentMaterialStream.Phases(phaseID).SPMProperties.volumetric_flow = result
-            Else
-                'result = Me.CurrentMaterialStream.Phases(phaseID).SPMProperties.massflow.GetValueOrDefault / Me.CurrentMaterialStream.Phases(phaseID).SPMProperties.density.GetValueOrDefault
-                'Me.CurrentMaterialStream.Phases(phaseID).SPMProperties.volumetric_flow = result
             End If
-
 
         End Sub
 
@@ -437,7 +432,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
 #End Region
 
-#Region "    Métodos Numéricos"
+#Region "Numerical Methods"
 
         Public Function IntegralSimpsonCp(ByVal a As Double,
                  ByVal b As Double,
@@ -491,7 +486,6 @@ Namespace DTL.SimulationObjects.PropertyPackages
          ByVal Epsilon As Double, ByVal subst As String) As Double
 
             'Cp = A + B*T + C*T^2 + D*T^3 + E*T^4 where Cp in kJ/kg-mol , T in K 
-
 
             Dim Result As Double
             Dim h As Double
