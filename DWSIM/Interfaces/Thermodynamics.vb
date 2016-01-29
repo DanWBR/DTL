@@ -19,7 +19,6 @@
 Imports DTL.DTL.SimulationObjects
 Imports DTL.DTL.SimulationObjects.PropertyPackages
 Imports DTL.DTL.BaseThermoClasses
-Imports CapeOpen = CAPEOPEN110
 Imports CAPEOPEN110
 Imports DTL.DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
@@ -124,30 +123,30 @@ Namespace Thermodynamics
         End Sub
 
         Private Sub LoadUserDB(ByVal path As String)
-            Dim cpa() As DTL.BaseThermoClasses.ConstantProperties
+            Dim cpa() As ConstantProperties
             cpa = DTL.Databases.UserDB.ReadComps(path)
-            For Each cp As DTL.BaseThermoClasses.ConstantProperties In cpa
+            For Each cp As ConstantProperties In cpa
                 If Not _availablecomps.ContainsKey(cp.Name) Then _availablecomps.Add(cp.Name, cp)
             Next
         End Sub
 
         Private Sub LoadCSDB()
             Dim csdb As New DTL.Databases.ChemSep
-            Dim cpa() As DTL.BaseThermoClasses.ConstantProperties
+            Dim cpa() As ConstantProperties
             'Try
             csdb.Load()
             cpa = csdb.Transfer()
-            For Each cp As DTL.BaseThermoClasses.ConstantProperties In cpa
+            For Each cp As ConstantProperties In cpa
                 If Not _availablecomps.ContainsKey(cp.Name) Then _availablecomps.Add(cp.Name, cp)
             Next
         End Sub
 
         Private Sub LoadDWSIMDB()
             Dim dwdb As New DTL.Databases.DWSIM
-            Dim cpa() As DTL.BaseThermoClasses.ConstantProperties
+            Dim cpa() As ConstantProperties
             dwdb.Load()
             cpa = dwdb.Transfer()
-            For Each cp As DTL.BaseThermoClasses.ConstantProperties In cpa
+            For Each cp As ConstantProperties In cpa
                 If Not _availablecomps.ContainsKey(cp.Name) Then _availablecomps.Add(cp.Name, cp)
             Next
         End Sub
@@ -482,7 +481,6 @@ Namespace Thermodynamics
 
             Dim tmpcomp As ConstantProperties = pp._availablecomps(compound)
             pp._selectedcomps.Add(compound, tmpcomp)
-            'pp._availablecomps.Remove(compound)
 
             ms._pp = pp
             pp.SetMaterial(ms)
@@ -688,7 +686,7 @@ Namespace Thermodynamics
             Next
 
             Dim dwp As PropertyPackages.Phase = PropertyPackages.Phase.Mixture
-            For Each pi As PropertyPackages.PhaseInfo In pp.PhaseMappings.Values
+            For Each pi As PhaseInfo In pp.PhaseMappings.Values
                 If pi.PhaseLabel = phaselabel Then dwp = pi.DWPhaseID
             Next
 
@@ -792,7 +790,7 @@ Namespace Thermodynamics
             Next
 
             Dim dwp As PropertyPackages.Phase = PropertyPackages.Phase.Mixture
-            For Each pi As PropertyPackages.PhaseInfo In pp.PhaseMappings.Values
+            For Each pi As PhaseInfo In pp.PhaseMappings.Values
                 If pi.PhaseLabel = phaselabel Then dwp = pi.DWPhaseID
             Next
 
@@ -897,12 +895,12 @@ Namespace Thermodynamics
             Next
 
             Dim dwp1 As PropertyPackages.Phase = PropertyPackages.Phase.Mixture
-            For Each pi As PropertyPackages.PhaseInfo In pp.PhaseMappings.Values
+            For Each pi As PhaseInfo In pp.PhaseMappings.Values
                 If pi.PhaseLabel = phaselabel1 Then dwp1 = pi.DWPhaseID
             Next
 
             Dim dwp2 As PropertyPackages.Phase = PropertyPackages.Phase.Mixture
-            For Each pi As PropertyPackages.PhaseInfo In pp.PhaseMappings.Values
+            For Each pi As PhaseInfo In pp.PhaseMappings.Values
                 If pi.PhaseLabel = phaselabel2 Then dwp2 = pi.DWPhaseID
             Next
 
@@ -1004,12 +1002,12 @@ Namespace Thermodynamics
             Next
 
             Dim dwp1 As PropertyPackages.Phase = PropertyPackages.Phase.Mixture
-            For Each pi As PropertyPackages.PhaseInfo In pp.PhaseMappings.Values
+            For Each pi As PhaseInfo In pp.PhaseMappings.Values
                 If pi.PhaseLabel = phaselabel1 Then dwp1 = pi.DWPhaseID
             Next
 
             Dim dwp2 As PropertyPackages.Phase = PropertyPackages.Phase.Mixture
-            For Each pi As PropertyPackages.PhaseInfo In pp.PhaseMappings.Values
+            For Each pi As PhaseInfo In pp.PhaseMappings.Values
                 If pi.PhaseLabel = phaselabel2 Then dwp2 = pi.DWPhaseID
             Next
 
@@ -1279,7 +1277,7 @@ Namespace Thermodynamics
             pp.CalcEquilibrium(ms, "TP", "UNDEFINED")
 
             Dim labels As String() = Nothing
-            Dim statuses As CAPEOPEN110.eCapePhaseStatus() = Nothing
+            Dim statuses As eCapePhaseStatus() = Nothing
 
             ms.GetPresentPhases(labels, statuses)
 
@@ -1507,7 +1505,7 @@ Namespace Thermodynamics
             pp.CalcEquilibrium(ms, "PS", "UNDEFINED")
 
             Dim labels As String() = Nothing
-            Dim statuses As CapeOpen.eCapePhaseStatus() = Nothing
+            Dim statuses As eCapePhaseStatus() = Nothing
 
             ms.GetPresentPhases(labels, statuses)
 
@@ -1622,7 +1620,7 @@ Namespace Thermodynamics
             pp.CalcEquilibrium(ms, "PVF", "UNDEFINED")
 
             Dim labels As String() = Nothing
-            Dim statuses As CapeOpen.eCapePhaseStatus() = Nothing
+            Dim statuses As eCapePhaseStatus() = Nothing
 
             ms.GetPresentPhases(labels, statuses)
 
@@ -1737,7 +1735,7 @@ Namespace Thermodynamics
             pp.CalcEquilibrium(ms, "TVF", "UNDEFINED")
 
             Dim labels As String() = Nothing
-            Dim statuses As CapeOpen.eCapePhaseStatus() = Nothing
+            Dim statuses As eCapePhaseStatus() = Nothing
 
             ms.GetPresentPhases(labels, statuses)
 
@@ -1824,7 +1822,6 @@ Namespace Thermodynamics
             For Each c As String In compounds
                 Dim tmpcomp As ConstantProperties = pp._availablecomps(c)
                 If Not pp._selectedcomps.ContainsKey(c) Then pp._selectedcomps.Add(c, tmpcomp)
-                'pp._availablecomps.Remove(c)
             Next
 
             ms.SetOverallComposition(molefractions)
@@ -1839,7 +1836,7 @@ Namespace Thermodynamics
             pp.CalcEquilibrium(ms, "TP", "UNDEFINED")
 
             Dim labels As String() = Nothing
-            Dim statuses As CapeOpen.eCapePhaseStatus() = Nothing
+            Dim statuses As eCapePhaseStatus() = Nothing
 
             ms.GetPresentPhases(labels, statuses)
 
@@ -1937,7 +1934,7 @@ Namespace Thermodynamics
             pp.CalcEquilibrium(ms, "PH", "UNDEFINED")
 
             Dim labels As String() = Nothing
-            Dim statuses As CapeOpen.eCapePhaseStatus() = Nothing
+            Dim statuses As eCapePhaseStatus() = Nothing
 
             ms.GetPresentPhases(labels, statuses)
 
@@ -2037,7 +2034,7 @@ Namespace Thermodynamics
             pp.CalcEquilibrium(ms, "PS", "UNDEFINED")
 
             Dim labels As String() = Nothing
-            Dim statuses As CapeOpen.eCapePhaseStatus() = Nothing
+            Dim statuses As eCapePhaseStatus() = Nothing
 
             ms.GetPresentPhases(labels, statuses)
 
@@ -2121,7 +2118,6 @@ Namespace Thermodynamics
             For Each c As String In compounds
                 Dim tmpcomp As ConstantProperties = pp._availablecomps(c)
                 If Not pp._selectedcomps.ContainsKey(c) Then pp._selectedcomps.Add(c, tmpcomp)
-                'pp._availablecomps.Remove(c)
             Next
 
             ms.SetOverallComposition(molefractions)
@@ -2138,7 +2134,7 @@ Namespace Thermodynamics
             pp.CalcEquilibrium(ms, "PVF", "UNDEFINED")
 
             Dim labels As String() = Nothing
-            Dim statuses As CapeOpen.eCapePhaseStatus() = Nothing
+            Dim statuses As eCapePhaseStatus() = Nothing
 
             ms.GetPresentPhases(labels, statuses)
 
@@ -2238,7 +2234,7 @@ Namespace Thermodynamics
             pp.CalcEquilibrium(ms, "TVF", "UNDEFINED")
 
             Dim labels As String() = Nothing
-            Dim statuses As CapeOpen.eCapePhaseStatus() = Nothing
+            Dim statuses As eCapePhaseStatus() = Nothing
 
             ms.GetPresentPhases(labels, statuses)
 
