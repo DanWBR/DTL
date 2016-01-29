@@ -139,7 +139,7 @@ Namespace DTL.MathEx.LBFGSB
         '*************************************************************************/
 
         ' Methods
-        Private Function additionallbfgsbstoppingcriterion(ByVal iter As Integer, ByRef x As Double(), ByVal f As Double, ByRef g As Double()) As Boolean
+        Private Function additionallbfgsbstoppingcriterionn(ByVal iter As Integer, ByRef x As Double(), ByVal f As Double, ByRef g As Double()) As Boolean
             Return False
         End Function
 
@@ -1955,7 +1955,7 @@ Label_03EE:
                         info = 1
                     ElseIf ((iter > maxits) And (maxits > 0)) Then
                         info = 5
-                    ElseIf Me.additionallbfgsbstoppingcriterion(iter, x, f, g) Then
+                    ElseIf Me.additionallbfgsbstoppingcriterionn(iter, x, f, g) Then
                         info = 0
                     Else
                         num36 = 1
