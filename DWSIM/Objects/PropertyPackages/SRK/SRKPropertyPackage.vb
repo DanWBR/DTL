@@ -33,7 +33,6 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
         Private m_props As New Auxiliary.PROPS
         Public m_pr As New Auxiliary.SRK
-        '<System.NonSerialized()> Private m_xn As DLLXnumbers.Xnumbers
 
         Public Sub New(ByVal comode As Boolean)
             MyBase.New(comode)
@@ -56,7 +55,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
             MyBase.ReconfigureConfigForm()
         End Sub
 
-#Region "    DWSIM Functions"
+#Region "DWSIM Functions"
 
         Public Function RET_KIJ(ByVal id1 As String, ByVal id2 As String) As Double
             If Me.m_pr.InteractionParameters.ContainsKey(id1) Then
@@ -386,17 +385,12 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
                 DW_CalcOverallProps()
 
-
             End If
 
             If phaseID > 0 Then
                 result = overallmolarflow * phasemolarfrac * Me.AUX_MMM(Phase) / 1000 / Me.CurrentMaterialStream.Phases(phaseID).SPMProperties.density.GetValueOrDefault
                 Me.CurrentMaterialStream.Phases(phaseID).SPMProperties.volumetric_flow = result
-            Else
-                'result = Me.CurrentMaterialStream.Phases(phaseID).SPMProperties.massflow.GetValueOrDefault / Me.CurrentMaterialStream.Phases(phaseID).SPMProperties.density.GetValueOrDefault
-                'Me.CurrentMaterialStream.Phases(phaseID).SPMProperties.volumetric_flow = result
             End If
-
 
         End Sub
 
@@ -434,21 +428,11 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
             Return True
 
-            'If Me.SupportedComponents.Contains(comp.ID) Then
-            '    Return True
-            'ElseIf comp.IsPF = 1 Then
-            '    Return True
-            'ElseIf comp.IsHYPO = 1 Then
-            '    Return True
-            'Else
-            '    Return False
-            'End If
-
         End Function
 
 #End Region
 
-#Region "    Métodos Numéricos"
+#Region "Numerical Methods"
 
         Public Function IntegralSimpsonCp(ByVal a As Double,
                  ByVal b As Double,
@@ -502,7 +486,6 @@ Namespace DTL.SimulationObjects.PropertyPackages
          ByVal Epsilon As Double, ByVal subst As String) As Double
 
             'Cp = A + B*T + C*T^2 + D*T^3 + E*T^4 where Cp in kJ/kg-mol , T in K 
-
 
             Dim Result As Double
             Dim h As Double
@@ -703,7 +686,6 @@ Namespace DTL.SimulationObjects.PropertyPackages
         End Function
 
         Public Overrides Function DW_CalcFugCoeff(ByVal Vx As Array, ByVal T As Double, ByVal P As Double, ByVal st As State) As Double()
-
 
             Dim srkn As New ThermoPlugs.SRK
 
