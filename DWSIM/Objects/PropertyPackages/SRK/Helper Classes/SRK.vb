@@ -21,7 +21,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
     <Serializable()> Public Class SRK
 
-        Dim m_pr As New DTL.SimulationObjects.PropertyPackages.Auxiliary.PROPS
+        Dim m_pr As New PROPS
         Private _ip As Dictionary(Of String, Dictionary(Of String, PR_IPData))
 
         Public ReadOnly Property InteractionParameters() As Dictionary(Of String, Dictionary(Of String, PR_IPData))
@@ -70,6 +70,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             srkip = Nothing
             srkipc = Nothing
             fh1 = Nothing
+
         End Sub
 
         Function bi(ByVal omega As Double, ByVal Tc As Double, ByVal Pc As Double) As Double
@@ -472,8 +473,6 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                 i = i + 1
             Loop Until i = n + 1
 
-            'Dim dadT = 
-
             Dim AG1 = am * P / (R * T) ^ 2
             Dim BG1 = bm * P / (R * T)
 
@@ -569,7 +568,6 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             ww = 0
 
             Dim V0 As Double = R * 298.15 / 101325
-            'Dim DSres = R * Math.Log((Z - BG1) / Z) + R * Math.Log(V * 101325 / (R * 298.15)) - 1 / ((uu ^ 2 - 4 * ww) ^ 0.5 * bm) * dadT * Math.Log((2 * Z + BG1 * (uu - (uu ^ 2 - 4 * ww) ^ 0.5)) / (2 * Z + BG1 * (uu + (uu ^ 2 - 4 * ww) ^ 0.5)))
             Dim DSres = R * Math.Log((Z - BG1) / Z) + R * Math.Log(Z) - 1 / ((uu ^ 2 - 4 * ww) ^ 0.5 * bm) * dadT * Math.Log((2 * Z + BG1 * (uu - (uu ^ 2 - 4 * ww) ^ 0.5)) / (2 * Z + BG1 * (uu + (uu ^ 2 - 4 * ww) ^ 0.5)))
 
             If MathEx.Common.Sum(Vz) = 0.0# Then
@@ -655,8 +653,6 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                 bm = bm + Vz(i) * bi(i)
                 i = i + 1
             Loop Until i = n + 1
-
-            'Dim dadT = 
 
             Dim AG1 = am * P / (R * T) ^ 2
             Dim BG1 = bm * P / (R * T)
@@ -760,7 +756,6 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
             dadT = aux1 * aux2
             Dim d2adt2 = R / 4 * (0.45724 / T) ^ 0.5 * (1 / T) * aux2
-            'Dim d2adt2 = 0.169049 * R / (T ^ (3 / 2))
 
             Dim dP_dT_V = R / (V - bm) - dadT / (V ^ 2 + V * bm)
 
@@ -787,7 +782,6 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Dim Cp_Cv2 = Cp / Cv
 
             Dim Cp_Cv = 1 - (T * dP_dT_V ^ 2 / dP_dV_T) / (Cpm_ig - R + T * Int_d2P_dT2_V_dV)
-            'Cv = Cp / Cp_Cv
 
             Dim tmp(2) As Double
             tmp(0) = Cp_Cv2
@@ -822,7 +816,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                 Vinf = Vinf + delta_V
                 fV_inf = OF_V(Vinf, Vz, KI)
             Loop Until fV * fV_inf < 0 Or Vinf > 1
-            'If i = 11 Then GoTo Final2
+
             Vsup = Vinf
             Vinf = Vinf - delta_V
 
@@ -930,11 +924,6 @@ Final3:
 
             If n >= 1 Then
                 Dim i As Integer = 1
-
-                'Do
-                '    mx = Vv(i - 1)
-                '    i += 1
-                'Loop Until i = n + 1
 
                 mx = Vv(i - 1)
                 i = 0
@@ -1138,9 +1127,9 @@ Final3:
 
                 If Not criterionOK Then
                     If TYPE = "L" Then
-                        'verificar qual componente é o mais pesado
+                        'Calculation of the liquid phase fugacity coefficient
                         i = 1
-                        'hbcindex é o índice do componente mais pesado
+                        'hbc index is the heaviest component of the index
                         hbcIndex = i
                         i = 0
                         Do
@@ -1149,9 +1138,9 @@ Final3:
                             End If
                             i += 1
                         Loop Until i = n + 1
-                        'aumenta-se a fração molar do componente hbc...
+                        'increases the mole fraction of component hbc...
                         Vx(hbcIndex) += 1
-                        'e em seguida normaliza-se a composição.
+                        'and then normalizes the composition.
                         i = 0
                         sum_x = 0
                         Do
@@ -1196,7 +1185,6 @@ Final3:
             Dim aml2(n), amv2(n), LN_CF(n), PHI(n)
             Dim Tc(n), Pc(n), W(n), alpha(n), m(n), Tr(n)
             Dim rho, rho0, rho_mc, Tmc, dPdrho, dPdrho_, Zcalc As Double
-            'Dim P_lim, rho_lim, Pcalc, rho_calc, rho_x As Double
 
             R = 8.314
 
@@ -1328,21 +1316,13 @@ Final3:
             Tmc = 0.20268 * aml / (R * bml)
             rho = P / (ZV * R * T)
             dPdrho_ = 0.1 * R * T
-            dPdrho = bml * rho * R * T * (1 - bml * rho) ^ -2 + R * T * (1 - bml * rho) ^ -1 + _
-                    aml * rho ^ 2 * (1 + 2 * bml * rho - (bml * rho) ^ 2) ^ -2 * (2 * bml - 2 * bml ^ 2 * rho) + _
+            dPdrho = bml * rho * R * T * (1 - bml * rho) ^ -2 + R * T * (1 - bml * rho) ^ -1 +
+                    aml * rho ^ 2 * (1 + 2 * bml * rho - (bml * rho) ^ 2) ^ -2 * (2 * bml - 2 * bml ^ 2 * rho) +
                     2 * aml * rho * (1 + 2 * bml * rho - (bml * rho) ^ 2) ^ -1
 
             If TYPE = "L" Then
-                'Dim C0, C1 As Double
-                'rho_lim = Me.ESTIMATE_RhoLim(aml, bml, T, P)
-                'P_lim = R * T * rho_lim / (1 - rho_lim * bml) - aml * rho_lim ^ 2 / (1 + 2 * bml * rho_lim - (rho_lim * bml) ^ 2)
-                'C1 = (rho - 0.7 * rho_mc) * dPdrho
-                'C0 = P_lim - C1 * Math.Log(rho_lim - 0.7 * rho_mc)
-                'rho_calc = Math.Exp((P - C0) / C1) + 0.7 * rho_mc
-                'Pcalc = R * T * rho_calc / (1 - rho_calc * bml) - aml * rho_calc ^ 2 / (1 + 2 * bml * rho_calc - (rho_calc * bml) ^ 2)
-                'Zcalc = P / (rho_calc * R * T)
                 Zcalc = ZV
-                ' CALCULO DO COEFICIENTE DE FUGACIDADE DA Phase LIQUIDA
+                'Calculation of the liquid phase fugacity coefficient
                 i = 0
                 Do
                     t1 = bi(i) * (Zcalc - 1) / bml
@@ -1355,17 +1335,8 @@ Final3:
                 Loop Until i = n + 1
                 Return LN_CF
             Else
-                'Dim aa, bb As Double
-                'rho_lim = Me.ESTIMATE_RhoLim(aml, bml, T, P)
-                'P_lim = R * T * rho_lim / (1 - rho_lim * bml) - aml * rho_lim ^ 2 / (1 + 2 * bml * rho_lim - (rho_lim * bml) ^ 2)
-                'rho_x = (rho_lim + rho_mc) / 2
-                'bb = 1 / P_lim * (1 / (rho_lim * (1 - rho_lim / rho_x)))
-                'aa = -bb / rho_x
-                'rho_calc = (1 / P + bb) / aa
-                'Pcalc = R * T * rho_calc / (1 - rho_calc * bml) - aml * rho_calc ^ 2 / (1 + 2 * bml * rho_calc - (rho_calc * bml) ^ 2)
-                'Zcalc = P / (rho_calc * R * T)
                 Zcalc = ZV
-                ' CALCULO DO COEFICIENTE DE FUGACIDADE DA Phase VAPOR
+                'Calculation of the vapour phase fugacity coefficient
                 i = 0
                 Do
                     t1 = bi(i) * (Zcalc - 1) / bml
@@ -1407,8 +1378,6 @@ Final3:
         End Function
 
     End Class
-
-
 
 End Namespace
 
