@@ -582,7 +582,6 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         End Function
 
-
         Function RET_Ri(ByVal VN As Dictionary(Of Integer, Double)) As Double
 
             Dim i As Integer = 0
@@ -699,13 +698,13 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
     <Serializable()> Public Class UnifacGroups
 
         Public InteracParam As Dictionary(Of Integer, Dictionary(Of Integer, Double))
-        Protected m_groups As System.Collections.Generic.Dictionary(Of Integer, UnifacGroup)
+        Protected m_groups As Dictionary(Of Integer, UnifacGroup)
 
         Sub New()
 
             Dim pathsep = IO.Path.DirectorySeparatorChar
 
-            m_groups = New System.Collections.Generic.Dictionary(Of Integer, UnifacGroup)
+            m_groups = New Dictionary(Of Integer, UnifacGroup)
             InteracParam = New Dictionary(Of Integer, Dictionary(Of Integer, Double))
 
             Dim cult As Globalization.CultureInfo = New Globalization.CultureInfo("en-US")
@@ -761,7 +760,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         End Sub
 
-        Public ReadOnly Property Groups() As System.Collections.Generic.Dictionary(Of Integer, UnifacGroup)
+        Public ReadOnly Property Groups() As Dictionary(Of Integer, UnifacGroup)
             Get
                 Return m_groups
             End Get
@@ -772,13 +771,13 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
     <Serializable()> Public Class UnifacGroupsLL
 
         Public InteracParam As Dictionary(Of Integer, Dictionary(Of Integer, Double))
-        Protected m_groups As System.Collections.Generic.Dictionary(Of Integer, UnifacGroup)
+        Protected m_groups As Dictionary(Of Integer, UnifacGroup)
 
         Sub New()
 
             Dim pathsep = IO.Path.DirectorySeparatorChar
 
-            m_groups = New System.Collections.Generic.Dictionary(Of Integer, UnifacGroup)
+            m_groups = New Dictionary(Of Integer, UnifacGroup)
             InteracParam = New Dictionary(Of Integer, Dictionary(Of Integer, Double))
 
             Dim cult As Globalization.CultureInfo = New Globalization.CultureInfo("en-US")
@@ -833,7 +832,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         End Sub
 
-        Public ReadOnly Property Groups() As System.Collections.Generic.Dictionary(Of Integer, UnifacGroup)
+        Public ReadOnly Property Groups() As Dictionary(Of Integer, UnifacGroup)
             Get
                 Return m_groups
             End Get
