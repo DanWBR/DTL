@@ -57,7 +57,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
     <Serializable()> Public Class PRSV2
 
-        Dim m_pr As New DTL.SimulationObjects.PropertyPackages.Auxiliary.PROPS
+        Dim m_pr As New PROPS
         Private _ip As Dictionary(Of String, Dictionary(Of String, PRSV2_IPData))
         Public _data As Dictionary(Of String, PRSV2Param)
 
@@ -192,8 +192,6 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                 i = i + 1
             Loop Until i = n + 1
 
-            'Dim dadT = 
-
             Dim AG1 = am * P / (R * T) ^ 2
             Dim BG1 = bm * P / (R * T)
 
@@ -287,7 +285,6 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
             dadT = aux1 * aux2
             Dim d2adt2 = R / 4 * (0.45724 / T) ^ 0.5 * (1 / T) * aux2
-            'Dim d2adt2 = 0.169049 * R / (T ^ (3 / 2))
 
             Dim dP_dT_V = R / (V - bm) - dadT / (V ^ 2 + 2 * bm * V - bm ^ 2)
 
@@ -309,13 +306,12 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Loop Until i = n + 1
 
             Dim Cv = T * Int_d2P_dT2_V_dV + Cpm_ig - 2 * R - T * dP_dT_V ^ 2 / dP_dV_T
-            'Dim Cp = Cpm_ig + T * Int_d2P_dT2_V_dV - T * dP_dT_V ^ 2 / dP_dV_T - R
+
             Dim Cp = Cpm_ig - R + T * dP_dT_V * dV_dT_P - T * d2adt2 / (8 ^ 0.5 * bm) * Math.Log((V + (1 - 2 ^ 0.5) * bm) / (V + (1 + 2 ^ 0.5) * bm))
 
             Dim Cp_Cv2 = Cp / Cv
 
             Dim Cp_Cv = 1 - (T * dP_dT_V ^ 2 / dP_dV_T) / (Cpm_ig - R + T * Int_d2P_dT2_V_dV)
-            'Cv = Cp / Cp_Cv
 
             Dim tmp(2) As Double
             tmp(0) = Cp_Cv2
@@ -732,8 +728,6 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                 i = i + 1
             Loop Until i = n + 1
 
-            'Dim dadT = 
-
             Dim AG1 = am * P / (R * T) ^ 2
             Dim BG1 = bm * P / (R * T)
 
@@ -825,7 +819,6 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             dadT = aux1 * aux2
 
             Dim V0 As Double = R * 298.15 / 101325
-            'Dim DSres = R * Math.Log((Z - BG1) / Z) + R * Math.Log(V / V0) - 1 / (8 ^ 0.5 * bm) * dadT * Math.Log((2 * Z + BG1 * (2 - 8 ^ 0.5)) / (2 * Z + BG1 * (2 + 8 ^ 0.5)))
             Dim DSres = R * Math.Log((Z - BG1) / Z) + R * Math.Log(Z) - 1 / (8 ^ 0.5 * bm) * dadT * Math.Log((2 * Z + BG1 * (2 - 8 ^ 0.5)) / (2 * Z + BG1 * (2 + 8 ^ 0.5)))
 
             S_PR_MIX = Sid + DSres / MMm '/ 1000
@@ -841,7 +834,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         End Function
 
-        Function ESTIMAR_V(ByVal Vz As Object, ByVal KI As Object) As Double
+        Function ESTIMATE_V(ByVal Vz As Object, ByVal KI As Object) As Double
 
             Dim n = UBound(Vz)
 
@@ -868,7 +861,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Vsup = Vinf
             Vinf = Vinf - delta_V
 
-            'método de Brent para encontrar Vc
+            'Brent method to find Vc
 
             Dim aaa, bbb, ccc, ddd, eee, min11, min22, faa, fbb, fcc, ppp, qqq, rrr, sss, tol11, xmm As Double
             Dim ITMAX2 As Integer = 100
@@ -971,7 +964,7 @@ Final3:
             Dim n, R, coeff(3), tmp() As Double
             Dim Tc(), Pc(), W(), alpha(), Vant(0, 4), m(), a(,), b(,), Tr() As Double
             Dim beta As Double
-            Dim criterioOK As Boolean = False
+            Dim criterionOK As Boolean = False
             Dim hbcIndex, counter As Integer
             Dim sum_x As Double
             Dim ZV As Double
@@ -1144,17 +1137,17 @@ Final3:
                 beta = 1 / P * (1 - (BG * ZV ^ 2 + AG * ZV - 6 * BG ^ 2 * ZV - 2 * BG * ZV - 2 * AG * BG + 2 * BG ^ 2 + 2 * BG) / (ZV * (3 * ZV ^ 2 - 2 * ZV + 2 * BG * ZV + AG - 3 * BG ^ 2 - 2 * BG)))
 
                 If TIPO = "L" Then
-                    If beta < 0.005 / 101325 Then criterioOK = True
+                    If beta < 0.005 / 101325 Then criterionOK = True
                 Else
-                    If beta < 3 / (P / 101325) And beta > 0.9 / (P / 101325) Then criterioOK = True
-                    If ZV > 0.8 Then criterioOK = True
+                    If beta < 3 / (P / 101325) And beta > 0.9 / (P / 101325) Then criterionOK = True
+                    If ZV > 0.8 Then criterionOK = True
                 End If
 
-                If Not criterioOK Then
+                If Not criterionOK Then
                     If TIPO = "L" Then
-                        'verificar qual componente é o mais pesado
+                        'check which component is the heaviest
                         i = 1
-                        'hbcindex é o índice do componente mais pesado
+                        'hbc index is the heaviest component of the index
                         hbcIndex = i
                         i = 0
                         Do
@@ -1163,9 +1156,9 @@ Final3:
                             End If
                             i += 1
                         Loop Until i = n + 1
-                        'aumenta-se a fração molar do componente hbc...
+                        'increases the mole fraction of component hbc...
                         Vx(hbcIndex) += 1
-                        'e em seguida normaliza-se a composição.
+                        'and then normalizes the composition.
                         i = 0
                         sum_x = 0
                         Do
@@ -1188,7 +1181,7 @@ Final3:
 
                 counter += 1
 
-            Loop Until criterioOK = True Or counter > 50
+            Loop Until criterionOK = True Or counter > 50
 
             Return New Object() {ZV, AG, BG, aml, bml}
 
@@ -1199,7 +1192,7 @@ Final3:
             Dim n, R, coeff(3) As Double
             Dim Vant(0, 4) As Double
             Dim beta As Double
-            Dim criterioOK As Boolean = False
+            Dim criterionOK As Boolean = False
             Dim ZV As Double
             Dim AG, BG, aml, bml As Double
             Dim t1, t2, t3, t4, t5 As Double
@@ -1210,7 +1203,6 @@ Final3:
             Dim aml2(n), amv2(n), LN_CF(n), PHI(n)
             Dim Tc(n), Pc(n), W(n), alpha(n), m(n), Tr(n)
             Dim rho, rho0, rho_mc, Tmc, dPdrho, dPdrho_, Zcalc As Double
-            'Dim P_lim, rho_lim, Pcalc, rho_calc, rho_x As Double
 
             R = 8.314
 
@@ -1368,16 +1360,8 @@ Final3:
                     2 * aml * rho * (1 + 2 * bml * rho - (bml * rho) ^ 2) ^ -1
 
             If TIPO = "L" Then
-                'Dim C0, C1 As Double
-                'rho_lim = Me.ESTIMAR_RhoLim(aml, bml, T, P)
-                'P_lim = R * T * rho_lim / (1 - rho_lim * bml) - aml * rho_lim ^ 2 / (1 + 2 * bml * rho_lim - (rho_lim * bml) ^ 2)
-                'C1 = (rho - 0.7 * rho_mc) * dPdrho
-                'C0 = P_lim - C1 * Math.Log(rho_lim - 0.7 * rho_mc)
-                'rho_calc = Math.Exp((P - C0) / C1) + 0.7 * rho_mc
-                'Pcalc = R * T * rho_calc / (1 - rho_calc * bml) - aml * rho_calc ^ 2 / (1 + 2 * bml * rho_calc - (rho_calc * bml) ^ 2)
-                'Zcalc = P / (rho_calc * R * T)
                 Zcalc = ZV
-                ' CALCULO DO COEFICIENTE DE FUGACIDADE DA Phase LIQUIDA
+                'Calculation of the liquid phase fugacity coefficient
                 i = 0
                 Do
                     t1 = bi(i) * (Zcalc - 1) / bml
@@ -1391,17 +1375,8 @@ Final3:
                 Loop Until i = n + 1
                 Return LN_CF
             Else
-                'Dim aa, bb As Double
-                'rho_lim = Me.ESTIMAR_RhoLim(aml, bml, T, P)
-                'P_lim = R * T * rho_lim / (1 - rho_lim * bml) - aml * rho_lim ^ 2 / (1 + 2 * bml * rho_lim - (rho_lim * bml) ^ 2)
-                'rho_x = (rho_lim + rho_mc) / 2
-                'bb = 1 / P_lim * (1 / (rho_lim * (1 - rho_lim / rho_x)))
-                'aa = -bb / rho_x
-                'rho_calc = (1 / P + bb) / aa
-                'Pcalc = R * T * rho_calc / (1 - rho_calc * bml) - aml * rho_calc ^ 2 / (1 + 2 * bml * rho_calc - (rho_calc * bml) ^ 2)
-                'Zcalc = P / (rho_calc * R * T)
                 Zcalc = ZV
-                ' CALCULO DO COEFICIENTE DE FUGACIDADE DA Phase VAPOR
+                'Calculation of the vapour phase fugacity coefficient
                 i = 0
                 Do
                     t1 = bi(i) * (Zcalc - 1) / bml
@@ -1443,7 +1418,7 @@ Final3:
 
         End Function
 
-        Function ESTIMAR_RhoLim(ByVal am As Double, ByVal bm As Double, ByVal T As Double, ByVal P As Double) As Double
+        Function ESTIMATE_RhoLim(ByVal am As Double, ByVal bm As Double, ByVal T As Double, ByVal P As Double) As Double
 
             Dim i As Integer
 
@@ -1469,7 +1444,7 @@ Final3:
             rsup = rinf
             rinf = rinf - delta_r
 
-            'método de Brent para encontrar Vc
+            'Brent method to find Vc
 
             Dim aaa, bbb, ccc, ddd, eee, min11, min22, faa, fbb, fcc, ppp, qqq, rrr, sss, tol11, xmm As Double
             Dim ITMAX2 As Integer = 100

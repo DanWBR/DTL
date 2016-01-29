@@ -942,7 +942,7 @@ Final3:
             Dim n, R, coeff(3), tmp() As Double
             Dim Tc(), Pc(), W(), alpha(), Vant(0, 4), m(), a(,), b(,), Tr() As Double
             Dim beta As Double
-            Dim criterioOK As Boolean = False
+            Dim criterionOK As Boolean = False
             Dim hbcIndex, counter As Integer
             Dim sum_x As Double
             Dim ZV As Double
@@ -1107,13 +1107,13 @@ Final3:
                 beta = 1 / P * (1 - (BG * ZV ^ 2 + AG * ZV - 6 * BG ^ 2 * ZV - 2 * BG * ZV - 2 * AG * BG + 2 * BG ^ 2 + 2 * BG) / (ZV * (3 * ZV ^ 2 - 2 * ZV + 2 * BG * ZV + AG - 3 * BG ^ 2 - 2 * BG)))
 
                 If TIPO = "L" Then
-                    If beta < 0.005 / 101325 Then criterioOK = True
+                    If beta < 0.005 / 101325 Then criterionOK = True
                 Else
-                    If beta < 3 / (P / 101325) And beta > 0.9 / (P / 101325) Then criterioOK = True
-                    If ZV > 0.8 Then criterioOK = True
+                    If beta < 3 / (P / 101325) And beta > 0.9 / (P / 101325) Then criterionOK = True
+                    If ZV > 0.8 Then criterionOK = True
                 End If
 
-                If Not criterioOK Then
+                If Not criterionOK Then
                     If TIPO = "L" Then
                         'check which component Is the heaviest
                         i = 1
@@ -1151,7 +1151,7 @@ Final3:
 
                 counter += 1
 
-            Loop Until criterioOK = True Or counter > 50
+            Loop Until criterionOK = True Or counter > 50
 
             Return New Object() {ZV, AG, BG, aml, bml}
 
@@ -1162,7 +1162,7 @@ Final3:
             Dim n, R, coeff(3) As Double
             Dim Vant(0, 4) As Double
             Dim beta As Double
-            Dim criterioOK As Boolean = False
+            Dim criterionOK As Boolean = False
             Dim ZV As Double
             Dim AG, BG, aml, bml As Double
             Dim t1, t2, t3, t4, t5 As Double

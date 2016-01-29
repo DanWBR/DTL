@@ -798,7 +798,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         End Function
 
-        Function ESTIMAR_V(ByVal Vz As Object, ByVal KI As Object) As Double
+        Function ESTIMATE_V(ByVal Vz As Object, ByVal KI As Object) As Double
 
             Dim n = UBound(Vz)
 
@@ -826,7 +826,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Vsup = Vinf
             Vinf = Vinf - delta_V
 
-            'método de Brent para encontrar Vc
+            'Brent method to find Vc
 
             Dim aaa, bbb, ccc, ddd, eee, min11, min22, faa, fbb, fcc, ppp, qqq, rrr, sss, tol11, xmm As Double
             Dim ITMAX2 As Integer = 100
@@ -989,7 +989,7 @@ Final3:
             Dim n, R, coeff(3), tmp() As Double
             Dim Tc(), Pc(), W(), alpha(), Vant(0, 4), m(), a(,), b(,), Tr() As Double
             Dim beta As Double
-            Dim criterioOK As Boolean = False
+            Dim criterionOK As Boolean = False
             Dim hbcIndex, counter As Integer
             Dim sum_x As Double
             Dim ZV As Double
@@ -1130,13 +1130,13 @@ Final3:
                 beta = 1 / P * (1 - (2 * AG * BG + ZV * BG + 2 * BG ^ 2 * ZV - AG * ZV) / (ZV * (3 * ZV ^ 2 - 2 * ZV + AG - BG - BG ^ 2)))
 
                 If TIPO = "L" Then
-                    If beta < 0.005 / 101325 Then criterioOK = True
+                    If beta < 0.005 / 101325 Then criterionOK = True
                 Else
-                    If beta < 3 / (P / 101325) And beta > 0.9 / (P / 101325) Then criterioOK = True
-                    If ZV > 0.8 Then criterioOK = True
+                    If beta < 3 / (P / 101325) And beta > 0.9 / (P / 101325) Then criterionOK = True
+                    If ZV > 0.8 Then criterionOK = True
                 End If
 
-                If Not criterioOK Then
+                If Not criterionOK Then
                     If TIPO = "L" Then
                         'verificar qual componente é o mais pesado
                         i = 1
@@ -1174,7 +1174,7 @@ Final3:
 
                 counter += 1
 
-            Loop Until criterioOK = True Or counter > 50
+            Loop Until criterionOK = True Or counter > 50
 
             Return New Object() {ZV, AG, BG, aml, bml}
 
@@ -1185,7 +1185,7 @@ Final3:
             Dim n, R, coeff(3) As Double
             Dim Vant(0, 4) As Double
             Dim beta As Double
-            Dim criterioOK As Boolean = False
+            Dim criterionOK As Boolean = False
             Dim ZV As Double
             Dim AG, BG, aml, bml As Double
             Dim t1, t2, t3, t4, t5 As Double
@@ -1334,7 +1334,7 @@ Final3:
 
             If TIPO = "L" Then
                 'Dim C0, C1 As Double
-                'rho_lim = Me.ESTIMAR_RhoLim(aml, bml, T, P)
+                'rho_lim = Me.ESTIMATE_RhoLim(aml, bml, T, P)
                 'P_lim = R * T * rho_lim / (1 - rho_lim * bml) - aml * rho_lim ^ 2 / (1 + 2 * bml * rho_lim - (rho_lim * bml) ^ 2)
                 'C1 = (rho - 0.7 * rho_mc) * dPdrho
                 'C0 = P_lim - C1 * Math.Log(rho_lim - 0.7 * rho_mc)
@@ -1356,7 +1356,7 @@ Final3:
                 Return LN_CF
             Else
                 'Dim aa, bb As Double
-                'rho_lim = Me.ESTIMAR_RhoLim(aml, bml, T, P)
+                'rho_lim = Me.ESTIMATE_RhoLim(aml, bml, T, P)
                 'P_lim = R * T * rho_lim / (1 - rho_lim * bml) - aml * rho_lim ^ 2 / (1 + 2 * bml * rho_lim - (rho_lim * bml) ^ 2)
                 'rho_x = (rho_lim + rho_mc) / 2
                 'bb = 1 / P_lim * (1 / (rho_lim * (1 - rho_lim / rho_x)))

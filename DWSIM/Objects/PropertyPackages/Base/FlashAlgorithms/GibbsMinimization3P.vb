@@ -997,7 +997,7 @@ out:        Return result
 
         End Function
 
-        Function ESTIMAR_T_H(ByVal HT As Double, ByVal Tref As Double, ByVal TIPO As String, ByVal P As Double, ByVal Vz As Array) As Double
+        Function ESTIMATE_T_H(ByVal HT As Double, ByVal Tref As Double, ByVal TIPO As String, ByVal P As Double, ByVal Vz As Array) As Double
 
             Dim maxit As Integer = Me.proppack.Parameters("PP_PHFMII")
             Dim tol As Double = Me.proppack.Parameters("PP_PHFILT")
@@ -1036,7 +1036,7 @@ out:        Return result
 
         End Function
 
-        Function ESTIMAR_T_S(ByVal ST As Double, ByVal Tref As Double, ByVal TIPO As String, ByVal P As Double, ByVal Vz As Array) As Double
+        Function ESTIMATE_T_S(ByVal ST As Double, ByVal Tref As Double, ByVal TIPO As String, ByVal P As Double, ByVal Vz As Array) As Double
 
             Dim maxit As Integer = Me.proppack.Parameters("PP_PSFMII")
             Dim tol As Double = Me.proppack.Parameters("PP_PSFILT")

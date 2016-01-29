@@ -98,7 +98,7 @@ Namespace DTL.MathEx.LM
         '    subroutine.   It  is  reasonable  to  redefine  the  subroutine for better
         '    debugging, for example, to visualize the solution process.
         '
-        '    The AdditionalLevenbergMarquardtStoppingCriterion could  be  redefined  to
+        '    The AdditionalLevenbergMarquardtStoppingcriterionn could  be  redefined  to
         '    modify stopping conditions.
         '
         '    Input parameters:
@@ -106,18 +106,18 @@ Namespace DTL.MathEx.LM
         '        M       –   number of summable functions, M>=N.
         '        X       –   initial solution approximation.
         '                    Array whose index ranges from 1 to N.
-        '        EpsG    –   stopping criterion. Iterations are stopped, if  cosine  of
+        '        EpsG    –   stopping criterionn. Iterations are stopped, if  cosine  of
         '                    the angle between vector of function values  and  each  of
         '                    the  Jacobian  columns  if  less or equal EpsG by absolute
         '                    value. In fact this value defines stopping condition which
         '                    is based on the function gradient smallness.
-        '        EpsF    –   stopping criterion. Iterations are  stopped,  if  relative
+        '        EpsF    –   stopping criterionn. Iterations are  stopped,  if  relative
         '                    decreasing of sum of function values squares (real and
         '                    predicted on the base of extrapolation)  is  less or equal
         '                    EpsF.
-        '        EpsX    –   stopping criterion. Iterations are  stopped,  if  relative
+        '        EpsX    –   stopping criterionn. Iterations are  stopped,  if  relative
         '                    change of solution is less or equal EpsX.
-        '        MaxIts  –   stopping  criterion.  Iterations  are  stopped,  if  their
+        '        MaxIts  –   stopping  criterionn.  Iterations  are  stopped,  if  their
         '                    number exceeds MaxIts.
         '
         '    Output parameters:
@@ -584,9 +584,9 @@ Namespace DTL.MathEx.LM
                 End While
 
                 '
-                ' Termination criterion
+                ' Termination criterionn
                 '
-                If additionallevenbergmarquardtstoppingcriterion(iter) Then
+                If additionallevenbergmarquardtstoppingcriterionn(iter) Then
                     info = 0
                     Exit Sub
                 End If
@@ -1106,7 +1106,7 @@ Namespace DTL.MathEx.LM
         End Sub
 
 
-        Private Shared Function additionallevenbergmarquardtstoppingcriterion(ByVal iter As Integer) As Boolean
+        Private Shared Function additionallevenbergmarquardtstoppingcriterionn(ByVal iter As Integer) As Boolean
             Dim result As New Boolean()
 
             result = False

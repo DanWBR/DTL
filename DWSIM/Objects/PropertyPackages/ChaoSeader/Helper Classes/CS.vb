@@ -117,7 +117,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
             Dim n, R, coeff(3) As Double
             Dim Vant(0, 4) As Double
-            Dim criterioOK As Boolean = False
+            Dim criterionOK As Boolean = False
             Dim ZV As Double
             Dim AG, BG, aml, bml As Double
             Dim t1, t2, t3, t4 As Double

@@ -29,7 +29,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
 
             Dim n, R, coeff(3) As Double
             Dim Vant(0, 4) As Double
-            Dim criterioOK As Boolean = False
+            Dim criterionOK As Boolean = False
             Dim AG, BG, aml, bml As Double
 
             n = UBound(Vx)
@@ -255,7 +255,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
 
             Dim n, R, coeff(3) As Double
             Dim Vant(0, 4) As Double
-            Dim criterioOK As Boolean = False
+            Dim criterionOK As Boolean = False
             Dim AG, BG, aml, bml As Double
             Dim t1, t2, t3, t4, t5 As Double
 
@@ -505,7 +505,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
             Dim n, R, coeff(3) As Double
             Dim Vant(0, 4) As Double
             Dim beta As Double
-            Dim criterioOK As Boolean = False
+            Dim criterionOK As Boolean = False
             Dim AG, BG, aml, bml As Double
 
             n = UBound(Vx)
@@ -1348,7 +1348,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
 
             Dim n, R, coeff(3) As Double
             Dim Vant(0, 4) As Double
-            Dim criterioOK As Boolean = False
+            Dim criterionOK As Boolean = False
             Dim AG, BG, aml, bml As Double
             Dim t1, t2, t3, t4, t5 As Double
 
