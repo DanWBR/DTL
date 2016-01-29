@@ -791,7 +791,7 @@ Namespace DTL.BaseThermoClasses
             Parameters = New Dictionary(Of String, Object)
         End Sub
 
-        Public Function Clone() As Object Implements System.ICloneable.Clone
+        Public Function Clone() As Object Implements ICloneable.Clone
             Return ObjectCopy(Me)
         End Function
 
@@ -1025,7 +1025,7 @@ Namespace DTL.BaseThermoClasses
             NISTMODFACGroups = New UNIFACGroupCollection
         End Sub
 
-        Public Function Clone() As Object Implements System.ICloneable.Clone
+        Public Function Clone() As Object Implements ICloneable.Clone
 
             Return ObjectCopy(Me)
 
