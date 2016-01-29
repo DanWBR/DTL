@@ -49,7 +49,6 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
     <Serializable()> Public Class UNIQUAC
 
         Private _ip As Dictionary(Of String, Dictionary(Of String, UNIQUAC_IPData))
-        'Private _ip2 As Dictionary(Of String, Dictionary(Of String, UNIQUAC_IPData))
 
         Public ReadOnly Property InteractionParameters() As Dictionary(Of String, Dictionary(Of String, UNIQUAC_IPData))
             Get
@@ -57,22 +56,14 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             End Get
         End Property
 
-        ' Public ReadOnly Property InteractionParameters2() As Dictionary(Of String, Dictionary(Of String, NRTL_IPData))
-        '    Get
-        '        Return _ip2
-        '    End Get
-        'End Property
-
         Sub New()
 
             _ip = New Dictionary(Of String, Dictionary(Of String, UNIQUAC_IPData))
-            '_ip2 = New Dictionary(Of String, Dictionary(Of String, UNIQUAC_IPData))
 
             Dim pathsep As Char = IO.Path.DirectorySeparatorChar
 
             Dim uniquacip As UNIQUAC_IPData
             Dim uniquacipc() As UNIQUAC_IPData
-            'Dim uniquacipc2() As UNIQUAC_IPData
             Dim fh1 As New FileHelperEngine(Of UNIQUAC_IPData)
             Using stream As IO.Stream = New IO.MemoryStream(My.Resources.uniquacip)
                 Using reader As New IO.StreamReader(stream)
@@ -108,9 +99,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
             uniquacip = Nothing
             uniquacipc = Nothing
-            'uniquacipc2 = Nothing
             fh1 = Nothing
-            'fh2 = Nothing
 
         End Sub
 
