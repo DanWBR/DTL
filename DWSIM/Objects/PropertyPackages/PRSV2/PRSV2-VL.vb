@@ -90,7 +90,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             fh1 = Nothing
         End Sub
 
-        Function CpCvR(ByVal TIPO, ByVal T, ByVal P, ByVal Vz, ByVal VKij, ByVal VKij2, ByVal Vk1, ByVal Vk2, ByVal Vk3, ByVal Vzmass, ByVal VTc, ByVal VPc, ByVal VCpig, ByVal VMM, ByVal Vw, ByVal VZRa)
+        Function CpCvR(ByVal TYPE, ByVal T, ByVal P, ByVal Vz, ByVal VKij, ByVal VKij2, ByVal Vk1, ByVal Vk2, ByVal Vk3, ByVal Vzmass, ByVal VTc, ByVal VPc, ByVal VCpig, ByVal VMM, ByVal Vw, ByVal VZRa)
 
             Dim ai(), bi(), ci() As Double
             Dim n, R As Double
@@ -200,7 +200,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                     temp1(1, 1) = tv2
                 End If
 
-                If TIPO = "L" Then
+                If TYPE = "L" Then
                     Z = temp1(0, 0)
                     If temp1(0, 1) <> 0 Then
                         Z = temp1(1, 0)
@@ -209,7 +209,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                         End If
                     End If
                     If Z < 0 Then Z = temp1(1, 0)
-                ElseIf TIPO = "V" Then
+                ElseIf TYPE = "V" Then
                     Z = temp1(2, 0)
                     If temp1(2, 1) <> 0 Then
                         Z = temp1(1, 0)
@@ -222,7 +222,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Else
 
                 Dim findZV, dfdz, zant As Double
-                If TIPO = "V" Then Z = 1 Else Z = 0.05
+                If TYPE = "V" Then Z = 1 Else Z = 0.05
                 Do
                     findZV = coeff(3) * Z ^ 3 + coeff(2) * Z ^ 2 + coeff(1) * Z + coeff(0)
                     dfdz = 3 * coeff(3) * Z ^ 2 + 2 * coeff(2) * Z + coeff(1)
@@ -295,7 +295,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         End Function
 
-        Function Z_PR(ByVal T, ByVal P, ByVal Vx, ByVal VKij, ByVal VKij2, ByVal Vk1, ByVal Vk2, ByVal Vk3, ByVal VTc, ByVal VPc, ByVal Vw, ByVal TIPO)
+        Function Z_PR(ByVal T, ByVal P, ByVal Vx, ByVal VKij, ByVal VKij2, ByVal Vk1, ByVal Vk2, ByVal Vk3, ByVal VTc, ByVal VPc, ByVal Vw, ByVal TYPE)
 
             Dim ai(), bi(), ci(), aml2(), amv2() As Double
             Dim n, R, coeff(3), tmp() As Double
@@ -436,7 +436,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Else
 
                 Dim findZV, dfdz, zant As Double
-                If TIPO = "V" Then ZV = 1 Else ZV = 0.05
+                If TYPE = "V" Then ZV = 1 Else ZV = 0.05
                 Do
                     findZV = coeff(3) * ZV ^ 3 + coeff(2) * ZV ^ 2 + coeff(1) * ZV + coeff(0)
                     dfdz = 3 * coeff(3) * ZV ^ 2 + 2 * coeff(2) * ZV + coeff(1)
@@ -450,15 +450,15 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             End If
 
             Z_PR = 0
-            If TIPO = "L" Then
+            If TYPE = "L" Then
                 Z_PR = temp1(0, 0)
-            ElseIf TIPO = "V" Then
+            ElseIf TYPE = "V" Then
                 Z_PR = temp1(2, 0)
             End If
 
         End Function
 
-        Function H_PR_MIX(ByVal TIPO As String, ByVal T As Double, ByVal P As Double, ByVal Vz As Object, ByVal VKij As Object, ByVal VKij2 As Object, ByVal Vk1 As Object, ByVal Vk2 As Object, ByVal Vk3 As Object, ByVal VTc As Object, ByVal VPc As Object, ByVal Vw As Object, ByVal VMM As Object, ByVal Hid As Double) As Double
+        Function H_PR_MIX(ByVal TYPE As String, ByVal T As Double, ByVal P As Double, ByVal Vz As Object, ByVal VKij As Object, ByVal VKij2 As Object, ByVal Vk1 As Object, ByVal Vk2 As Object, ByVal Vk3 As Object, ByVal VTc As Object, ByVal VPc As Object, ByVal Vw As Object, ByVal VMM As Object, ByVal Hid As Double) As Double
 
             Dim ai(), bi(), ci() As Double
             Dim n, R As Double
@@ -568,7 +568,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                     temp1(1, 1) = tv2
                 End If
 
-                If TIPO = "L" Then
+                If TYPE = "L" Then
                     Z = temp1(0, 0)
                     If temp1(0, 1) <> 0 Then
                         Z = temp1(1, 0)
@@ -577,7 +577,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                         End If
                     End If
                     If Z < 0 Then Z = temp1(1, 0)
-                ElseIf TIPO = "V" Then
+                ElseIf TYPE = "V" Then
                     Z = temp1(2, 0)
                     If temp1(2, 1) <> 0 Then
                         Z = temp1(1, 0)
@@ -590,7 +590,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Else
 
                 Dim findZV, dfdz, zant As Double
-                If TIPO = "V" Then Z = 1 Else Z = 0.05
+                If TYPE = "V" Then Z = 1 Else Z = 0.05
                 Do
                     findZV = coeff(3) * Z ^ 3 + coeff(2) * Z ^ 2 + coeff(1) * Z + coeff(0)
                     dfdz = 3 * coeff(3) * Z ^ 2 + 2 * coeff(2) * Z + coeff(1)
@@ -635,7 +635,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         End Function
 
-        Function S_PR_MIX(ByVal TIPO As String, ByVal T As Double, ByVal P As Double, ByVal Vz As Array, ByVal VKij As Object, ByVal VKij2 As Object, ByVal Vk1 As Object, ByVal Vk2 As Object, ByVal Vk3 As Object, ByVal VTc As Array, ByVal VPc As Array, ByVal Vw As Array, ByVal VMM As Array, ByVal Sid As Double) As Double
+        Function S_PR_MIX(ByVal TYPE As String, ByVal T As Double, ByVal P As Double, ByVal Vz As Array, ByVal VKij As Object, ByVal VKij2 As Object, ByVal Vk1 As Object, ByVal Vk2 As Object, ByVal Vk3 As Object, ByVal VTc As Array, ByVal VPc As Array, ByVal Vw As Array, ByVal VMM As Array, ByVal Sid As Double) As Double
 
             Dim ai(), bi(), ci() As Double
             Dim n, R As Double
@@ -744,7 +744,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                     temp1(1, 1) = tv2
                 End If
 
-                If TIPO = "L" Then
+                If TYPE = "L" Then
                     Z = temp1(0, 0)
                     If temp1(0, 1) <> 0 Then
                         Z = temp1(1, 0)
@@ -753,7 +753,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                         End If
                     End If
                     If Z < 0 Then Z = temp1(1, 0)
-                ElseIf TIPO = "V" Then
+                ElseIf TYPE = "V" Then
                     Z = temp1(2, 0)
                     If temp1(2, 1) <> 0 Then
                         Z = temp1(1, 0)
@@ -765,7 +765,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Else
 
                 Dim findZV, dfdz, zant As Double
-                If TIPO = "V" Then Z = 1 Else Z = 0.05
+                If TYPE = "V" Then Z = 1 Else Z = 0.05
                 Do
                     findZV = coeff(3) * Z ^ 3 + coeff(2) * Z ^ 2 + coeff(1) * Z + coeff(0)
                     dfdz = 3 * coeff(3) * Z ^ 2 + 2 * coeff(2) * Z + coeff(1)
@@ -803,10 +803,10 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         End Function
 
-        Function G_PR_MIX(ByVal TIPO As String, ByVal T As Double, ByVal P As Double, ByVal Vz As Array, ByVal VKij As Object, ByVal VKij2 As Object, ByVal Vk1 As Object, ByVal Vk2 As Object, ByVal Vk3 As Object, ByVal VTc As Array, ByVal VPc As Array, ByVal Vw As Array, ByVal VMM As Array, ByVal Sid As Double, ByVal Hid As Double) As Double
+        Function G_PR_MIX(ByVal TYPE As String, ByVal T As Double, ByVal P As Double, ByVal Vz As Array, ByVal VKij As Object, ByVal VKij2 As Object, ByVal Vk1 As Object, ByVal Vk2 As Object, ByVal Vk3 As Object, ByVal VTc As Array, ByVal VPc As Array, ByVal Vw As Array, ByVal VMM As Array, ByVal Sid As Double, ByVal Hid As Double) As Double
 
-            Dim h As Double = H_PR_MIX(TIPO, T, P, Vz, VKij, VKij2, Vk1, Vk2, Vk3, VTc, VPc, Vw, VMM, Hid)
-            Dim s As Double = S_PR_MIX(TIPO, T, P, Vz, VKij, VKij2, Vk1, Vk2, Vk3, VTc, VPc, Vw, VMM, Sid)
+            Dim h As Double = H_PR_MIX(TYPE, T, P, Vz, VKij, VKij2, Vk1, Vk2, Vk3, VTc, VPc, Vw, VMM, Hid)
+            Dim s As Double = S_PR_MIX(TYPE, T, P, Vz, VKij, VKij2, Vk1, Vk2, Vk3, VTc, VPc, Vw, VMM, Sid)
 
             Return h - T * s
 
@@ -936,7 +936,7 @@ Final3:
 
         End Function
 
-        Function GeneratePseudoRoot(ByVal T, ByVal P, ByVal Vx, ByVal VKij, ByVal VKij2, ByVal Vk1, ByVal Vk2, ByVal Vk3, ByVal VTc, ByVal VPc, ByVal Vw, ByVal VTb, ByVal TIPO)
+        Function GeneratePseudoRoot(ByVal T, ByVal P, ByVal Vx, ByVal VKij, ByVal VKij2, ByVal Vk1, ByVal Vk2, ByVal Vk3, ByVal VTc, ByVal VPc, ByVal Vw, ByVal VTb, ByVal TYPE)
 
             Dim ai(), bi(), ci(), aml2(), amv2() As Double
             Dim n, R, coeff(3), tmp() As Double
@@ -1083,16 +1083,16 @@ Final3:
                     End If
 
                     ZV = 0
-                    If TIPO = "L" Then
+                    If TYPE = "L" Then
                         ZV = temp1(0, 0)
-                    ElseIf TIPO = "V" Then
+                    ElseIf TYPE = "V" Then
                         ZV = temp1(2, 0)
                     End If
 
                 Else
 
                     Dim findZV, dfdz, zant As Double
-                    If TIPO = "V" Then ZV = 1 Else ZV = 0.05
+                    If TYPE = "V" Then ZV = 1 Else ZV = 0.05
                     Do
                         findZV = coeff(3) * ZV ^ 3 + coeff(2) * ZV ^ 2 + coeff(1) * ZV + coeff(0)
                         dfdz = 3 * coeff(3) * ZV ^ 2 + 2 * coeff(2) * ZV + coeff(1)
@@ -1106,7 +1106,7 @@ Final3:
 
                 beta = 1 / P * (1 - (BG * ZV ^ 2 + AG * ZV - 6 * BG ^ 2 * ZV - 2 * BG * ZV - 2 * AG * BG + 2 * BG ^ 2 + 2 * BG) / (ZV * (3 * ZV ^ 2 - 2 * ZV + 2 * BG * ZV + AG - 3 * BG ^ 2 - 2 * BG)))
 
-                If TIPO = "L" Then
+                If TYPE = "L" Then
                     If beta < 0.005 / 101325 Then criterionOK = True
                 Else
                     If beta < 3 / (P / 101325) And beta > 0.9 / (P / 101325) Then criterionOK = True
@@ -1114,7 +1114,7 @@ Final3:
                 End If
 
                 If Not criterionOK Then
-                    If TIPO = "L" Then
+                    If TYPE = "L" Then
                         'check which component Is the heaviest
                         i = 1
                         'hbcindex is the heaviest component of the index
@@ -1157,7 +1157,7 @@ Final3:
 
         End Function
 
-        Function CalcLnFug(ByVal T, ByVal P, ByVal Vx, ByVal VKij, ByVal VKij2, ByVal Vk1, ByVal Vk2, ByVal Vk3, ByVal VTc, ByVal VPc, ByVal Vw, ByVal VTb, ByVal TIPO)
+        Function CalcLnFug(ByVal T, ByVal P, ByVal Vx, ByVal VKij, ByVal VKij2, ByVal Vk1, ByVal Vk2, ByVal Vk3, ByVal VTc, ByVal VPc, ByVal Vw, ByVal VTb, ByVal TYPE)
 
             Dim n, R, coeff(3) As Double
             Dim Vant(0, 4) As Double
@@ -1301,16 +1301,16 @@ Final3:
                 End If
 
                 ZV = 0
-                If TIPO = "L" Then
+                If TYPE = "L" Then
                     ZV = temp1(0, 0)
-                ElseIf TIPO = "V" Then
+                ElseIf TYPE = "V" Then
                     ZV = temp1(2, 0)
                 End If
 
             Else
 
                 Dim findZV, dfdz, zant As Double
-                If TIPO = "V" Then ZV = 1 Else ZV = 0.05
+                If TYPE = "V" Then ZV = 1 Else ZV = 0.05
                 Do
                     findZV = coeff(3) * ZV ^ 3 + coeff(2) * ZV ^ 2 + coeff(1) * ZV + coeff(0)
                     dfdz = 3 * coeff(3) * ZV ^ 2 + 2 * coeff(2) * ZV + coeff(1)
@@ -1332,7 +1332,7 @@ Final3:
                     aml * rho ^ 2 * (1 + 2 * bml * rho - (bml * rho) ^ 2) ^ -2 * (2 * bml - 2 * bml ^ 2 * rho) + _
                     2 * aml * rho * (1 + 2 * bml * rho - (bml * rho) ^ 2) ^ -1
 
-            If TIPO = "L" Then
+            If TYPE = "L" Then
                 Zcalc = ZV
                 'Calculation of the liquid phase fugacity coefficient 
                 i = 0
@@ -1366,15 +1366,15 @@ Final3:
 
         End Function
 
-        Function CalcPartialVolume(ByVal T, ByVal P, ByVal Vx, ByVal VKij, ByVal VKij2, ByVal Vk1, ByVal Vk2, ByVal Vk3, ByVal VTc, ByVal VPc, ByVal Vw, ByVal VTb, ByVal TIPO, ByVal deltaP)
+        Function CalcPartialVolume(ByVal T, ByVal P, ByVal Vx, ByVal VKij, ByVal VKij2, ByVal Vk1, ByVal Vk2, ByVal Vk3, ByVal VTc, ByVal VPc, ByVal Vw, ByVal VTb, ByVal TYPE, ByVal deltaP)
 
             Dim lnfug1, lnfug2 As Object
             Dim P1, P2 As Double
             P1 = P
             P2 = P + deltaP
 
-            lnfug1 = Me.CalcLnFug(T, P1, Vx, VKij, VKij2, Vk1, Vk2, Vk3, VTc, VPc, Vw, VTb, TIPO)
-            lnfug2 = Me.CalcLnFug(T, P2, Vx, VKij, VKij2, Vk1, Vk2, Vk3, VTc, VPc, Vw, VTb, TIPO)
+            lnfug1 = Me.CalcLnFug(T, P1, Vx, VKij, VKij2, Vk1, Vk2, Vk3, VTc, VPc, Vw, VTb, TYPE)
+            lnfug2 = Me.CalcLnFug(T, P2, Vx, VKij, VKij2, Vk1, Vk2, Vk3, VTc, VPc, Vw, VTb, TYPE)
 
             Dim i As Integer
             Dim n As Integer = UBound(lnfug1)
