@@ -30,7 +30,6 @@ Namespace DTL.SimulationObjects.PropertyPackages
         Public Shadows Const ClassId As String = "170D6E8A-8880-4bf9-B7A0-E4A3FDBFD589"
 
         Protected m_iapws97 As New IAPWS_IF97
-        'Protected m_steam67 As New STEAM67
 
         Public Sub New(ByVal comode As Boolean)
             MyBase.New(comode)
@@ -49,9 +48,9 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
         End Function
 
-        Public Overrides Sub DW_CalcEquilibrium(ByVal spec1 As DTL.SimulationObjects.PropertyPackages.FlashSpec, ByVal spec2 As DTL.SimulationObjects.PropertyPackages.FlashSpec)
+        Public Overrides Sub DW_CalcEquilibrium(ByVal spec1 As FlashSpec, ByVal spec2 As FlashSpec)
 
-            If Not Me.CurrentMaterialStream.Phases(0).Components.ContainsKey("Agua") Then
+            If Not Me.CurrentMaterialStream.Phases(0).Components.ContainsKey("Water") Then
                 Throw New Exception("The Steam Tables Property Package only works with the 'Water (H2O)' compound from the DWSIM database. Please setup your simulation accordingly.")
             End If
 
@@ -281,20 +280,20 @@ FINAL:
                 .Phases(0).SPMProperties.massfraction = 1
                 .Phases(3).SPMProperties.massfraction = lf
                 .Phases(2).SPMProperties.massfraction = vf
-                .Phases(0).Components("Agua").MolarFraction = 1
-                If lf > 0 Then .Phases(3).Components("Agua").MolarFraction = 1
-                If lf > 0 Then .Phases(3).Components("Agua").FugacityCoeff = 1
-                If lf = 0 Then .Phases(3).Components("Agua").MolarFraction = 0
-                If vf > 0 Then .Phases(2).Components("Agua").MolarFraction = 1
-                If vf > 0 Then .Phases(2).Components("Agua").FugacityCoeff = 1
-                If vf = 0 Then .Phases(2).Components("Agua").MolarFraction = 0
-                .Phases(0).Components("Agua").MassFraction = 1
-                If lf > 0 Then .Phases(3).Components("Agua").MassFraction = 1
-                If lf > 0 Then .Phases(3).Components("Agua").FugacityCoeff = 1
-                If lf = 0 Then .Phases(3).Components("Agua").MassFraction = 0
-                If vf > 0 Then .Phases(2).Components("Agua").MassFraction = 1
-                If vf > 0 Then .Phases(2).Components("Agua").FugacityCoeff = 1
-                If vf = 0 Then .Phases(2).Components("Agua").MassFraction = 0
+                .Phases(0).Components("Water").MolarFraction = 1
+                If lf > 0 Then .Phases(3).Components("Water").MolarFraction = 1
+                If lf > 0 Then .Phases(3).Components("Water").FugacityCoeff = 1
+                If lf = 0 Then .Phases(3).Components("Water").MolarFraction = 0
+                If vf > 0 Then .Phases(2).Components("Water").MolarFraction = 1
+                If vf > 0 Then .Phases(2).Components("Water").FugacityCoeff = 1
+                If vf = 0 Then .Phases(2).Components("Water").MolarFraction = 0
+                .Phases(0).Components("Water").MassFraction = 1
+                If lf > 0 Then .Phases(3).Components("Water").MassFraction = 1
+                If lf > 0 Then .Phases(3).Components("Water").FugacityCoeff = 1
+                If lf = 0 Then .Phases(3).Components("Water").MassFraction = 0
+                If vf > 0 Then .Phases(2).Components("Water").MassFraction = 1
+                If vf > 0 Then .Phases(2).Components("Water").FugacityCoeff = 1
+                If vf = 0 Then .Phases(2).Components("Water").MassFraction = 0
 
                 If lf = 0 Then
                     With .Phases(3).SPMProperties
@@ -366,7 +365,7 @@ FINAL:
 
         Public Overrides Sub DW_CalcProp(ByVal [property] As String, ByVal phase As Phase)
 
-            If Not Me.CurrentMaterialStream.Phases(0).Components.ContainsKey("Agua") Then
+            If Not Me.CurrentMaterialStream.Phases(0).Components.ContainsKey("Water") Then
                 Throw New Exception("The Steam Tables Property Package only works with the 'Water (H2O)' compound from the DWSIM database. Please setup your simulation accordingly.")
             End If
 
