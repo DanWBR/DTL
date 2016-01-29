@@ -23,7 +23,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
 
     <Serializable()> Public Class PR
 
-        Inherits DTL.SimulationObjects.PropertyPackages.ThermoPlug
+        Inherits ThermoPlug
 
         Shared Function ReturnParameters(ByVal T As Double, ByVal P As Double, ByVal Vx As Array, ByVal VKij As Object, ByVal VTc As Array, ByVal VPc As Array, ByVal Vw As Array)
 
@@ -579,10 +579,8 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
             Z = _zarray(_mingz(0))
 
             beta = 1 / P * (1 - (BG * Z ^ 2 + AG * Z - 6 * BG ^ 2 * Z - 2 * BG * Z - 2 * AG * BG + 2 * BG ^ 2 + 2 * BG) / (Z * (3 * Z ^ 2 - 2 * Z + 2 * BG * Z + AG - 3 * BG ^ 2 - 2 * BG)))
-            Dim phase As String = "Unknown"
 
-            'If beta < 0.005 / 101322 Then phase = "L" Else phase = "V"
-            'If beta > 0.9 / P And beta < 3 / P Then phase = "V" Else phase = "L"
+            Dim phase As String = "Unknown"
             If Z < 0.302 Then phase = "L" Else phase = "V"
 
             Return New Object() {phase, beta}
@@ -1433,12 +1431,11 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
 
             Return LN_CF
 
-
         End Function
 
         ''' <summary>
         ''' This procedure checks if the compressibility factor is within the allowable region for the specified phase. 
-        ''' If not, it generates a pseudo-root cabable of generate properties for the specified phase in order to keep 
+        ''' If not, it generates a pseudo-root capable of generating properties for the specified phase in order to keep 
         ''' the flash convergence process going forward.
         ''' </summary>
         ''' <param name="Z">The calculated compressibility factor, coming from the EOS</param>
@@ -1596,13 +1593,6 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
                 End If
 
             End If
-
-            'PR EOS P=f(rho) derivatives
-            'P = (rho * R * T - rho ^ 2 * (a - 2 * b * R * T) + rho ^ 3 * (a * b - b ^ 2 * R * T)) / (1 + rho * b - 3 * rho ^ 2 * b ^ 2 + rho ^ 3 * b ^ 3)
-            'dPdrho = (R * T * (-b ^ 2 * rho ^ 2 + 2 * b * rho + 1) ^ 2 - 2 * a * rho * (b * rho - 1) ^ 2 * (b * rho + 1)) / (b ^ 3 * rho ^ 3 - 3 * b ^ 2 * rho ^ 2 + b * rho + 1) ^ 2
-            'd2Pdrho2 = -(2 * (b * R * T * (b ^ 2 * rho ^ 2 - 2 * b * rho - 1) ^ 3 - a * (b * rho - 1) ^ 3 * (2 * b ^ 3 * rho ^ 3 + 3 * b ^ 2 * rho ^ 2 + 1))) / (b ^ 3 * rho ^ 3 - 3 * b ^ 2 * rho ^ 2 + b * rho + 1) ^ 3
-            'd3Pdrho3 = (6 * b * (b * R * T * (-b ^ 2 * rho ^ 2 + 2 * b * rho + 1) ^ 4 - 2 * a * (b * rho - 1) ^ 4 * (b ^ 4 * rho ^ 4 + 2 * b ^ 3 * rho ^ 3 + 2 * b * rho - 1))) / (b ^ 3 * rho ^ 3 - 3 * b ^ 2 * rho ^ 2 + b * rho + 1) ^ 4
-
 
         End Function
 
