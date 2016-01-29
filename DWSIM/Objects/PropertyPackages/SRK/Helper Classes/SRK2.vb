@@ -22,7 +22,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
 
     <Serializable()> Public Class SRK
 
-        Inherits DTL.SimulationObjects.PropertyPackages.ThermoPlug
+        Inherits ThermoPlug
 
         Shared Function ReturnParameters(ByVal T As Double, ByVal P As Double, ByVal Vx As Array, ByVal VKij As Object, ByVal VTc As Array, ByVal VPc As Array, ByVal Vw As Array)
 
@@ -575,7 +575,6 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
             Dim phase As String = "Unknown"
 
             If beta < 0.005 / 101322 Then phase = "L" Else phase = "V"
-            'If beta > 0.9 / P And beta < 3 / P Then phase = "V"
 
             Return New Object() {phase, beta}
 
@@ -1422,7 +1421,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
 
         ''' <summary>
         ''' This procedure checks if the compressibility factor is within the allowable region for the specified phase. 
-        ''' If not, it generates a pseudo-root cabable of generate properties for the specified phase in order to keep 
+        ''' If not, it generates a pseudo-root capable of generating properties for the specified phase in order to keep 
         ''' the flash convergence process going forward.
         ''' </summary>
         ''' <param name="Z">The calculated compressibility factor, coming from the EOS</param>
@@ -1579,15 +1578,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
 
             End If
 
-            'SRK EOS P=f(rho) derivatives
-            'P = (a * b * rho ^ 3 + (b * R * T - a) * rho ^ 2 + R * T * rho) / (1 - b ^ 2 * rho ^ 2)
-            'dPdrho = (R * T * (b * rho + 1) ^ 2 - a * rho * (b * rho - 1) ^ 2 * (b * rho + 2)) / (b ^ 2 * rho ^ 2 - 1) ^ 2
-            'd2Pdrho2 = -(2 * (a * (b * rho - 1) ^ 3 + b * R * T * (b * rho + 1) ^ 3)) / (b ^ 2 * rho ^ 2 - 1) ^ 3
-            'd3Pdrho3 = (2 * (3 * a * rho * (b * rho - 1) ^ 4 + R * T * (b * rho + 1) ^ 4 * (2 * b * rho + 1))) / (b ^ 2 * rho ^ 2 - 1) ^ 4
-
-
         End Function
-
 
     End Class
 
