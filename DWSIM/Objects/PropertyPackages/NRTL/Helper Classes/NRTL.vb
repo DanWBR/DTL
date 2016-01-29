@@ -32,7 +32,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
         Public alpha12 As Double = 0
         Public comment As String = ""
 
-        Public Function Clone() As Object Implements System.ICloneable.Clone
+        Public Function Clone() As Object Implements ICloneable.Clone
 
             Dim newclass As New NRTL_IPData
             With newclass

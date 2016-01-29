@@ -30,7 +30,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
         Public ID2 As String
         Public kij As Double = 1.0#
 
-        Public Function Clone() As Object Implements System.ICloneable.Clone
+        Public Function Clone() As Object Implements ICloneable.Clone
 
             Dim newclass As New LKP_IPData
             With newclass

@@ -31,7 +31,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
         Public A21 As Double = 0
         Public comment As String = ""
 
-        Public Function Clone() As Object Implements System.ICloneable.Clone
+        Public Function Clone() As Object Implements ICloneable.Clone
 
             Dim newclass As New UNIQUAC_IPData
             With newclass

@@ -72,7 +72,7 @@ Imports System.Runtime.InteropServices
 
     End Sub
 
-    Public Function Clone() As Object Implements System.ICloneable.Clone
+    Public Function Clone() As Object Implements ICloneable.Clone
 
         Return ObjectCopy(Me)
 

@@ -40,7 +40,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
         Public kji As Double = 0.0#
         Public comment As String = ""
 
-        Public Function Clone() As Object Implements System.ICloneable.Clone
+        Public Function Clone() As Object Implements ICloneable.Clone
 
             Dim newclass As New PRSV2_IPData
             With newclass
