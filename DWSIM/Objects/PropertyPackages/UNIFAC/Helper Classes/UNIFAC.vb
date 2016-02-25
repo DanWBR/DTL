@@ -17,12 +17,11 @@
 '    along with DWSIM.  If not, see <http://www.gnu.org/licenses/>.
 
 Imports Microsoft.VisualBasic.FileIO
-Imports DTL.DTL.MathEx
 Imports System.Linq
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
-    <System.Serializable()> Public Class Unifac
+    <Serializable()> Public Class Unifac
 
         Public UnifGroups As UnifacGroups
 
@@ -100,18 +99,18 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                 i += 1
             Next
 
-            Dim soma_xq = 0.0#
+            Dim sum_xq = 0.0#
             i = 0
             Do
                 Q(i) = VQ(i)
-                soma_xq = soma_xq + Vx(i) * Q(i)
+                sum_xq = sum_xq + Vx(i) * Q(i)
                 i = i + 1
             Loop Until i = n + 1
 
             i = 0
             For Each item In VEKI
                 For Each item2 In item
-                    val = Vx(i) * Q(i) * VEKI(i)(item2.Key) / soma_xq
+                    val = Vx(i) * Q(i) * VEKI(i)(item2.Key) / sum_xq
                     If Not teta.ContainsKey(item2.Key) Then teta.Add(item2.Key, val) Else teta(item2.Key) += val
                 Next
                 i += 1
@@ -124,18 +123,18 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                 Next
             Next
 
-            Dim soma_xr = 0.0#
+            Dim sum_xr = 0.0#
             i = 0
             Do
                 R(i) = VR(i)
-                soma_xr = soma_xr + Vx(i) * R(i)
+                sum_xr = sum_xr + Vx(i) * R(i)
                 i = i + 1
             Loop Until i = n + 1
 
             i = 0
             Do
-                j(i) = R(i) / soma_xr
-                L(i) = Q(i) / soma_xq
+                j(i) = R(i) / sum_xr
+                L(i) = Q(i) / sum_xq
                 Vgammac(i) = 1 - j(i) + Math.Log(j(i)) - 5 * Q(i) * (1 - j(i) / L(i) + Math.Log(j(i) / L(i)))
                 k = 0
                 Dim tmpsum = 0.0#
@@ -252,7 +251,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         End Function
 
-        Function RET_VN(ByVal cp As DTL.ClassesBasicasTermodinamica.ConstantProperties) As Dictionary(Of Integer, Double)
+        Function RET_VN(ByVal cp As BaseThermoClasses.ConstantProperties) As Dictionary(Of Integer, Double)
 
             Dim res As New Dictionary(Of Integer, Double)
             For Each s As String In cp.UNIFACGroups.Collection.Keys
@@ -313,7 +312,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
     End Class
 
-    <System.Serializable()> Public Class UnifacLL
+    <Serializable()> Public Class UnifacLL
 
         Public UnifGroups As UnifacGroupsLL
 
@@ -374,11 +373,11 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                 i = i + 1
             Loop Until i = n + 1
 
-            Dim soma_xq = 0.0#
+            Dim sum_xq = 0.0#
             i = 0
             Do
                 Q(i) = VQ(i)
-                soma_xq = soma_xq + Vx(i) * Q(i)
+                sum_xq = sum_xq + Vx(i) * Q(i)
                 i = i + 1
             Loop Until i = n + 1
 
@@ -389,7 +388,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                     teta(k) = teta(k) + Vx(i) * Q(i) * VEKI(i, k)
                     i = i + 1
                 Loop Until i = n + 1
-                teta(k) = teta(k) / soma_xq
+                teta(k) = teta(k) / sum_xq
                 k = k + 1
             Loop Until k = n2 + 1
 
@@ -403,18 +402,18 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                 k = k + 1
             Loop Until k = n2 + 1
 
-            Dim soma_xr = 0.0#
+            Dim sum_xr = 0.0#
             i = 0
             Do
                 R(i) = VR(i)
-                soma_xr = soma_xr + Vx(i) * R(i)
+                sum_xr = sum_xr + Vx(i) * R(i)
                 i = i + 1
             Loop Until i = n + 1
 
             i = 0
             Do
-                j(i) = R(i) / soma_xr
-                L(i) = Q(i) / soma_xq
+                j(i) = R(i) / sum_xr
+                L(i) = Q(i) / sum_xq
                 Vgammac(i) = 1 - j(i) + Math.Log(j(i)) - 5 * Q(i) * (1 - j(i) / L(i) + Math.Log(j(i) / L(i)))
                 k = 0
                 Dim tmpsum = 0.0#
@@ -462,11 +461,11 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                 i = i + 1
             Loop Until i = n + 1
 
-            Dim soma_xq = 0.0#
+            Dim sum_xq = 0.0#
             i = 0
             Do
                 Q(i) = VQ(i)
-                soma_xq = soma_xq + Vx(i) * Q(i)
+                sum_xq = sum_xq + Vx(i) * Q(i)
                 i = i + 1
             Loop Until i = n + 1
 
@@ -477,7 +476,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                     teta(k) = teta(k) + Vx(i) * Q(i) * VEKI(i, k)
                     i = i + 1
                 Loop Until i = n + 1
-                teta(k) = teta(k) / soma_xq
+                teta(k) = teta(k) / sum_xq
                 k = k + 1
             Loop Until k = n2 + 1
 
@@ -491,18 +490,18 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                 k = k + 1
             Loop Until k = n2 + 1
 
-            Dim soma_xr = 0.0#
+            Dim sum_xr = 0.0#
             i = 0
             Do
                 R(i) = VR(i)
-                soma_xr = soma_xr + Vx(i) * R(i)
+                sum_xr = sum_xr + Vx(i) * R(i)
                 i = i + 1
             Loop Until i = n + 1
 
             i = 0
             Do
-                j(i) = R(i) / soma_xr
-                L(i) = Q(i) / soma_xq
+                j(i) = R(i) / sum_xr
+                L(i) = Q(i) / sum_xq
                 Vgammac(i) = 1 - j(i) + Math.Log(j(i)) - 5 * Q(i) * (1 - j(i) / L(i) + Math.Log(j(i) / L(i)))
                 k = 0
                 Dim tmpsum = 0.0#
@@ -583,7 +582,6 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         End Function
 
-
         Function RET_Ri(ByVal VN As Dictionary(Of Integer, Double)) As Double
 
             Dim i As Integer = 0
@@ -626,7 +624,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         End Function
 
-        Function RET_VN(ByVal cp As DTL.ClassesBasicasTermodinamica.ConstantProperties) As Dictionary(Of Integer, Double)
+        Function RET_VN(ByVal cp As BaseThermoClasses.ConstantProperties) As Dictionary(Of Integer, Double)
 
             Dim i As Integer = 0
             Dim res As New Dictionary(Of Integer, Double)
@@ -697,17 +695,17 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
     End Class
 
-    <System.Serializable()> Public Class UnifacGroups
+    <Serializable()> Public Class UnifacGroups
 
-        Public InteracParam As System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))
-        Protected m_groups As System.Collections.Generic.Dictionary(Of Integer, UnifacGroup)
+        Public InteracParam As Dictionary(Of Integer, Dictionary(Of Integer, Double))
+        Protected m_groups As Dictionary(Of Integer, UnifacGroup)
 
         Sub New()
 
-            Dim pathsep = System.IO.Path.DirectorySeparatorChar
+            Dim pathsep = IO.Path.DirectorySeparatorChar
 
-            m_groups = New System.Collections.Generic.Dictionary(Of Integer, UnifacGroup)
-            InteracParam = New System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))
+            m_groups = New Dictionary(Of Integer, UnifacGroup)
+            InteracParam = New Dictionary(Of Integer, Dictionary(Of Integer, Double))
 
             Dim cult As Globalization.CultureInfo = New Globalization.CultureInfo("en-US")
 
@@ -736,7 +734,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                         While Not parser.EndOfData
                             fields = parser.ReadFields()
                             If Not Me.InteracParam.ContainsKey(fields(0)) Then
-                                Me.InteracParam.Add(fields(0), New System.Collections.Generic.Dictionary(Of Integer, Double))
+                                Me.InteracParam.Add(fields(0), New Dictionary(Of Integer, Double))
                                 Me.InteracParam(fields(0)).Add(fields(2), Double.Parse(fields(4), cult))
                             Else
                                 If Not Me.InteracParam(fields(0)).ContainsKey(fields(2)) Then
@@ -746,7 +744,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                                 End If
                             End If
                             If Not Me.InteracParam.ContainsKey(fields(2)) Then
-                                Me.InteracParam.Add(fields(2), New System.Collections.Generic.Dictionary(Of Integer, Double))
+                                Me.InteracParam.Add(fields(2), New Dictionary(Of Integer, Double))
                                 Me.InteracParam(fields(2)).Add(fields(0), Double.Parse(fields(5), cult))
                             Else
                                 If Not Me.InteracParam(fields(2)).ContainsKey(fields(0)) Then
@@ -762,7 +760,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         End Sub
 
-        Public ReadOnly Property Groups() As System.Collections.Generic.Dictionary(Of Integer, UnifacGroup)
+        Public ReadOnly Property Groups() As Dictionary(Of Integer, UnifacGroup)
             Get
                 Return m_groups
             End Get
@@ -770,17 +768,17 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
     End Class
 
-    <System.Serializable()> Public Class UnifacGroupsLL
+    <Serializable()> Public Class UnifacGroupsLL
 
-        Public InteracParam As System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))
-        Protected m_groups As System.Collections.Generic.Dictionary(Of Integer, UnifacGroup)
+        Public InteracParam As Dictionary(Of Integer, Dictionary(Of Integer, Double))
+        Protected m_groups As Dictionary(Of Integer, UnifacGroup)
 
         Sub New()
 
-            Dim pathsep = System.IO.Path.DirectorySeparatorChar
+            Dim pathsep = IO.Path.DirectorySeparatorChar
 
-            m_groups = New System.Collections.Generic.Dictionary(Of Integer, UnifacGroup)
-            InteracParam = New System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))
+            m_groups = New Dictionary(Of Integer, UnifacGroup)
+            InteracParam = New Dictionary(Of Integer, Dictionary(Of Integer, Double))
 
             Dim cult As Globalization.CultureInfo = New Globalization.CultureInfo("en-US")
 
@@ -808,7 +806,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                         While Not parser.EndOfData
                             fields = parser.ReadFields()
                             If Not Me.InteracParam.ContainsKey(fields(0)) Then
-                                Me.InteracParam.Add(fields(0), New System.Collections.Generic.Dictionary(Of Integer, Double))
+                                Me.InteracParam.Add(fields(0), New Dictionary(Of Integer, Double))
                                 Me.InteracParam(fields(0)).Add(fields(2), Double.Parse(fields(4), cult))
                             Else
                                 If Not Me.InteracParam(fields(0)).ContainsKey(fields(2)) Then
@@ -818,7 +816,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                                 End If
                             End If
                             If Not Me.InteracParam.ContainsKey(fields(2)) Then
-                                Me.InteracParam.Add(fields(2), New System.Collections.Generic.Dictionary(Of Integer, Double))
+                                Me.InteracParam.Add(fields(2), New Dictionary(Of Integer, Double))
                                 Me.InteracParam(fields(2)).Add(fields(0), Double.Parse(fields(5), cult))
                             Else
                                 If Not Me.InteracParam(fields(2)).ContainsKey(fields(0)) Then
@@ -834,7 +832,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         End Sub
 
-        Public ReadOnly Property Groups() As System.Collections.Generic.Dictionary(Of Integer, UnifacGroup)
+        Public ReadOnly Property Groups() As Dictionary(Of Integer, UnifacGroup)
             Get
                 Return m_groups
             End Get
@@ -842,7 +840,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
     End Class
 
-    <System.Serializable()> Public Class UnifacGroup
+    <Serializable()> Public Class UnifacGroup
 
         Protected m_primarygroupname As String
         Protected m_groupname As String
@@ -905,9 +903,9 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             End Set
         End Property
 
-        Sub New(ByVal MainGroupName As String, ByVal Nome As String, ByVal PrimGroup As String, ByVal SecGroup As String, ByVal R As Double, ByVal Q As Double)
+        Sub New(ByVal MainGroupName As String, ByVal Name As String, ByVal PrimGroup As String, ByVal SecGroup As String, ByVal R As Double, ByVal Q As Double)
             Me.PrimGroupName = MainGroupName
-            Me.GroupName = Nome
+            Me.GroupName = Name
             Me.PrimaryGroup = PrimGroup
             Me.Secondary_Group = SecGroup
             Me.R = R

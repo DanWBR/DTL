@@ -19,7 +19,7 @@
 Imports System.Math
 Imports System.Threading.Tasks
 Imports DTL.DTL.SimulationObjects.PropertyPackages.ThermoPlugs
-Imports DTL.DTL.ClassesBasicasTermodinamica
+Imports DTL.DTL.BaseThermoClasses
 Imports System.Linq
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
@@ -28,7 +28,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
     ''' This is the base class for the flash algorithms.
     ''' </summary>
     ''' <remarks></remarks>
-    <System.Serializable()> Public MustInherit Class FlashAlgorithm
+    <Serializable()> Public MustInherit Class FlashAlgorithm
 
         Public Property StabSearchSeverity As Integer = 0
         Public Property StabSearchCompIDs As String() = New String() {}
@@ -41,7 +41,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
         Public Sub WriteDebugInfo(text As String)
 
-            DTL.App.WriteToConsole(text, 1)
+            App.WriteToConsole(text, 1)
 
         End Sub
 
@@ -181,29 +181,28 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
             Return calcresult
 
         End Function
-
 #Region "Generic Functions"
 
-        Public Overridable Function Flash_PSF(ByVal Vz As Double(), ByVal P As Double, ByVal V As Double, ByVal Tref As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
-            Throw New Exception(DTL.App.GetLocalString("PropPack_FlashPSFError"))
+        Public Overridable Function Flash_PSF(ByVal Vz As Double(), ByVal P As Double, ByVal V As Double, ByVal Tref As Double, ByVal PP As PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
+            Throw New Exception(App.GetLocalString("PropPack_FlashPSFError"))
             Return Nothing
         End Function
 
-        Public MustOverride Function Flash_PT(ByVal Vz As Double(), ByVal P As Double, ByVal T As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
+        Public MustOverride Function Flash_PT(ByVal Vz As Double(), ByVal P As Double, ByVal T As Double, ByVal PP As PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
 
-        Public MustOverride Function Flash_PH(ByVal Vz As Double(), ByVal P As Double, ByVal H As Double, ByVal Tref As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
+        Public MustOverride Function Flash_PH(ByVal Vz As Double(), ByVal P As Double, ByVal H As Double, ByVal Tref As Double, ByVal PP As PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
 
-        Public MustOverride Function Flash_PS(ByVal Vz As Double(), ByVal P As Double, ByVal S As Double, ByVal Tref As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
+        Public MustOverride Function Flash_PS(ByVal Vz As Double(), ByVal P As Double, ByVal S As Double, ByVal Tref As Double, ByVal PP As PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
 
-        Public MustOverride Function Flash_PV(ByVal Vz As Double(), ByVal P As Double, ByVal V As Double, ByVal Tref As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
+        Public MustOverride Function Flash_PV(ByVal Vz As Double(), ByVal P As Double, ByVal V As Double, ByVal Tref As Double, ByVal PP As PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
 
-        Public MustOverride Function Flash_TV(ByVal Vz As Double(), ByVal T As Double, ByVal V As Double, ByVal Pref As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
+        Public MustOverride Function Flash_TV(ByVal Vz As Double(), ByVal T As Double, ByVal V As Double, ByVal Pref As Double, ByVal PP As PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
 
 #End Region
 
 #Region "Auxiliary Functions"
 
-        Public Function BubbleTemperature_LLE(ByVal Vz As Double(), ByVal Vx1est As Double(), ByVal Vx2est As Double(), ByVal P As Double, ByVal Tmin As Double, ByVal Tmax As Double, ByVal PP As PropertyPackages.PropertyPackage) As Double
+        Public Function BubbleTemperature_LLE(ByVal Vz As Double(), ByVal Vx1est As Double(), ByVal Vx2est As Double(), ByVal P As Double, ByVal Tmin As Double, ByVal Tmax As Double, ByVal PP As PropertyPackage) As Double
 
             _P = P
             _pp = PP
@@ -233,8 +232,6 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
             Dim result As Object = New SimpleLLE() With {.UseInitialEstimatesForPhase1 = True, .UseInitialEstimatesForPhase2 = True,
                                                           .InitialEstimatesForPhase1 = _Vx1est, .InitialEstimatesForPhase2 = _Vx2est}.Flash_PT(_Vz, _P, x, _pp)
 
-            'Dim result As Object = New GibbsMinimization3P() With {.ForceTwoPhaseOnly = False, .StabSearchSeverity = 0, .StabSearchCompIDs = _pp.RET_VNAMES}.Flash_PT(_Vz, _P, x, _pp)
-
             Vx1 = result(2)
             Vx2 = result(6)
             fi1 = _pp.DW_CalcFugCoeff(Vx1, x, _P, State.Liquid)
@@ -253,11 +250,11 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                 err -= Vx2(i) * act2(i) * Vp(i)
             Next
 
-            Return Math.Abs(err)
+            Return Abs(err)
 
         End Function
 
-        Public Function BubblePressure_LLE(ByVal Vz As Double(), ByVal Vx1est As Double(), ByVal Vx2est As Double(), ByVal P As Double, ByVal T As Double, ByVal PP As PropertyPackages.PropertyPackage) As Double
+        Public Function BubblePressure_LLE(ByVal Vz As Double(), ByVal Vx1est As Double(), ByVal Vx2est As Double(), ByVal P As Double, ByVal T As Double, ByVal PP As PropertyPackage) As Double
 
             Dim n As Integer = UBound(_Vz)
 
@@ -292,7 +289,6 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 #End Region
 
 #Region "Liquid Phase Stability Check"
-
         Public Function StabTest(ByVal T As Double, ByVal P As Double, ByVal Vz As Array, ByVal pp As PropertyPackage, Optional ByVal VzArray(,) As Double = Nothing, Optional ByVal searchseverity As Integer = 0)
 
             WriteDebugInfo("Starting Liquid Phase Stability Test @ T = " & T & " K & P = " & P & " Pa for the following trial phases:")
@@ -523,8 +519,6 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                 Do
                     If (Abs(g_(i)) < 0.0000000001 And r(i) > 0.9 And r(i) < 1.1) Then
                         If Not excidx.Contains(i) Then excidx.Add(i)
-                        'ElseIf c > 4 And r(i) > r_ant(i) Then
-                        '    If Not excidx.Contains(i) Then excidx.Add(i)
                     End If
                     i = i + 1
                 Loop Until i = m + 1
@@ -690,7 +684,6 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
             End If
 
         End Function
-
 #End Region
 
 #Region "Phase Type Verification"
@@ -746,7 +739,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                     dfdx = (fx - fx2)
                     Tinv = Tinv - fx / dfdx
                     i += 1
-                Loop Until Math.Abs(fx) < 0.000001 Or i = 25
+                Loop Until Abs(fx) < 0.000001 Or i = 25
             End If
 
             If Double.IsNaN(Tinv) Or Double.IsInfinity(Tinv) Then Tinv = 2000
@@ -787,7 +780,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
             Else
                 t1 = 1 + 2 ^ 0.5
                 t2 = 1 - 2 ^ 0.5
-                tmp = ThermoPlugs.PR.ReturnParameters(T, P, Vx, pp.RET_VKij, pp.RET_VTC, pp.RET_VPC, pp.RET_VW)
+                tmp = PR.ReturnParameters(T, P, Vx, pp.RET_VKij, pp.RET_VTC, pp.RET_VPC, pp.RET_VW)
             End If
 
             a = tmp(0)
@@ -854,8 +847,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
     ''' Class to store flash calculation results.
     ''' </summary>
     ''' <remarks></remarks>
-    <System.Serializable> Public Class FlashCalculationResult
-
+    <Serializable> Public Class FlashCalculationResult
         ''' <summary>
         ''' Defines the base mole amount for determination of phase/compound fractions. Default is 1.
         ''' </summary>
@@ -868,12 +860,12 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
         Public Property LiquidPhase1MoleAmounts As New List(Of Double)
         Public Property LiquidPhase2MoleAmounts As New List(Of Double)
         Public Property SolidPhaseMoleAmounts As New List(Of Double)
-        Public Property CalculatedTemperature As Nullable(Of Double)
-        Public Property CalculatedPressure As Nullable(Of Double)
+        Public Property CalculatedTemperature As Double?
+        Public Property CalculatedPressure As Double?
         Public Property CompoundProperties As List(Of ConstantProperties)
         Public Property FlashAlgorithmType As String = ""
-        Public Property FlashSpecification1 As PropertyPackages.FlashSpec
-        Public Property FlashSpecification2 As PropertyPackages.FlashSpec
+        Public Property FlashSpecification1 As FlashSpec
+        Public Property FlashSpecification2 As FlashSpec
         Public Property ResultException As Exception
         Public Property IterationsTaken As Integer = 0
         Public Property TimeTaken As New TimeSpan()
@@ -1092,12 +1084,16 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
         End Function
 
     End Class
-    <System.Serializable()> Public Class FlashResult
+
+    <Serializable()> Public Class FlashResult
+
         Public P, T, H, S As Double 'pressure, temperature, enthalpy, entropy
         Public LF, L1F, L2F, VF, SF As Double 'molar fraction of phases
         Public Vx(), Vx1(), Vx2(), Vy(), Vs() As Double 'molar fractions in each phase
         Public Counter As Integer 'number of iterations
         Public Err As Double 'final error
         Public dT As TimeSpan
+
     End Class
+
 End Namespace

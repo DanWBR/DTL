@@ -75,8 +75,8 @@
     <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DWSIM.Thermodynamics">
-      <HintPath>..\DWSIM\bin\Release\DWSIM.Thermodynamics.dll</HintPath>
+    <Reference Include="DTL">
+      <HintPath>..\DWSIM\bin\Debug\DTL.dll</HintPath>
     </Reference>
     <Reference Include="System" />
   </ItemGroup>

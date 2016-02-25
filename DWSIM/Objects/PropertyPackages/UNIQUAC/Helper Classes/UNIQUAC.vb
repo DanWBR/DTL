@@ -16,12 +16,11 @@
 '    You should have received a copy of the GNU General Public License
 '    along with DTL.  If not, see <http://www.gnu.org/licenses/>.
 
-Imports System.Collections.Generic
 Imports FileHelpers
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
-    <DelimitedRecord(";")> <IgnoreFirst()> <System.Serializable()> _
+    <DelimitedRecord(";")> <IgnoreFirst()> <Serializable()> _
     Public Class UNIQUAC_IPData
 
         Implements ICloneable
@@ -32,7 +31,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
         Public A21 As Double = 0
         Public comment As String = ""
 
-        Public Function Clone() As Object Implements System.ICloneable.Clone
+        Public Function Clone() As Object Implements ICloneable.Clone
 
             Dim newclass As New UNIQUAC_IPData
             With newclass
@@ -47,10 +46,9 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
     End Class
 
-    <System.Serializable()> Public Class UNIQUAC
+    <Serializable()> Public Class UNIQUAC
 
         Private _ip As Dictionary(Of String, Dictionary(Of String, UNIQUAC_IPData))
-        'Private _ip2 As Dictionary(Of String, Dictionary(Of String, UNIQUAC_IPData))
 
         Public ReadOnly Property InteractionParameters() As Dictionary(Of String, Dictionary(Of String, UNIQUAC_IPData))
             Get
@@ -58,22 +56,14 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             End Get
         End Property
 
-        ' Public ReadOnly Property InteractionParameters2() As Dictionary(Of String, Dictionary(Of String, NRTL_IPData))
-        '    Get
-        '        Return _ip2
-        '    End Get
-        'End Property
-
         Sub New()
 
             _ip = New Dictionary(Of String, Dictionary(Of String, UNIQUAC_IPData))
-            '_ip2 = New Dictionary(Of String, Dictionary(Of String, UNIQUAC_IPData))
 
-            Dim pathsep As Char = System.IO.Path.DirectorySeparatorChar
+            Dim pathsep As Char = IO.Path.DirectorySeparatorChar
 
             Dim uniquacip As UNIQUAC_IPData
             Dim uniquacipc() As UNIQUAC_IPData
-            'Dim uniquacipc2() As UNIQUAC_IPData
             Dim fh1 As New FileHelperEngine(Of UNIQUAC_IPData)
             Using stream As IO.Stream = New IO.MemoryStream(My.Resources.uniquacip)
                 Using reader As New IO.StreamReader(stream)
@@ -82,7 +72,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             End Using
 
 
-            Dim csdb As New DTL.Databases.ChemSep
+            Dim csdb As New Databases.ChemSep
 
             For Each uniquacip In uniquacipc
                 If Me.InteractionParameters.ContainsKey(csdb.GetDWSIMName(uniquacip.ID1)) Then
@@ -109,9 +99,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
             uniquacip = Nothing
             uniquacipc = Nothing
-            'uniquacipc2 = Nothing
             fh1 = Nothing
-            'fh2 = Nothing
 
         End Sub
 

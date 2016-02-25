@@ -24,7 +24,7 @@ Imports DTL.DTL.SimulationObjects.PropertyPackages.Auxiliary
 
 Namespace DTL.Databases
 
-    <DelimitedRecord(";")> <IgnoreFirst()> <System.Serializable()> _
+    <DelimitedRecord(";")> <IgnoreFirst()> <Serializable()>
     Public Class ChemSepNameIDPair
 
         Implements ICloneable
@@ -33,25 +33,25 @@ Namespace DTL.Databases
         Public ChemSepName As String = ""
         Public DWSIMName As String = ""
 
-        Public Function Clone() As Object Implements System.ICloneable.Clone
+        Public Function Clone() As Object Implements ICloneable.Clone
 
             Dim newclass As New ChemSepNameIDPair
             With newclass
-                .ID = Me.ID
-                .ChemSepName = Me.ChemSepName
-                .DWSIMName = Me.DWSIMName
+                .ID = ID
+                .ChemSepName = ChemSepName
+                .DWSIMName = DWSIMName
             End With
             Return newclass
         End Function
 
     End Class
 
-    <System.Serializable()> Public Class ChemSep
+    <Serializable()> Public Class ChemSep
 
-        Private _ids As System.Collections.Generic.Dictionary(Of Integer, ChemSepNameIDPair)
+        Private _ids As Dictionary(Of Integer, ChemSepNameIDPair)
         Private xmldoc As XmlDocument
 
-        Public ReadOnly Property IDs() As System.Collections.Generic.Dictionary(Of Integer, ChemSepNameIDPair)
+        Public ReadOnly Property IDs() As Dictionary(Of Integer, ChemSepNameIDPair)
             Get
                 Return _ids
             End Get
@@ -59,9 +59,9 @@ Namespace DTL.Databases
 
         Sub New()
 
-            _ids = New System.Collections.Generic.Dictionary(Of Integer, ChemSepNameIDPair)
+            _ids = New Dictionary(Of Integer, ChemSepNameIDPair)
 
-            Dim pathsep As Char = System.IO.Path.DirectorySeparatorChar
+            Dim pathsep As Char = Path.DirectorySeparatorChar
 
             Dim csid As ChemSepNameIDPair
             Dim csidc() As ChemSepNameIDPair
@@ -75,7 +75,7 @@ Namespace DTL.Databases
             End With
 
             For Each csid In csidc
-                Me.IDs.Add(csid.ID, csid.Clone)
+                IDs.Add(csid.ID, csid.Clone)
             Next
 
             csid = Nothing
@@ -86,8 +86,8 @@ Namespace DTL.Databases
 
         Public Function GetCSName(ByVal id As String)
 
-            If Me.IDs.ContainsKey(id) Then
-                Return Me.IDs(id).ChemSepName
+            If IDs.ContainsKey(id) Then
+                Return IDs(id).ChemSepName
             Else
                 Return id
             End If
@@ -96,8 +96,8 @@ Namespace DTL.Databases
 
         Public Function GetDWSIMName(ByVal id As String)
 
-            If Me.IDs.ContainsKey(id) Then
-                Return Me.IDs(id).DWSIMName
+            If IDs.ContainsKey(id) Then
+                Return IDs(id).DWSIMName
             Else
                 Return id
             End If
@@ -121,18 +121,18 @@ Namespace DTL.Databases
 
         End Sub
 
-        Public Function Transfer(Optional ByVal CompName As String = "") As ClassesBasicasTermodinamica.ConstantProperties()
+        Public Function Transfer(Optional ByVal CompName As String = "") As BaseThermoClasses.ConstantProperties()
 
-            Dim cp As ClassesBasicasTermodinamica.ConstantProperties
+            Dim cp As BaseThermoClasses.ConstantProperties
             Dim cpa As New ArrayList()
             Dim cult As Globalization.CultureInfo = New Globalization.CultureInfo("en-US")
             Dim nf As Globalization.NumberFormatInfo = cult.NumberFormat
 
-            Dim unif As New Global.DTL.DTL.SimulationObjects.PropertyPackages.Auxiliary.Unifac
-            Dim modf As New Global.DTL.DTL.SimulationObjects.PropertyPackages.Auxiliary.Modfac
+            Dim unif As New Unifac
+            Dim modf As New Modfac
 
             For Each node As XmlNode In xmldoc.ChildNodes(0).ChildNodes
-                cp = New ClassesBasicasTermodinamica.ConstantProperties
+                cp = New BaseThermoClasses.ConstantProperties
                 With cp
                     .CurrentDB = "ChemSep"
                     .OriginalDB = "ChemSep"
@@ -482,13 +482,13 @@ Namespace DTL.Databases
 
             Next
 
-            Return cpa.ToArray(Type.GetType("DTL.DTL.ClassesBasicasTermodinamica.ConstantProperties"))
+            Return cpa.ToArray(Type.GetType("DTL.DTL.BaseThermoClasses.ConstantProperties"))
 
         End Function
 
     End Class
 
-    <System.Serializable()> Public Class DWSIM
+    <Serializable()> Public Class DWSIM
 
         Private xmldoc As XmlDocument
 
@@ -513,18 +513,18 @@ Namespace DTL.Databases
 
         End Sub
 
-        Public Function Transfer(Optional ByVal CompName As String = "") As ClassesBasicasTermodinamica.ConstantProperties()
+        Public Function Transfer(Optional ByVal CompName As String = "") As BaseThermoClasses.ConstantProperties()
 
-            Dim cp As ClassesBasicasTermodinamica.ConstantProperties
+            Dim cp As BaseThermoClasses.ConstantProperties
             Dim cpa As New ArrayList()
             Dim cult As Globalization.CultureInfo = New Globalization.CultureInfo("en-US")
             Dim nf As Globalization.NumberFormatInfo = cult.NumberFormat
 
-            Dim unif As New SimulationObjects.PropertyPackages.Auxiliary.Unifac
-            Dim modf As New SimulationObjects.PropertyPackages.Auxiliary.Modfac
+            Dim unif As New Unifac
+            Dim modf As New Modfac
 
             For Each node As XmlNode In xmldoc.ChildNodes(1)
-                cp = New ClassesBasicasTermodinamica.ConstantProperties
+                cp = New BaseThermoClasses.ConstantProperties
                 With cp
                     .OriginalDB = "DWSIM"
                     For Each node2 As XmlNode In node.ChildNodes
@@ -659,7 +659,7 @@ Namespace DTL.Databases
             unif = Nothing
             modf = Nothing
 
-            Return cpa.ToArray(Type.GetType("DTL.DTL.ClassesBasicasTermodinamica.ConstantProperties"))
+            Return cpa.ToArray(Type.GetType("DTL.DTL.BaseThermoClasses.ConstantProperties"))
 
         End Function
 
@@ -689,15 +689,15 @@ Namespace DTL.Databases
 
         End Sub
 
-        Public Function Transfer() As ClassesBasicasTermodinamica.ConstantProperties()
+        Public Function Transfer() As BaseThermoClasses.ConstantProperties()
 
-            Dim cp As ClassesBasicasTermodinamica.ConstantProperties
+            Dim cp As BaseThermoClasses.ConstantProperties
             Dim cpa As New ArrayList()
             Dim cult As Globalization.CultureInfo = New Globalization.CultureInfo("en-US")
             Dim nf As Globalization.NumberFormatInfo = cult.NumberFormat
             Dim i As Integer = 100000
             For Each node As XmlNode In xmldoc.ChildNodes(1)
-                cp = New ClassesBasicasTermodinamica.ConstantProperties
+                cp = New BaseThermoClasses.ConstantProperties
                 With cp
                     .OriginalDB = "Biodiesel"
                     For Each node2 As XmlNode In node.ChildNodes
@@ -771,13 +771,13 @@ Namespace DTL.Databases
                 i += 1
             Next
 
-            Return cpa.ToArray(Type.GetType("DTL.DTL.ClassesBasicasTermodinamica.ConstantProperties"))
+            Return cpa.ToArray(Type.GetType("DTL.DTL.BaseThermoClasses.ConstantProperties"))
 
         End Function
 
     End Class
 
-    <System.Serializable()> Public Class UserDB
+    <Serializable()> Public Class UserDB
 
         Public Shared Sub CreateNew(ByVal path As String, ByVal TopNode As String)
 
@@ -795,7 +795,7 @@ Namespace DTL.Databases
 
         End Sub
 
-        Public Shared Sub AddCompounds(ByVal comps() As ClassesBasicasTermodinamica.ConstantProperties, ByVal xmlpath As String, ByVal replace As Boolean)
+        Public Shared Sub AddCompounds(ByVal comps() As BaseThermoClasses.ConstantProperties, ByVal xmlpath As String, ByVal replace As Boolean)
 
             Dim xmldoc As XmlDocument
             Dim reader As XmlReader = XmlReader.Create(xmlpath)
@@ -813,7 +813,7 @@ Namespace DTL.Databases
             xmldoc = New XmlDocument
             xmldoc.Load(reader)
 
-            For Each comp As ClassesBasicasTermodinamica.ConstantProperties In comps
+            For Each comp As BaseThermoClasses.ConstantProperties In comps
                 Dim index As Integer = -1
                 Dim i As Integer = 0
                 If xmldoc.ChildNodes.Count > 0 Then
@@ -941,7 +941,6 @@ Namespace DTL.Databases
             xmldoc.Save(xmlpath)
             xmldoc = Nothing
 
-
         End Sub
 
         Public Shared Sub RemoveCompound(ByVal xmlpath As String, ByVal compID As String)
@@ -978,7 +977,7 @@ Namespace DTL.Databases
 
         End Sub
 
-        Public Shared Function ReadComps(ByVal xmlpath As String) As ClassesBasicasTermodinamica.ConstantProperties()
+        Public Shared Function ReadComps(ByVal xmlpath As String) As BaseThermoClasses.ConstantProperties()
 
             Dim xmldoc As XmlDocument
             Dim reader As XmlReader = XmlReader.Create(xmlpath)
@@ -987,13 +986,13 @@ Namespace DTL.Databases
             xmldoc = New XmlDocument
             xmldoc.Load(reader)
 
-            Dim cp As ClassesBasicasTermodinamica.ConstantProperties
+            Dim cp As BaseThermoClasses.ConstantProperties
             Dim cpa As New ArrayList()
             Dim cult As Globalization.CultureInfo = New Globalization.CultureInfo("en-US")
             Dim nf As Globalization.NumberFormatInfo = cult.NumberFormat
 
             For Each node As XmlNode In xmldoc.ChildNodes(1)
-                cp = New ClassesBasicasTermodinamica.ConstantProperties
+                cp = New BaseThermoClasses.ConstantProperties
                 With cp
                     .OriginalDB = "User"
                     .CurrentDB = "User"
@@ -1175,7 +1174,7 @@ Namespace DTL.Databases
             reader.Close()
             reader = Nothing
 
-            Return cpa.ToArray(Type.GetType("DTL.DTL.ClassesBasicasTermodinamica.ConstantProperties"))
+            Return cpa.ToArray(Type.GetType("DTL.DTL.BaseThermoClasses.ConstantProperties"))
 
         End Function
 
@@ -1185,7 +1184,7 @@ Namespace DTL.Databases
     ''' Interaction Parameter user database class
     ''' </summary>
     ''' <remarks></remarks>
-    <System.Serializable()> Public Class UserIPDB
+    <Serializable()> Public Class UserIPDB
 
         Public Shared Sub CreateNew(ByVal path As String, ByVal TopNode As String)
 
@@ -1203,7 +1202,7 @@ Namespace DTL.Databases
 
         End Sub
 
-        Public Shared Sub AddInteractionParameters(ByVal IPDS() As ClassesBasicasTermodinamica.InteractionParameter, ByVal xmlpath As String, ByVal replace As Boolean)
+        Public Shared Sub AddInteractionParameters(ByVal IPDS() As BaseThermoClasses.InteractionParameter, ByVal xmlpath As String, ByVal replace As Boolean)
             Dim xmldoc As XmlDocument
             Dim reader As XmlReader = XmlReader.Create(xmlpath)
             Try
@@ -1221,7 +1220,7 @@ Namespace DTL.Databases
             xmldoc = New XmlDocument
             xmldoc.Load(reader)
 
-            For Each IP As ClassesBasicasTermodinamica.InteractionParameter In IPDS
+            For Each IP As BaseThermoClasses.InteractionParameter In IPDS
                 Dim index As Integer = -1
                 Dim i As Integer = 0
                 Dim C1, C2, M, S1, S2 As String
@@ -1278,7 +1277,7 @@ Namespace DTL.Databases
             xmldoc = Nothing
         End Sub
 
-        Public Shared Function ReadInteractions(ByVal xmlpath As String, ByVal Model As String) As ClassesBasicasTermodinamica.InteractionParameter()
+        Public Shared Function ReadInteractions(ByVal xmlpath As String, ByVal Model As String) As BaseThermoClasses.InteractionParameter()
 
             Dim xmldoc As XmlDocument
             Dim reader As XmlReader = XmlReader.Create(xmlpath)
@@ -1287,13 +1286,13 @@ Namespace DTL.Databases
             xmldoc = New XmlDocument
             xmldoc.Load(reader)
 
-            Dim IP As ClassesBasicasTermodinamica.InteractionParameter
+            Dim IP As BaseThermoClasses.InteractionParameter
             Dim IPA As New ArrayList()
             Dim cult As Globalization.CultureInfo = New Globalization.CultureInfo("en-US")
             'Dim nf As Globalization.NumberFormatInfo = cult.NumberFormat
 
             For Each node As XmlNode In xmldoc.ChildNodes(1)
-                IP = New ClassesBasicasTermodinamica.InteractionParameter
+                IP = New BaseThermoClasses.InteractionParameter
                 With IP
                     For Each node2 As XmlNode In node.ChildNodes
                         Select Case node2.Name
@@ -1328,7 +1327,7 @@ Namespace DTL.Databases
             reader.Close()
             reader = Nothing
 
-            Return IPA.ToArray(Type.GetType("DTL.DTL.ClassesBasicasTermodinamica.InteractionParameter"))
+            Return IPA.ToArray(Type.GetType("DTL.DTL.BaseThermoClasses.InteractionParameter"))
 
         End Function
 
@@ -1343,6 +1342,7 @@ Namespace DTL.Databases
         End Sub
 
         Public Sub Load(ByVal filename As String)
+
             Dim pathsep As Char = Path.DirectorySeparatorChar
 
             Dim settings As New XmlReaderSettings()
@@ -1358,15 +1358,15 @@ Namespace DTL.Databases
 
         End Sub
 
-        Public Function Transfer() As ClassesBasicasTermodinamica.ConstantProperties()
+        Public Function Transfer() As BaseThermoClasses.ConstantProperties()
 
-            Dim cp As ClassesBasicasTermodinamica.ConstantProperties
+            Dim cp As BaseThermoClasses.ConstantProperties
             Dim cpa As New ArrayList()
             Dim cult As Globalization.CultureInfo = New Globalization.CultureInfo("en-US")
             Dim nf As Globalization.NumberFormatInfo = cult.NumberFormat
             Dim i As Integer = 200000
             For Each node As XmlNode In xmldoc.ChildNodes(1)
-                cp = New ClassesBasicasTermodinamica.ConstantProperties
+                cp = New BaseThermoClasses.ConstantProperties
                 With cp
                     .OriginalDB = "Electrolytes"
                     For Each node2 As XmlNode In node.ChildNodes
@@ -1443,7 +1443,7 @@ Namespace DTL.Databases
                 i += 1
             Next
 
-            Return cpa.ToArray(Type.GetType("DTL.DTL.ClassesBasicasTermodinamica.ConstantProperties"))
+            Return cpa.ToArray(Type.GetType("DTL.DTL.BaseThermoClasses.ConstantProperties"))
 
         End Function
 

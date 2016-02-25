@@ -21,7 +21,7 @@ Imports DTL.DTL.MathEx
 
 Namespace DTL.SimulationObjects.PropertyPackages
 
-    <System.Serializable()> Public MustInherit Class ThermoPlug
+    <Serializable()> Public MustInherit Class ThermoPlug
 
         Public MustOverride Function CalcP(ByVal V As Double, ByVal T As Double, ByVal Vx As Array, ByVal VKij As Object, ByVal VTc As Array, ByVal VPc As Array, ByVal Vw As Array, Optional ByVal otherargs As Object = Nothing)
 
@@ -41,18 +41,16 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
     End Class
 
-    <System.Serializable()> Public Class MichelsenFlash
+    <Serializable()> Public Class MichelsenFlash
 
         Public thermobase As ThermoPlug
         Public ppbase As PropertyPackage
 
-#Region "        Enums"
+#Region "Enums"
 
         Public Enum ErrorCode
-
             MaximumIterationsReached = 0
             IterationDiverged = 1
-
         End Enum
 
         Public Enum FallbackType
@@ -62,7 +60,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
 #End Region
 
-#Region "        Properties"
+#Region "Properties"
 
         Private m_flashtype As String = "LL"
         Private m_flashfallback As FallbackType = FallbackType.VLL
@@ -133,7 +131,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
 #End Region
 
-#Region "        Base Flash and Stability Codes"
+#Region "Base Flash and Stability Codes"
 
         Private Function StabTest(ByVal T As Double, ByVal P As Double, ByVal Vz As Array, ByVal VKij As Object, ByVal VTc As Array, ByVal VPc As Array, ByVal Vw As Array, Optional ByVal VzArray(,) As Double = Nothing, Optional ByVal otherargs As Object = Nothing)
 
@@ -519,7 +517,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
                     End If
                     i = i + 1
                 Loop Until i = n + 1
-                If Math.Abs(F / dF) > 1 Then
+                If Abs(F / dF) > 1 Then
                     v = -F / dF * 0.5 * v + v
                 Else
                     v = -F / dF + v
@@ -929,7 +927,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
                 End If
                 i = i + 1
             Loop Until i = n + 1
-            If Math.Abs(F / dF) > 1 Then
+            If Abs(F / dF) > 1 Then
                 v = -F / dF * 0.5 * v + v
             Else
                 v = -F / dF + v
@@ -1032,7 +1030,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
             Vsup = Vinf
             Vinf = Vinf - delta_V
 
-            'método de Brent para encontrar Vc
+            'Brent method to find Vc
 
             Dim aaa, bbb, ccc, ddd, eee, min11, min22, faa, fbb, fcc, ppp, qqq, rrr, sss, tol11, xmm As Double
             Dim ITMAX2 As Integer = 100
@@ -1054,7 +1052,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
                     ddd = bbb - aaa
                     eee = ddd
                 End If
-                If Math.Abs(fcc) < Math.Abs(fbb) Then
+                If Abs(fcc) < Abs(fbb) Then
                     aaa = bbb
                     bbb = ccc
                     ccc = aaa
@@ -1064,8 +1062,8 @@ Namespace DTL.SimulationObjects.PropertyPackages
                 End If
                 tol11 = 0.000001
                 xmm = 0.5 * (ccc - bbb)
-                If (Math.Abs(xmm) <= tol11) Or (fbb = 0) Then GoTo Final3
-                If (Math.Abs(eee) >= tol11) And (Math.Abs(faa) > Math.Abs(fbb)) Then
+                If (Abs(xmm) <= tol11) Or (fbb = 0) Then GoTo Final3
+                If (Abs(eee) >= tol11) And (Abs(faa) > Abs(fbb)) Then
                     sss = fbb / faa
                     If aaa = ccc Then
                         ppp = 2 * xmm * sss
@@ -1077,9 +1075,9 @@ Namespace DTL.SimulationObjects.PropertyPackages
                         qqq = (qqq - 1) * (rrr - 1) * (sss - 1)
                     End If
                     If ppp > 0 Then qqq = -qqq
-                    ppp = Math.Abs(ppp)
-                    min11 = 3 * xmm * qqq - Math.Abs(tol11 * qqq)
-                    min22 = Math.Abs(eee * qqq)
+                    ppp = Abs(ppp)
+                    min11 = 3 * xmm * qqq - Abs(tol11 * qqq)
+                    min22 = Abs(eee * qqq)
                     Dim tvar2 As Double
                     If min11 < min22 Then tvar2 = min11
                     If min11 > min22 Then tvar2 = min22
@@ -1096,7 +1094,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
                 End If
                 aaa = bbb
                 faa = fbb
-                If (Math.Abs(ddd) > tol11) Then
+                If (Abs(ddd) > tol11) Then
                     bbb += ddd
                 Else
                     bbb += Math.Sign(xmm) * tol11
@@ -1131,7 +1129,7 @@ Final3:
 
 #End Region
 
-#Region "        Bubble/Dew Point Functions"
+#Region "Bubble/Dew Point Functions"
 
         Function _dKdT(ByVal T As Double, ByVal P As Double, ByVal Vx As Object, ByVal Vy As Object, ByVal VKij As Object, ByVal VTc As Object, ByVal VPc As Object, ByVal Vw As Object, Optional ByVal otherargs As Object = Nothing) As Object
 
@@ -1234,15 +1232,15 @@ Final:
             Dim n = UBound(Vy)
 
             Dim chk As Boolean = False
-            Dim marcador2 As Integer
+            Dim marker2 As Integer
 
             Dim F As Double
             Dim dKdP(n), dKdPi(n) As Object
             Dim Vx(n), LN_CFL(n), LN_CFV(n) As Double
             Dim Vp(n), R, coeff(3) As Double
             Dim i As Integer
-            Dim soma_x As Double
-            Dim marcador
+            Dim sum_x As Double
+            Dim marker
             Dim stmp4_ant, stmp4, Pant As Double
             stmp4_ant = 0
             stmp4 = 0
@@ -1275,15 +1273,15 @@ Final:
             Loop Until i = n + 1
 
             i = 0
-            soma_x = 0
+            sum_x = 0
             Do
-                soma_x = soma_x + Vx(i)
+                sum_x = sum_x + Vx(i)
                 i = i + 1
             Loop Until i = n + 1
 
             i = 0
             Do
-                Vx(i) = Vx(i) / soma_x
+                Vx(i) = Vx(i) / sum_x
                 i = i + 1
             Loop Until i = n + 1
 
@@ -1302,9 +1300,9 @@ Final:
                         i = i + 1
                     Loop Until i = n + 1
 
-                    marcador = 0
+                    marker = 0
                     If stmp4_ant <> 0 Then
-                        marcador = 1
+                        marker = 1
                     End If
                     stmp4_ant = stmp4
 
@@ -1321,10 +1319,10 @@ Final:
                         i = i + 1
                     Loop Until i = n + 1
 
-                    marcador2 = 0
-                    If marcador = 1 Then
-                        If Math.Abs(stmp4_ant - stmp4) < m_tolerance Then
-                            marcador2 = 1
+                    marker2 = 0
+                    If marker = 1 Then
+                        If Abs(stmp4_ant - stmp4) < m_tolerance Then
+                            marker2 = 1
                         End If
                     End If
 
@@ -1333,7 +1331,7 @@ Final:
                     If cont_int >= m_miti Then Throw New Exception(ErrorCode.MaximumIterationsReached)
                     If Double.IsNaN(stmp4) Then Throw New Exception(ErrorCode.IterationDiverged)
 
-                Loop Until marcador2 = 1
+                Loop Until marker2 = 1
 
                 dKdP = _dKdP(T, P, Vx, Vy, VKij, VTc, VPc, Vw, otherargs)
 
@@ -1354,28 +1352,9 @@ Final:
                 If cnt >= m_mite Then Throw New Exception(ErrorCode.MaximumIterationsReached)
                 If Double.IsNaN(P) Then Throw New Exception(ErrorCode.IterationDiverged)
 
-            Loop Until Math.Abs(F) < m_tolerance
+            Loop Until Abs(F) < m_tolerance
 
             'check for trivial solution
-
-            'Dim sumk As Double = 0
-            'i = 0
-            'Do
-            '    sumk += KI(i) / n
-            '    i = i + 1
-            'Loop Until i = n + 1
-
-            'If Abs(sumk - 1) < 0.1 Then
-
-            '    i = 0
-            '    P = 0
-            '    Do
-            '        P = P + Vy(i) / Vp(i)
-            '        i = i + 1
-            '    Loop Until i = n + 1
-            '    P = 1 / P
-            'End If
-
             Dim tmp2(n + 1)
             tmp2(0) = Pant
             i = 0
@@ -1396,15 +1375,15 @@ Final:
             Dim n = UBound(Vx)
 
             Dim chk As Boolean = False
-            Dim marcador2 As Integer
+            Dim marker2 As Integer
 
             Dim F As Double
             Dim dKdP(n), dKdPi(n) As Object
             Dim Vy(n), Vx_ant(n), Vy_ant(n), LN_CFL(n), LN_CFV(n) As Double
             Dim Vp(n), R, coeff(3), tmp(2, 2) As Double
             Dim i As Integer
-            Dim soma_y As Double
-            Dim marcador3, marcador
+            Dim sum_y As Double
+            Dim marker3, marker
             Dim stmp4_ant, stmp4, Pant As Double
             stmp4_ant = 0
             stmp4 = 0
@@ -1438,15 +1417,15 @@ Final:
             Loop Until i = n + 1
 
             i = 0
-            soma_y = 0
+            sum_y = 0
             Do
-                soma_y = soma_y + Vy(i)
+                sum_y = sum_y + Vy(i)
                 i = i + 1
             Loop Until i = n + 1
 
             i = 0
             Do
-                Vy(i) = Vy(i) / soma_y
+                Vy(i) = Vy(i) / sum_y
                 i = i + 1
             Loop Until i = n + 1
 
@@ -1454,7 +1433,7 @@ Final:
 
                 LN_CFL = thermobase.CalcLnFug(T, P, Vx, VKij, VTc, VPc, Vw, otherargs)
 
-                marcador3 = 0
+                marker3 = 0
 
                 Dim cont_int = 0
                 Do
@@ -1467,9 +1446,9 @@ Final:
                         i = i + 1
                     Loop Until i = n + 1
 
-                    marcador = 0
+                    marker = 0
                     If stmp4_ant <> 0 Then
-                        marcador = 1
+                        marker = 1
                     End If
                     stmp4_ant = stmp4
 
@@ -1487,10 +1466,10 @@ Final:
                         i = i + 1
                     Loop Until i = n + 1
 
-                    marcador2 = 0
-                    If marcador = 1 Then
-                        If Math.Abs(stmp4_ant - stmp4) < m_tolerance Then
-                            marcador2 = 1
+                    marker2 = 0
+                    If marker = 1 Then
+                        If Abs(stmp4_ant - stmp4) < m_tolerance Then
+                            marker2 = 1
                         End If
                     End If
 
@@ -1499,7 +1478,7 @@ Final:
                     If cont_int >= m_miti Then Throw New Exception(ErrorCode.MaximumIterationsReached)
                     If Double.IsNaN(stmp4) Then Throw New Exception(ErrorCode.IterationDiverged)
 
-                Loop Until marcador2 = 1
+                Loop Until marker2 = 1
 
                 dKdP = _dKdP(T, P, Vx, Vy, VKij, VTc, VPc, Vw, otherargs)
 
@@ -1520,28 +1499,9 @@ Final:
                 If cnt >= m_mite Then Throw New Exception(ErrorCode.MaximumIterationsReached)
                 If Double.IsNaN(P) Then Throw New Exception(ErrorCode.IterationDiverged)
 
-            Loop Until Math.Abs(F) < m_tolerance
+            Loop Until Abs(F) < m_tolerance
 
             ''check for trivial solution
-
-            'Dim sumk As Double = 0
-            'i = 0
-            'Do
-            '    sumk += KI(i) / n
-            '    i = i + 1
-            'Loop Until i = n + 1
-
-            'If Abs(sumk - 1) < 0.1 Then
-
-            '    i = 0
-            '    P = 0
-            '    Do
-            '        P = P + Vx(i) * Vp(i)
-            '        i = i + 1
-            '    Loop Until i = n + 1
-
-            'End If
-
             Dim tmp2(n + 1)
             tmp2(0) = P
             i = 0
@@ -1562,15 +1522,15 @@ Final:
             Dim n = UBound(Vy)
 
             Dim chk As Boolean = False
-            Dim marcador2 As Integer
+            Dim marker2 As Integer
 
             Dim F As Double
             Dim dKdT(n), dKdTi(n) As Object
             Dim Vx(n), LN_CFL(n), LN_CFV(n) As Double
             Dim Vp(n) As Double
             Dim i As Integer
-            Dim soma_x As Double
-            Dim marcador
+            Dim sum_x As Double
+            Dim marker
             Dim stmp4_ant, stmp4, Tant As Double
             stmp4_ant = 0
             stmp4 = 0
@@ -1601,15 +1561,15 @@ Final:
             Loop Until i = n + 1
 
             i = 0
-            soma_x = 0
+            sum_x = 0
             Do
-                soma_x = soma_x + Vx(i)
+                sum_x = sum_x + Vx(i)
                 i = i + 1
             Loop Until i = n + 1
 
             i = 0
             Do
-                Vx(i) = Vx(i) / soma_x
+                Vx(i) = Vx(i) / sum_x
                 i = i + 1
             Loop Until i = n + 1
 
@@ -1636,9 +1596,9 @@ Final:
                         i = i + 1
                     Loop Until i = n + 1
 
-                    marcador = 0
+                    marker = 0
                     If stmp4_ant <> 0 Then
-                        marcador = 1
+                        marker = 1
                     End If
                     stmp4_ant = stmp4
 
@@ -1655,10 +1615,10 @@ Final:
                         i = i + 1
                     Loop Until i = n + 1
 
-                    marcador2 = 0
-                    If marcador = 1 Then
-                        If Math.Abs(stmp4_ant - stmp4) < m_tolerance Then
-                            marcador2 = 1
+                    marker2 = 0
+                    If marker = 1 Then
+                        If Abs(stmp4_ant - stmp4) < m_tolerance Then
+                            marker2 = 1
                         End If
                     End If
 
@@ -1667,7 +1627,7 @@ Final:
                     If cont_int >= m_miti Then Throw New Exception(ErrorCode.MaximumIterationsReached)
                     If Double.IsNaN(stmp4) Then Throw New Exception(ErrorCode.IterationDiverged)
 
-                Loop Until marcador2 = 1
+                Loop Until marker2 = 1
 
                 dKdT = _dKdT(T, P, Vx, Vy, VKij, VTc, VPc, Vw, otherargs)
 
@@ -1688,28 +1648,9 @@ Final:
                 If cnt >= m_mite Then Throw New Exception(ErrorCode.MaximumIterationsReached)
                 If Double.IsNaN(T) Then Throw New Exception(ErrorCode.IterationDiverged)
 
-            Loop Until Math.Abs(F) < m_tolerance
+            Loop Until Abs(F) < m_tolerance
 
             'check for trivial solution
-
-            'Dim sumk As Double = 0
-            'i = 0
-            'Do
-            '    sumk += KI(i) / n
-            '    i = i + 1
-            'Loop Until i = n + 1
-
-            'If Abs(sumk - 1) < 0.1 Then
-
-            '    i = 0
-            '    T = 0
-            '    Do
-            '        T = T + Vy(i) * ppbase.AUX_TSATi(P, i)
-            '        i = i + 1
-            '    Loop Until i = n + 1
-
-            'End If
-
             Dim tmp2(n + 1)
             tmp2(0) = T
             i = 0
@@ -1730,7 +1671,7 @@ Final:
             Dim n = UBound(Vx)
 
             Dim chk As Boolean = False
-            Dim marcador2 As Integer
+            Dim marker2 As Integer
 
             Dim F As Double
             Dim dKdT(n) As Object
@@ -1738,8 +1679,8 @@ Final:
             Dim Vy(n), Vx_ant(n), Vy_ant(n), LN_CFL(n), LN_CFV(n) As Double
             Dim Vp(n) As Double
             Dim i As Integer
-            Dim soma_y As Double
-            Dim marcador
+            Dim sum_y As Double
+            Dim marker
             Dim stmp4_ant, stmp4, Tant As Double
             stmp4_ant = 0
             stmp4 = 0
@@ -1769,15 +1710,15 @@ Final:
             Loop Until i = n + 1
 
             i = 0
-            soma_y = 0
+            sum_y = 0
             Do
-                soma_y = soma_y + Vy(i)
+                sum_y = sum_y + Vy(i)
                 i = i + 1
             Loop Until i = n + 1
 
             i = 0
             Do
-                Vy(i) = Vy(i) / soma_y
+                Vy(i) = Vy(i) / sum_y
                 i = i + 1
             Loop Until i = n + 1
 
@@ -1802,9 +1743,9 @@ Final:
                         i = i + 1
                     Loop Until i = n + 1
 
-                    marcador = 0
+                    marker = 0
                     If stmp4_ant <> 0 Then
-                        marcador = 1
+                        marker = 1
                     End If
                     stmp4_ant = stmp4
 
@@ -1821,10 +1762,10 @@ Final:
                         i = i + 1
                     Loop Until i = n + 1
 
-                    marcador2 = 0
-                    If marcador = 1 Then
-                        If Math.Abs(stmp4_ant - stmp4) < m_tolerance Then
-                            marcador2 = 1
+                    marker2 = 0
+                    If marker = 1 Then
+                        If Abs(stmp4_ant - stmp4) < m_tolerance Then
+                            marker2 = 1
                         End If
                     End If
 
@@ -1833,7 +1774,7 @@ Final:
                     If cont_int >= m_miti Then Throw New Exception(ErrorCode.MaximumIterationsReached)
                     If Double.IsNaN(stmp4) Then Throw New Exception(ErrorCode.IterationDiverged)
 
-                Loop Until marcador2 = 1
+                Loop Until marker2 = 1
 
                 dKdT = _dKdT(T, P, Vx, Vy, VKij, VTc, VPc, Vw)
 
@@ -1854,28 +1795,9 @@ Final:
                 If cnt >= m_mite Then Throw New Exception(ErrorCode.MaximumIterationsReached)
                 If Double.IsNaN(T) Then Throw New Exception(ErrorCode.IterationDiverged)
 
-            Loop Until Math.Abs(F) < m_tolerance
+            Loop Until Abs(F) < m_tolerance
 
             'check for trivial solution
-
-            'Dim sumk As Double = 0
-            'i = 0
-            'Do
-            '    sumk += KI(i) / n
-            '    i = i + 1
-            'Loop Until i = n + 1
-
-            'If Abs(sumk - 1) < 0.1 Then
-
-            '    i = 0
-            '    T = 0
-            '    Do
-            '        T = T + Vx(i) * ppbase.AUX_TSATi(P, i)
-            '        i = i + 1
-            '    Loop Until i = n + 1
-
-            'End If
-
             Dim tmp2(n + 1)
             tmp2(0) = Tant
             i = 0
@@ -1890,7 +1812,7 @@ Final:
 
 #End Region
 
-#Region "        Critical Point General Calculation Routines (EXPERIMENTAL)"
+#Region "Critical Point General Calculation Routines (EXPERIMENTAL)"
 
         Public Function dlnfug_i_dn_j(ByVal jidx As Integer, ByVal T As Double, ByVal V As Double, ByVal Vz As Array, ByVal VKij As Object, ByVal VTc As Array, ByVal VPc As Array, ByVal Vw As Array, Optional ByVal otherargs As Object = Nothing)
 
@@ -2013,9 +1935,6 @@ Final:
 
             Dim T As Double = x
 
-            'ByVal T As Double, ByVal V As Double, ByVal Vz As Array, ByVal VTc As Array, 
-            'ByVal VPc As Array, ByVal Vw As Array, ByVal VKIj As Array, Optional ByVal otherargs
-
             Dim V As Double = otherargs(0)
             Dim Vz As Array = otherargs(1)
             Dim VTc As Array = otherargs(2)
@@ -2124,16 +2043,16 @@ Final:
                 Loop Until i = n + 1
             End Try
 
-            Dim soma_Dn = 0
+            Dim sum_Dn = 0
             i = 0
             Do
-                soma_Dn += (Dn0(i) ^ 2) ^ 0.5
+                sum_Dn += (Dn0(i) ^ 2) ^ 0.5
                 i = i + 1
             Loop Until i = n + 1
 
             i = 0
             Do
-                Dn(i) = Dn0(i) / soma_Dn
+                Dn(i) = Dn0(i) / sum_Dn
                 i = i + 1
             Loop Until i = n + 1
 
@@ -2260,7 +2179,7 @@ Final2:
             Dim Tc(n), Pc(n)
             Dim b As Double
 
-            'estimar temperatura e pressão críticas iniciais
+            'ESTIMATE temperatura e pressão críticas iniciais
 
             R = 8.314
 
@@ -2280,7 +2199,7 @@ Final2:
                 i = i + 1
             Loop Until i = n + 1
 
-            'estimar temperatura e pressão críticas iniciais
+            'ESTIMATE temperatura e pressão críticas iniciais
 
             If Vmax = 0 Then Vmax = b * multipl
             Vmin = b * 1.05

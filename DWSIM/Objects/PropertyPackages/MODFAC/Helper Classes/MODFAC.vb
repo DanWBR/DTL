@@ -21,7 +21,7 @@ Imports System.Linq
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
-    <System.Serializable()> Public Class Modfac
+    <Serializable()> Public Class Modfac
 
         Public ModfGroups As ModfacGroups
 
@@ -100,18 +100,18 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                 i += 1
             Next
 
-            Dim soma_xq = 0.0#
+            Dim sum_xq = 0.0#
             i = 0
             Do
                 Q(i) = VQ(i)
-                soma_xq = soma_xq + Vx(i) * Q(i)
+                sum_xq = sum_xq + Vx(i) * Q(i)
                 i = i + 1
             Loop Until i = n + 1
 
             i = 0
             For Each item In VEKI
                 For Each item2 In item
-                    val = Vx(i) * Q(i) * VEKI(i)(item2.Key) / soma_xq
+                    val = Vx(i) * Q(i) * VEKI(i)(item2.Key) / sum_xq
                     If Not teta.ContainsKey(item2.Key) Then teta.Add(item2.Key, val) Else teta(item2.Key) += val
                 Next
                 i += 1
@@ -124,21 +124,21 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                 Next
             Next
 
-            Dim soma_xr = 0.0#
-            Dim soma_xr_ = 0.0#
+            Dim sum_xr = 0.0#
+            Dim sum_xr_ = 0.0#
             i = 0
             Do
                 R(i) = VR(i)
-                soma_xr = soma_xr + Vx(i) * R(i)
-                soma_xr_ = soma_xr_ + Vx(i) * R(i) ^ (3 / 4)
+                sum_xr = sum_xr + Vx(i) * R(i)
+                sum_xr_ = sum_xr_ + Vx(i) * R(i) ^ (3 / 4)
                 i = i + 1
             Loop Until i = n + 1
 
             i = 0
             Do
-                j(i) = R(i) / soma_xr
-                j_(i) = R(i) ^ (3 / 4) / soma_xr_
-                L(i) = Q(i) / soma_xq
+                j(i) = R(i) / sum_xr
+                j_(i) = R(i) ^ (3 / 4) / sum_xr_
+                L(i) = Q(i) / sum_xq
                 Vgammac(i) = 1 - j_(i) + Math.Log(j_(i)) - 5 * Q(i) * (1 - j(i) / L(i) + Math.Log(j(i) / L(i)))
                 k = 0
                 Dim tmpsum = 0.0#
@@ -283,7 +283,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         End Function
 
-        Function RET_VN(ByVal cp As DTL.ClassesBasicasTermodinamica.ConstantProperties) As Dictionary(Of Integer, Double)
+        Function RET_VN(ByVal cp As BaseThermoClasses.ConstantProperties) As Dictionary(Of Integer, Double)
 
             Dim i As Integer = 0
             Dim res As New Dictionary(Of Integer, Double)
@@ -354,28 +354,28 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
     End Class
 
-    <System.Serializable()> Public Class ModfacGroups
+    <Serializable()> Public Class ModfacGroups
 
-        Public InteracParam_aij As System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))
-        Public InteracParam_bij As System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))
-        Public InteracParam_cij As System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))
-        Public InteracParam_aji As System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))
-        Public InteracParam_bji As System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))
-        Public InteracParam_cji As System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))
+        Public InteracParam_aij As Dictionary(Of Integer, Dictionary(Of Integer, Double))
+        Public InteracParam_bij As Dictionary(Of Integer, Dictionary(Of Integer, Double))
+        Public InteracParam_cij As Dictionary(Of Integer, Dictionary(Of Integer, Double))
+        Public InteracParam_aji As Dictionary(Of Integer, Dictionary(Of Integer, Double))
+        Public InteracParam_bji As Dictionary(Of Integer, Dictionary(Of Integer, Double))
+        Public InteracParam_cji As Dictionary(Of Integer, Dictionary(Of Integer, Double))
 
-        Protected m_groups As System.Collections.Generic.SortedDictionary(Of Integer, ModfacGroup)
+        Protected m_groups As SortedDictionary(Of Integer, ModfacGroup)
 
         Sub New()
 
-            Dim pathsep = System.IO.Path.DirectorySeparatorChar
+            Dim pathsep = IO.Path.DirectorySeparatorChar
 
-            m_groups = New System.Collections.Generic.SortedDictionary(Of Integer, ModfacGroup)
-            InteracParam_aij = New System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))
-            InteracParam_bij = New System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))
-            InteracParam_cij = New System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))
-            InteracParam_aji = New System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))
-            InteracParam_bji = New System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))
-            InteracParam_cji = New System.Collections.Generic.Dictionary(Of Integer, System.Collections.Generic.Dictionary(Of Integer, Double))
+            m_groups = New SortedDictionary(Of Integer, ModfacGroup)
+            InteracParam_aij = New Dictionary(Of Integer, Dictionary(Of Integer, Double))
+            InteracParam_bij = New Dictionary(Of Integer, Dictionary(Of Integer, Double))
+            InteracParam_cij = New Dictionary(Of Integer, Dictionary(Of Integer, Double))
+            InteracParam_aji = New Dictionary(Of Integer, Dictionary(Of Integer, Double))
+            InteracParam_bji = New Dictionary(Of Integer, Dictionary(Of Integer, Double))
+            InteracParam_cji = New Dictionary(Of Integer, Dictionary(Of Integer, Double))
 
             Dim cult As Globalization.CultureInfo = New Globalization.CultureInfo("en-US")
 
@@ -384,15 +384,15 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Using stream As IO.Stream = New IO.MemoryStream(My.Resources.modfac)
                 Using reader As New IO.StreamReader(stream)
                     Using parser As New TextFieldParser(reader)
-                            parser.SetDelimiters(delimiter)
+                        parser.SetDelimiters(delimiter)
+                        fields = parser.ReadFields()
+                        While Not parser.EndOfData
                             fields = parser.ReadFields()
-                            While Not parser.EndOfData
-                                fields = parser.ReadFields()
-                                Me.Groups.Add(fields(3), New ModfacGroup(fields(2), fields(1), fields(0), fields(3), Double.Parse(fields(4), cult), Double.Parse(fields(5), cult)))
-                            End While
-                        End Using
+                            Me.Groups.Add(fields(3), New ModfacGroup(fields(2), fields(1), fields(0), fields(3), Double.Parse(fields(4), cult), Double.Parse(fields(5), cult)))
+                        End While
                     End Using
                 End Using
+            End Using
 
             Using stream As IO.Stream = New IO.MemoryStream(My.Resources.modfac_ip)
                 Using reader As New IO.StreamReader(stream)
@@ -414,17 +414,17 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                         While Not parser.EndOfData
                             fields = parser.ReadFields()
                             If Not Me.InteracParam_aij.ContainsKey(fields(0)) Then
-                                Me.InteracParam_aij.Add(fields(0), New System.Collections.Generic.Dictionary(Of Integer, Double))
+                                Me.InteracParam_aij.Add(fields(0), New Dictionary(Of Integer, Double))
                                 Me.InteracParam_aij(fields(0)).Add(fields(1), Double.Parse(fields(2), cult))
-                                Me.InteracParam_bij.Add(fields(0), New System.Collections.Generic.Dictionary(Of Integer, Double))
+                                Me.InteracParam_bij.Add(fields(0), New Dictionary(Of Integer, Double))
                                 Me.InteracParam_bij(fields(0)).Add(fields(1), Double.Parse(fields(3), cult))
-                                Me.InteracParam_cij.Add(fields(0), New System.Collections.Generic.Dictionary(Of Integer, Double))
+                                Me.InteracParam_cij.Add(fields(0), New Dictionary(Of Integer, Double))
                                 Me.InteracParam_cij(fields(0)).Add(fields(1), Double.Parse(fields(4), cult))
-                                Me.InteracParam_aji.Add(fields(0), New System.Collections.Generic.Dictionary(Of Integer, Double))
+                                Me.InteracParam_aji.Add(fields(0), New Dictionary(Of Integer, Double))
                                 Me.InteracParam_aji(fields(0)).Add(fields(1), Double.Parse(fields(5), cult))
-                                Me.InteracParam_bji.Add(fields(0), New System.Collections.Generic.Dictionary(Of Integer, Double))
+                                Me.InteracParam_bji.Add(fields(0), New Dictionary(Of Integer, Double))
                                 Me.InteracParam_bji(fields(0)).Add(fields(1), Double.Parse(fields(6), cult))
-                                Me.InteracParam_cji.Add(fields(0), New System.Collections.Generic.Dictionary(Of Integer, Double))
+                                Me.InteracParam_cji.Add(fields(0), New Dictionary(Of Integer, Double))
                                 Me.InteracParam_cji(fields(0)).Add(fields(1), Double.Parse(fields(7), cult))
                             Else
                                 If Not Me.InteracParam_aij(fields(0)).ContainsKey(fields(1)) Then
@@ -450,7 +450,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         End Sub
 
-        Public ReadOnly Property Groups() As System.Collections.Generic.SortedDictionary(Of Integer, ModfacGroup)
+        Public ReadOnly Property Groups() As SortedDictionary(Of Integer, ModfacGroup)
             Get
                 Return m_groups
             End Get
@@ -458,7 +458,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
     End Class
 
-    <System.Serializable()> Public Class ModfacGroup
+    <Serializable()> Public Class ModfacGroup
 
         Protected m_groupname As String
         Protected m_maingroupname As String

@@ -17,7 +17,6 @@
 '    along with DWSIM.  If not, see <http://www.gnu.org/licenses/>.
 
 Imports System.Math
-Imports DTL.DTL.SimulationObjects
 Imports DTL.DTL.MathEx
 Imports DTL.DTL.MathEx.Common
 Imports System.Threading.Tasks
@@ -25,7 +24,7 @@ Imports System.Linq
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
-    <System.Serializable()> Public Class BostonBrittInsideOut
+    <Serializable()> Public Class BostonBrittInsideOut
 
         Inherits FlashAlgorithm
 
@@ -40,21 +39,21 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
         Dim Kb, Kb0, Kb_ As Double
         Dim DHv, DHl, DHv1, DHv2, DHl1, DHl2, Hv0, Hvid, Hlid, Hf, DHlsp, DHvsp As Double
         Dim DSv, DSl, DSv1, DSv2, DSl1, DSl2, Sv0, Svid, Slid, Sf, DSlsp, DSvsp As Double
-        Dim Pb, Pd, Pmin, Pmax, Px, soma_x, soma_y, Tmin, Tmax As Double
-        Dim proppack As PropertyPackages.PropertyPackage
+        Dim Pb, Pd, Pmin, Pmax, Px, sum_x, sum_y, Tmin, Tmax As Double
+        Dim proppack As PropertyPackage
         Dim tmpdx, refx, currx As Object
 
-        Public Overrides Function Flash_PT(ByVal Vz As Double(), ByVal P As Double, ByVal T As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
+        Public Overrides Function Flash_PT(ByVal Vz As Double(), ByVal P As Double, ByVal T As Double, ByVal PP As PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
 
             Dim d1, d2 As Date, dt As TimeSpan
             Dim i, j As Integer
 
             d1 = Date.Now
 
-            etol = CDbl(PP.Parameters("PP_PTFELT"))
-            maxit_e = CInt(PP.Parameters("PP_PTFMEI"))
-            itol = CDbl(PP.Parameters("PP_PTFILT"))
-            maxit_i = CInt(PP.Parameters("PP_PTFMII"))
+            Me.etol = PP.Parameters("PP_PTFELT")
+            Me.maxit_e = CInt(PP.Parameters("PP_PTFMEI"))
+            Me.itol = PP.Parameters("PP_PTFILT")
+            Me.maxit_i = CInt(PP.Parameters("PP_PTFMII"))
 
             n = UBound(Vz)
 
@@ -99,7 +98,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
             'Estimate V
 
-            If T > DTL.MathEx.Common.Max(proppack.RET_VTC, Vz) Then
+            If T > Common.Max(proppack.RET_VTC, Vz) Then
                 Vy = Vz
                 V = 1
                 L = 0
@@ -193,17 +192,17 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
             Loop Until i = n + 1
 
             i = 0
-            soma_x = 0
-            soma_y = 0
+            sum_x = 0
+            sum_y = 0
             Do
-                soma_x = soma_x + Vx(i)
-                soma_y = soma_y + Vy(i)
+                sum_x = sum_x + Vx(i)
+                sum_y = sum_y + Vy(i)
                 i = i + 1
             Loop Until i = n + 1
             i = 0
             Do
-                Vx(i) = Vx(i) / soma_x
-                Vy(i) = Vy(i) / soma_y
+                Vx(i) = Vx(i) / sum_x
+                Vy(i) = Vy(i) / sum_y
                 i = i + 1
             Loop Until i = n + 1
 
@@ -320,8 +319,8 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
                 ecount += 1
 
-                If Double.IsNaN(V) Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashTPVapFracError"))
-                If ecount > maxit_e Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt2"))
+                If Double.IsNaN(V) Then Throw New Exception(App.GetLocalString("PropPack_FlashTPVapFracError"))
+                If ecount > maxit_e Then Throw New Exception(App.GetLocalString("PropPack_FlashMaxIt2"))
 
                 WriteDebugInfo("PT Flash [IO]: Iteration #" & ecount & ", VF = " & V)
 
@@ -339,7 +338,7 @@ out:        Return New Object() {L, V, Vx, Vy, ecount, 0.0#, Vx, 0.0#, PP.RET_Nu
 
         End Function
 
-        Public Overrides Function Flash_PH(ByVal Vz As Double(), ByVal P As Double, ByVal H As Double, ByVal Tref As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
+        Public Overrides Function Flash_PH(ByVal Vz As Double(), ByVal P As Double, ByVal H As Double, ByVal Tref As Double, ByVal PP As PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
 
             If PP.Parameters.ContainsKey("PP_ENTH_CP_CALC_METHOD") Then
                 If PP.Parameters("PP_ENTH_CP_CALC_METHOD") = 1 Then
@@ -354,10 +353,10 @@ out:        Return New Object() {L, V, Vx, Vy, ecount, 0.0#, Vx, 0.0#, PP.RET_Nu
 
             maxit_i = CInt(PP.Parameters("PP_PHFMII"))
             maxit_e = CInt(PP.Parameters("PP_PHFMEI"))
-            itol = CDbl(PP.Parameters("PP_PHFILT"))
-            etol = CDbl(PP.Parameters("PP_PHFELT"))
+            Me.itol = PP.Parameters("PP_PHFILT")
+            Me.etol = PP.Parameters("PP_PHFELT")
 
-            n = UBound(Vz)
+            Me.n = UBound(Vz)
 
             proppack = PP
             Hf = H * PP.AUX_MMM(Vz)
@@ -463,7 +462,7 @@ out:        Return New Object() {L, V, Vx, Vy, ecount, 0.0#, Vx, 0.0#, PP.RET_Nu
                 End If
             End If
 
-            If T > DTL.MathEx.Common.Max(VTc, Vz) Then
+            If T > Common.Max(VTc, Vz) Then
                 V = 1
                 L = 0
             End If
@@ -481,17 +480,17 @@ out:        Return New Object() {L, V, Vx, Vy, ecount, 0.0#, Vx, 0.0#, PP.RET_Nu
             Loop Until i = n + 1
 
             i = 0
-            soma_x = 0
-            soma_y = 0
+            sum_x = 0
+            sum_y = 0
             Do
-                soma_x = soma_x + Vx(i)
-                soma_y = soma_y + Vy(i)
+                sum_x = sum_x + Vx(i)
+                sum_y = sum_y + Vy(i)
                 i = i + 1
             Loop Until i = n + 1
             i = 0
             Do
-                Vx(i) = Vx(i) / soma_x
-                Vy(i) = Vy(i) / soma_y
+                Vx(i) = Vx(i) / sum_x
+                Vy(i) = Vy(i) / sum_y
                 i = i + 1
             Loop Until i = n + 1
 
@@ -510,15 +509,15 @@ out:        Return New Object() {L, V, Vx, Vy, ecount, 0.0#, Vx, 0.0#, PP.RET_Nu
                 My.MyApplication.IsRunningParallelTasks = True
                 Try
                     Dim task1 As Task = New Task(Sub()
-                                                     DHv1 = PP.DW_CalcEnthalpyDeparture(Vy, T, P, PropertyPackages.State.Vapor) * PP.AUX_MMM(Vy) / 1000
-                                                     DHv2 = PP.DW_CalcEnthalpyDeparture(Vy, Tref, P, PropertyPackages.State.Vapor) * PP.AUX_MMM(Vy) / 1000
+                                                     DHv1 = PP.DW_CalcEnthalpyDeparture(Vy, T, P, State.Vapor) * PP.AUX_MMM(Vy) / 1000
+                                                     DHv2 = PP.DW_CalcEnthalpyDeparture(Vy, Tref, P, State.Vapor) * PP.AUX_MMM(Vy) / 1000
                                                      C = DHv2
                                                      D = (DHv1 - C) / (T - Tref)
                                                  End Sub)
                     Dim task2 As Task = New Task(Sub()
-                                                     If T < DTL.MathEx.Common.Max(VTc, Vz) Then
-                                                         DHl1 = PP.DW_CalcEnthalpyDeparture(Vx, T, P, PropertyPackages.State.Liquid) * PP.AUX_MMM(Vx) / 1000
-                                                         DHl2 = PP.DW_CalcEnthalpyDeparture(Vx, Tref, P, PropertyPackages.State.Liquid) * PP.AUX_MMM(Vx) / 1000
+                                                     If T < Common.Max(VTc, Vz) Then
+                                                         DHl1 = PP.DW_CalcEnthalpyDeparture(Vx, T, P, State.Liquid) * PP.AUX_MMM(Vx) / 1000
+                                                         DHl2 = PP.DW_CalcEnthalpyDeparture(Vx, Tref, P, State.Liquid) * PP.AUX_MMM(Vx) / 1000
                                                          E = DHl2
                                                          F = (DHl1 - E) / (T - Tref)
                                                      Else
@@ -534,11 +533,11 @@ out:        Return New Object() {L, V, Vx, Vy, ecount, 0.0#, Vx, 0.0#, PP.RET_Nu
                 End Try
                 My.MyApplication.IsRunningParallelTasks = False
             Else
-                DHv1 = PP.DW_CalcEnthalpyDeparture(Vy, T, P, PropertyPackages.State.Vapor) * PP.AUX_MMM(Vy) / 1000
-                DHv2 = PP.DW_CalcEnthalpyDeparture(Vy, Tref, P, PropertyPackages.State.Vapor) * PP.AUX_MMM(Vy) / 1000
-                If T < DTL.MathEx.Common.Max(VTc, Vz) Then
-                    DHl1 = PP.DW_CalcEnthalpyDeparture(Vx, T, P, PropertyPackages.State.Liquid) * PP.AUX_MMM(Vx) / 1000
-                    DHl2 = PP.DW_CalcEnthalpyDeparture(Vx, Tref, P, PropertyPackages.State.Liquid) * PP.AUX_MMM(Vx) / 1000
+                DHv1 = PP.DW_CalcEnthalpyDeparture(Vy, T, P, State.Vapor) * PP.AUX_MMM(Vy) / 1000
+                DHv2 = PP.DW_CalcEnthalpyDeparture(Vy, Tref, P, State.Vapor) * PP.AUX_MMM(Vy) / 1000
+                If T < Common.Max(VTc, Vz) Then
+                    DHl1 = PP.DW_CalcEnthalpyDeparture(Vx, T, P, State.Liquid) * PP.AUX_MMM(Vx) / 1000
+                    DHl2 = PP.DW_CalcEnthalpyDeparture(Vx, Tref, P, State.Liquid) * PP.AUX_MMM(Vx) / 1000
                     E = DHl2
                     F = (DHl1 - E) / (T - Tref)
                 Else
@@ -599,15 +598,15 @@ restart:    Do
                     My.MyApplication.IsRunningParallelTasks = True
                     Try
                         Dim task1 As Task = New Task(Sub()
-                                                         DHv1 = PP.DW_CalcEnthalpyDeparture(Vy, T, P, PropertyPackages.State.Vapor) * PP.AUX_MMM(Vy) / 1000
-                                                         DHv2 = PP.DW_CalcEnthalpyDeparture(Vy, T0, P, PropertyPackages.State.Vapor) * PP.AUX_MMM(Vy) / 1000
+                                                         DHv1 = PP.DW_CalcEnthalpyDeparture(Vy, T, P, State.Vapor) * PP.AUX_MMM(Vy) / 1000
+                                                         DHv2 = PP.DW_CalcEnthalpyDeparture(Vy, T0, P, State.Vapor) * PP.AUX_MMM(Vy) / 1000
                                                          Cc = DHv2
                                                          Dc = (DHv1 - Cc) / (T - T0)
                                                      End Sub)
                         Dim task2 As Task = New Task(Sub()
-                                                         If T < DTL.MathEx.Common.Max(VTc, Vz) Then
-                                                             DHl1 = PP.DW_CalcEnthalpyDeparture(Vx, T, P, PropertyPackages.State.Liquid) * PP.AUX_MMM(Vx) / 1000
-                                                             DHl2 = PP.DW_CalcEnthalpyDeparture(Vx, T0, P, PropertyPackages.State.Liquid) * PP.AUX_MMM(Vx) / 1000
+                                                         If T < Common.Max(VTc, Vz) Then
+                                                             DHl1 = PP.DW_CalcEnthalpyDeparture(Vx, T, P, State.Liquid) * PP.AUX_MMM(Vx) / 1000
+                                                             DHl2 = PP.DW_CalcEnthalpyDeparture(Vx, T0, P, State.Liquid) * PP.AUX_MMM(Vx) / 1000
                                                              Ec = DHl2
                                                              Fc = (DHl1 - Ec) / (T - T0)
                                                          Else
@@ -623,13 +622,13 @@ restart:    Do
                     End Try
                     My.MyApplication.IsRunningParallelTasks = False
                 Else
-                    DHv1 = PP.DW_CalcEnthalpyDeparture(Vy, T, P, PropertyPackages.State.Vapor) * PP.AUX_MMM(Vy) / 1000
-                    DHv2 = PP.DW_CalcEnthalpyDeparture(Vy, T0, P, PropertyPackages.State.Vapor) * PP.AUX_MMM(Vy) / 1000
+                    DHv1 = PP.DW_CalcEnthalpyDeparture(Vy, T, P, State.Vapor) * PP.AUX_MMM(Vy) / 1000
+                    DHv2 = PP.DW_CalcEnthalpyDeparture(Vy, T0, P, State.Vapor) * PP.AUX_MMM(Vy) / 1000
                     Cc = DHv2
                     Dc = (DHv1 - Cc) / (T - T0)
-                    If T < DTL.MathEx.Common.Max(VTc, Vz) Then
-                        DHl1 = PP.DW_CalcEnthalpyDeparture(Vx, T, P, PropertyPackages.State.Liquid) * PP.AUX_MMM(Vx) / 1000
-                        DHl2 = PP.DW_CalcEnthalpyDeparture(Vx, T0, P, PropertyPackages.State.Liquid) * PP.AUX_MMM(Vx) / 1000
+                    If T < Common.Max(VTc, Vz) Then
+                        DHl1 = PP.DW_CalcEnthalpyDeparture(Vx, T, P, State.Liquid) * PP.AUX_MMM(Vx) / 1000
+                        DHl2 = PP.DW_CalcEnthalpyDeparture(Vx, T0, P, State.Liquid) * PP.AUX_MMM(Vx) / 1000
                         Ec = DHl2
                         Fc = (DHl1 - Ec) / (T - T0)
                     Else
@@ -705,17 +704,15 @@ restart:    Do
 
                 ecount += 1
 
-                If ecount > maxit_e Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt"))
+                If ecount > maxit_e Then Throw New Exception(App.GetLocalString("PropPack_FlashMaxIt"))
                 If Double.IsNaN(AbsSum(fx)) Then
-                    Throw New Exception(DTL.App.GetLocalString("PropPack_FlashError"))
+                    Throw New Exception(App.GetLocalString("PropPack_FlashError"))
                 End If
 
                 WriteDebugInfo("PH Flash [IO]: Iteration #" & ecount & ", T = " & T)
                 WriteDebugInfo("PH Flash [IO]: Iteration #" & ecount & ", VF = " & V)
                 WriteDebugInfo("PH Flash [IO]: Iteration #" & ecount & ", H error = " & fr)
                 WriteDebugInfo("PH Flash [IO]: Iteration #" & ecount & ", Damping Factor = " & alpha)
-
-
 
             Loop Until SumSqr(fx) < etol
 
@@ -728,7 +725,7 @@ restart:    Do
                     x1 = Tref
                     Do
                         fx2 = EnergyBalanceSPL(x1, Nothing)
-                        If Math.Abs(fx2) < etol Then Exit Do
+                        If Abs(fx2) < etol Then Exit Do
                         dfdx2 = (EnergyBalanceSPL(x1 + 1, Nothing) - fx2)
                         x1 = x1 - fx2 / dfdx2
                         ecount += 1
@@ -743,7 +740,7 @@ restart:    Do
                     x1 = Tref
                     Do
                         fx2 = EnergyBalanceSPV(x1, Nothing)
-                        If Math.Abs(fx2) < etol Then Exit Do
+                        If Abs(fx2) < etol Then Exit Do
                         dfdx2 = (EnergyBalanceSPV(x1 + 1, Nothing) - fx2)
                         x1 = x1 - fx2 / dfdx2
                         ecount += 1
@@ -769,7 +766,7 @@ restart:    Do
 
         End Function
 
-        Public Overrides Function Flash_PS(ByVal Vz As Double(), ByVal P As Double, ByVal S As Double, ByVal Tref As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
+        Public Overrides Function Flash_PS(ByVal Vz As Double(), ByVal P As Double, ByVal S As Double, ByVal Tref As Double, ByVal PP As PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
 
             Dim d1, d2 As Date, dt As TimeSpan
             Dim i, j As Integer
@@ -778,10 +775,10 @@ restart:    Do
 
             maxit_i = CInt(PP.Parameters("PP_PSFMII"))
             maxit_e = CInt(PP.Parameters("PP_PSFMEI"))
-            itol = CDbl(PP.Parameters("PP_PSFILT"))
-            etol = CDbl(PP.Parameters("PP_PSFELT"))
+            Me.itol = PP.Parameters("PP_PSFILT")
+            Me.etol = PP.Parameters("PP_PSFELT")
 
-            n = UBound(Vz)
+            Me.n = UBound(Vz)
 
             proppack = PP
             Sf = S * PP.AUX_MMM(Vz)
@@ -887,7 +884,7 @@ restart:    Do
                 End If
             End If
 
-            If T > DTL.MathEx.Common.Max(proppack.RET_VTC, Vz) Then
+            If T > Common.Max(proppack.RET_VTC, Vz) Then
                 V = 1
                 L = 0
             End If
@@ -905,17 +902,17 @@ restart:    Do
             Loop Until i = n + 1
 
             i = 0
-            soma_x = 0
-            soma_y = 0
+            sum_x = 0
+            sum_y = 0
             Do
-                soma_x = soma_x + Vx(i)
-                soma_y = soma_y + Vy(i)
+                sum_x = sum_x + Vx(i)
+                sum_y = sum_y + Vy(i)
                 i = i + 1
             Loop Until i = n + 1
             i = 0
             Do
-                Vx(i) = Vx(i) / soma_x
-                Vy(i) = Vy(i) / soma_y
+                Vx(i) = Vx(i) / sum_x
+                Vy(i) = Vy(i) / sum_y
                 i = i + 1
             Loop Until i = n + 1
 
@@ -935,15 +932,15 @@ restart:    Do
                 My.MyApplication.IsRunningParallelTasks = True
                 Try
                     Dim task1 As Task = New Task(Sub()
-                                                     DSv1 = PP.DW_CalcEntropyDeparture(Vy, T, P, PropertyPackages.State.Vapor) * PP.AUX_MMM(Vy)
-                                                     DSv2 = PP.DW_CalcEntropyDeparture(Vy, Tref, P, PropertyPackages.State.Vapor) * PP.AUX_MMM(Vy)
+                                                     DSv1 = PP.DW_CalcEntropyDeparture(Vy, T, P, State.Vapor) * PP.AUX_MMM(Vy)
+                                                     DSv2 = PP.DW_CalcEntropyDeparture(Vy, Tref, P, State.Vapor) * PP.AUX_MMM(Vy)
                                                      C = DSv2
                                                      D = (DSv1 - C) / (T - Tref)
                                                  End Sub)
                     Dim task2 As Task = New Task(Sub()
-                                                     If T < DTL.MathEx.Common.Max(VTc, Vz) Then
-                                                         DSl1 = PP.DW_CalcEntropyDeparture(Vx, T, P, PropertyPackages.State.Liquid) * PP.AUX_MMM(Vx)
-                                                         DSl2 = PP.DW_CalcEntropyDeparture(Vx, Tref, P, PropertyPackages.State.Liquid) * PP.AUX_MMM(Vx)
+                                                     If T < Common.Max(VTc, Vz) Then
+                                                         DSl1 = PP.DW_CalcEntropyDeparture(Vx, T, P, State.Liquid) * PP.AUX_MMM(Vx)
+                                                         DSl2 = PP.DW_CalcEntropyDeparture(Vx, Tref, P, State.Liquid) * PP.AUX_MMM(Vx)
                                                          E = DSl2
                                                          F = (DSl1 - E) / (T - Tref)
                                                      Else
@@ -959,13 +956,13 @@ restart:    Do
                 End Try
                 My.MyApplication.IsRunningParallelTasks = False
             Else
-                DSv1 = PP.DW_CalcEntropyDeparture(Vy, T, P, PropertyPackages.State.Vapor) * PP.AUX_MMM(Vy)
-                DSv2 = PP.DW_CalcEntropyDeparture(Vy, Tref, P, PropertyPackages.State.Vapor) * PP.AUX_MMM(Vy)
+                DSv1 = PP.DW_CalcEntropyDeparture(Vy, T, P, State.Vapor) * PP.AUX_MMM(Vy)
+                DSv2 = PP.DW_CalcEntropyDeparture(Vy, Tref, P, State.Vapor) * PP.AUX_MMM(Vy)
                 C = DSv2
                 D = (DSv1 - C) / (T - Tref)
-                If T < DTL.MathEx.Common.Max(VTc, Vz) Then
-                    DSl1 = PP.DW_CalcEntropyDeparture(Vx, T, P, PropertyPackages.State.Liquid) * PP.AUX_MMM(Vx)
-                    DSl2 = PP.DW_CalcEntropyDeparture(Vx, Tref, P, PropertyPackages.State.Liquid) * PP.AUX_MMM(Vx)
+                If T < Common.Max(VTc, Vz) Then
+                    DSl1 = PP.DW_CalcEntropyDeparture(Vx, T, P, State.Liquid) * PP.AUX_MMM(Vx)
+                    DSl2 = PP.DW_CalcEntropyDeparture(Vx, Tref, P, State.Liquid) * PP.AUX_MMM(Vx)
                     E = DSl2
                     F = (DSl1 - E) / (T - Tref)
                 Else
@@ -1017,15 +1014,15 @@ restart:    Do
                     My.MyApplication.IsRunningParallelTasks = True
                     Try
                         Dim task1 As Task = New Task(Sub()
-                                                         DSv1 = PP.DW_CalcEntropyDeparture(Vy, T, P, PropertyPackages.State.Vapor) * PP.AUX_MMM(Vy)
-                                                         DSv2 = PP.DW_CalcEntropyDeparture(Vy, T0, P, PropertyPackages.State.Vapor) * PP.AUX_MMM(Vy)
+                                                         DSv1 = PP.DW_CalcEntropyDeparture(Vy, T, P, State.Vapor) * PP.AUX_MMM(Vy)
+                                                         DSv2 = PP.DW_CalcEntropyDeparture(Vy, T0, P, State.Vapor) * PP.AUX_MMM(Vy)
                                                          Cc = DSv2
                                                          Dc = (DSv1 - Cc) / (T - T0)
                                                      End Sub)
                         Dim task2 As Task = New Task(Sub()
-                                                         If T < DTL.MathEx.Common.Max(VTc, Vz) Then
-                                                             DSl1 = PP.DW_CalcEntropyDeparture(Vx, T, P, PropertyPackages.State.Liquid) * PP.AUX_MMM(Vx)
-                                                             DSl2 = PP.DW_CalcEntropyDeparture(Vx, T0, P, PropertyPackages.State.Liquid) * PP.AUX_MMM(Vx)
+                                                         If T < Common.Max(VTc, Vz) Then
+                                                             DSl1 = PP.DW_CalcEntropyDeparture(Vx, T, P, State.Liquid) * PP.AUX_MMM(Vx)
+                                                             DSl2 = PP.DW_CalcEntropyDeparture(Vx, T0, P, State.Liquid) * PP.AUX_MMM(Vx)
                                                              Ec = DSl2
                                                              Fc = (DSl1 - Ec) / (T - T0)
                                                          Else
@@ -1041,13 +1038,13 @@ restart:    Do
                     End Try
                     My.MyApplication.IsRunningParallelTasks = False
                 Else
-                    DSv1 = PP.DW_CalcEntropyDeparture(Vy, T, P, PropertyPackages.State.Vapor) * PP.AUX_MMM(Vy)
-                    DSv2 = PP.DW_CalcEntropyDeparture(Vy, T0, P, PropertyPackages.State.Vapor) * PP.AUX_MMM(Vy)
+                    DSv1 = PP.DW_CalcEntropyDeparture(Vy, T, P, State.Vapor) * PP.AUX_MMM(Vy)
+                    DSv2 = PP.DW_CalcEntropyDeparture(Vy, T0, P, State.Vapor) * PP.AUX_MMM(Vy)
                     Cc = DSv2
                     Dc = (DSv1 - Cc) / (T - T0)
-                    If T < DTL.MathEx.Common.Max(VTc, Vz) Then
-                        DSl1 = PP.DW_CalcEntropyDeparture(Vx, T, P, PropertyPackages.State.Liquid) * PP.AUX_MMM(Vx)
-                        DSl2 = PP.DW_CalcEntropyDeparture(Vx, T0, P, PropertyPackages.State.Liquid) * PP.AUX_MMM(Vx)
+                    If T < Common.Max(VTc, Vz) Then
+                        DSl1 = PP.DW_CalcEntropyDeparture(Vx, T, P, State.Liquid) * PP.AUX_MMM(Vx)
+                        DSl2 = PP.DW_CalcEntropyDeparture(Vx, T0, P, State.Liquid) * PP.AUX_MMM(Vx)
                         Ec = DSl2
                         Fc = (DSl1 - Ec) / (T - T0)
                     Else
@@ -1122,15 +1119,13 @@ restart:    Do
 
                 ecount += 1
 
-                If ecount > maxit_e Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt"))
-                If Double.IsNaN(AbsSum(fx)) Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashError"))
+                If ecount > maxit_e Then Throw New Exception(App.GetLocalString("PropPack_FlashMaxIt"))
+                If Double.IsNaN(AbsSum(fx)) Then Throw New Exception(App.GetLocalString("PropPack_FlashError"))
 
                 WriteDebugInfo("PS Flash [IO]: Iteration #" & ecount & ", T = " & T)
                 WriteDebugInfo("PS Flash [IO]: Iteration #" & ecount & ", VF = " & V)
                 WriteDebugInfo("PS Flash [IO]: Iteration #" & ecount & ", H error = " & fr)
                 WriteDebugInfo("PS Flash [IO]: Iteration #" & ecount & ", Damping Factor = " & alpha)
-
-
 
             Loop Until AbsSum(fx) < etol
 
@@ -1143,7 +1138,7 @@ restart:    Do
                     x1 = Tref
                     Do
                         fx2 = EntropyBalanceSPL(x1, Nothing)
-                        If Math.Abs(fx2) < etol Then Exit Do
+                        If Abs(fx2) < etol Then Exit Do
                         dfdx2 = (EntropyBalanceSPL(x1 + 1, Nothing) - fx2)
                         x1 = x1 - fx2 / dfdx2
                         ecount += 1
@@ -1158,7 +1153,7 @@ restart:    Do
                     x1 = Tref
                     Do
                         fx2 = EntropyBalanceSPV(x1, Nothing)
-                        If Math.Abs(fx2) < etol Then Exit Do
+                        If Abs(fx2) < etol Then Exit Do
                         dfdx2 = (EntropyBalanceSPV(x1 + 1, Nothing) - fx2)
                         x1 = x1 - fx2 / dfdx2
                         ecount += 1
@@ -1183,18 +1178,17 @@ restart:    Do
             Return New Object() {L, V, Vx, Vy, T, ecount, Ki, 0.0#, PP.RET_NullVector, 0.0#, PP.RET_NullVector}
 
         End Function
-
-        Public Overrides Function Flash_PV(ByVal Vz As Double(), ByVal P As Double, ByVal V As Double, ByVal Tref As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
+        Public Overrides Function Flash_PV(ByVal Vz As Double(), ByVal P As Double, ByVal V As Double, ByVal Tref As Double, ByVal PP As PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
 
             Dim d1, d2 As Date, dt As TimeSpan
             Dim i, j As Integer
 
             d1 = Date.Now
 
-            etol = CDbl(PP.Parameters("PP_PTFELT"))
-            maxit_e = CInt(PP.Parameters("PP_PTFMEI"))
-            itol = CDbl(PP.Parameters("PP_PTFILT"))
-            maxit_i = CInt(PP.Parameters("PP_PTFMII"))
+            Me.etol = PP.Parameters("PP_PTFELT")
+            Me.maxit_e = CInt(PP.Parameters("PP_PTFMEI"))
+            Me.itol = PP.Parameters("PP_PTFILT")
+            Me.maxit_i = CInt(PP.Parameters("PP_PTFMII"))
 
             n = UBound(Vz)
 
@@ -1295,17 +1289,17 @@ restart:    Do
             Loop Until i = n + 1
 
             i = 0
-            soma_x = 0
-            soma_y = 0
+            sum_x = 0
+            sum_y = 0
             Do
-                soma_x = soma_x + Vx(i)
-                soma_y = soma_y + Vy(i)
+                sum_x = sum_x + Vx(i)
+                sum_y = sum_y + Vy(i)
                 i = i + 1
             Loop Until i = n + 1
             i = 0
             Do
-                Vx(i) = Vx(i) / soma_x
-                Vy(i) = Vy(i) / soma_y
+                Vx(i) = Vx(i) / sum_x
+                Vy(i) = Vy(i) / sum_y
                 i = i + 1
             Loop Until i = n + 1
 
@@ -1417,7 +1411,6 @@ restart:    Do
                     Broyden.broydn(n + 2, x, fx, dx, xbr, fbr, dfdx, 1)
                 End If
 
-
                 Dim bo2 As New BrentOpt.BrentMinimize
                 bo2.DefineFuncDelegate(AddressOf MinimizeError)
                 Dim alpha As Double = 1.0#, err As Double
@@ -1442,25 +1435,17 @@ restart:    Do
                 A += alpha * dx(n + 1)
                 B += alpha * dx(n + 2)
 
-                'For i = 0 To n
-                '    ui(i) = uic(i)
-                'Next
-                'A = Ac
-                'B = Bc
-
                 ecount += 1
 
                 If ecount > maxit_e Then
-                    Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt"))
+                    Throw New Exception(App.GetLocalString("PropPack_FlashMaxIt"))
                 End If
                 If Double.IsNaN(AbsSum(fx)) Then
-                    Throw New Exception(DTL.App.GetLocalString("PropPack_FlashError"))
+                    Throw New Exception(App.GetLocalString("PropPack_FlashError"))
                 End If
 
                 WriteDebugInfo("PV Flash [IO]: Iteration #" & ecount & ", T = " & T & ", VF = " & V)
                 WriteDebugInfo("PV Flash [IO]: Iteration #" & ecount & ", Damping Factor = " & alpha)
-
-
 
             Loop Until AbsSum(fx) < etol * (n + 2)
 
@@ -1475,16 +1460,15 @@ final:      d2 = Date.Now
             Return New Object() {L, V, Vx, Vy, T, ecount, Ki, 0.0#, PP.RET_NullVector, 0.0#, PP.RET_NullVector}
 
         End Function
-
-        Public Overrides Function Flash_TV(ByVal Vz As Double(), ByVal T As Double, ByVal V As Double, ByVal Pref As Double, ByVal PP As PropertyPackages.PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
+        Public Overrides Function Flash_TV(ByVal Vz As Double(), ByVal T As Double, ByVal V As Double, ByVal Pref As Double, ByVal PP As PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi As Double() = Nothing) As Object
 
             Dim d1, d2 As Date, dt As TimeSpan
             Dim i, j As Integer
 
             d1 = Date.Now
 
-            etol = CDbl(PP.Parameters("PP_PTFELT"))
-            maxit_e = CInt(PP.Parameters("PP_PTFMEI"))
+            Me.etol = PP.Parameters("PP_PTFELT")
+            Me.maxit_e = CInt(PP.Parameters("PP_PTFMEI"))
 
             n = UBound(Vz)
 
@@ -1579,17 +1563,17 @@ final:      d2 = Date.Now
             Loop Until i = n + 1
 
             i = 0
-            soma_x = 0
-            soma_y = 0
+            sum_x = 0
+            sum_y = 0
             Do
-                soma_x = soma_x + Vx(i)
-                soma_y = soma_y + Vy(i)
+                sum_x = sum_x + Vx(i)
+                sum_y = sum_y + Vy(i)
                 i = i + 1
             Loop Until i = n + 1
             i = 0
             Do
-                Vx(i) = Vx(i) / soma_x
-                Vy(i) = Vy(i) / soma_y
+                Vx(i) = Vx(i) / sum_x
+                Vy(i) = Vy(i) / sum_y
                 i = i + 1
             Loop Until i = n + 1
 
@@ -1651,13 +1635,6 @@ final:      d2 = Date.Now
                     Kb = sumpi / sumeuipi
 
                     P = Exp((A - Log(Kb) - B * Log(P0)) / (1 - B))
-
-                    'If Double.IsNaN(P) Then P = Pref * 1.01
-                    'If P < Pmin * 0.8 Then
-                    '    P = Pmin * 0.8 + 101325
-                    'ElseIf P > Pmax * 1.2 Then
-                    '    P = Pmax * 1.2 - 101325
-                    'End If
 
                     For i = 0 To n
                         Vx(i) = pi(i) / sumpi
@@ -1732,8 +1709,8 @@ final:      d2 = Date.Now
 
                 ecount += 1
 
-                If ecount > maxit_e Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt"))
-                If Double.IsNaN(AbsSum(fx)) Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashError"))
+                If ecount > maxit_e Then Throw New Exception(App.GetLocalString("PropPack_FlashMaxIt"))
+                If Double.IsNaN(AbsSum(fx)) Then Throw New Exception(App.GetLocalString("PropPack_FlashError"))
 
                 WriteDebugInfo("TV Flash [IO]: Iteration #" & ecount & ", P = " & P & ", VF = " & V)
                 WriteDebugInfo("TV Flash [IO]: Iteration #" & ecount & ", Damping Factor = " & alpha)
@@ -1753,7 +1730,6 @@ final:      d2 = Date.Now
             Return New Object() {L, V, Vx, Vy, P, ecount, Ki, 0.0#, PP.RET_NullVector, 0.0#, PP.RET_NullVector}
 
         End Function
-
         Private Function LiquidFractionBalance(ByVal R As Double) As Double
 
             Dim i As Integer
@@ -1776,9 +1752,6 @@ final:      d2 = Date.Now
             T = 1 / T0 + (Log(Kb) - A) / B
             T = 1 / T
 
-            'If T < Tmin Then T = Tmin
-            'If T > Tmax Then T = Tmax
-
             For i = 0 To n
                 Vx(i) = pi(i) / sumpi
                 Vy(i) = Exp(ui(i)) * pi(i) / sumeuipi
@@ -1788,8 +1761,6 @@ final:      d2 = Date.Now
             V = 1 - L
 
             Dim eberror As Double = L - Lf
-
-
 
             Return eberror
 
@@ -1825,8 +1796,6 @@ final:      d2 = Date.Now
 
             Dim eberror As Double = L - Lf
 
-
-
             Return eberror
 
         End Function
@@ -1852,9 +1821,6 @@ final:      d2 = Date.Now
             T = 1 / T_ + (Log(Kb) - A) / B
             T = 1 / T
 
-            'If T < Tmin Then T = Tmin
-            'If T > Tmax Then T = Tmax
-
             For i = 0 To n
                 Vx(i) = pi(i) / sumpi
                 Vy(i) = Exp(ui(i)) * pi(i) / sumeuipi
@@ -1872,8 +1838,6 @@ final:      d2 = Date.Now
             Hlid = proppack.RET_Hid(298.15, T, Vx) * proppack.AUX_MMM(Vx) / 1000
 
             Dim eberror As Double = Hf / 1000 - L * (DHl + Hlid) - V * (DHv + Hvid)
-
-
 
             Return eberror
 
@@ -1900,9 +1864,6 @@ final:      d2 = Date.Now
             T = 1 / T_ + (Log(Kb) - A) / B
             T = 1 / T
 
-            'If T < Tmin Then T = Tmin
-            'If T > Tmax Then T = Tmax
-
             For i = 0 To n
                 Vx(i) = pi(i) / sumpi
                 Vy(i) = Exp(ui(i)) * pi(i) / sumeuipi
@@ -1921,19 +1882,15 @@ final:      d2 = Date.Now
 
             Dim eberror As Double = Hf / 1000 - L * (DHl + Hlid) - V * (DHv + Hvid)
 
-
-
             Return Abs(eberror)
 
         End Function
 
         Private Function EnergyBalanceSPL(ByVal T As Double, ByVal otherargs As Object) As Double
 
-
-
             Dim HL, balerror As Double
 
-            HL = proppack.DW_CalcEnthalpy(fi, T, Pf, PropertyPackages.State.Liquid) * proppack.AUX_MMM(fi)
+            HL = proppack.DW_CalcEnthalpy(fi, T, Pf, State.Liquid) * proppack.AUX_MMM(fi)
 
             balerror = Hf - HL
 
@@ -1943,16 +1900,13 @@ final:      d2 = Date.Now
 
             Return balerror
 
-
         End Function
 
         Private Function EnergyBalanceSPV(ByVal T As Double, ByVal otherargs As Object) As Double
 
-
-
             Dim HV, balerror As Double
 
-            HV = proppack.DW_CalcEnthalpy(fi, T, Pf, PropertyPackages.State.Vapor) * proppack.AUX_MMM(fi)
+            HV = proppack.DW_CalcEnthalpy(fi, T, Pf, State.Vapor) * proppack.AUX_MMM(fi)
 
             balerror = Hf - HV
 
@@ -1961,7 +1915,6 @@ final:      d2 = Date.Now
             WriteDebugInfo("PH Flash [IO]: Iteration #" & ecount & ", H error = " & balerror)
 
             Return balerror
-
 
         End Function
 
@@ -1985,9 +1938,6 @@ final:      d2 = Date.Now
 
             T = 1 / T_ + (Log(Kb) - A) / B
             T = 1 / T
-
-            'If T < Tmin Then T = Tmin
-            'If T > Tmax Then T = Tmax
 
             For i = 0 To n
                 Vx(i) = pi(i) / sumpi
@@ -2031,9 +1981,6 @@ final:      d2 = Date.Now
             T = 1 / T_ + (Log(Kb) - A) / B
             T = 1 / T
 
-            'If T < Tmin Then T = Tmin
-            'If T > Tmax Then T = Tmax
-
             For i = 0 To n
                 Vx(i) = pi(i) / sumpi
                 Vy(i) = Exp(ui(i)) * pi(i) / sumeuipi
@@ -2050,18 +1997,15 @@ final:      d2 = Date.Now
 
             Dim eberror As Double = Sf - L * (DSl + Slid) - V * (DSv + Svid)
 
-
             Return Abs(eberror)
 
         End Function
 
         Private Function EntropyBalanceSPL(ByVal T As Double, ByVal otherargs As Object) As Double
 
-
-
             Dim SL, balerror As Double
 
-            SL = proppack.DW_CalcEntropy(fi, T, Pf, PropertyPackages.State.Liquid) * proppack.AUX_MMM(fi)
+            SL = proppack.DW_CalcEntropy(fi, T, Pf, State.Liquid) * proppack.AUX_MMM(fi)
 
             balerror = Sf - SL
 
@@ -2076,11 +2020,9 @@ final:      d2 = Date.Now
 
         Private Function EntropyBalanceSPV(ByVal T As Double, ByVal otherargs As Object) As Double
 
-
-
             Dim SV, balerror As Double
 
-            SV = proppack.DW_CalcEntropy(fi, T, Pf, PropertyPackages.State.Vapor) * proppack.AUX_MMM(fi)
+            SV = proppack.DW_CalcEntropy(fi, T, Pf, State.Vapor) * proppack.AUX_MMM(fi)
 
             balerror = Sf - SV
 
@@ -2174,8 +2116,6 @@ final:      d2 = Date.Now
             V = 1 - L
 
             Dim eberror As Double = sumpi / sumeuipi - 1
-
-
 
             Return eberror ^ 2
 

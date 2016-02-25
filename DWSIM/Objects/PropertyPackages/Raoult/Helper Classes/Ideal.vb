@@ -16,16 +16,12 @@
 '    You should have received a copy of the GNU General Public License
 '    along with DWSIM.  If not, see <http://www.gnu.org/licenses/>.
 
-Imports System.Collections.Generic
-Imports FileHelpers
-Imports System.Math
-Imports DTL.DTL.ClassesBasicasTermodinamica
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
-    <System.Serializable()> Public Class Ideal
+    <Serializable()> Public Class Ideal
 
-        Function H_RA_MIX(ByVal TIPO As String, ByVal T As Double, ByVal P As Double, ByVal Vz As Object, ByVal VKij As Object, ByVal VTc As Object, ByVal VPc As Object, ByVal Vw As Object, ByVal VMM As Object, ByVal Hid As Double, ByVal HVap As Array) As Double
+        Function H_RA_MIX(ByVal TYPE As String, ByVal T As Double, ByVal P As Double, ByVal Vz As Object, ByVal VKij As Object, ByVal VTc As Object, ByVal VPc As Object, ByVal Vw As Object, ByVal VMM As Object, ByVal Hid As Double, ByVal HVap As Array) As Double
 
             Dim i, n As Integer
 
@@ -42,7 +38,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                 i += 1
             Loop Until i = n + 1
 
-            If TIPO = "L" Then
+            If TYPE = "L" Then
                 Dim val As Double
                 For i = 0 To n
                     If T / VTc(i) <= 1 Then val += Vz(i) * HVap(i) * VMM(i)
@@ -56,17 +52,17 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         End Function
 
-        Function S_RA_MIX(ByVal TIPO As String, ByVal T As Double, ByVal P As Double, ByVal Vz As Array, ByVal VKij As Object, ByVal VTc As Array, ByVal VPc As Array, ByVal Vw As Array, ByVal VMM As Array, ByVal Sid As Double, ByVal HVap As Array, ByVal Hid As Double) As Double
+        Function S_RA_MIX(ByVal TYPE As String, ByVal T As Double, ByVal P As Double, ByVal Vz As Array, ByVal VKij As Object, ByVal VTc As Array, ByVal VPc As Array, ByVal Vw As Array, ByVal VMM As Array, ByVal Sid As Double, ByVal HVap As Array, ByVal Hid As Double) As Double
 
-            If TIPO = "L" Then
-                Return Sid + Me.H_RA_MIX(TIPO, T, P, Vz, VKij, VTc, VPc, Vw, VMM, Hid, HVap) / T
+            If TYPE = "L" Then
+                Return Sid + Me.H_RA_MIX(TYPE, T, P, Vz, VKij, VTc, VPc, Vw, VMM, Hid, HVap) / T
             Else
-                Return Sid + Me.H_RA_MIX(TIPO, T, P, Vz, VKij, VTc, VPc, Vw, VMM, Hid, HVap) / T
+                Return Sid + Me.H_RA_MIX(TYPE, T, P, Vz, VKij, VTc, VPc, Vw, VMM, Hid, HVap) / T
             End If
 
         End Function
 
-        Function CpCv(ByVal TIPO, ByVal T, ByVal P, ByVal Vz, ByVal VKij, ByVal Vzmass, ByVal VTc, ByVal VPc, ByVal VCpig, ByVal VMM, ByVal Vw, ByVal VZRa)
+        Function CpCv(ByVal TYPE, ByVal T, ByVal P, ByVal Vz, ByVal VKij, ByVal Vzmass, ByVal VTc, ByVal VPc, ByVal VCpig, ByVal VMM, ByVal Vw, ByVal VZRa)
 
             Dim n As Double
             Dim i As Integer
@@ -100,7 +96,6 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             CpCv = tmp
 
         End Function
-
 
     End Class
 

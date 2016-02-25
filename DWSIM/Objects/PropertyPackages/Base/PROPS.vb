@@ -18,7 +18,7 @@
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
-    <System.Serializable()> Class PROPS
+    <Serializable()> Class PROPS
 
         Sub New()
 
@@ -68,7 +68,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         Function sigma_bb(ByVal T As Double, ByVal Tb As Double, ByVal Tc As Double, ByVal Pc As Double) As Double
 
-            'Estimativa da tensão interfacial pelo método de Brock e Bird
+            'Estimation of interfacial tension by Brock and Bird method
 
             Dim Tr, Tbr, Q, tmp, Pc_ As Double
 
@@ -90,7 +90,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         Function viscl_letsti(ByVal T As Double, ByVal Tc As Double, ByVal Pc As Double, ByVal w As Double, ByVal MM As Double) As Double
 
-            'Estimativa da viscosidade de líquidos pelo método de Letsou e Stiel
+            'Estimation of viscosity liquids with Letsou and Stiel method
 
             Dim Tr = T / Tc
 
@@ -108,7 +108,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         Function viscg_lucas(ByVal T As Double, ByVal Tc As Double, ByVal Pc As Double, ByVal w As Double, ByVal MM As Double) As Double
 
-            'Estimativa da viscosidade de gases pelo método de Lucas
+            'Estimation of gas viscosity by Luke method
 
             Dim Tr = T / Tc
 
@@ -124,7 +124,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         Function liq_dens_rackett(ByVal T As Double, ByVal Tc As Double, ByVal Pc As Double, ByVal w As Double, ByVal MM As Double, Optional ByVal ZRa As Double = 0, Optional ByVal P As Double = 0, Optional ByVal Pvp As Double = 0) As Double
 
-            'Cálculo da densidade do líquido utilizando o método de Rackett
+            'Liquid density calculation using the method of Rackett
 
             If Double.IsNaN(Pvp) Then Pvp = 0.0#
 
@@ -143,7 +143,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
             If Pvp <> 0.0# And T < Tc Then
 
-                'Modified HBT method - Thomson (para líquidos comprimidos)
+                'Modified HBT method - Thomson (for compressible liquids)
                 Dim a, b, c, d, e, f, g, h, j, k As Double
 
                 a = -9.070217
@@ -176,27 +176,27 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         Function JT_Goldzberg(ByVal T As Double, ByVal Tpc As Double, ByVal Ppc As Double, ByVal Cp As Double, ByVal fluido As Double, ByVal SG As Double)
 
-            'T em °F
+            'T °F
             T = 5 / 9 * (T + 459.7)
-            'Tpc em °F
+            'Tpc °F
             Tpc = 5 / 9 * (Tpc + 459.7)
-            'Ppc em lbf/in.2
+            'Ppc lbf/in.2
             Ppc = Ppc / 6894.76
-            'Cp em J/kg°F
+            'Cp J/kg°F
             Cp = Cp * 1.8 / 1000
-            'tipo como "V" ou "L"
-            'SG = densidade absoluta ou densidade do líquido em lbm/ft3
+            'type as "V" "L"
+            'SG = absolute density or liquid density lbm / ft3
 
-            'JT em °F in.2/lbf
+            'JT °F in.2/lbf
 
-            'para gases
+            'for gases
 
             Dim Tpr = T / Tpc
             Dim eta As Double
 
             If fluido = "V" Then eta = 0.0048823 * Tpc * (18 / Tpr ^ 2 - 1) / (Ppc * Cp * SG)
 
-            'para líquidos
+            'for liquids
 
             If fluido = "L" Then eta = -1 / (SG / 16.0185 * Cp)
 
@@ -204,45 +204,45 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         End Function
 
-        Function condl_latini(ByVal T As Double, ByVal Tb As Double, ByVal Tc As Double, ByVal M As Double, ByVal Tipo As String) As Double
+        Function condl_latini(ByVal T As Double, ByVal Tb As Double, ByVal Tc As Double, ByVal M As Double, ByVal TYPE As String) As Double
 
             Dim Tr, A, A_, alpha, beta, lambda, gamma As Double
 
             Tr = T / Tc
 
-            'Hidrocarbonetos saturados (Tipo = "H")
+            'Saturated Hydrocarbons (Type = "H")
 
             A_ = 0.0035
             alpha = 1.2
             beta = 0.5
             gamma = 0.167
 
-            If Tipo = "O" Then
-                'Oleofinas
+            If TYPE = "O" Then
+                'Olefines
 
                 A_ = 0.0361
                 alpha = 1.2
                 beta = 1
                 gamma = 0.167
 
-            ElseIf Tipo = "C" Then
-                'Cicloparafinas
+            ElseIf TYPE = "C" Then
+                'Ciclo-paraffines
 
                 A_ = 0.031
                 alpha = 1.2
                 beta = 1.0
                 gamma = 0.167
 
-            ElseIf Tipo = "A" Then
-                'Aromáticos
+            ElseIf TYPE = "A" Then
+                'Aromatics
 
                 A_ = 0.0346
                 alpha = 1.2
                 beta = 1.0
                 gamma = 0.167
 
-            ElseIf Tipo = "X" Then
-                'Outros (ex. água)
+            ElseIf TYPE = "X" Then
+                'Others (ex. water)
 
                 A_ = 0.494
                 alpha = 0
@@ -445,8 +445,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         Function viscg_jossi_stiel_thodos(ByVal eta0 As Double, ByVal T As Double, ByVal V As Double, ByVal Tc As Double, ByVal Pc As Double, ByVal Vc As Double, ByVal MM As Double) As Double
 
-            'Estimativa da viscosidade de gases em pressões elevadas pelo 
-            'método de Jossi-Stiel-Thodos
+            'Gas viscosity at high pressures estimated by the method of Jossi-Stiel-Thodos
 
             Dim Tr = T / Tc
 
@@ -486,18 +485,18 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
             Dim n = UBound(Vz)
 
-            Dim phi(n) As Double, somaz, i, j
+            Dim phi(n) As Double, sumz, i, j
 
-            somaz = 0.0#
+            sumz = 0.0#
             i = 0
             Do
-                If Vz(i) <> 0.0# And Not Double.IsNaN(VVl(i)) Then somaz = somaz + Vz(i) * VVl(i)
+                If Vz(i) <> 0.0# And Not Double.IsNaN(VVl(i)) Then sumz = sumz + Vz(i) * VVl(i)
                 i = i + 1
             Loop Until i = n + 1
 
             i = 0
             Do
-                If Vz(i) <> 0.0# And Not Double.IsNaN(VVl(i)) Then phi(i) = Vz(i) * VVl(i) / somaz
+                If Vz(i) <> 0.0# And Not Double.IsNaN(VVl(i)) Then phi(i) = Vz(i) * VVl(i) / sumz
                 i = i + 1
             Loop Until i = n + 1
 
@@ -563,7 +562,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         End Function
 
-        Function CpCvR(ByVal TIPO, ByVal T, ByVal P, ByVal Vz, ByVal VKij, ByVal Vzmass, ByVal VTc, ByVal VPc, ByVal VCpig, ByVal VMM, ByVal Vw, ByVal VZRa)
+        Function CpCvR(ByVal TYPE, ByVal T, ByVal P, ByVal Vz, ByVal VKij, ByVal Vzmass, ByVal VTc, ByVal VPc, ByVal VCpig, ByVal VMM, ByVal Vw, ByVal VZRa)
 
             Dim ai(), bi(), ci() As Double
             Dim n, R As Double
@@ -673,7 +672,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                     temp1(1, 1) = tv2
                 End If
 
-                If TIPO = "L" Then
+                If TYPE = "L" Then
                     Z = temp1(0, 0)
                     If temp1(0, 1) <> 0 Then
                         Z = temp1(1, 0)
@@ -682,7 +681,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                         End If
                     End If
                     If Z < 0 Then Z = temp1(1, 0)
-                ElseIf TIPO = "V" Then
+                ElseIf TYPE = "V" Then
                     Z = temp1(2, 0)
                     If temp1(2, 1) <> 0 Then
                         Z = temp1(1, 0)
@@ -695,7 +694,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Else
 
                 Dim findZV, dfdz, zant As Double
-                If TIPO = "V" Then Z = 1 Else Z = 0.05
+                If TYPE = "V" Then Z = 1 Else Z = 0.05
                 Do
                     findZV = coeff(3) * Z ^ 3 + coeff(2) * Z ^ 2 + coeff(1) * Z + coeff(0)
                     dfdz = 3 * coeff(3) * Z ^ 2 + 2 * coeff(2) * Z + coeff(1)
@@ -764,7 +763,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         End Function
 
-        Function JT_PR(ByVal TIPO, ByVal T, ByVal P, ByVal Vz, ByVal Vzmass, ByVal VTc, ByVal VPc, ByVal VCpig, ByVal VMM, ByVal Vw, ByVal VZRa)
+        Function JT_PR(ByVal TYPE, ByVal T, ByVal P, ByVal Vz, ByVal Vzmass, ByVal VTc, ByVal VPc, ByVal VCpig, ByVal VMM, ByVal Vw, ByVal VZRa)
 
             Dim n, R, Cpm_ig As Double
             Dim vetor(8) As Double
@@ -818,11 +817,11 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Dim Pcm = Zcm * R * Tcm / (Vcm)
 
             Dim V = 0.0#
-            If TIPO = "L" Then
+            If TYPE = "L" Then
 
                 'V = (Z_PR(T, P, Vz, VTc, VPc, Vw, "L") * R * T / P) * 1000 ' m3/kgmol
 
-            ElseIf TIPO = "V" Then
+            ElseIf TYPE = "V" Then
 
                 'V = (Z_PR(T, P, Vz, VTc, VPc, Vw, "V") * R * T / P) * 1000 ' m3/kgmol
 

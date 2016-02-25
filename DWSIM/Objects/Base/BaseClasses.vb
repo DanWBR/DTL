@@ -20,12 +20,9 @@
 Imports System.Runtime.Serialization.Formatters.Binary
 Imports System.Runtime.Serialization
 Imports System.IO
-Imports CAPEOPEN110
-Imports System.Runtime.Serialization.Formatters
-Imports System.Runtime.InteropServices.Marshal
 Imports System.Runtime.InteropServices
 
-<System.Serializable()> <ComVisible(True)> Friend MustInherit Class SimulationObjects_BaseClass
+<Serializable()> <ComVisible(True)> Friend MustInherit Class SimulationObjects_BaseClass
 
     Implements ICloneable, IDisposable
 
@@ -45,15 +42,15 @@ Imports System.Runtime.InteropServices
 
     Public MustOverride Function GetProperties(ByVal proptype As PropertyType) As String()
 
-    Public MustOverride Function GetPropertyValue(ByVal prop As String, Optional ByVal su As DTL.SistemasDeUnidades.Unidades = Nothing)
-    Public MustOverride Function GetPropertyUnit(ByVal prop As String, Optional ByVal su As DTL.SistemasDeUnidades.Unidades = Nothing)
-    Public MustOverride Function SetPropertyValue(ByVal prop As String, ByVal propval As Object, Optional ByVal su As DTL.SistemasDeUnidades.Unidades = Nothing)
+    Public MustOverride Function GetPropertyValue(ByVal prop As String, Optional ByVal su As DTL.UnitsOfMeasure.Units = Nothing)
+    Public MustOverride Function GetPropertyUnit(ByVal prop As String, Optional ByVal su As DTL.UnitsOfMeasure.Units = Nothing)
+    Public MustOverride Function SetPropertyValue(ByVal prop As String, ByVal propval As Object, Optional ByVal su As DTL.UnitsOfMeasure.Units = Nothing)
 
     Public Function FT(ByRef prop As String, ByVal unit As String)
         Return prop & " (" & unit & ")"
     End Function
 
-    Public Property Descricao() As String
+    Public Property CompDescription() As String
         Get
             Return m_ComponentDescription
         End Get
@@ -62,7 +59,7 @@ Imports System.Runtime.InteropServices
         End Set
     End Property
 
-    Public Property Nome() As String
+    Public Property CompName() As String
         Get
             Return m_ComponentName
         End Get
@@ -75,7 +72,7 @@ Imports System.Runtime.InteropServices
 
     End Sub
 
-    Public Function Clone() As Object Implements System.ICloneable.Clone
+    Public Function Clone() As Object Implements ICloneable.Clone
 
         Return ObjectCopy(Me)
 
@@ -112,12 +109,14 @@ Imports System.Runtime.InteropServices
     End Sub
 
 #Region "   IDisposable Support "
+
     ' This code added by Visual Basic to correctly implement the disposable pattern.
     Public Sub Dispose() Implements IDisposable.Dispose
         ' Do not change this code.  Put cleanup code in Dispose(ByVal disposing As Boolean) above.
         Dispose(True)
         GC.SuppressFinalize(Me)
     End Sub
+
 #End Region
 
 End Class

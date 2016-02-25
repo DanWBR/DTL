@@ -17,14 +17,13 @@
 '    along with DWSIM.  If not, see <http://www.gnu.org/licenses/>.
 
 Imports System.Math
-Imports DTL.DTL.SimulationObjects
 Imports DTL.DTL.MathEx
 Imports DTL.DTL.MathEx.Common
 Imports System.Linq
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
-    <System.Serializable()> Public Class BostonFournierInsideOut3P
+    <Serializable()> Public Class BostonFournierInsideOut3P
 
         Inherits FlashAlgorithm
 
@@ -39,8 +38,8 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
         Dim Kb, Kb0, Kb_ As Double
         Dim DHv, DHl, DHv1, DHv2, DHl1, DHl2, Hv0, Hvid, Hlid, Hf, DHlsp, DHvsp As Double
         Dim DSv, DSl, DSv1, DSv2, DSl1, DSl2, Sv0, Svid, Slid, Sf, DSlsp, DSvsp As Double
-        Dim Pb, Pd, Pmin, Pmax, Px, soma_x1, soma_x2, soma_y, Tmin, Tmax As Double
-        Dim proppack As PropertyPackages.PropertyPackage
+        Dim Pb, Pd, Pmin, Pmax, Px, sum_x1, sum_x2, sum_y, Tmin, Tmax As Double
+        Dim proppack As PropertyPackage
         Dim tmpdx, refx, currx As Object
 
         Public Overrides Function Flash_PT(ByVal Vz() As Double, ByVal P As Double, ByVal T As Double, ByVal PP As PropertyPackage, Optional ByVal ReuseKI As Boolean = False, Optional ByVal PrevKi() As Double = Nothing) As Object
@@ -78,8 +77,8 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                         idx(i) = i
                     Else
                         j = 0
-                        For Each subst As DTL.ClassesBasicasTermodinamica.Substancia In PP.CurrentMaterialStream.Fases(0).Componentes.Values
-                            If subst.Nome = Me.StabSearchCompIDs(i) Then
+                        For Each subst As BaseThermoClasses.Substance In PP.CurrentMaterialStream.Phases(0).Components.Values
+                            If subst.Name = Me.StabSearchCompIDs(i) Then
                                 idx(i) = j
                                 Exit For
                             End If
@@ -148,7 +147,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
                         Dim vx1e(UBound(Vz)), vx2e(UBound(Vz)) As Double
 
-                        Dim maxl As Double = MathEx.Common.Max(vx2est)
+                        Dim maxl As Double = Common.Max(vx2est)
                         Dim imaxl As Integer = Array.IndexOf(vx2est, maxl)
 
                         F = 1
@@ -227,8 +226,8 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                         idx(i) = i
                     Else
                         j = 0
-                        For Each subst As DTL.ClassesBasicasTermodinamica.Substancia In PP.CurrentMaterialStream.Fases(0).Componentes.Values
-                            If subst.Nome = Me.StabSearchCompIDs(i) Then
+                        For Each subst As BaseThermoClasses.Substance In PP.CurrentMaterialStream.Phases(0).Components.Values
+                            If subst.Name = Me.StabSearchCompIDs(i) Then
                                 idx(i) = j
                                 Exit For
                             End If
@@ -293,7 +292,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
                         Dim vx1e(UBound(Vz)), vx2e(UBound(Vz)) As Double
 
-                        Dim maxl As Double = MathEx.Common.Max(vx2est)
+                        Dim maxl As Double = Common.Max(vx2est)
                         Dim imaxl As Integer = Array.IndexOf(vx2est, maxl)
 
                         F = 1
@@ -364,8 +363,8 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                         idx(i) = i
                     Else
                         j = 0
-                        For Each subst As DTL.ClassesBasicasTermodinamica.Substancia In PP.CurrentMaterialStream.Fases(0).Componentes.Values
-                            If subst.Nome = Me.StabSearchCompIDs(i) Then
+                        For Each subst As BaseThermoClasses.Substance In PP.CurrentMaterialStream.Phases(0).Components.Values
+                            If subst.Name = Me.StabSearchCompIDs(i) Then
                                 idx(i) = j
                                 Exit For
                             End If
@@ -430,7 +429,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
                         Dim vx1e(UBound(Vz)), vx2e(UBound(Vz)) As Double
 
-                        Dim maxl As Double = MathEx.Common.Max(vx2est)
+                        Dim maxl As Double = Common.Max(vx2est)
                         Dim imaxl As Integer = Array.IndexOf(vx2est, maxl)
 
                         F = 1
@@ -503,8 +502,8 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                         idx(i) = i
                     Else
                         j = 0
-                        For Each subst As DTL.ClassesBasicasTermodinamica.Substancia In PP.CurrentMaterialStream.Fases(0).Componentes.Values
-                            If subst.Nome = Me.StabSearchCompIDs(i) Then
+                        For Each subst As BaseThermoClasses.Substance In PP.CurrentMaterialStream.Phases(0).Components.Values
+                            If subst.Name = Me.StabSearchCompIDs(i) Then
                                 idx(i) = j
                                 Exit For
                             End If
@@ -622,8 +621,8 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                         idx(i) = i
                     Else
                         j = 0
-                        For Each subst As DTL.ClassesBasicasTermodinamica.Substancia In PP.CurrentMaterialStream.Fases(0).Componentes.Values
-                            If subst.Nome = Me.StabSearchCompIDs(i) Then
+                        For Each subst As BaseThermoClasses.Substance In PP.CurrentMaterialStream.Phases(0).Components.Values
+                            If subst.Name = Me.StabSearchCompIDs(i) Then
                                 idx(i) = j
                                 Exit For
                             End If
@@ -799,17 +798,12 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
             T = 1 / T_ + (Log(Kb) - A) / B
             T = 1 / T
 
-            'If T < Tmin Then T = Tmin
-            'If T > Tmax Then T = Tmax
-
             Dim Hv, Hl1, Hl2 As Double
 
             Hv = proppack.DW_CalcEnthalpy(Vy, T, Pf, State.Vapor) * proppack.AUX_MMM(Vy)
             Hl1 = proppack.DW_CalcEnthalpy(Vx1, T, Pf, State.Liquid) * proppack.AUX_MMM(Vx1)
             Hl2 = proppack.DW_CalcEnthalpy(Vx2, T, Pf, State.Liquid) * proppack.AUX_MMM(Vx2)
             eberror = Hf - V * Hv - L1 * Hl1 - L2 * Hl2
-
-
 
             Return eberror
 
@@ -869,17 +863,12 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
             T = 1 / T_ + (Log(Kb) - A) / B
             T = 1 / T
 
-            'If T < Tmin Then T = Tmin
-            'If T > Tmax Then T = Tmax
-
             Dim Hv, Hl1, Hl2 As Double
 
             Hv = proppack.DW_CalcEnthalpy(Vy, T, Pf, State.Vapor) * proppack.AUX_MMM(Vy)
             Hl1 = proppack.DW_CalcEnthalpy(Vx1, T, Pf, State.Liquid) * proppack.AUX_MMM(Vx1)
             Hl2 = proppack.DW_CalcEnthalpy(Vx2, T, Pf, State.Liquid) * proppack.AUX_MMM(Vx2)
             eberror = Hf - V * Hv - L1 * Hl1 - L2 * Hl2
-
-
 
             Return Abs(eberror)
 
@@ -936,9 +925,6 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
             T = 1 / T_ + (Log(Kb) - A) / B
             T = 1 / T
 
-            'If T < Tmin Then T = Tmin
-            'If T > Tmax Then T = Tmax
-
             Dim Sv, Sl1, Sl2 As Double
 
             Sv = proppack.DW_CalcEntropy(Vy, T, Pf, State.Vapor) * proppack.AUX_MMM(Vy)
@@ -946,8 +932,6 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
             Sl2 = proppack.DW_CalcEntropy(Vx2, T, Pf, State.Liquid) * proppack.AUX_MMM(Vx2)
 
             Dim eberror As Double = Sf - V * Sv - L1 * Sl1 - L2 * Sl2
-
-
 
             Return eberror
 
@@ -1004,9 +988,6 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
             T = 1 / T_ + (Log(Kb) - A) / B
             T = 1 / T
 
-            'If T < Tmin Then T = Tmin
-            'If T > Tmax Then T = Tmax
-
             Dim Sv, Sl1, Sl2 As Double
 
             Sv = proppack.DW_CalcEntropy(Vy, T, Pf, State.Vapor) * proppack.AUX_MMM(Vy)
@@ -1014,8 +995,6 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
             Sl2 = proppack.DW_CalcEntropy(Vx2, T, Pf, State.Liquid) * proppack.AUX_MMM(Vx2)
 
             Dim eberror As Double = Sf - V * Sv - L1 * Sl1 - L2 * Sl2
-
-
 
             Return Abs(eberror)
 
@@ -1027,10 +1006,10 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
             maxit_i = CInt(PP.Parameters("PP_PHFMII"))
             maxit_e = CInt(PP.Parameters("PP_PHFMEI"))
-            itol = CDbl(PP.Parameters("PP_PHFILT"))
-            etol = CDbl(PP.Parameters("PP_PHFELT"))
+            Me.itol = PP.Parameters("PP_PHFILT")
+            Me.etol = PP.Parameters("PP_PHFELT")
 
-            n = UBound(Vz)
+            Me.n = UBound(Vz)
 
             proppack = PP
             Hf = H * PP.AUX_MMM(Vz)
@@ -1203,16 +1182,14 @@ restart:    Do
 
                 ecount += 1
 
-                If ecount > maxit_e Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt"))
-                If Double.IsNaN(AbsSum(fx)) Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashError"))
+                If ecount > maxit_e Then Throw New Exception(App.GetLocalString("PropPack_FlashMaxIt"))
+                If Double.IsNaN(AbsSum(fx)) Then Throw New Exception(App.GetLocalString("PropPack_FlashError"))
 
                 WriteDebugInfo("PH Flash 3P [IO]: Iteration #" & ecount & ", T = " & T)
                 WriteDebugInfo("PH Flash 3P [IO]: Iteration #" & ecount & ", VF = " & V)
                 WriteDebugInfo("PH Flash 3P [IO]: Iteration #" & ecount & ", L1F = " & L1)
                 WriteDebugInfo("PH Flash 3P [IO]: Iteration #" & ecount & ", L2F = " & L2)
                 WriteDebugInfo("PH Flash 3P [IO]: Iteration #" & ecount & ", H error = " & fr)
-
-
 
             Loop Until AbsSum(fx) < etol
 
@@ -1237,7 +1214,7 @@ restart:    Do
                     x1 = Tref
                     Do
                         fx2 = EnergyBalanceSPV(x1, Nothing)
-                        If Math.Abs(fx2) < etol Then Exit Do
+                        If Abs(fx2) < etol Then Exit Do
                         dfdx2 = (EnergyBalanceSPV(x1 + 1, Nothing) - fx2)
                         x1 = x1 - fx2 / dfdx2
                         ecount += 1
@@ -1252,8 +1229,6 @@ restart:    Do
         End Function
 
         Private Function EnergyBalanceSPL(ByVal T As Double, ByVal otherargs As Object) As Double
-
-
 
             Dim Hl1, Hl2, balerror As Double
 
@@ -1272,11 +1247,9 @@ restart:    Do
 
         Private Function EnergyBalanceSPV(ByVal T As Double, ByVal otherargs As Object) As Double
 
-
-
             Dim HV, balerror As Double
 
-            HV = proppack.DW_CalcEnthalpy(fi, T, Pf, PropertyPackages.State.Vapor) * proppack.AUX_MMM(fi)
+            HV = proppack.DW_CalcEnthalpy(fi, T, Pf, State.Vapor) * proppack.AUX_MMM(fi)
 
             balerror = Hf - HV
 
@@ -1286,7 +1259,6 @@ restart:    Do
 
             Return balerror
 
-
         End Function
 
         Public Function Flash_PS_3P(ByVal Vz() As Double, ByVal Vest As Double, ByVal L1est As Double, ByVal L2est As Double, ByVal VyEST() As Double, ByVal Vx1EST() As Double, ByVal Vx2EST() As Double, ByVal P As Double, ByVal S As Double, ByVal Tref As Double, ByVal PP As PropertyPackage) As Object
@@ -1295,10 +1267,10 @@ restart:    Do
 
             maxit_i = CInt(PP.Parameters("PP_PSFMII"))
             maxit_e = CInt(PP.Parameters("PP_PSFMEI"))
-            itol = CDbl(PP.Parameters("PP_PSFILT"))
-            etol = CDbl(PP.Parameters("PP_PSFELT"))
+            Me.itol = PP.Parameters("PP_PSFILT")
+            Me.etol = PP.Parameters("PP_PSFELT")
 
-            n = UBound(Vz)
+            Me.n = UBound(Vz)
 
             proppack = PP
             Sf = S * PP.AUX_MMM(Vz)
@@ -1467,14 +1439,12 @@ restart:    Do
 
                 ecount += 1
 
-                If ecount > maxit_e Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt"))
-                If Double.IsNaN(AbsSum(fx)) Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashError"))
+                If ecount > maxit_e Then Throw New Exception(App.GetLocalString("PropPack_FlashMaxIt"))
+                If Double.IsNaN(AbsSum(fx)) Then Throw New Exception(App.GetLocalString("PropPack_FlashError"))
 
                 WriteDebugInfo("PS Flash 3P [IO]: Iteration #" & ecount & ", T = " & T)
                 WriteDebugInfo("PS Flash 3P [IO]: Iteration #" & ecount & ", VF = " & V)
                 WriteDebugInfo("PS Flash 3P [IO]: Iteration #" & ecount & ", S error = " & fr)
-
-
 
             Loop Until AbsSum(fx) < etol
 
@@ -1500,7 +1470,7 @@ restart:    Do
                     x1 = Tref
                     Do
                         fx2 = EntropyBalanceSPV(x1, Nothing)
-                        If Math.Abs(fx2) < etol Then Exit Do
+                        If Abs(fx2) < etol Then Exit Do
                         dfdx2 = (EntropyBalanceSPV(x1 + 1, Nothing) - fx2)
                         x1 = x1 - fx2 / dfdx2
                         ecount += 1
@@ -1522,8 +1492,6 @@ restart:    Do
 
         Private Function EntropyBalanceSPL(ByVal T As Double, ByVal otherargs As Object) As Double
 
-
-
             Dim Sl1, Sl2, balerror As Double
 
             Sl1 = proppack.DW_CalcEntropy(Vx1, T, Pf, State.Liquid) * proppack.AUX_MMM(Vx1)
@@ -1541,11 +1509,9 @@ restart:    Do
 
         Private Function EntropyBalanceSPV(ByVal T As Double, ByVal otherargs As Object) As Double
 
-
-
             Dim SV, balerror As Double
 
-            SV = proppack.DW_CalcEnthalpy(fi, T, Pf, PropertyPackages.State.Vapor) * proppack.AUX_MMM(fi)
+            SV = proppack.DW_CalcEnthalpy(fi, T, Pf, State.Vapor) * proppack.AUX_MMM(fi)
 
             balerror = Sf - SV
 
@@ -1555,17 +1521,16 @@ restart:    Do
 
             Return balerror
 
-
         End Function
 
-        Public Function Flash_PT_3P(ByVal Vz As Double(), ByVal Vest As Double, ByVal L1est As Double, ByVal L2est As Double, ByVal VyEST As Double(), ByVal Vx1EST As Double(), ByVal Vx2EST As Double(), ByVal P As Double, ByVal T As Double, ByVal PP As PropertyPackages.PropertyPackage) As Object
+        Public Function Flash_PT_3P(ByVal Vz As Double(), ByVal Vest As Double, ByVal L1est As Double, ByVal L2est As Double, ByVal VyEST As Double(), ByVal Vx1EST As Double(), ByVal Vx2EST As Double(), ByVal P As Double, ByVal T As Double, ByVal PP As PropertyPackage) As Object
 
             Dim i, j As Integer
 
-            etol = CDbl(PP.Parameters("PP_PTFELT"))
-            maxit_e = CInt(PP.Parameters("PP_PTFMEI"))
-            itol = CDbl(PP.Parameters("PP_PTFILT"))
-            maxit_i = CInt(PP.Parameters("PP_PTFMII"))
+            Me.etol = PP.Parameters("PP_PTFELT")
+            Me.maxit_e = CInt(PP.Parameters("PP_PTFMEI"))
+            Me.itol = PP.Parameters("PP_PTFILT")
+            Me.maxit_i = CInt(PP.Parameters("PP_PTFMII"))
 
             n = UBound(Vz)
 
@@ -1619,20 +1584,20 @@ restart:    Do
             Loop Until i = n + 1
 
             i = 0
-            soma_x1 = 0
-            soma_x2 = 0
-            soma_y = 0
+            sum_x1 = 0
+            sum_x2 = 0
+            sum_y = 0
             Do
-                soma_x1 = soma_x1 + Vx1(i)
-                soma_x2 = soma_x2 + Vx2(i)
-                soma_y = soma_y + Vy(i)
+                sum_x1 = sum_x1 + Vx1(i)
+                sum_x2 = sum_x2 + Vx2(i)
+                sum_y = sum_y + Vy(i)
                 i = i + 1
             Loop Until i = n + 1
             i = 0
             Do
-                Vx1(i) = Vx1(i) / soma_x1
-                Vx2(i) = Vx2(i) / soma_x2
-                Vy(i) = Vy(i) / soma_y
+                Vx1(i) = Vx1(i) / sum_x1
+                Vx2(i) = Vx2(i) / sum_x2
+                Vy(i) = Vy(i) / sum_y
                 i = i + 1
             Loop Until i = n + 1
 
@@ -1738,15 +1703,13 @@ restart:    Do
                 ecount += 1
 
                 If Double.IsNaN(V) Then
-                    Throw New Exception(DTL.App.GetLocalString("PropPack_FlashTPVapFracError"))
+                    Throw New Exception(App.GetLocalString("PropPack_FlashTPVapFracError"))
                 End If
                 If ecount > maxit_e Then
-                    Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt2"))
+                    Throw New Exception(App.GetLocalString("PropPack_FlashMaxIt2"))
                 End If
 
                 WriteDebugInfo("PT Flash [IO]: Iteration #" & ecount & ", VF = " & V)
-
-
 
             Loop Until AbsSum(fx) < etol
 
@@ -1781,14 +1744,12 @@ out:
                 End If
             End If
 
-
         End Function
 
         Private Function TPErrorFunc(ByVal Rtv As Double) As Double
 
             Dim i As Integer
 
-            'Dim fr, dfr, S0, S1 As Double
             Dim icount As Integer = 0
 
             Dim bo2 As New BrentOpt.BrentMinimize
@@ -1818,11 +1779,7 @@ out:
                 Vy(i) = pi(i) / sumpi
             Next
 
-            'If Rt <> 1.0# Then
             Kb = ((1 - Rt + S) * sumeuipi1 + (1 - Rt - S) * sumeuipi2) / (2 * (1 - Rt) * sumpi)
-            'Else
-            'Kb = 1.0#
-            'End If
 
             V = Rt * sumpi
             L1 = 0.5 * (S * V * (Kb / Kb0 - 1) + (1 + S) - V)
@@ -1830,8 +1787,6 @@ out:
             beta = L1 / (L1 + L2)
 
             Dim err1 As Double = Kb - 1
-
-
 
             Return err1 ^ 2
 
@@ -1865,10 +1820,10 @@ out:
 
             Dim i, j As Integer
 
-            etol = CDbl(PP.Parameters("PP_PTFELT"))
-            maxit_e = CInt(PP.Parameters("PP_PTFMEI"))
-            itol = CDbl(PP.Parameters("PP_PTFILT"))
-            maxit_i = CInt(PP.Parameters("PP_PTFMII"))
+            Me.etol = PP.Parameters("PP_PTFELT")
+            Me.maxit_e = CInt(PP.Parameters("PP_PTFMEI"))
+            Me.itol = PP.Parameters("PP_PTFILT")
+            Me.maxit_i = CInt(PP.Parameters("PP_PTFMII"))
 
             n = UBound(Vz)
 
@@ -2068,28 +2023,25 @@ out:
                 ecount += 1
 
                 If ecount > maxit_e Then
-                    Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt"))
+                    Throw New Exception(App.GetLocalString("PropPack_FlashMaxIt"))
                 End If
                 If Double.IsNaN(AbsSum(fx)) Then
-                    Throw New Exception(DTL.App.GetLocalString("PropPack_FlashError"))
+                    Throw New Exception(App.GetLocalString("PropPack_FlashError"))
                 End If
 
                 WriteDebugInfo("PV Flash 3P [IO]: Iteration #" & ecount & ", T = " & T & ", VF = " & V)
-
-
 
             Loop Until AbsSum(fx) < etol * (n + 2)
 
             Return New Object() {L1, V, Vx1, Vy, T, ecount, Ki1, L2, Vx2, 0.0#, PP.RET_NullVector}
 
         End Function
-
         Public Function Flash_TV_3P(ByVal Vz() As Double, ByVal Vest As Double, ByVal L1est As Double, ByVal L2est As Double, ByVal VyEST As Double(), ByVal Vx1EST As Double(), ByVal Vx2EST As Double(), ByVal T As Double, ByVal V As Double, ByVal Pref As Double, ByVal PP As PropertyPackage) As Object
 
             Dim i, j As Integer
 
-            etol = CDbl(PP.Parameters("PP_PTFELT"))
-            maxit_e = CInt(PP.Parameters("PP_PTFMEI"))
+            Me.etol = PP.Parameters("PP_PTFELT")
+            Me.maxit_e = CInt(PP.Parameters("PP_PTFMEI"))
 
             n = UBound(Vz)
 
@@ -2272,12 +2224,10 @@ out:
 
                 ecount += 1
 
-                If ecount > maxit_e Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashMaxIt"))
-                If Double.IsNaN(AbsSum(fx)) Then Throw New Exception(DTL.App.GetLocalString("PropPack_FlashError"))
+                If ecount > maxit_e Then Throw New Exception(App.GetLocalString("PropPack_FlashMaxIt"))
+                If Double.IsNaN(AbsSum(fx)) Then Throw New Exception(App.GetLocalString("PropPack_FlashError"))
 
                 WriteDebugInfo("TV Flash 3P [IO]: Iteration #" & ecount & ", P = " & P & ", VF = " & V)
-
-
 
             Loop Until AbsSum(fx) < etol
 
@@ -2339,8 +2289,6 @@ out:
 
             Dim eberror As Double = (L1 + L2) - Lf
 
-
-
             Return eberror
 
         End Function
@@ -2395,8 +2343,6 @@ out:
 
             Dim eberror As Double = (L1 + L2) - Lf
 
-
-
             Return eberror
 
         End Function
@@ -2416,8 +2362,6 @@ out:
         End Function
 
         Public Sub New()
-
-
 
         End Sub
 

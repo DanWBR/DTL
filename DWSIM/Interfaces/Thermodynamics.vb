@@ -18,14 +18,13 @@
 '
 Imports DTL.DTL.SimulationObjects
 Imports DTL.DTL.SimulationObjects.PropertyPackages
-Imports DTL.DTL.ClassesBasicasTermodinamica
-Imports CapeOpen = CAPEOPEN110
+Imports DTL.DTL.BaseThermoClasses
 Imports CAPEOPEN110
 Imports DTL.DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
 Namespace Thermodynamics
 
-    <System.Serializable()> <ComClass(Calculator.ClassId, Calculator.InterfaceId, Calculator.EventsId)>
+    <Serializable()> <ComClass(Calculator.ClassId, Calculator.InterfaceId, Calculator.EventsId)>
     Public Class Calculator
 
         Public Const ClassId As String = "5F2B671E-FA61-401e-8D14-71FB5B328F9B"
@@ -42,7 +41,7 @@ Namespace Thermodynamics
         ''' Initializes the calculator and loads the compound databases into memory.
         ''' </summary>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(1)> Sub Initialize()
+        <Runtime.InteropServices.DispId(1)> Sub Initialize()
 
             'load databases
             _availablecomps = New Dictionary(Of String, ConstantProperties)
@@ -60,7 +59,7 @@ Namespace Thermodynamics
         ''' </summary>
         ''' <param name="userdbs">A string array containing the full path of DWSIM-generated user databases to load.</param>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(2)> Sub Initialize(ByVal userdbs() As String)
+        <Runtime.InteropServices.DispId(2)> Sub Initialize(ByVal userdbs() As String)
 
             Initialize()
 
@@ -74,7 +73,7 @@ Namespace Thermodynamics
         ''' Enables CPU parallel processing for some tasks.
         ''' </summary>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(3)> Sub EnableParallelProcessing()
+        <Runtime.InteropServices.DispId(3)> Sub EnableParallelProcessing()
 
             My.MyApplication._EnableParallelProcessing = True
 
@@ -84,7 +83,7 @@ Namespace Thermodynamics
         ''' Disables CPU parallel processing.
         ''' </summary>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(4)> Sub DisableParallelProcessing()
+        <Runtime.InteropServices.DispId(4)> Sub DisableParallelProcessing()
 
             My.MyApplication._EnableParallelProcessing = False
 
@@ -95,7 +94,7 @@ Namespace Thermodynamics
         ''' </summary>
         ''' <param name="level">Debug level: 0 = none, 1 = low, 2 = medium, 3 = high</param>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(38)> Public Sub SetDebugLevel(level As Integer)
+        <Runtime.InteropServices.DispId(38)> Public Sub SetDebugLevel(level As Integer)
 
             My.MyApplication._DebugLevel = level
 
@@ -105,7 +104,7 @@ Namespace Thermodynamics
         ''' Activates CPU-accelerated SIMD vector operations.
         ''' </summary>
         ''' <remarks>This uses the routines implemented in the Yeppp! (http://www.yeppp.info) library, which must be in the same directory as DTL's.</remarks>
-        <System.Runtime.InteropServices.DispId(40)> Public Sub EnableSIMDExtensions()
+        <Runtime.InteropServices.DispId(40)> Public Sub EnableSIMDExtensions()
             My.MyApplication.UseSIMDExtensions = True
         End Sub
 
@@ -113,7 +112,7 @@ Namespace Thermodynamics
         ''' Deactivates CPU-accelerated SIMD vector operations.
         ''' </summary>
         ''' <remarks>This uses the routines implemented in the Yeppp! (http://www.yeppp.info) library, which must be in the same directory as DTL's.</remarks>
-        <System.Runtime.InteropServices.DispId(41)> Public Sub DisableSIMDExtensions()
+        <Runtime.InteropServices.DispId(41)> Public Sub DisableSIMDExtensions()
             My.MyApplication.UseSIMDExtensions = False
         End Sub
 
@@ -124,34 +123,33 @@ Namespace Thermodynamics
         End Sub
 
         Private Sub LoadUserDB(ByVal path As String)
-            Dim cpa() As DTL.ClassesBasicasTermodinamica.ConstantProperties
+            Dim cpa() As ConstantProperties
             cpa = DTL.Databases.UserDB.ReadComps(path)
-            For Each cp As DTL.ClassesBasicasTermodinamica.ConstantProperties In cpa
+            For Each cp As ConstantProperties In cpa
                 If Not _availablecomps.ContainsKey(cp.Name) Then _availablecomps.Add(cp.Name, cp)
             Next
         End Sub
 
         Private Sub LoadCSDB()
             Dim csdb As New DTL.Databases.ChemSep
-            Dim cpa() As DTL.ClassesBasicasTermodinamica.ConstantProperties
+            Dim cpa() As ConstantProperties
             'Try
             csdb.Load()
             cpa = csdb.Transfer()
-            For Each cp As DTL.ClassesBasicasTermodinamica.ConstantProperties In cpa
+            For Each cp As ConstantProperties In cpa
                 If Not _availablecomps.ContainsKey(cp.Name) Then _availablecomps.Add(cp.Name, cp)
             Next
         End Sub
 
         Private Sub LoadDWSIMDB()
             Dim dwdb As New DTL.Databases.DWSIM
-            Dim cpa() As DTL.ClassesBasicasTermodinamica.ConstantProperties
+            Dim cpa() As ConstantProperties
             dwdb.Load()
             cpa = dwdb.Transfer()
-            For Each cp As DTL.ClassesBasicasTermodinamica.ConstantProperties In cpa
+            For Each cp As ConstantProperties In cpa
                 If Not _availablecomps.ContainsKey(cp.Name) Then _availablecomps.Add(cp.Name, cp)
             Next
         End Sub
-
         Friend Sub SetIP(ByVal proppack As String, ByRef pp As PropertyPackage, ByVal compounds As Object, ByVal ip1 As Object, ByVal ip2 As Object, ByVal ip3 As Object, ByVal ip4 As Object)
 
             Dim i, j As Integer
@@ -424,8 +422,8 @@ Namespace Thermodynamics
         ''' <param name="prop">Property identifier.</param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(10)> Public Function GetCompoundConstProp( _
-            ByVal compound As String, _
+        <Runtime.InteropServices.DispId(10)> Public Function GetCompoundConstProp(
+            ByVal compound As String,
             ByVal prop As String) As String
 
             Dim pp As New RaoultPropertyPackage(True)
@@ -433,14 +431,13 @@ Namespace Thermodynamics
 
             Dim ms As New Streams.MaterialStream("", "")
 
-            For Each phase As DTL.ClassesBasicasTermodinamica.Fase In ms.Fases.Values
-                phase.Componentes.Add(compound, New DTL.ClassesBasicasTermodinamica.Substancia(compound, ""))
-                phase.Componentes(compound).ConstantProperties = pp._availablecomps(compound)
+            For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
+                phase.Components.Add(compound, New Substance(compound, ""))
+                phase.Components(compound).ConstantProperties = pp._availablecomps(compound)
             Next
 
             Dim tmpcomp As ConstantProperties = pp._availablecomps(compound)
             pp._selectedcomps.Add(compound, tmpcomp)
-            'pp._availablecomps.Remove(compound)
 
             ms._pp = pp
             pp.SetMaterial(ms)
@@ -467,9 +464,9 @@ Namespace Thermodynamics
         ''' <param name="temperature">Temperature in K.</param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(11)> Public Function GetCompoundTDepProp( _
-            ByVal compound As String, _
-            ByVal prop As String, _
+        <Runtime.InteropServices.DispId(11)> Public Function GetCompoundTDepProp(
+            ByVal compound As String,
+            ByVal prop As String,
             ByVal temperature As Double) As String
 
             Dim pp As New RaoultPropertyPackage(True)
@@ -477,14 +474,13 @@ Namespace Thermodynamics
 
             Dim ms As New Streams.MaterialStream("", "")
 
-            For Each phase As DTL.ClassesBasicasTermodinamica.Fase In ms.Fases.Values
-                phase.Componentes.Add(compound, New DTL.ClassesBasicasTermodinamica.Substancia(compound, ""))
-                phase.Componentes(compound).ConstantProperties = pp._availablecomps(compound)
+            For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
+                phase.Components.Add(compound, New Substance(compound, ""))
+                phase.Components(compound).ConstantProperties = pp._availablecomps(compound)
             Next
 
             Dim tmpcomp As ConstantProperties = pp._availablecomps(compound)
             pp._selectedcomps.Add(compound, tmpcomp)
-            'pp._availablecomps.Remove(compound)
 
             ms._pp = pp
             pp.SetMaterial(ms)
@@ -511,9 +507,9 @@ Namespace Thermodynamics
         ''' <param name="pressure">Pressure in Pa.</param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(12)> Public Function GetCompoundPDepProp( _
-            ByVal compound As String, _
-            ByVal prop As String, _
+        <Runtime.InteropServices.DispId(12)> Public Function GetCompoundPDepProp(
+            ByVal compound As String,
+            ByVal prop As String,
             ByVal pressure As Double) As String
 
             Dim pp As New RaoultPropertyPackage(True)
@@ -521,14 +517,13 @@ Namespace Thermodynamics
 
             Dim ms As New Streams.MaterialStream("", "")
 
-            For Each phase As DTL.ClassesBasicasTermodinamica.Fase In ms.Fases.Values
-                phase.Componentes.Add(compound, New DTL.ClassesBasicasTermodinamica.Substancia(compound, ""))
-                phase.Componentes(compound).ConstantProperties = pp._availablecomps(compound)
+            For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
+                phase.Components.Add(compound, New Substance(compound, ""))
+                phase.Components(compound).ConstantProperties = pp._availablecomps(compound)
             Next
 
             Dim tmpcomp As ConstantProperties = pp._availablecomps(compound)
             pp._selectedcomps.Add(compound, tmpcomp)
-            'pp._availablecomps.Remove(compound)
 
             ms._pp = pp
             pp.SetMaterial(ms)
@@ -552,7 +547,7 @@ Namespace Thermodynamics
         ''' </summary>
         ''' <returns>A list of the available single compound properties</returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(13)> Public Function GetCompoundConstPropList() As String()
+        <Runtime.InteropServices.DispId(13)> Public Function GetCompoundConstPropList() As String()
 
             Dim pp As New RaoultPropertyPackage(True)
 
@@ -581,7 +576,7 @@ Namespace Thermodynamics
         ''' </summary>
         ''' <returns>A list of the available single compound properties</returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(14)> Public Function GetCompoundTDepPropList() As String()
+        <Runtime.InteropServices.DispId(14)> Public Function GetCompoundTDepPropList() As String()
 
             Dim pp As New RaoultPropertyPackage(True)
 
@@ -610,7 +605,7 @@ Namespace Thermodynamics
         ''' </summary>
         ''' <returns>A list of the available single compound properties</returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(15)> Public Function GetCompoundPDepPropList() As String()
+        <Runtime.InteropServices.DispId(15)> Public Function GetCompoundPDepPropList() As String()
 
             Dim pp As New RaoultPropertyPackage(True)
 
@@ -651,23 +646,23 @@ Namespace Thermodynamics
         ''' <param name="ip4">Interaction Parameters Set #4.</param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(16)> Public Function CalcProp( _
-            ByVal proppack As String, _
-            ByVal prop As String, _
-            ByVal basis As String, _
-            ByVal phaselabel As String, _
-            ByVal compounds As String(), _
-            ByVal temperature As Double, _
-            ByVal pressure As Double, _
-            ByVal molefractions As Double(), _
-            Optional ByVal ip1 As Object = Nothing, _
-            Optional ByVal ip2 As Object = Nothing, _
-            Optional ByVal ip3 As Object = Nothing, _
+        <Runtime.InteropServices.DispId(16)> Public Function CalcProp(
+            ByVal proppack As String,
+            ByVal prop As String,
+            ByVal basis As String,
+            ByVal phaselabel As String,
+            ByVal compounds As String(),
+            ByVal temperature As Double,
+            ByVal pressure As Double,
+            ByVal molefractions As Double(),
+            Optional ByVal ip1 As Object = Nothing,
+            Optional ByVal ip2 As Object = Nothing,
+            Optional ByVal ip3 As Object = Nothing,
             Optional ByVal ip4 As Object = Nothing) As Object()
 
             Dim ppm As New CAPEOPENPropertyPackageManager()
 
-            Dim pp As PropertyPackages.PropertyPackage = ppm.GetPropertyPackage(proppack)
+            Dim pp As PropertyPackage = ppm.GetPropertyPackage(proppack)
 
             TransferComps(pp)
 
@@ -678,27 +673,26 @@ Namespace Thermodynamics
 
             Dim ms As New Streams.MaterialStream("", "")
 
-            For Each phase As DTL.ClassesBasicasTermodinamica.Fase In ms.Fases.Values
+            For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
-                    phase.Componentes.Add(c, New DTL.ClassesBasicasTermodinamica.Substancia(c, ""))
-                    phase.Componentes(c).ConstantProperties = pp._availablecomps(c)
+                    phase.Components.Add(c, New Substance(c, ""))
+                    phase.Components(c).ConstantProperties = pp._availablecomps(c)
                 Next
             Next
 
             For Each c As String In compounds
                 Dim tmpcomp As ConstantProperties = pp._availablecomps(c)
                 pp._selectedcomps.Add(c, tmpcomp)
-                'pp._availablecomps.Remove(c)
             Next
 
-            Dim dwp As PropertyPackages.Fase = PropertyPackages.Fase.Mixture
-            For Each pi As PropertyPackages.PhaseInfo In pp.PhaseMappings.Values
+            Dim dwp As PropertyPackages.Phase = PropertyPackages.Phase.Mixture
+            For Each pi As PhaseInfo In pp.PhaseMappings.Values
                 If pi.PhaseLabel = phaselabel Then dwp = pi.DWPhaseID
             Next
 
             ms.SetPhaseComposition(molefractions, dwp)
-            ms.Fases(0).SPMProperties.temperature = temperature
-            ms.Fases(0).SPMProperties.pressure = pressure
+            ms.Phases(0).SPMProperties.temperature = temperature
+            ms.Phases(0).SPMProperties.pressure = pressure
 
             ms._pp = pp
             pp.SetMaterial(ms)
@@ -738,7 +732,6 @@ Namespace Thermodynamics
             Return results2
 
         End Function
-
         ''' <summary>
         ''' Calculates properties using the selected Property Package.
         ''' </summary>
@@ -756,23 +749,23 @@ Namespace Thermodynamics
         ''' <param name="ip4">Interaction Parameters Set #4.</param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(17)> Public Function CalcProp( _
-            ByVal proppack As PropertyPackage, _
-            ByVal prop As String, _
-            ByVal basis As String, _
-            ByVal phaselabel As String, _
-            ByVal compounds As String(), _
-            ByVal temperature As Double, _
-            ByVal pressure As Double, _
-            ByVal molefractions As Double(), _
-            Optional ByVal ip1 As Object = Nothing, _
-            Optional ByVal ip2 As Object = Nothing, _
-            Optional ByVal ip3 As Object = Nothing, _
+        <Runtime.InteropServices.DispId(17)> Public Function CalcProp(
+            ByVal proppack As PropertyPackage,
+            ByVal prop As String,
+            ByVal basis As String,
+            ByVal phaselabel As String,
+            ByVal compounds As String(),
+            ByVal temperature As Double,
+            ByVal pressure As Double,
+            ByVal molefractions As Double(),
+            Optional ByVal ip1 As Object = Nothing,
+            Optional ByVal ip2 As Object = Nothing,
+            Optional ByVal ip3 As Object = Nothing,
             Optional ByVal ip4 As Object = Nothing) As Object()
 
             Dim ppm As New CAPEOPENPropertyPackageManager()
 
-            Dim pp As PropertyPackages.PropertyPackage
+            Dim pp As PropertyPackage
 
             pp = proppack
             TransferComps(pp)
@@ -784,28 +777,27 @@ Namespace Thermodynamics
 
             Dim ms As New Streams.MaterialStream("", "")
 
-            For Each phase As DTL.ClassesBasicasTermodinamica.Fase In ms.Fases.Values
+            For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
-                    phase.Componentes.Add(c, New DTL.ClassesBasicasTermodinamica.Substancia(c, ""))
-                    phase.Componentes(c).ConstantProperties = pp._availablecomps(c)
+                    phase.Components.Add(c, New Substance(c, ""))
+                    phase.Components(c).ConstantProperties = pp._availablecomps(c)
                 Next
             Next
 
             For Each c As String In compounds
                 Dim tmpcomp As ConstantProperties = pp._availablecomps(c)
                 If Not pp._selectedcomps.ContainsKey(c) Then pp._selectedcomps.Add(c, tmpcomp)
-                'pp._availablecomps.Remove(c)
             Next
 
-            Dim dwp As PropertyPackages.Fase = PropertyPackages.Fase.Mixture
-            For Each pi As PropertyPackages.PhaseInfo In pp.PhaseMappings.Values
+            Dim dwp As PropertyPackages.Phase = PropertyPackages.Phase.Mixture
+            For Each pi As PhaseInfo In pp.PhaseMappings.Values
                 If pi.PhaseLabel = phaselabel Then dwp = pi.DWPhaseID
             Next
 
             ms.SetPhaseComposition(molefractions, dwp)
             ms.CalcPhaseMassComposition(dwp)
-            ms.Fases(0).SPMProperties.temperature = temperature
-            ms.Fases(0).SPMProperties.pressure = pressure
+            ms.Phases(0).SPMProperties.temperature = temperature
+            ms.Phases(0).SPMProperties.pressure = pressure
 
             ms._pp = pp
             pp.SetMaterial(ms)
@@ -842,7 +834,6 @@ Namespace Thermodynamics
             Return results2
 
         End Function
-
         ''' <summary>
         ''' Calculates two phase properties (K-values, Ln(K-values) or Surface Tension) using the selected Property Package.
         ''' </summary>
@@ -862,25 +853,25 @@ Namespace Thermodynamics
         ''' <param name="ip4">Interaction Parameters Set #4.</param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(18)> Public Function CalcTwoPhaseProp( _
-            ByVal proppack As String, _
-            ByVal prop As String, _
-            ByVal basis As String, _
-            ByVal phaselabel1 As String, _
-            ByVal phaselabel2 As String, _
-            ByVal compounds As String(), _
-            ByVal temperature As Double, _
-            ByVal pressure As Double, _
-            ByVal molefractions1 As Double(), _
-            ByVal molefractions2 As Double(), _
-            Optional ByVal ip1 As Object = Nothing, _
-            Optional ByVal ip2 As Object = Nothing, _
-            Optional ByVal ip3 As Object = Nothing, _
+        <Runtime.InteropServices.DispId(18)> Public Function CalcTwoPhaseProp(
+            ByVal proppack As String,
+            ByVal prop As String,
+            ByVal basis As String,
+            ByVal phaselabel1 As String,
+            ByVal phaselabel2 As String,
+            ByVal compounds As String(),
+            ByVal temperature As Double,
+            ByVal pressure As Double,
+            ByVal molefractions1 As Double(),
+            ByVal molefractions2 As Double(),
+            Optional ByVal ip1 As Object = Nothing,
+            Optional ByVal ip2 As Object = Nothing,
+            Optional ByVal ip3 As Object = Nothing,
             Optional ByVal ip4 As Object = Nothing) As Object()
 
             Dim ppm As New CAPEOPENPropertyPackageManager()
 
-            Dim pp As PropertyPackages.PropertyPackage = ppm.GetPropertyPackage(proppack)
+            Dim pp As PropertyPackage = ppm.GetPropertyPackage(proppack)
 
             TransferComps(pp)
 
@@ -891,33 +882,32 @@ Namespace Thermodynamics
 
             Dim ms As New Streams.MaterialStream("", "")
 
-            For Each phase As DTL.ClassesBasicasTermodinamica.Fase In ms.Fases.Values
+            For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
-                    phase.Componentes.Add(c, New DTL.ClassesBasicasTermodinamica.Substancia(c, ""))
-                    phase.Componentes(c).ConstantProperties = pp._availablecomps(c)
+                    phase.Components.Add(c, New Substance(c, ""))
+                    phase.Components(c).ConstantProperties = pp._availablecomps(c)
                 Next
             Next
 
             For Each c As String In compounds
                 Dim tmpcomp As ConstantProperties = pp._availablecomps(c)
                 pp._selectedcomps.Add(c, tmpcomp)
-                'pp._availablecomps.Remove(c)
             Next
 
-            Dim dwp1 As PropertyPackages.Fase = PropertyPackages.Fase.Mixture
-            For Each pi As PropertyPackages.PhaseInfo In pp.PhaseMappings.Values
+            Dim dwp1 As PropertyPackages.Phase = PropertyPackages.Phase.Mixture
+            For Each pi As PhaseInfo In pp.PhaseMappings.Values
                 If pi.PhaseLabel = phaselabel1 Then dwp1 = pi.DWPhaseID
             Next
 
-            Dim dwp2 As PropertyPackages.Fase = PropertyPackages.Fase.Mixture
-            For Each pi As PropertyPackages.PhaseInfo In pp.PhaseMappings.Values
+            Dim dwp2 As PropertyPackages.Phase = PropertyPackages.Phase.Mixture
+            For Each pi As PhaseInfo In pp.PhaseMappings.Values
                 If pi.PhaseLabel = phaselabel2 Then dwp2 = pi.DWPhaseID
             Next
 
             ms.SetPhaseComposition(molefractions1, dwp1)
             ms.SetPhaseComposition(molefractions2, dwp2)
-            ms.Fases(0).SPMProperties.temperature = temperature
-            ms.Fases(0).SPMProperties.pressure = pressure
+            ms.Phases(0).SPMProperties.temperature = temperature
+            ms.Phases(0).SPMProperties.pressure = pressure
 
             ms._pp = pp
             pp.SetMaterial(ms)
@@ -951,7 +941,6 @@ Namespace Thermodynamics
             Return results2
 
         End Function
-
         ''' <summary>
         ''' Calculates two phase properties (K-values, Ln(K-values) or Surface Tension) using the selected Property Package.
         ''' </summary>
@@ -971,25 +960,25 @@ Namespace Thermodynamics
         ''' <param name="ip4">Interaction Parameters Set #4.</param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(19)> Public Function CalcTwoPhaseProp( _
-            ByVal proppack As PropertyPackage, _
-            ByVal prop As String, _
-            ByVal basis As String, _
-            ByVal phaselabel1 As String, _
-            ByVal phaselabel2 As String, _
-            ByVal compounds As String(), _
-            ByVal temperature As Double, _
-            ByVal pressure As Double, _
-            ByVal molefractions1 As Double(), _
-            ByVal molefractions2 As Double(), _
-            Optional ByVal ip1 As Object = Nothing, _
-            Optional ByVal ip2 As Object = Nothing, _
-            Optional ByVal ip3 As Object = Nothing, _
+        <Runtime.InteropServices.DispId(19)> Public Function CalcTwoPhaseProp(
+            ByVal proppack As PropertyPackage,
+            ByVal prop As String,
+            ByVal basis As String,
+            ByVal phaselabel1 As String,
+            ByVal phaselabel2 As String,
+            ByVal compounds As String(),
+            ByVal temperature As Double,
+            ByVal pressure As Double,
+            ByVal molefractions1 As Double(),
+            ByVal molefractions2 As Double(),
+            Optional ByVal ip1 As Object = Nothing,
+            Optional ByVal ip2 As Object = Nothing,
+            Optional ByVal ip3 As Object = Nothing,
             Optional ByVal ip4 As Object = Nothing) As Object()
 
             Dim ppm As New CAPEOPENPropertyPackageManager()
 
-            Dim pp As PropertyPackages.PropertyPackage
+            Dim pp As PropertyPackage
             pp = proppack
             TransferComps(pp)
 
@@ -1000,33 +989,32 @@ Namespace Thermodynamics
 
             Dim ms As New Streams.MaterialStream("", "")
 
-            For Each phase As DTL.ClassesBasicasTermodinamica.Fase In ms.Fases.Values
+            For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
-                    phase.Componentes.Add(c, New DTL.ClassesBasicasTermodinamica.Substancia(c, ""))
-                    phase.Componentes(c).ConstantProperties = pp._availablecomps(c)
+                    phase.Components.Add(c, New Substance(c, ""))
+                    phase.Components(c).ConstantProperties = pp._availablecomps(c)
                 Next
             Next
 
             For Each c As String In compounds
                 Dim tmpcomp As ConstantProperties = pp._availablecomps(c)
                 If Not pp._selectedcomps.ContainsKey(c) Then pp._selectedcomps.Add(c, tmpcomp)
-                'pp._availablecomps.Remove(c)
             Next
 
-            Dim dwp1 As PropertyPackages.Fase = PropertyPackages.Fase.Mixture
-            For Each pi As PropertyPackages.PhaseInfo In pp.PhaseMappings.Values
+            Dim dwp1 As PropertyPackages.Phase = PropertyPackages.Phase.Mixture
+            For Each pi As PhaseInfo In pp.PhaseMappings.Values
                 If pi.PhaseLabel = phaselabel1 Then dwp1 = pi.DWPhaseID
             Next
 
-            Dim dwp2 As PropertyPackages.Fase = PropertyPackages.Fase.Mixture
-            For Each pi As PropertyPackages.PhaseInfo In pp.PhaseMappings.Values
+            Dim dwp2 As PropertyPackages.Phase = PropertyPackages.Phase.Mixture
+            For Each pi As PhaseInfo In pp.PhaseMappings.Values
                 If pi.PhaseLabel = phaselabel2 Then dwp2 = pi.DWPhaseID
             Next
 
             ms.SetPhaseComposition(molefractions1, dwp1)
             ms.SetPhaseComposition(molefractions2, dwp2)
-            ms.Fases(0).SPMProperties.temperature = temperature
-            ms.Fases(0).SPMProperties.pressure = pressure
+            ms.Phases(0).SPMProperties.temperature = temperature
+            ms.Phases(0).SPMProperties.pressure = pressure
 
             ms._pp = pp
             pp.SetMaterial(ms)
@@ -1060,13 +1048,12 @@ Namespace Thermodynamics
             Return results2
 
         End Function
-
         ''' <summary>
         ''' Returns a list of the available Property Packages.
         ''' </summary>
         ''' <returns>A list of the available Property Packages</returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(20)> Public Function GetPropPackList() As String()
+        <Runtime.InteropServices.DispId(20)> Public Function GetPropPackList() As String()
 
             Dim ppm As New CAPEOPENPropertyPackageManager()
 
@@ -1091,11 +1078,11 @@ Namespace Thermodynamics
         ''' </summary>
         ''' <returns>A Property Package instance.</returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(21)> Public Function GetPropPackInstance(ByVal proppackname As String) As PropertyPackage
+        <Runtime.InteropServices.DispId(21)> Public Function GetPropPackInstance(ByVal proppackname As String) As PropertyPackage
 
             Dim ppm As New CAPEOPENPropertyPackageManager()
 
-            Dim pp As PropertyPackages.PropertyPackage = ppm.GetPropertyPackage(proppackname)
+            Dim pp As PropertyPackage = ppm.GetPropertyPackage(proppackname)
 
             TransferComps(pp)
 
@@ -1111,7 +1098,7 @@ Namespace Thermodynamics
         ''' </summary>
         ''' <returns>A list of the available single-phase properties</returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(22)> Public Function GetPropList() As String()
+        <Runtime.InteropServices.DispId(22)> Public Function GetPropList() As String()
 
             Dim pp As New RaoultPropertyPackage(True)
 
@@ -1136,7 +1123,7 @@ Namespace Thermodynamics
         ''' </summary>
         ''' <returns>A list of the available two-phase properties</returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(23)> Public Function GetTwoPhasePropList() As String()
+        <Runtime.InteropServices.DispId(23)> Public Function GetTwoPhasePropList() As String()
 
             Dim pp As New RaoultPropertyPackage(True)
 
@@ -1161,7 +1148,7 @@ Namespace Thermodynamics
         ''' </summary>
         ''' <returns>A list of the available phases</returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(24)> Public Function GetPhaseList() As String()
+        <Runtime.InteropServices.DispId(24)> Public Function GetPhaseList() As String()
 
             Dim pp As New RaoultPropertyPackage(True)
 
@@ -1186,7 +1173,7 @@ Namespace Thermodynamics
         ''' </summary>
         ''' <returns>A list of the available compounds</returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(25)> Public Function GetCompoundList() As String()
+        <Runtime.InteropServices.DispId(25)> Public Function GetCompoundList() As String()
 
             Try
 
@@ -1230,21 +1217,21 @@ Namespace Thermodynamics
         ''' <param name="ip4">Interaction Parameters Set #4.</param>
         ''' <returns>A matrix containing phase fractions and compound distribution in mole fractions.</returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(26)> Public Function PTFlash( _
-            ByVal proppack As String, _
-            ByVal flashalg As Integer, _
-            ByVal P As Double, _
-            ByVal T As Double, _
-            ByVal compounds As String(), _
-            ByVal molefractions As Double(), _
-            Optional ByVal ip1 As Object = Nothing, _
-            Optional ByVal ip2 As Object = Nothing, _
-            Optional ByVal ip3 As Object = Nothing, _
+        <Runtime.InteropServices.DispId(26)> Public Function PTFlash(
+            ByVal proppack As String,
+            ByVal flashalg As Integer,
+            ByVal P As Double,
+            ByVal T As Double,
+            ByVal compounds As String(),
+            ByVal molefractions As Double(),
+            Optional ByVal ip1 As Object = Nothing,
+            Optional ByVal ip2 As Object = Nothing,
+            Optional ByVal ip3 As Object = Nothing,
             Optional ByVal ip4 As Object = Nothing) As Object(,)
 
             Dim ppm As New CAPEOPENPropertyPackageManager()
 
-            Dim pp As PropertyPackages.PropertyPackage
+            Dim pp As PropertyPackage
 
             pp = ppm.GetPropertyPackage(proppack)
             TransferComps(pp)
@@ -1256,22 +1243,21 @@ Namespace Thermodynamics
 
             Dim ms As New Streams.MaterialStream("", "")
 
-            For Each phase As DTL.ClassesBasicasTermodinamica.Fase In ms.Fases.Values
+            For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
-                    phase.Componentes.Add(c, New DTL.ClassesBasicasTermodinamica.Substancia(c, ""))
-                    phase.Componentes(c).ConstantProperties = pp._availablecomps(c)
+                    phase.Components.Add(c, New Substance(c, ""))
+                    phase.Components(c).ConstantProperties = pp._availablecomps(c)
                 Next
             Next
 
             For Each c As String In compounds
                 Dim tmpcomp As ConstantProperties = pp._availablecomps(c)
                 If Not pp._selectedcomps.ContainsKey(c) Then pp._selectedcomps.Add(c, tmpcomp)
-                'pp._availablecomps.Remove(c)
             Next
 
             ms.SetOverallComposition(molefractions)
-            ms.Fases(0).SPMProperties.temperature = T
-            ms.Fases(0).SPMProperties.pressure = P
+            ms.Phases(0).SPMProperties.temperature = T
+            ms.Phases(0).SPMProperties.pressure = P
 
             ms._pp = pp
             pp.SetMaterial(ms)
@@ -1291,7 +1277,7 @@ Namespace Thermodynamics
             pp.CalcEquilibrium(ms, "TP", "UNDEFINED")
 
             Dim labels As String() = Nothing
-            Dim statuses As CAPEOPEN110.eCapePhaseStatus() = Nothing
+            Dim statuses As eCapePhaseStatus() = Nothing
 
             ms.GetPresentPhases(labels, statuses)
 
@@ -1325,7 +1311,6 @@ Namespace Thermodynamics
             Return fractions
 
         End Function
-
         ''' <summary>
         ''' Calculates a PH Flash using the selected Property Package.
         ''' </summary>
@@ -1342,22 +1327,22 @@ Namespace Thermodynamics
         ''' <param name="InitialTemperatureEstimate">Initial estimate for the temperature, in K.</param>
         ''' <returns>A matrix containing phase fractions and compound distribution in mole fractions.</returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(27)> Public Function PHFlash( _
-            ByVal proppack As String, _
-            ByVal flashalg As Integer, _
-            ByVal P As Double, _
-            ByVal H As Double, _
-            ByVal compounds As String(), _
-            ByVal molefractions As Double(), _
-            Optional ByVal ip1 As Object = Nothing, _
-            Optional ByVal ip2 As Object = Nothing, _
-            Optional ByVal ip3 As Object = Nothing, _
+        <Runtime.InteropServices.DispId(27)> Public Function PHFlash(
+            ByVal proppack As String,
+            ByVal flashalg As Integer,
+            ByVal P As Double,
+            ByVal H As Double,
+            ByVal compounds As String(),
+            ByVal molefractions As Double(),
+            Optional ByVal ip1 As Object = Nothing,
+            Optional ByVal ip2 As Object = Nothing,
+            Optional ByVal ip3 As Object = Nothing,
             Optional ByVal ip4 As Object = Nothing,
             Optional ByVal InitialTemperatureEstimate As Double = 0.0#) As Object(,)
 
             Dim ppm As New CAPEOPENPropertyPackageManager()
 
-            Dim pp As PropertyPackages.PropertyPackage
+            Dim pp As PropertyPackage
 
             pp = ppm.GetPropertyPackage(proppack)
             TransferComps(pp)
@@ -1369,22 +1354,21 @@ Namespace Thermodynamics
 
             Dim ms As New Streams.MaterialStream("", "")
 
-            For Each phase As DTL.ClassesBasicasTermodinamica.Fase In ms.Fases.Values
+            For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
-                    phase.Componentes.Add(c, New DTL.ClassesBasicasTermodinamica.Substancia(c, ""))
-                    phase.Componentes(c).ConstantProperties = pp._availablecomps(c)
+                    phase.Components.Add(c, New Substance(c, ""))
+                    phase.Components(c).ConstantProperties = pp._availablecomps(c)
                 Next
             Next
 
             For Each c As String In compounds
                 Dim tmpcomp As ConstantProperties = pp._availablecomps(c)
                 If Not pp._selectedcomps.ContainsKey(c) Then pp._selectedcomps.Add(c, tmpcomp)
-                'pp._availablecomps.Remove(c)
             Next
 
             ms.SetOverallComposition(molefractions)
-            ms.Fases(0).SPMProperties.enthalpy = H
-            ms.Fases(0).SPMProperties.pressure = P
+            ms.Phases(0).SPMProperties.enthalpy = H
+            ms.Phases(0).SPMProperties.pressure = P
 
             ms._pp = pp
             pp.SetMaterial(ms)
@@ -1401,7 +1385,7 @@ Namespace Thermodynamics
             Next
             pp._tpcompids = comps
 
-            ms.Fases(0).SPMProperties.temperature = InitialTemperatureEstimate
+            ms.Phases(0).SPMProperties.temperature = InitialTemperatureEstimate
 
             pp.CalcEquilibrium(ms, "PH", "UNDEFINED")
 
@@ -1417,7 +1401,7 @@ Namespace Thermodynamics
             Dim i, j As Integer
             i = 0
             For Each l As String In labels
-                If statuses(i) = CapeOpen.eCapePhaseStatus.CAPE_ATEQUILIBRIUM Then
+                If statuses(i) = eCapePhaseStatus.CAPE_ATEQUILIBRIUM Then
                     fractions(0, i) = labels(i)
                     ms.GetSinglePhaseProp("phasefraction", labels(i), "Mole", res)
                     fractions(1, i) = res(0)
@@ -1429,7 +1413,7 @@ Namespace Thermodynamics
                 i += 1
             Next
 
-            fractions(compounds.Length + 2, 0) = ms.Fases(0).SPMProperties.temperature.GetValueOrDefault
+            fractions(compounds.Length + 2, 0) = ms.Phases(0).SPMProperties.temperature.GetValueOrDefault
 
             If TypeOf proppack Is String Then
                 pp.Dispose()
@@ -1442,7 +1426,6 @@ Namespace Thermodynamics
             Return fractions
 
         End Function
-
         ''' <summary>
         ''' Calculates a PH Flash using the selected Property Package.
         ''' </summary>
@@ -1459,22 +1442,22 @@ Namespace Thermodynamics
         ''' <param name="InitialTemperatureEstimate">Initial estimate for the temperature, in K.</param>
         ''' <returns>A matrix containing phase fractions and compound distribution in mole fractions.</returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(28)> Public Function PSFlash( _
-            ByVal proppack As String, _
-            ByVal flashalg As Integer, _
-            ByVal P As Double, _
-            ByVal S As Double, _
-            ByVal compounds As String(), _
-            ByVal molefractions As Double(), _
-            Optional ByVal ip1 As Object = Nothing, _
-            Optional ByVal ip2 As Object = Nothing, _
-            Optional ByVal ip3 As Object = Nothing, _
+        <Runtime.InteropServices.DispId(28)> Public Function PSFlash(
+            ByVal proppack As String,
+            ByVal flashalg As Integer,
+            ByVal P As Double,
+            ByVal S As Double,
+            ByVal compounds As String(),
+            ByVal molefractions As Double(),
+            Optional ByVal ip1 As Object = Nothing,
+            Optional ByVal ip2 As Object = Nothing,
+            Optional ByVal ip3 As Object = Nothing,
             Optional ByVal ip4 As Object = Nothing,
             Optional ByVal InitialTemperatureEstimate As Double = 0.0#) As Object(,)
 
             Dim ppm As New CAPEOPENPropertyPackageManager()
 
-            Dim pp As PropertyPackages.PropertyPackage
+            Dim pp As PropertyPackage
 
             pp = ppm.GetPropertyPackage(proppack)
             TransferComps(pp)
@@ -1486,22 +1469,21 @@ Namespace Thermodynamics
 
             Dim ms As New Streams.MaterialStream("", "")
 
-            For Each phase As DTL.ClassesBasicasTermodinamica.Fase In ms.Fases.Values
+            For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
-                    phase.Componentes.Add(c, New DTL.ClassesBasicasTermodinamica.Substancia(c, ""))
-                    phase.Componentes(c).ConstantProperties = pp._availablecomps(c)
+                    phase.Components.Add(c, New Substance(c, ""))
+                    phase.Components(c).ConstantProperties = pp._availablecomps(c)
                 Next
             Next
 
             For Each c As String In compounds
                 Dim tmpcomp As ConstantProperties = pp._availablecomps(c)
                 If Not pp._selectedcomps.ContainsKey(c) Then pp._selectedcomps.Add(c, tmpcomp)
-                'pp._availablecomps.Remove(c)
             Next
 
             ms.SetOverallComposition(molefractions)
-            ms.Fases(0).SPMProperties.entropy = S
-            ms.Fases(0).SPMProperties.pressure = P
+            ms.Phases(0).SPMProperties.entropy = S
+            ms.Phases(0).SPMProperties.pressure = P
 
             ms._pp = pp
             pp.SetMaterial(ms)
@@ -1518,12 +1500,12 @@ Namespace Thermodynamics
             Next
             pp._tpcompids = comps
 
-            ms.Fases(0).SPMProperties.temperature = InitialTemperatureEstimate
+            ms.Phases(0).SPMProperties.temperature = InitialTemperatureEstimate
 
             pp.CalcEquilibrium(ms, "PS", "UNDEFINED")
 
             Dim labels As String() = Nothing
-            Dim statuses As CapeOpen.eCapePhaseStatus() = Nothing
+            Dim statuses As eCapePhaseStatus() = Nothing
 
             ms.GetPresentPhases(labels, statuses)
 
@@ -1534,7 +1516,7 @@ Namespace Thermodynamics
             Dim i, j As Integer
             i = 0
             For Each l As String In labels
-                If statuses(i) = CapeOpen.eCapePhaseStatus.CAPE_ATEQUILIBRIUM Then
+                If statuses(i) = eCapePhaseStatus.CAPE_ATEQUILIBRIUM Then
                     fractions(0, i) = labels(i)
                     ms.GetSinglePhaseProp("phasefraction", labels(i), "Mole", res)
                     fractions(1, i) = res(0)
@@ -1546,7 +1528,7 @@ Namespace Thermodynamics
                 i += 1
             Next
 
-            fractions(compounds.Length + 2, 0) = ms.Fases(0).SPMProperties.temperature.GetValueOrDefault
+            fractions(compounds.Length + 2, 0) = ms.Phases(0).SPMProperties.temperature.GetValueOrDefault
 
             If TypeOf proppack Is String Then
                 pp.Dispose()
@@ -1559,7 +1541,6 @@ Namespace Thermodynamics
             Return fractions
 
         End Function
-
         ''' <summary>
         ''' Calculates a PVF Flash using the selected Property Package.
         ''' </summary>
@@ -1576,22 +1557,22 @@ Namespace Thermodynamics
         ''' <param name="InitialTemperatureEstimate">Initial estimate for the temperature, in K.</param>
         ''' <returns>A matrix containing phase fractions and compound distribution in mole fractions.</returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(29)> Public Function PVFFlash( _
-            ByVal proppack As String, _
-            ByVal flashalg As Integer, _
-            ByVal P As Double, _
-            ByVal VF As Double, _
-            ByVal compounds As Object(), _
-            ByVal molefractions As Double(), _
-            Optional ByVal ip1 As Object = Nothing, _
-            Optional ByVal ip2 As Object = Nothing, _
-            Optional ByVal ip3 As Object = Nothing, _
+        <Runtime.InteropServices.DispId(29)> Public Function PVFFlash(
+            ByVal proppack As String,
+            ByVal flashalg As Integer,
+            ByVal P As Double,
+            ByVal VF As Double,
+            ByVal compounds As Object(),
+            ByVal molefractions As Double(),
+            Optional ByVal ip1 As Object = Nothing,
+            Optional ByVal ip2 As Object = Nothing,
+            Optional ByVal ip3 As Object = Nothing,
             Optional ByVal ip4 As Object = Nothing,
             Optional ByVal InitialTemperatureEstimate As Double = 0.0#) As Object(,)
 
             Dim ppm As New CAPEOPENPropertyPackageManager()
 
-            Dim pp As PropertyPackages.PropertyPackage
+            Dim pp As PropertyPackage
 
             pp = ppm.GetPropertyPackage(proppack)
             TransferComps(pp)
@@ -1603,22 +1584,21 @@ Namespace Thermodynamics
 
             Dim ms As New Streams.MaterialStream("", "")
 
-            For Each phase As DTL.ClassesBasicasTermodinamica.Fase In ms.Fases.Values
+            For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
-                    phase.Componentes.Add(c, New DTL.ClassesBasicasTermodinamica.Substancia(c, ""))
-                    phase.Componentes(c).ConstantProperties = pp._availablecomps(c)
+                    phase.Components.Add(c, New Substance(c, ""))
+                    phase.Components(c).ConstantProperties = pp._availablecomps(c)
                 Next
             Next
 
             For Each c As String In compounds
                 Dim tmpcomp As ConstantProperties = pp._availablecomps(c)
                 If Not pp._selectedcomps.ContainsKey(c) Then pp._selectedcomps.Add(c, tmpcomp)
-                'pp._availablecomps.Remove(c)
             Next
 
             ms.SetOverallComposition(molefractions)
-            ms.Fases(2).SPMProperties.molarfraction = VF
-            ms.Fases(0).SPMProperties.pressure = P
+            ms.Phases(2).SPMProperties.molarfraction = VF
+            ms.Phases(0).SPMProperties.pressure = P
 
             ms._pp = pp
             pp.SetMaterial(ms)
@@ -1635,12 +1615,12 @@ Namespace Thermodynamics
             Next
             pp._tpcompids = comps
 
-            ms.Fases(0).SPMProperties.temperature = InitialTemperatureEstimate
+            ms.Phases(0).SPMProperties.temperature = InitialTemperatureEstimate
 
             pp.CalcEquilibrium(ms, "PVF", "UNDEFINED")
 
             Dim labels As String() = Nothing
-            Dim statuses As CapeOpen.eCapePhaseStatus() = Nothing
+            Dim statuses As eCapePhaseStatus() = Nothing
 
             ms.GetPresentPhases(labels, statuses)
 
@@ -1651,7 +1631,7 @@ Namespace Thermodynamics
             Dim i, j As Integer
             i = 0
             For Each l As String In labels
-                If statuses(i) = CapeOpen.eCapePhaseStatus.CAPE_ATEQUILIBRIUM Then
+                If statuses(i) = eCapePhaseStatus.CAPE_ATEQUILIBRIUM Then
                     fractions(0, i) = labels(i)
                     ms.GetSinglePhaseProp("phasefraction", labels(i), "Mole", res)
                     fractions(1, i) = res(0)
@@ -1663,7 +1643,7 @@ Namespace Thermodynamics
                 i += 1
             Next
 
-            fractions(compounds.Length + 2, 0) = ms.Fases(0).SPMProperties.temperature.GetValueOrDefault
+            fractions(compounds.Length + 2, 0) = ms.Phases(0).SPMProperties.temperature.GetValueOrDefault
 
             If TypeOf proppack Is String Then
                 pp.Dispose()
@@ -1676,7 +1656,6 @@ Namespace Thermodynamics
             Return fractions
 
         End Function
-
         ''' <summary>
         ''' Calculates a TVF Flash using the selected Property Package.
         ''' </summary>
@@ -1693,22 +1672,22 @@ Namespace Thermodynamics
         '''<param name="InitialPressureEstimate">Initial estimate for the pressure, in Pa.</param>
         ''' <returns>A matrix containing phase fractions and compound distribution in mole fractions.</returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(30)> Public Function TVFFlash( _
-            ByVal proppack As String, _
-            ByVal flashalg As Integer, _
-            ByVal T As Double, _
-            ByVal VF As Double, _
-            ByVal compounds As String(), _
-            ByVal molefractions As Double(), _
-            Optional ByVal ip1 As Object = Nothing, _
-            Optional ByVal ip2 As Object = Nothing, _
-            Optional ByVal ip3 As Object = Nothing, _
+        <Runtime.InteropServices.DispId(30)> Public Function TVFFlash(
+            ByVal proppack As String,
+            ByVal flashalg As Integer,
+            ByVal T As Double,
+            ByVal VF As Double,
+            ByVal compounds As String(),
+            ByVal molefractions As Double(),
+            Optional ByVal ip1 As Object = Nothing,
+            Optional ByVal ip2 As Object = Nothing,
+            Optional ByVal ip3 As Object = Nothing,
             Optional ByVal ip4 As Object = Nothing,
             Optional ByVal InitialPressureEstimate As Double = 0.0#) As Object(,)
 
             Dim ppm As New CAPEOPENPropertyPackageManager()
 
-            Dim pp As PropertyPackages.PropertyPackage
+            Dim pp As PropertyPackage
 
             pp = ppm.GetPropertyPackage(proppack)
             TransferComps(pp)
@@ -1720,22 +1699,21 @@ Namespace Thermodynamics
 
             Dim ms As New Streams.MaterialStream("", "")
 
-            For Each phase As DTL.ClassesBasicasTermodinamica.Fase In ms.Fases.Values
+            For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
-                    phase.Componentes.Add(c, New DTL.ClassesBasicasTermodinamica.Substancia(c, ""))
-                    phase.Componentes(c).ConstantProperties = pp._availablecomps(c)
+                    phase.Components.Add(c, New Substance(c, ""))
+                    phase.Components(c).ConstantProperties = pp._availablecomps(c)
                 Next
             Next
 
             For Each c As String In compounds
                 Dim tmpcomp As ConstantProperties = pp._availablecomps(c)
                 If Not pp._selectedcomps.ContainsKey(c) Then pp._selectedcomps.Add(c, tmpcomp)
-                'pp._availablecomps.Remove(c)
             Next
 
             ms.SetOverallComposition(molefractions)
-            ms.Fases(2).SPMProperties.molarfraction = VF
-            ms.Fases(0).SPMProperties.temperature = T
+            ms.Phases(2).SPMProperties.molarfraction = VF
+            ms.Phases(0).SPMProperties.temperature = T
 
             ms._pp = pp
             pp.SetMaterial(ms)
@@ -1752,12 +1730,12 @@ Namespace Thermodynamics
             Next
             pp._tpcompids = comps
 
-            ms.Fases(0).SPMProperties.pressure = InitialPressureEstimate
+            ms.Phases(0).SPMProperties.pressure = InitialPressureEstimate
 
             pp.CalcEquilibrium(ms, "TVF", "UNDEFINED")
 
             Dim labels As String() = Nothing
-            Dim statuses As CapeOpen.eCapePhaseStatus() = Nothing
+            Dim statuses As eCapePhaseStatus() = Nothing
 
             ms.GetPresentPhases(labels, statuses)
 
@@ -1768,7 +1746,7 @@ Namespace Thermodynamics
             Dim i, j As Integer
             i = 0
             For Each l As String In labels
-                If statuses(i) = CapeOpen.eCapePhaseStatus.CAPE_ATEQUILIBRIUM Then
+                If statuses(i) = eCapePhaseStatus.CAPE_ATEQUILIBRIUM Then
                     fractions(0, i) = labels(i)
                     ms.GetSinglePhaseProp("phasefraction", labels(i), "Mole", res)
                     fractions(1, i) = res(0)
@@ -1780,7 +1758,7 @@ Namespace Thermodynamics
                 i += 1
             Next
 
-            fractions(compounds.Length + 2, 0) = ms.Fases(0).SPMProperties.pressure.GetValueOrDefault
+            fractions(compounds.Length + 2, 0) = ms.Phases(0).SPMProperties.pressure.GetValueOrDefault
 
             If TypeOf proppack Is String Then
                 pp.Dispose()
@@ -1793,7 +1771,6 @@ Namespace Thermodynamics
             Return fractions
 
         End Function
-
         ''' <summary>
         ''' Calculates a PT Flash using the referenced Property Package.
         ''' </summary>
@@ -1809,21 +1786,21 @@ Namespace Thermodynamics
         ''' <param name="ip4">Interaction Parameters Set #4.</param>
         ''' <returns>A matrix containing phase fractions and compound distribution in mole fractions.</returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(31)> Public Function PTFlash( _
-            ByVal proppack As PropertyPackage, _
-            ByVal flashalg As Integer, _
-            ByVal P As Double, _
-            ByVal T As Double, _
-            ByVal compounds As String(), _
-            ByVal molefractions As Double(), _
-            Optional ByVal ip1 As Object = Nothing, _
-            Optional ByVal ip2 As Object = Nothing, _
-            Optional ByVal ip3 As Object = Nothing, _
+        <Runtime.InteropServices.DispId(31)> Public Function PTFlash(
+            ByVal proppack As PropertyPackage,
+            ByVal flashalg As Integer,
+            ByVal P As Double,
+            ByVal T As Double,
+            ByVal compounds As String(),
+            ByVal molefractions As Double(),
+            Optional ByVal ip1 As Object = Nothing,
+            Optional ByVal ip2 As Object = Nothing,
+            Optional ByVal ip3 As Object = Nothing,
             Optional ByVal ip4 As Object = Nothing) As Object(,)
 
             Dim ppm As New CAPEOPENPropertyPackageManager()
 
-            Dim pp As PropertyPackages.PropertyPackage
+            Dim pp As PropertyPackage
 
             pp = proppack
             TransferComps(pp)
@@ -1835,22 +1812,21 @@ Namespace Thermodynamics
 
             Dim ms As New Streams.MaterialStream("", "")
 
-            For Each phase As DTL.ClassesBasicasTermodinamica.Fase In ms.Fases.Values
+            For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
-                    phase.Componentes.Add(c, New DTL.ClassesBasicasTermodinamica.Substancia(c, ""))
-                    phase.Componentes(c).ConstantProperties = pp._availablecomps(c)
+                    phase.Components.Add(c, New Substance(c, ""))
+                    phase.Components(c).ConstantProperties = pp._availablecomps(c)
                 Next
             Next
 
             For Each c As String In compounds
                 Dim tmpcomp As ConstantProperties = pp._availablecomps(c)
                 If Not pp._selectedcomps.ContainsKey(c) Then pp._selectedcomps.Add(c, tmpcomp)
-                'pp._availablecomps.Remove(c)
             Next
 
             ms.SetOverallComposition(molefractions)
-            ms.Fases(0).SPMProperties.temperature = T
-            ms.Fases(0).SPMProperties.pressure = P
+            ms.Phases(0).SPMProperties.temperature = T
+            ms.Phases(0).SPMProperties.pressure = P
 
             ms._pp = pp
             pp.SetMaterial(ms)
@@ -1860,7 +1836,7 @@ Namespace Thermodynamics
             pp.CalcEquilibrium(ms, "TP", "UNDEFINED")
 
             Dim labels As String() = Nothing
-            Dim statuses As CapeOpen.eCapePhaseStatus() = Nothing
+            Dim statuses As eCapePhaseStatus() = Nothing
 
             ms.GetPresentPhases(labels, statuses)
 
@@ -1871,7 +1847,7 @@ Namespace Thermodynamics
             Dim i, j As Integer
             i = 0
             For Each l As String In labels
-                If statuses(i) = CapeOpen.eCapePhaseStatus.CAPE_ATEQUILIBRIUM Then
+                If statuses(i) = eCapePhaseStatus.CAPE_ATEQUILIBRIUM Then
                     fractions(0, i) = labels(i)
                     ms.GetSinglePhaseProp("phasefraction", labels(i), "Mole", res)
                     fractions(1, i) = res(0)
@@ -1889,7 +1865,6 @@ Namespace Thermodynamics
             Return fractions
 
         End Function
-
         ''' <summary>
         ''' Calculates a PH Flash using the referenced Property Package.
         ''' </summary>
@@ -1906,22 +1881,22 @@ Namespace Thermodynamics
         ''' <param name="InitialTemperatureEstimate">Initial estimate for the temperature, in K.</param>
         ''' <returns>A matrix containing phase fractions and compound distribution in mole fractions.</returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(32)> Public Function PHFlash( _
-            ByVal proppack As PropertyPackage, _
-            ByVal flashalg As Integer, _
-            ByVal P As Double, _
-            ByVal H As Double, _
-            ByVal compounds As String(), _
-            ByVal molefractions As Double(), _
-            Optional ByVal ip1 As Object = Nothing, _
-            Optional ByVal ip2 As Object = Nothing, _
-            Optional ByVal ip3 As Object = Nothing, _
+        <Runtime.InteropServices.DispId(32)> Public Function PHFlash(
+            ByVal proppack As PropertyPackage,
+            ByVal flashalg As Integer,
+            ByVal P As Double,
+            ByVal H As Double,
+            ByVal compounds As String(),
+            ByVal molefractions As Double(),
+            Optional ByVal ip1 As Object = Nothing,
+            Optional ByVal ip2 As Object = Nothing,
+            Optional ByVal ip3 As Object = Nothing,
             Optional ByVal ip4 As Object = Nothing,
             Optional ByVal InitialTemperatureEstimate As Double = 0.0#) As Object(,)
 
             Dim ppm As New CAPEOPENPropertyPackageManager()
 
-            Dim pp As PropertyPackages.PropertyPackage
+            Dim pp As PropertyPackage
 
             pp = proppack
             TransferComps(pp)
@@ -1933,34 +1908,33 @@ Namespace Thermodynamics
 
             Dim ms As New Streams.MaterialStream("", "")
 
-            For Each phase As DTL.ClassesBasicasTermodinamica.Fase In ms.Fases.Values
+            For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
-                    phase.Componentes.Add(c, New DTL.ClassesBasicasTermodinamica.Substancia(c, ""))
-                    phase.Componentes(c).ConstantProperties = pp._availablecomps(c)
+                    phase.Components.Add(c, New Substance(c, ""))
+                    phase.Components(c).ConstantProperties = pp._availablecomps(c)
                 Next
             Next
 
             For Each c As String In compounds
                 Dim tmpcomp As ConstantProperties = pp._availablecomps(c)
                 If Not pp._selectedcomps.ContainsKey(c) Then pp._selectedcomps.Add(c, tmpcomp)
-                'pp._availablecomps.Remove(c)
             Next
 
             ms.SetOverallComposition(molefractions)
-            ms.Fases(0).SPMProperties.enthalpy = H
-            ms.Fases(0).SPMProperties.pressure = P
+            ms.Phases(0).SPMProperties.enthalpy = H
+            ms.Phases(0).SPMProperties.pressure = P
 
             ms._pp = pp
             pp.SetMaterial(ms)
 
             pp.FlashAlgorithm = flashalg
 
-            ms.Fases(0).SPMProperties.temperature = InitialTemperatureEstimate
+            ms.Phases(0).SPMProperties.temperature = InitialTemperatureEstimate
 
             pp.CalcEquilibrium(ms, "PH", "UNDEFINED")
 
             Dim labels As String() = Nothing
-            Dim statuses As CapeOpen.eCapePhaseStatus() = Nothing
+            Dim statuses As eCapePhaseStatus() = Nothing
 
             ms.GetPresentPhases(labels, statuses)
 
@@ -1971,7 +1945,7 @@ Namespace Thermodynamics
             Dim i, j As Integer
             i = 0
             For Each l As String In labels
-                If statuses(i) = CapeOpen.eCapePhaseStatus.CAPE_ATEQUILIBRIUM Then
+                If statuses(i) = eCapePhaseStatus.CAPE_ATEQUILIBRIUM Then
                     fractions(0, i) = labels(i)
                     ms.GetSinglePhaseProp("phasefraction", labels(i), "Mole", res)
                     fractions(1, i) = res(0)
@@ -1983,7 +1957,7 @@ Namespace Thermodynamics
                 i += 1
             Next
 
-            fractions(compounds.Length + 2, 0) = ms.Fases(0).SPMProperties.temperature.GetValueOrDefault
+            fractions(compounds.Length + 2, 0) = ms.Phases(0).SPMProperties.temperature.GetValueOrDefault
 
             ms.Dispose()
             ms = Nothing
@@ -1991,7 +1965,6 @@ Namespace Thermodynamics
             Return fractions
 
         End Function
-
         ''' <summary>
         ''' Calculates a PS Flash using the referenced Property Package.
         ''' </summary>
@@ -2008,22 +1981,22 @@ Namespace Thermodynamics
         ''' <param name="InitialTemperatureEstimate">Initial estimate for the temperature, in K.</param>
         ''' <returns>A matrix containing phase fractions and compound distribution in mole fractions.</returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(33)> Public Function PSFlash( _
-            ByVal proppack As PropertyPackage, _
-            ByVal flashalg As Integer, _
-            ByVal P As Double, _
-            ByVal S As Double, _
-            ByVal compounds As String(), _
-            ByVal molefractions As Double(), _
-            Optional ByVal ip1 As Object = Nothing, _
-            Optional ByVal ip2 As Object = Nothing, _
-            Optional ByVal ip3 As Object = Nothing, _
+        <Runtime.InteropServices.DispId(33)> Public Function PSFlash(
+            ByVal proppack As PropertyPackage,
+            ByVal flashalg As Integer,
+            ByVal P As Double,
+            ByVal S As Double,
+            ByVal compounds As String(),
+            ByVal molefractions As Double(),
+            Optional ByVal ip1 As Object = Nothing,
+            Optional ByVal ip2 As Object = Nothing,
+            Optional ByVal ip3 As Object = Nothing,
             Optional ByVal ip4 As Object = Nothing,
             Optional ByVal InitialTemperatureEstimate As Double = 0.0#) As Object(,)
 
             Dim ppm As New CAPEOPENPropertyPackageManager()
 
-            Dim pp As PropertyPackages.PropertyPackage
+            Dim pp As PropertyPackage
 
             pp = proppack
             TransferComps(pp)
@@ -2035,34 +2008,33 @@ Namespace Thermodynamics
 
             Dim ms As New Streams.MaterialStream("", "")
 
-            For Each phase As DTL.ClassesBasicasTermodinamica.Fase In ms.Fases.Values
+            For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
-                    phase.Componentes.Add(c, New DTL.ClassesBasicasTermodinamica.Substancia(c, ""))
-                    phase.Componentes(c).ConstantProperties = pp._availablecomps(c)
+                    phase.Components.Add(c, New Substance(c, ""))
+                    phase.Components(c).ConstantProperties = pp._availablecomps(c)
                 Next
             Next
 
             For Each c As String In compounds
                 Dim tmpcomp As ConstantProperties = pp._availablecomps(c)
                 If Not pp._selectedcomps.ContainsKey(c) Then pp._selectedcomps.Add(c, tmpcomp)
-                'pp._availablecomps.Remove(c)
             Next
 
             ms.SetOverallComposition(molefractions)
-            ms.Fases(0).SPMProperties.entropy = S
-            ms.Fases(0).SPMProperties.pressure = P
+            ms.Phases(0).SPMProperties.entropy = S
+            ms.Phases(0).SPMProperties.pressure = P
 
             ms._pp = pp
             pp.SetMaterial(ms)
 
             pp.FlashAlgorithm = flashalg
 
-            ms.Fases(0).SPMProperties.temperature = InitialTemperatureEstimate
+            ms.Phases(0).SPMProperties.temperature = InitialTemperatureEstimate
 
             pp.CalcEquilibrium(ms, "PS", "UNDEFINED")
 
             Dim labels As String() = Nothing
-            Dim statuses As CapeOpen.eCapePhaseStatus() = Nothing
+            Dim statuses As eCapePhaseStatus() = Nothing
 
             ms.GetPresentPhases(labels, statuses)
 
@@ -2073,7 +2045,7 @@ Namespace Thermodynamics
             Dim i, j As Integer
             i = 0
             For Each l As String In labels
-                If statuses(i) = CapeOpen.eCapePhaseStatus.CAPE_ATEQUILIBRIUM Then
+                If statuses(i) = eCapePhaseStatus.CAPE_ATEQUILIBRIUM Then
                     fractions(0, i) = labels(i)
                     ms.GetSinglePhaseProp("phasefraction", labels(i), "Mole", res)
                     fractions(1, i) = res(0)
@@ -2085,7 +2057,7 @@ Namespace Thermodynamics
                 i += 1
             Next
 
-            fractions(compounds.Length + 2, 0) = ms.Fases(0).SPMProperties.temperature.GetValueOrDefault
+            fractions(compounds.Length + 2, 0) = ms.Phases(0).SPMProperties.temperature.GetValueOrDefault
 
             ms.Dispose()
             ms = Nothing
@@ -2093,7 +2065,6 @@ Namespace Thermodynamics
             Return fractions
 
         End Function
-
         ''' <summary>
         ''' Calculates a PVF Flash using the referenced Property Package.
         ''' </summary>
@@ -2110,22 +2081,22 @@ Namespace Thermodynamics
         ''' <param name="InitialTemperatureEstimate">Initial estimate for the temperature, in K.</param>
         ''' <returns>A matrix containing phase fractions and compound distribution in mole fractions.</returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(34)> Public Function PVFFlash( _
-            ByVal proppack As PropertyPackage, _
-            ByVal flashalg As Integer, _
-            ByVal P As Double, _
-            ByVal VF As Double, _
-            ByVal compounds As String(), _
-            ByVal molefractions As Double(), _
-            Optional ByVal ip1 As Object = Nothing, _
-            Optional ByVal ip2 As Object = Nothing, _
-            Optional ByVal ip3 As Object = Nothing, _
+        <Runtime.InteropServices.DispId(34)> Public Function PVFFlash(
+            ByVal proppack As PropertyPackage,
+            ByVal flashalg As Integer,
+            ByVal P As Double,
+            ByVal VF As Double,
+            ByVal compounds As String(),
+            ByVal molefractions As Double(),
+            Optional ByVal ip1 As Object = Nothing,
+            Optional ByVal ip2 As Object = Nothing,
+            Optional ByVal ip3 As Object = Nothing,
             Optional ByVal ip4 As Object = Nothing,
             Optional ByVal InitialTemperatureEstimate As Double = 0.0#) As Object(,)
 
             Dim ppm As New CAPEOPENPropertyPackageManager()
 
-            Dim pp As PropertyPackages.PropertyPackage
+            Dim pp As PropertyPackage
 
             pp = proppack
             TransferComps(pp)
@@ -2137,34 +2108,33 @@ Namespace Thermodynamics
 
             Dim ms As New Streams.MaterialStream("", "")
 
-            For Each phase As DTL.ClassesBasicasTermodinamica.Fase In ms.Fases.Values
+            For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
-                    phase.Componentes.Add(c, New DTL.ClassesBasicasTermodinamica.Substancia(c, ""))
-                    phase.Componentes(c).ConstantProperties = pp._availablecomps(c)
+                    phase.Components.Add(c, New Substance(c, ""))
+                    phase.Components(c).ConstantProperties = pp._availablecomps(c)
                 Next
             Next
 
             For Each c As String In compounds
                 Dim tmpcomp As ConstantProperties = pp._availablecomps(c)
                 If Not pp._selectedcomps.ContainsKey(c) Then pp._selectedcomps.Add(c, tmpcomp)
-                'pp._availablecomps.Remove(c)
             Next
 
             ms.SetOverallComposition(molefractions)
-            ms.Fases(2).SPMProperties.molarfraction = VF
-            ms.Fases(0).SPMProperties.pressure = P
+            ms.Phases(2).SPMProperties.molarfraction = VF
+            ms.Phases(0).SPMProperties.pressure = P
 
             ms._pp = pp
             pp.SetMaterial(ms)
 
             pp.FlashAlgorithm = flashalg
 
-            ms.Fases(0).SPMProperties.temperature = InitialTemperatureEstimate
+            ms.Phases(0).SPMProperties.temperature = InitialTemperatureEstimate
 
             pp.CalcEquilibrium(ms, "PVF", "UNDEFINED")
 
             Dim labels As String() = Nothing
-            Dim statuses As CapeOpen.eCapePhaseStatus() = Nothing
+            Dim statuses As eCapePhaseStatus() = Nothing
 
             ms.GetPresentPhases(labels, statuses)
 
@@ -2175,7 +2145,7 @@ Namespace Thermodynamics
             Dim i, j As Integer
             i = 0
             For Each l As String In labels
-                If statuses(i) = CapeOpen.eCapePhaseStatus.CAPE_ATEQUILIBRIUM Then
+                If statuses(i) = eCapePhaseStatus.CAPE_ATEQUILIBRIUM Then
                     fractions(0, i) = labels(i)
                     ms.GetSinglePhaseProp("phasefraction", labels(i), "Mole", res)
                     fractions(1, i) = res(0)
@@ -2187,7 +2157,7 @@ Namespace Thermodynamics
                 i += 1
             Next
 
-            fractions(compounds.Length + 2, 0) = ms.Fases(0).SPMProperties.temperature.GetValueOrDefault
+            fractions(compounds.Length + 2, 0) = ms.Phases(0).SPMProperties.temperature.GetValueOrDefault
 
             ms.Dispose()
             ms = Nothing
@@ -2195,7 +2165,6 @@ Namespace Thermodynamics
             Return fractions
 
         End Function
-
         ''' <summary>
         ''' Calculates a TVF Flash using the referenced Property Package.
         ''' </summary>
@@ -2212,22 +2181,22 @@ Namespace Thermodynamics
         '''<param name="InitialPressureEstimate">Initial estimate for the pressure, in Pa.</param>
         ''' <returns>A matrix containing phase fractions and compound distribution in mole fractions.</returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(35)> Public Function TVFFlash( _
-            ByVal proppack As PropertyPackage, _
-            ByVal flashalg As Integer, _
-            ByVal T As Double, _
-            ByVal VF As Double, _
-            ByVal compounds As String(), _
-            ByVal molefractions As Double(), _
-            Optional ByVal ip1 As Object = Nothing, _
-            Optional ByVal ip2 As Object = Nothing, _
-            Optional ByVal ip3 As Object = Nothing, _
+        <Runtime.InteropServices.DispId(35)> Public Function TVFFlash(
+            ByVal proppack As PropertyPackage,
+            ByVal flashalg As Integer,
+            ByVal T As Double,
+            ByVal VF As Double,
+            ByVal compounds As String(),
+            ByVal molefractions As Double(),
+            Optional ByVal ip1 As Object = Nothing,
+            Optional ByVal ip2 As Object = Nothing,
+            Optional ByVal ip3 As Object = Nothing,
             Optional ByVal ip4 As Object = Nothing,
             Optional ByVal InitialPressureEstimate As Double = 0.0#) As Object(,)
 
             Dim ppm As New CAPEOPENPropertyPackageManager()
 
-            Dim pp As PropertyPackages.PropertyPackage
+            Dim pp As PropertyPackage
 
             pp = proppack
             TransferComps(pp)
@@ -2239,34 +2208,33 @@ Namespace Thermodynamics
 
             Dim ms As New Streams.MaterialStream("", "")
 
-            For Each phase As DTL.ClassesBasicasTermodinamica.Fase In ms.Fases.Values
+            For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
-                    phase.Componentes.Add(c, New DTL.ClassesBasicasTermodinamica.Substancia(c, ""))
-                    phase.Componentes(c).ConstantProperties = pp._availablecomps(c)
+                    phase.Components.Add(c, New Substance(c, ""))
+                    phase.Components(c).ConstantProperties = pp._availablecomps(c)
                 Next
             Next
 
             For Each c As String In compounds
                 Dim tmpcomp As ConstantProperties = pp._availablecomps(c)
                 If Not pp._selectedcomps.ContainsKey(c) Then pp._selectedcomps.Add(c, tmpcomp)
-                'pp._availablecomps.Remove(c)
             Next
 
             ms.SetOverallComposition(molefractions)
-            ms.Fases(2).SPMProperties.molarfraction = VF
-            ms.Fases(0).SPMProperties.temperature = T
+            ms.Phases(2).SPMProperties.molarfraction = VF
+            ms.Phases(0).SPMProperties.temperature = T
 
             ms._pp = pp
             pp.SetMaterial(ms)
 
             pp.FlashAlgorithm = flashalg
 
-            ms.Fases(0).SPMProperties.pressure = InitialPressureEstimate
+            ms.Phases(0).SPMProperties.pressure = InitialPressureEstimate
 
             pp.CalcEquilibrium(ms, "TVF", "UNDEFINED")
 
             Dim labels As String() = Nothing
-            Dim statuses As CapeOpen.eCapePhaseStatus() = Nothing
+            Dim statuses As eCapePhaseStatus() = Nothing
 
             ms.GetPresentPhases(labels, statuses)
 
@@ -2277,7 +2245,7 @@ Namespace Thermodynamics
             Dim i, j As Integer
             i = 0
             For Each l As String In labels
-                If statuses(i) = CapeOpen.eCapePhaseStatus.CAPE_ATEQUILIBRIUM Then
+                If statuses(i) = eCapePhaseStatus.CAPE_ATEQUILIBRIUM Then
                     fractions(0, i) = labels(i)
                     ms.GetSinglePhaseProp("phasefraction", labels(i), "Mole", res)
                     fractions(1, i) = res(0)
@@ -2289,7 +2257,7 @@ Namespace Thermodynamics
                 i += 1
             Next
 
-            fractions(compounds.Length + 2, 0) = ms.Fases(0).SPMProperties.pressure.GetValueOrDefault
+            fractions(compounds.Length + 2, 0) = ms.Phases(0).SPMProperties.pressure.GetValueOrDefault
 
             ms.Dispose()
             ms = Nothing
@@ -2297,13 +2265,12 @@ Namespace Thermodynamics
             Return fractions
 
         End Function
-
         ''' <summary>
         ''' Returns a list of the thermodynamic models.
         ''' </summary>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(36)> Public Function GetModelList() As ArrayList
+        <Runtime.InteropServices.DispId(36)> Public Function GetModelList() As ArrayList
 
             Dim modellist As New ArrayList
 
@@ -2328,7 +2295,7 @@ Namespace Thermodynamics
         ''' <param name="Compound2">The name of the second compound.</param>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        <System.Runtime.InteropServices.DispId(37)> Public Function GetInteractionParameterSet(ByVal Model As String, ByVal Compound1 As String, ByVal Compound2 As String) As InteractionParameter
+        <Runtime.InteropServices.DispId(37)> Public Function GetInteractionParameterSet(ByVal Model As String, ByVal Compound1 As String, ByVal Compound2 As String) As InteractionParameter
 
             Dim pars As New Dictionary(Of String, Object)
 
@@ -2518,17 +2485,17 @@ Namespace Thermodynamics
         ''' <returns>A FlashCalculationResult instance with the results of the calculations</returns>
         ''' <remarks>This function must be used instead of the older type-specific flash functions.
         ''' Check if the 'ResultException' property of the result object is nothing/null before proceeding.</remarks>
-        <System.Runtime.InteropServices.DispId(39)> Public Function CalcEquilibrium(flashtype As FlashCalculationType,
-                                                                                           flashalg As Integer, _
+        <Runtime.InteropServices.DispId(39)> Public Function CalcEquilibrium(flashtype As FlashCalculationType,
+                                                                                           flashalg As Integer,
                                                                                            val1 As Double, val2 As Double,
                                                                                            pp As PropertyPackage,
                                                                                            compounds As String(),
                                                                                            molefractions As Double(),
                                                                                            initialKval As Double(),
-                                                                                           initialestimate As Double, _
-                                                                                           Optional ByVal ip1 As Object = Nothing, _
-                                                                                           Optional ByVal ip2 As Object = Nothing, _
-                                                                                           Optional ByVal ip3 As Object = Nothing, _
+                                                                                           initialestimate As Double,
+                                                                                           Optional ByVal ip1 As Object = Nothing,
+                                                                                           Optional ByVal ip2 As Object = Nothing,
+                                                                                           Optional ByVal ip3 As Object = Nothing,
                                                                                            Optional ByVal ip4 As Object = Nothing) As FlashCalculationResult
 
             TransferComps(pp)
@@ -2537,10 +2504,10 @@ Namespace Thermodynamics
 
             Dim ms As New Streams.MaterialStream("", "")
 
-            For Each phase As DTL.ClassesBasicasTermodinamica.Fase In ms.Fases.Values
+            For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
                 For Each c As String In compounds
-                    phase.Componentes.Add(c, New DTL.ClassesBasicasTermodinamica.Substancia(c, ""))
-                    phase.Componentes(c).ConstantProperties = pp._availablecomps(c)
+                    phase.Components.Add(c, New Substance(c, ""))
+                    phase.Components(c).ConstantProperties = pp._availablecomps(c)
                 Next
             Next
 
@@ -2584,8 +2551,6 @@ Namespace Thermodynamics
             Return results
 
         End Function
-
-
     End Class
 
 End Namespace

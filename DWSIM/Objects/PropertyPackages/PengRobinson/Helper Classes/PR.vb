@@ -21,15 +21,15 @@ Imports System.Math
 
 Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
 
-    <System.Serializable()> Public Class PR
+    <Serializable()> Public Class PR
 
-        Inherits DTL.SimulationObjects.PropertyPackages.ThermoPlug
+        Inherits ThermoPlug
 
         Shared Function ReturnParameters(ByVal T As Double, ByVal P As Double, ByVal Vx As Array, ByVal VKij As Object, ByVal VTc As Array, ByVal VPc As Array, ByVal Vw As Array)
 
             Dim n, R, coeff(3) As Double
             Dim Vant(0, 4) As Double
-            Dim criterioOK As Boolean = False
+            Dim criterionOK As Boolean = False
             Dim AG, BG, aml, bml As Double
 
             n = UBound(Vx)
@@ -122,7 +122,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
 
         Shared Function ZtoMinG(ByVal Z_ As Array, ByVal T As Double, ByVal P As Double, ByVal Vz As Array, ByVal VKij As Object, ByVal VTc As Array, ByVal VPc As Array, ByVal Vw As Array) As Object
 
-            DTL.App.WriteToConsole("PR min-G root finder (Z) for T = " & T & " K, P = " & P & " Pa and Z = " & DirectCast(Z_, Object()).ToArrayString, 3)
+            App.WriteToConsole("PR min-G root finder (Z) for T = " & T & " K, P = " & P & " Pa and Z = " & DirectCast(Z_, Object()).ToArrayString, 3)
 
             Dim S, H, Z As Double
 
@@ -239,7 +239,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
 
             Next
 
-            DTL.App.WriteToConsole("Result: Min-G Z Index = " & k, 3)
+            App.WriteToConsole("Result: Min-G Z Index = " & k, 3)
 
             Return New Object() {k, G(k)}
 
@@ -255,7 +255,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
 
             Dim n, R, coeff(3) As Double
             Dim Vant(0, 4) As Double
-            Dim criterioOK As Boolean = False
+            Dim criterionOK As Boolean = False
             Dim AG, BG, aml, bml As Double
             Dim t1, t2, t3, t4, t5 As Double
 
@@ -505,7 +505,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
             Dim n, R, coeff(3) As Double
             Dim Vant(0, 4) As Double
             Dim beta As Double
-            Dim criterioOK As Boolean = False
+            Dim criterionOK As Boolean = False
             Dim AG, BG, aml, bml As Double
 
             n = UBound(Vx)
@@ -579,17 +579,15 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
             Z = _zarray(_mingz(0))
 
             beta = 1 / P * (1 - (BG * Z ^ 2 + AG * Z - 6 * BG ^ 2 * Z - 2 * BG * Z - 2 * AG * BG + 2 * BG ^ 2 + 2 * BG) / (Z * (3 * Z ^ 2 - 2 * Z + 2 * BG * Z + AG - 3 * BG ^ 2 - 2 * BG)))
-            Dim phase As String = "Unknown"
 
-            'If beta < 0.005 / 101322 Then phase = "L" Else phase = "V"
-            'If beta > 0.9 / P And beta < 3 / P Then phase = "V" Else phase = "L"
+            Dim phase As String = "Unknown"
             If Z < 0.302 Then phase = "L" Else phase = "V"
 
             Return New Object() {phase, beta}
 
         End Function
 
-        Public Overrides Function CalcEnthalpy(ByVal phasetype As String, ByVal T As Double, ByVal P As Double, ByVal Vz As System.Array, ByVal VKij As Object, ByVal VTc As System.Array, ByVal VPc As System.Array, ByVal Vw As System.Array, ByVal Hid As Double, Optional ByVal otherargs As Object = Nothing) As Double
+        Public Overrides Function CalcEnthalpy(ByVal phasetype As String, ByVal T As Double, ByVal P As Double, ByVal Vz As Array, ByVal VKij As Object, ByVal VTc As Array, ByVal VPc As Array, ByVal Vw As Array, ByVal Hid As Double, Optional ByVal otherargs As Object = Nothing) As Double
 
             Dim ai(), bi(), ci() As Double
             Dim n, R As Double
@@ -716,7 +714,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
                     Do
                         findZ = coeff(3) * Z ^ 3 + coeff(2) * Z ^ 2 + coeff(1) * Z + coeff(0)
                         Z -= 0.00001
-                        If Z < 0 Then Throw New Exception(DTL.App.GetLocalString("PropPack_ZError"))
+                        If Z < 0 Then Throw New Exception(App.GetLocalString("PropPack_ZError"))
                     Loop Until Math.Abs(findZ) < 0.0001
 
                 Else
@@ -725,7 +723,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
                     Do
                         findZ = coeff(3) * Z ^ 3 + coeff(2) * Z ^ 2 + coeff(1) * Z + coeff(0)
                         Z += 0.00001
-                        If Z > 1 Then Throw New Exception(DTL.App.GetLocalString("PropPack_ZError"))
+                        If Z > 1 Then Throw New Exception(App.GetLocalString("PropPack_ZError"))
                     Loop Until Math.Abs(findZ) < 0.0001
 
                 End If
@@ -761,7 +759,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
 
         End Function
 
-        Public Overrides Function CalcEntropy(ByVal phasetype As String, ByVal T As Double, ByVal P As Double, ByVal Vz As System.Array, ByVal VKij As Object, ByVal VTc As System.Array, ByVal VPc As System.Array, ByVal Vw As System.Array, ByVal Sid As Double, Optional ByVal otherargs As Object = Nothing) As Double
+        Public Overrides Function CalcEntropy(ByVal phasetype As String, ByVal T As Double, ByVal P As Double, ByVal Vz As Array, ByVal VKij As Object, ByVal VTc As Array, ByVal VPc As Array, ByVal Vw As Array, ByVal Sid As Double, Optional ByVal otherargs As Object = Nothing) As Double
 
             Dim ai(), bi(), ci() As Double
             Dim n, R As Double
@@ -888,7 +886,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
                     Do
                         findZ = coeff(3) * Z ^ 3 + coeff(2) * Z ^ 2 + coeff(1) * Z + coeff(0)
                         Z -= 0.00001
-                        If Z < 0 Then Throw New Exception(DTL.App.GetLocalString("PropPack_ZError"))
+                        If Z < 0 Then Throw New Exception(App.GetLocalString("PropPack_ZError"))
                     Loop Until Math.Abs(findZ) < 0.0001
 
                 Else
@@ -897,7 +895,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
                     Do
                         findZ = coeff(3) * Z ^ 3 + coeff(2) * Z ^ 2 + coeff(1) * Z + coeff(0)
                         Z += 0.00001
-                        If Z > 1 Then Throw New Exception(DTL.App.GetLocalString("PropPack_ZError"))
+                        If Z > 1 Then Throw New Exception(App.GetLocalString("PropPack_ZError"))
                     Loop Until Math.Abs(findZ) < 0.0001
 
                 End If
@@ -933,7 +931,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
 
         End Function
 
-        Public Overrides Function CalcGibbsEnergy(ByVal phasetype As String, ByVal T As Double, ByVal P As Double, ByVal Vz As System.Array, ByVal VKij As Object, ByVal VTc As System.Array, ByVal VPc As System.Array, ByVal Vw As System.Array, ByVal Gid As Double, Optional ByVal otherargs As Object = Nothing) As Double
+        Public Overrides Function CalcGibbsEnergy(ByVal phasetype As String, ByVal T As Double, ByVal P As Double, ByVal Vz As Array, ByVal VKij As Object, ByVal VTc As Array, ByVal VPc As Array, ByVal Vw As Array, ByVal Gid As Double, Optional ByVal otherargs As Object = Nothing) As Double
 
             Dim ai(), bi(), ci() As Double
             Dim n, R As Double
@@ -1060,7 +1058,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
                     Do
                         findZ = coeff(3) * Z ^ 3 + coeff(2) * Z ^ 2 + coeff(1) * Z + coeff(0)
                         Z -= 0.00001
-                        If Z < 0 Then Throw New Exception(DTL.App.GetLocalString("PropPack_ZError"))
+                        If Z < 0 Then Throw New Exception(App.GetLocalString("PropPack_ZError"))
                     Loop Until Math.Abs(findZ) < 0.0001
 
                 Else
@@ -1069,7 +1067,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
                     Do
                         findZ = coeff(3) * Z ^ 3 + coeff(2) * Z ^ 2 + coeff(1) * Z + coeff(0)
                         Z += 0.00001
-                        If Z > 1 Then Throw New Exception(DTL.App.GetLocalString("PropPack_ZError"))
+                        If Z > 1 Then Throw New Exception(App.GetLocalString("PropPack_ZError"))
                     Loop Until Math.Abs(findZ) < 0.0001
 
                 End If
@@ -1105,7 +1103,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
 
         End Function
 
-        Public Overrides Function CalcHelmoltzEnergy(ByVal phasetype As String, ByVal T As Double, ByVal P As Double, ByVal Vz As System.Array, ByVal VKij As Object, ByVal VTc As System.Array, ByVal VPc As System.Array, ByVal Vw As System.Array, ByVal Aid As Double, Optional ByVal otherargs As Object = Nothing) As Double
+        Public Overrides Function CalcHelmoltzEnergy(ByVal phasetype As String, ByVal T As Double, ByVal P As Double, ByVal Vz As Array, ByVal VKij As Object, ByVal VTc As Array, ByVal VPc As Array, ByVal Vw As Array, ByVal Aid As Double, Optional ByVal otherargs As Object = Nothing) As Double
 
             Dim ai(), bi(), ci() As Double
             Dim n, R As Double
@@ -1232,7 +1230,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
                     Do
                         findZ = coeff(3) * Z ^ 3 + coeff(2) * Z ^ 2 + coeff(1) * Z + coeff(0)
                         Z -= 0.00001
-                        If Z < 0 Then Throw New Exception(DTL.App.GetLocalString("PropPack_ZError"))
+                        If Z < 0 Then Throw New Exception(App.GetLocalString("PropPack_ZError"))
                     Loop Until Math.Abs(findZ) < 0.0001
 
                 Else
@@ -1241,7 +1239,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
                     Do
                         findZ = coeff(3) * Z ^ 3 + coeff(2) * Z ^ 2 + coeff(1) * Z + coeff(0)
                         Z += 0.00001
-                        If Z > 1 Then Throw New Exception(DTL.App.GetLocalString("PropPack_ZError"))
+                        If Z > 1 Then Throw New Exception(App.GetLocalString("PropPack_ZError"))
                     Loop Until Math.Abs(findZ) < 0.0001
 
                 End If
@@ -1277,7 +1275,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
 
         End Function
 
-        Public Overrides Function CalcP(ByVal V As Double, ByVal T As Double, ByVal Vx As System.Array, ByVal VKij As Object, ByVal VTc As System.Array, ByVal VPc As System.Array, ByVal Vw As System.Array, Optional ByVal otherargs As Object = Nothing) As Object
+        Public Overrides Function CalcP(ByVal V As Double, ByVal T As Double, ByVal Vx As Array, ByVal VKij As Object, ByVal VTc As Array, ByVal VPc As Array, ByVal Vw As Array, Optional ByVal otherargs As Object = Nothing) As Object
 
             Dim ai(), bi() As Double
             Dim n, R, P, coeff(3), tmp() As Double
@@ -1342,7 +1340,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
 
         End Function
 
-        Public Overrides Function CalcLnFugTV(ByVal T As Double, ByVal V As Double, ByVal Vx As System.Array, ByVal VKij As Object, ByVal VTc As System.Array, ByVal VPc As System.Array, ByVal Vw As System.Array, Optional ByVal otherargs As Object = Nothing, Optional ByVal forcephase As String = "") As Object
+        Public Overrides Function CalcLnFugTV(ByVal T As Double, ByVal V As Double, ByVal Vx As Array, ByVal VKij As Object, ByVal VTc As Array, ByVal VPc As Array, ByVal Vw As Array, Optional ByVal otherargs As Object = Nothing, Optional ByVal forcephase As String = "") As Object
 
             Dim P As Double = Me.CalcP(V, T, Vx, VKij, VTc, VPc, Vw, otherargs)
 
@@ -1350,7 +1348,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
 
             Dim n, R, coeff(3) As Double
             Dim Vant(0, 4) As Double
-            Dim criterioOK As Boolean = False
+            Dim criterionOK As Boolean = False
             Dim AG, BG, aml, bml As Double
             Dim t1, t2, t3, t4, t5 As Double
 
@@ -1433,12 +1431,11 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
 
             Return LN_CF
 
-
         End Function
 
         ''' <summary>
         ''' This procedure checks if the compressibility factor is within the allowable region for the specified phase. 
-        ''' If not, it generates a pseudo-root cabable of generate properties for the specified phase in order to keep 
+        ''' If not, it generates a pseudo-root capable of generating properties for the specified phase in order to keep 
         ''' the flash convergence process going forward.
         ''' </summary>
         ''' <param name="Z">The calculated compressibility factor, coming from the EOS</param>
@@ -1484,7 +1481,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
                 rhomax = rhomax - 0.7 * fx / dfdx
                 If rhomax < 0 Then rhomax = -rhomax
                 i += 1
-            Loop Until Math.Abs(fx) < 0.000001 Or i = 100
+            Loop Until Abs(fx) < 0.000001 Or i = 100
 
             'find rhomin
 
@@ -1496,7 +1493,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
                 rhomin = rhomin - 0.7 * fx / dfdx
                 If rhomin < 0 Then rhomin = -rhomin
                 i += 1
-            Loop Until Math.Abs(fx) < 0.000001 Or i = 100
+            Loop Until Abs(fx) < 0.000001 Or i = 100
 
             'find rhomc
 
@@ -1507,7 +1504,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
                 dfdx = (6 * b * (b * R * T * (-b ^ 2 * rhomc ^ 2 + 2 * b * rhomc + 1) ^ 4 - 2 * a * (b * rhomc - 1) ^ 4 * (b ^ 4 * rhomc ^ 4 + 2 * b ^ 3 * rhomc ^ 3 + 2 * b * rhomc - 1))) / (b ^ 3 * rhomc ^ 3 - 3 * b ^ 2 * rhomc ^ 2 + b * rhomc + 1) ^ 4
                 rhomc = rhomc - 0.7 * fx / dfdx
                 i += 1
-            Loop Until Math.Abs(fx) < 0.000001 Or i = 100
+            Loop Until Abs(fx) < 0.000001 Or i = 100
 
             dPdrho = (R * T * (-b ^ 2 * rho ^ 2 + 2 * b * rho + 1) ^ 2 - 2 * a * rho * (b * rho - 1) ^ 2 * (b * rho + 1)) / (b ^ 3 * rho ^ 3 - 3 * b ^ 2 * rho ^ 2 + b * rho + 1) ^ 2
 
@@ -1533,7 +1530,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
                     rho_ = rho_ - fx / dfdx
                     If rho_ < rhomc Then rho_ = rhomc * 1.02
                     i += 1
-                Loop Until Math.Abs(fx) < 0.000001 Or i = 100
+                Loop Until Abs(fx) < 0.000001 Or i = 100
 
                 P_ = (rho_ * R * T - rho_ ^ 2 * (a - 2 * b * R * T) + rho_ ^ 3 * (a * b - b ^ 2 * R * T)) / (1 + rho_ * b - 3 * rho_ ^ 2 * b ^ 2 + rho_ ^ 3 * b ^ 3)
 
@@ -1569,7 +1566,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
                     rho_ = rho_ - fx / dfdx
                     If rho_ < rhomc Then rho_ = rhomc * 0.98
                     i += 1
-                Loop Until Math.Abs(fx) < 0.000001 Or i = 100
+                Loop Until Abs(fx) < 0.000001 Or i = 100
 
                 P_ = (rho_ * R * T - rho_ ^ 2 * (a - 2 * b * R * T) + rho_ ^ 3 * (a * b - b ^ 2 * R * T)) / (1 + rho_ * b - 3 * rho_ ^ 2 * b ^ 2 + rho_ ^ 3 * b ^ 3)
 
@@ -1596,13 +1593,6 @@ Namespace DTL.SimulationObjects.PropertyPackages.ThermoPlugs
                 End If
 
             End If
-
-            'PR EOS P=f(rho) derivatives
-            'P = (rho * R * T - rho ^ 2 * (a - 2 * b * R * T) + rho ^ 3 * (a * b - b ^ 2 * R * T)) / (1 + rho * b - 3 * rho ^ 2 * b ^ 2 + rho ^ 3 * b ^ 3)
-            'dPdrho = (R * T * (-b ^ 2 * rho ^ 2 + 2 * b * rho + 1) ^ 2 - 2 * a * rho * (b * rho - 1) ^ 2 * (b * rho + 1)) / (b ^ 3 * rho ^ 3 - 3 * b ^ 2 * rho ^ 2 + b * rho + 1) ^ 2
-            'd2Pdrho2 = -(2 * (b * R * T * (b ^ 2 * rho ^ 2 - 2 * b * rho - 1) ^ 3 - a * (b * rho - 1) ^ 3 * (2 * b ^ 3 * rho ^ 3 + 3 * b ^ 2 * rho ^ 2 + 1))) / (b ^ 3 * rho ^ 3 - 3 * b ^ 2 * rho ^ 2 + b * rho + 1) ^ 3
-            'd3Pdrho3 = (6 * b * (b * R * T * (-b ^ 2 * rho ^ 2 + 2 * b * rho + 1) ^ 4 - 2 * a * (b * rho - 1) ^ 4 * (b ^ 4 * rho ^ 4 + 2 * b ^ 3 * rho ^ 3 + 2 * b * rho - 1))) / (b ^ 3 * rho ^ 3 - 3 * b ^ 2 * rho ^ 2 + b * rho + 1) ^ 4
-
 
         End Function
 

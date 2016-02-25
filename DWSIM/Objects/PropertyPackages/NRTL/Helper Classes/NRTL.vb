@@ -16,12 +16,11 @@
 '    You should have received a copy of the GNU General Public License
 '    along with DTL.  If not, see <http://www.gnu.org/licenses/>.
 
-Imports System.Collections.Generic
 Imports FileHelpers
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
-    <DelimitedRecord(";")> <IgnoreFirst()> <System.Serializable()> _
+    <DelimitedRecord(";")> <IgnoreFirst()> <Serializable()> _
     Public Class NRTL_IPData
 
         Implements ICloneable
@@ -33,7 +32,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
         Public alpha12 As Double = 0
         Public comment As String = ""
 
-        Public Function Clone() As Object Implements System.ICloneable.Clone
+        Public Function Clone() As Object Implements ICloneable.Clone
 
             Dim newclass As New NRTL_IPData
             With newclass
@@ -49,7 +48,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
     End Class
 
-    <System.Serializable()> Public Class ObjectConverter
+    <Serializable()> Public Class ObjectConverter
 
         Inherits ConverterBase
 
@@ -66,7 +65,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
     End Class
 
-    <System.Serializable()> Public Class NRTL
+    <Serializable()> Public Class NRTL
 
         Private _ip As Dictionary(Of String, Dictionary(Of String, NRTL_IPData))
 
@@ -80,7 +79,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
             _ip = New Dictionary(Of String, Dictionary(Of String, NRTL_IPData))
 
-            Dim pathsep As Char = System.IO.Path.DirectorySeparatorChar
+            Dim pathsep As Char = IO.Path.DirectorySeparatorChar
 
             Dim nrtlip As NRTL_IPData
             Dim nrtlipc() As NRTL_IPData
@@ -91,7 +90,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
                 End Using
             End Using
 
-            Dim csdb As New DTL.Databases.ChemSep
+            Dim csdb As New Databases.ChemSep
 
             For Each nrtlip In nrtlipc
                 If Me.InteractionParameters.ContainsKey(csdb.GetDWSIMName(nrtlip.ID1)) Then

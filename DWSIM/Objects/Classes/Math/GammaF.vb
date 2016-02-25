@@ -37,7 +37,6 @@
 'OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 '************************************************************************
 
-Imports System
 
 Namespace DTL.MathEx.GammaFunctions
 
@@ -506,10 +505,10 @@ Namespace DTL.MathEx.GammaFunctions
         '    arithmetic      domain        # trials     peak         rms
         '       IEEE    0, 3                 28000     5.4e-16     1.1e-16
         '       IEEE    2.718, 2.556e305     40000     3.5e-16     8.3e-17
-        '    The error criterion was relative when the function magnitude
+        '    The error criterionn was relative when the function magnitude
         '    was greater than one but absolute when it was less than one.
         '
-        '    The following test used the relative error criterion, though
+        '    The following test used the relative error criterionn, though
         '    at certain points the relative error could be much higher than
         '    indicated.
         '       IEEE    -200, -4             10000     4.8e-16     1.3e-16

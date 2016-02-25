@@ -28,7 +28,7 @@ Namespace DTL.MathEx.BrentOpt
         End Sub
 
         Sub DefineFuncDelegate(ByVal fg As funcdelegate)
-            Me.fc = fg
+            fc = fg
         End Sub
 
         Function f(ByVal x As Double) As Double
@@ -49,7 +49,6 @@ Namespace DTL.MathEx.BrentOpt
         '    The result:
         '        function value at the point of minimum.
         '    ************************************************************************
-
         Public Function brentoptimize(ByVal a As Double, ByVal b As Double, ByVal epsilon As Double, ByRef xmin As Double) As Double
             Dim result As Double = 0
             Dim ia As Double = 0

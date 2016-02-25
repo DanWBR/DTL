@@ -16,11 +16,11 @@
 '    You should have received a copy of the GNU General Public License
 '    along with DTL.  If not, see <http://www.gnu.org/licenses/>.
 
-Namespace DTL.SistemasDeUnidades
+Namespace DTL.UnitsOfMeasure
 
-    <System.Serializable()> <Xml.Serialization.XmlRoot(ElementName:="Component")> Public Class Unidades
+    <Serializable()> <Xml.Serialization.XmlRoot(ElementName:="Component")> Public Class Units
 
-        Public nome As String
+        Public Name As String
 
         Public area, distance, time, volume, molar_volume, diameter, thickness, molar_conc, mass_conc, _
                 heat_transf_coeff, force, accel, spec_vol, reac_rate, velocity, foulingfactor As String
@@ -74,21 +74,21 @@ Namespace DTL.SistemasDeUnidades
         Public tpmp_logKvalue As String
         Public tpmp_surfaceTension As String
 
-
         Public Sub New()
 
         End Sub
+
     End Class
 
-    <System.Serializable()> Public Class UnidadesSI
+    <Serializable()> Public Class UnitsSI
 
-        Inherits Unidades
+        Inherits Units
 
         Public Sub New()
 
             With Me
 
-                .nome = DTL.App.GetLocalString("SistemaSI")
+                .Name = App.GetLocalString("SystemSI")
 
                 .accel = "m2/s"
                 .area = "m2"
@@ -159,15 +159,15 @@ Namespace DTL.SistemasDeUnidades
 
     End Class
 
-    <System.Serializable()> Public Class UnidadesSI_Deriv1
+    <Serializable()> Public Class UnitsSI_Deriv1
 
-        Inherits Unidades
+        Inherits Units
 
         Public Sub New()
 
             With Me
 
-                .nome = DTL.App.GetLocalString("Personalizado1BR")
+                .Name = App.GetLocalString("Custom1BR")
 
                 .accel = "m2/s"
                 .area = "m2"
@@ -238,15 +238,15 @@ Namespace DTL.SistemasDeUnidades
 
     End Class
 
-    <System.Serializable()> Public Class UnidadesSI_Deriv2
+    <Serializable()> Public Class UnitsSI_Deriv2
 
-        Inherits Unidades
+        Inherits Units
 
         Public Sub New()
 
             With Me
 
-                .nome = DTL.App.GetLocalString("Personalizado2SC")
+                .Name = App.GetLocalString("Custom2SC")
 
                 .accel = "m2/s"
                 .area = "m2"
@@ -317,15 +317,15 @@ Namespace DTL.SistemasDeUnidades
 
     End Class
 
-    <System.Serializable()> Public Class UnidadesSI_Deriv3
+    <Serializable()> Public Class UnitsSI_Deriv3
 
-        Inherits Unidades
+        Inherits Units
 
         Public Sub New()
 
             With Me
 
-                .nome = DTL.App.GetLocalString("Personalizado3CNTP")
+                .Name = App.GetLocalString("Custom3CNTP")
 
                 .accel = "m/s2"
                 .area = "m2"
@@ -396,15 +396,15 @@ Namespace DTL.SistemasDeUnidades
 
     End Class
 
-    <System.Serializable()> Public Class UnidadesSI_Deriv4
+    <Serializable()> Public Class UnitsSI_Deriv4
 
-        Inherits Unidades
+        Inherits Units
 
         Public Sub New()
 
             With Me
 
-                .nome = DTL.App.GetLocalString("Personalizado4")
+                .Name = App.GetLocalString("Custom4")
 
                 .accel = "m/s2"
                 .area = "m2"
@@ -475,15 +475,15 @@ Namespace DTL.SistemasDeUnidades
 
     End Class
 
-    <System.Serializable()> Public Class UnidadesINGLES
+    <Serializable()> Public Class UnitsENGLISH
 
-        Inherits Unidades
+        Inherits Units
 
         Public Sub New()
 
             With Me
 
-                .nome = DTL.App.GetLocalString("SistemaIngls")
+                .Name = App.GetLocalString("SystemEnglish")
 
                 .accel = "ft/s2"
                 .area = "ft2"
@@ -554,15 +554,15 @@ Namespace DTL.SistemasDeUnidades
 
     End Class
 
-    <System.Serializable()> Public Class UnidadesCGS
+    <Serializable()> Public Class UnitsCGS
 
-        Inherits Unidades
+        Inherits Units
 
         Public Sub New()
 
             With Me
 
-                .nome = DTL.App.GetLocalString("SistemaCGS")
+                .Name = App.GetLocalString("SystemCGS")
 
                 .accel = "cm/s2"
                 .area = "cm2"
@@ -633,745 +633,745 @@ Namespace DTL.SistemasDeUnidades
 
     End Class
 
-    <System.Serializable()> Public Class Conversor
+    <Serializable()> Public Class Converter
 
-        Public Function ConverterParaSI(ByVal unidade As String, ByVal valor As Double)
+        Public Function ConvertToSI(ByVal unit As String, ByVal value As Double)
 
-            Select Case unidade
+            Select Case unit
 
                 Case "m/s"
-                    Return valor
+                    Return value
                 Case "cm/s"
-                    Return valor / 100
+                    Return value / 100
                 Case "mm/s"
-                    Return valor / 1000
+                    Return value / 1000
                 Case "km/h"
-                    Return valor / 3.6
+                    Return value / 3.6
                 Case "ft/h"
-                    Return valor / 11811
+                    Return value / 11811
                 Case "ft/min"
-                    Return valor / 196.85
+                    Return value / 196.85
                 Case "ft/s"
-                    Return valor / 3.28084
+                    Return value / 3.28084
                 Case "in/s"
-                    Return valor / 39.3701
+                    Return value / 39.3701
 
                 Case "kPa"
-                    Return valor / 0.001
+                    Return value / 0.001
                 Case "ftH2O"
-                    Return valor / 0.000334
+                    Return value / 0.000334
                 Case "inH2O"
-                    Return valor / 0.00401463
+                    Return value / 0.00401463
                 Case "inHg"
-                    Return valor / 0.000295301
+                    Return value / 0.000295301
                 Case "lbf/ft2"
-                    Return valor / 0.0208854
+                    Return value / 0.0208854
                 Case "mbar"
-                    Return valor / 0.01
+                    Return value / 0.01
                 Case "mH2O"
-                    Return valor / 0.000101972
+                    Return value / 0.000101972
                 Case "mmH2O"
-                    Return valor / 0.101972
+                    Return value / 0.101972
                 Case "mmHg"
-                    Return valor / 0.00750064
+                    Return value / 0.00750064
                 Case "MPa"
-                    Return valor / 0.000001
+                    Return value / 0.000001
                 Case "psi"
-                    Return valor / 0.000145038
+                    Return value / 0.000145038
                 Case "bar"
-                    Return valor * 100000
+                    Return value * 100000
                 Case "kPag"
-                    Return (valor + 101.325) * 1000
+                    Return (value + 101.325) * 1000
                 Case "barg"
-                    Return (valor + 1) * 100000
+                    Return (value + 1) * 100000
                 Case "kgf/cm2g"
-                    Return (valor + 1.033) * 101325 / 1.033
+                    Return (value + 1.033) * 101325 / 1.033
                 Case "psig"
-                    Return (valor + 14.696) * 6894.8
+                    Return (value + 14.696) * 6894.8
 
                 Case "kg/d"
-                    Return valor / 60 / 60 / 24
+                    Return value / 60 / 60 / 24
                 Case "kg/min"
-                    Return valor / 60
+                    Return value / 60
                 Case "lb/h"
-                    Return valor / 7936.64
+                    Return value / 7936.64
                 Case "lb/min"
-                    Return valor / 132.277
+                    Return value / 132.277
                 Case "lb/s"
                     Return 2.20462
 
                 Case "mol/h"
-                    Return valor / 3600
+                    Return value / 3600
                 Case "mol/d"
-                    Return valor / 3600 / 24
+                    Return value / 3600 / 24
                 Case "kmol/s"
-                    Return valor * 1000
+                    Return value * 1000
                 Case "kmol/h"
-                    Return valor * 1000 / 3600
+                    Return value * 1000 / 3600
                 Case "kmol/d"
-                    Return valor * 1000 / 3600 / 24
+                    Return value * 1000 / 3600 / 24
 
                 Case "bbl/h"
-                    Return valor / 22643.3
+                    Return value / 22643.3
                 Case "bbl/d"
-                    Return valor / 543440
+                    Return value / 543440
                 Case "ft3/min"
-                    Return valor / 35.3147 / 60
+                    Return value / 35.3147 / 60
                 Case "ft3/s"
-                    Return valor / 35.3147
+                    Return value / 35.3147
                 Case "gal[UK]/h"
-                    Return valor / 791889
+                    Return value / 791889
                 Case "gal[UK]/s"
-                    Return valor / 219.969
+                    Return value / 219.969
                 Case "gal[US]/h"
-                    Return valor / 951019
+                    Return value / 951019
                 Case "gal[US]/min"
-                    Return valor / 15850.3
+                    Return value / 15850.3
                 Case "L/h"
-                    Return valor / 3600000.0
+                    Return value / 3600000.0
                 Case "L/min"
-                    Return valor / 60000
+                    Return value / 60000
                 Case "L/s"
-                    Return valor / 1000
+                    Return value / 1000
                 Case "m3/d"
-                    Return valor / 3600 / 24
+                    Return value / 3600 / 24
 
                 Case "BTU/h"
-                    Return valor / 3412.14
+                    Return value / 3412.14
                 Case "BTU/s"
-                    Return valor / 0.947817
+                    Return value / 0.947817
                 Case "cal/s"
-                    Return valor / 238.846
+                    Return value / 238.846
                 Case "HP"
-                    Return valor / 1.35962
+                    Return value / 1.35962
                 Case "kcal/h"
-                    Return valor / 859.845
+                    Return value / 859.845
                 Case "kJ/h"
-                    Return valor / 3600
+                    Return value / 3600
                 Case "kJ/d"
-                    Return valor / 3600 / 24
+                    Return value / 3600 / 24
                 Case "MW"
-                    Return valor / 0.001
+                    Return value / 0.001
                 Case "W"
-                    Return valor / 1000
+                    Return value / 1000
 
                 Case "BTU/lb"
-                    Return valor / 0.429923
+                    Return value / 0.429923
                 Case "cal/g"
-                    Return valor / 0.238846
+                    Return value / 0.238846
                 Case "kcal/kg"
-                    Return valor / 0.238846
+                    Return value / 0.238846
 
                 Case "kJ/kmol"
-                    Return valor
+                    Return value
                 Case "cal/mol"
-                    Return valor * 0.0041868 * 1000
+                    Return value * 0.0041868 * 1000
                 Case "BTU/lbmol"
-                    Return valor * 1.05506 * 1000
+                    Return value * 1.05506 * 1000
                 Case "kJ/[kmol.K]"
-                    Return valor * 1
+                    Return value * 1
                 Case "cal/[mol.°C]"
-                    Return valor * 0.0041868 * 1000
+                    Return value * 0.0041868 * 1000
                 Case "cal/[mol.C]"
-                    Return valor * 0.0041868 * 1000
+                    Return value * 0.0041868 * 1000
                 Case "BTU/[lbmol.R]"
-                    Return valor * 1.05506 * 1000
+                    Return value * 1.05506 * 1000
 
-                Case "K.m2/W"                           'fouling factor
-                    Return valor
+                Case "K.m2/W"
+                    Return value
                 Case "C.cm2.s/cal"
-                    Return valor * 0.000023885
+                    Return value * 0.000023885
                 Case "ft2.h.F/BTU"
-                    Return valor * 0.17611
+                    Return value * 0.17611
 
 
-                Case "m2"                               'area
-                    Return valor
+                Case "m2"
+                    Return value
                 Case "cm2"
-                    Return valor / 10000.0
+                    Return value / 10000.0
                 Case "ft2"
-                    Return valor / 10.7639
-                Case "h"                                'tempo
-                    Return valor / 3600
+                    Return value / 10.7639
+                Case "h"
+                    Return value / 3600
                 Case "s"
-                    Return valor
+                    Return value
                 Case "min."
-                    Return valor / 60
-                Case "ft3"                              'volume
-                    Return valor / 35.3147
+                    Return value / 60
+                Case "ft3"
+                    Return value / 35.3147
                 Case "m3"
-                    Return valor
+                    Return value
                 Case "cm3"
-                    Return valor / 1000000.0
+                    Return value / 1000000.0
                 Case "L"
-                    Return valor / 1000.0
-                Case "cm3/mol"                          'volume molar'
-                    Return valor / 1000.0
+                    Return value / 1000.0
+                Case "cm3/mol"
+                    Return value / 1000.0
                 Case "m3/kmol"
-                    Return valor
+                    Return value
                 Case "m3/mol"
-                    Return valor * 1000
+                    Return value * 1000
                 Case "ft3/lbmol"
-                    Return valor / 35.3147 / 1000
-                Case "mm"                               'comprimento'
-                    Return valor / 1000
+                    Return value / 35.3147 / 1000
+                Case "mm"
+                    Return value / 1000
                 Case "in.", "in"
-                    Return valor / 39.3701
-                Case "dyn"                              'força
-                    Return valor / 100000
+                    Return value / 39.3701
+                Case "dyn"
+                    Return value / 100000
                 Case "N"
-                    Return valor
+                    Return value
                 Case "lbf"
-                    Return valor / 0.224809
-                Case "mol/L"                            'conc molar
-                    Return valor
+                    Return value / 0.224809
+                Case "mol/L"
+                    Return value
                 Case "kmol/m3"
-                    Return valor
+                    Return value
                 Case "mol/cm3"
-                    Return valor * 1000000.0 / 1000
+                    Return value * 1000000.0 / 1000
                 Case "mol/mL"
-                    Return valor * 1000000.0 / 1000
+                    Return value * 1000000.0 / 1000
                 Case "lbmol/ft3"
-                    Return valor * 35.3147 * 1000
-                Case "g/L"                              'conc mássica
-                    Return valor
+                    Return value * 35.3147 * 1000
+                Case "g/L"
+                    Return value
                 Case "kg/m3"
-                    Return valor
+                    Return value
                 Case "g/cm3"
-                    Return valor * 1000000.0 / 1000
+                    Return value * 1000000.0 / 1000
                 Case "g/mL"
-                    Return valor * 1000000.0 / 1000
-                Case "m2/s"                              'k.visc
-                    Return valor
+                    Return value * 1000000.0 / 1000
+                Case "m2/s"
+                    Return value
                 Case "ft/s2"
-                    Return valor / 3.28084
+                    Return value / 3.28084
                 Case "cm2/s"
-                    Return valor / 10000.0
-                Case "W/[m2.K]"                              'HTC
-                    Return valor
+                    Return value / 10000.0
+                Case "W/[m2.K]"
+                    Return value
                 Case "BTU/[ft2.h.R]"
-                    Return valor / 0.17611
+                    Return value / 0.17611
                 Case "cal/[cm.s.°C]"
-                    Return valor / 0.0000238846
+                    Return value / 0.0000238846
                 Case "cal/[cm.s.C]"
-                    Return valor / 0.0000238846
-                Case "m3/kg"                                'vol especif
-                    Return valor
+                    Return value / 0.0000238846
+                Case "m3/kg"
+                    Return value
                 Case "ft3/lbm"
-                    Return valor * 0.062428
+                    Return value * 0.062428
                 Case "cm3/g"
-                    Return valor / 1000
+                    Return value / 1000
                 Case "kmol/[m3.s]"
-                    Return valor * 1000                            'taxa reacao
+                    Return value * 1000
                 Case "kmol/[m3.min.]"
-                    Return valor / 60 * 1000
+                    Return value / 60 * 1000
                 Case "kmol/[m3.h]"
-                    Return valor / 3600 * 1000
+                    Return value / 3600 * 1000
                 Case "mol/[m3.s]"
-                    Return valor
+                    Return value
                 Case "mol/[m3.min.]"
-                    Return valor / 60
+                    Return value / 60
                 Case "mol/[m3.h]"
-                    Return valor / 3600
+                    Return value / 3600
                 Case "mol/[L.s]"
-                    Return valor / 1000
+                    Return value / 1000
                 Case "mol/[L.min.]"
-                    Return valor / 60 / 1000
+                    Return value / 60 / 1000
                 Case "mol/[L.h]"
-                    Return valor / 3600 / 1000
+                    Return value / 3600 / 1000
                 Case "mol/[cm3.s]"
-                    Return valor * 1000000.0
+                    Return value * 1000000.0
                 Case "mol/[cm3.min.]"
-                    Return valor / 60 * 1000000.0
+                    Return value / 60 * 1000000.0
                 Case "mol/[cm3.h]"
-                    Return valor / 3600 * 1000000.0
+                    Return value / 3600 * 1000000.0
                 Case "lbmol.[ft3.h]"
-                    Return valor / 3600 * 35.3147 * 1000
-                Case "°C"                               'temperatura e demais
-                    Return valor + 273.15
-                Case "C"                               'temperatura e demais
-                    Return valor + 273.15
+                    Return value / 3600 * 35.3147 * 1000
+                Case "°C"
+                    Return value + 273.15
+                Case "C"
+                    Return value + 273.15
                 Case "°C."
-                    Return valor
+                    Return value
                 Case "C."
-                    Return valor
+                    Return value
                 Case "atm"
-                    Return valor * 101325
+                    Return value * 101325
                 Case "g/s"
-                    Return valor / 1000
+                    Return value / 1000
                 Case "mol/s"
-                    Return valor
+                    Return value
                 Case "kmol/s"
-                    Return valor * 1000
+                    Return value * 1000
                 Case "cal/g"
-                    Return valor / 0.238846
+                    Return value / 0.238846
                 Case "g/cm3"
-                    Return valor * 1000
+                    Return value * 1000
                 Case "dyn/cm"
-                    Return valor * 0.001
+                    Return value * 0.001
                 Case "dyn/cm2"
-                    Return valor * 0.001
+                    Return value * 0.001
                 Case "cal/[cm.s.°C]"
-                    Return valor / 0.00238846
+                    Return value / 0.00238846
                 Case "cal/[cm.s.C]"
-                    Return valor / 0.00238846
+                    Return value / 0.00238846
                 Case "cm3/s"
-                    Return valor * 0.000001
+                    Return value * 0.000001
                 Case "cal/[g.°C]"
-                    Return valor / 0.238846
+                    Return value / 0.238846
                 Case "cal/[g.C]"
-                    Return valor / 0.238846
+                    Return value / 0.238846
                 Case "cSt"
-                    Return valor / 1000000.0
+                    Return value / 1000000.0
                 Case "mm2/s"
-                    Return valor / 1000000.0
+                    Return value / 1000000.0
                 Case "Pa.s"
-                    Return valor
+                    Return value
                 Case "cP"
-                    Return valor / 1000
+                    Return value / 1000
                 Case "kcal/h"
-                    Return valor / 859.845
+                    Return value / 859.845
                 Case "m"
-                    Return valor
+                    Return value
                 Case "R"
-                    Return valor / 1.8
+                    Return value / 1.8
                 Case "R."
-                    Return valor / 1.8
+                    Return value / 1.8
                 Case "lbf/ft2"
-                    Return valor / 0.0208854
+                    Return value / 0.0208854
                 Case "lbm/h"
-                    Return valor / 7936.64
+                    Return value / 7936.64
                 Case "lbmol/h"
-                    Return valor * 453.59237 / 3600
+                    Return value * 453.59237 / 3600
                 Case "BTU/lbm"
-                    Return valor / 0.429923
+                    Return value / 0.429923
                 Case "lbm/ft3"
-                    Return valor / 0.062428
+                    Return value / 0.062428
                 Case "lbf/in"
-                    Return valor / 0.00571015
+                    Return value / 0.00571015
                 Case "BTU/[ft.h.R]"
-                    Return valor / 0.577789
+                    Return value / 0.577789
                 Case "ft3/s"
-                    Return valor / 35.3147
+                    Return value / 35.3147
                 Case "BTU/[lbm.R]"
-                    Return valor / 0.238846
+                    Return value / 0.238846
                 Case "ft2/s"
-                    Return valor / 10.7639
+                    Return value / 10.7639
                 Case "lbm/[ft.s]"
-                    Return valor / 0.671969
+                    Return value / 0.671969
                 Case "BTU/h"
-                    Return valor / 3412.14
+                    Return value / 3412.14
                 Case "ft"
-                    Return valor / 3.28084
-                    'Personalizados
+                    Return value / 3.28084
+                    'Customs
                 Case "kgf/cm2_a"
-                    Return valor * 101325 / 1.033
+                    Return value * 101325 / 1.033
                 Case "kgf/cm2"
-                    Return valor * 101325 / 1.033
+                    Return value * 101325 / 1.033
                 Case "kgf/cm2_g"
-                    Return (valor + 1.033) * 101325 / 1.033
+                    Return (value + 1.033) * 101325 / 1.033
                 Case "kg/h"
-                    Return valor / 3600
+                    Return value / 3600
                 Case "kg/d"
-                    Return valor / 3600 / 24
+                    Return value / 3600 / 24
                 Case "m3/h"
-                    Return valor / 3600
+                    Return value / 3600
                 Case "m3/d"
-                    Return valor / 3600 / 24
+                    Return value / 3600 / 24
                 Case "m3/d @ BR"
-                    Return valor / (24.055 * 3600 * 24 / 1000)
+                    Return value / (24.055 * 3600 * 24 / 1000)
                 Case "m3/d @ CNTP"
-                    Return valor / (22.71 * 3600 * 24 / 1000)
+                    Return value / (22.71 * 3600 * 24 / 1000)
                 Case "m3/d @ NC"
-                    Return valor / (22.71 * 3600 * 24 / 1000)
+                    Return value / (22.71 * 3600 * 24 / 1000)
                 Case "m3/d @ SC"
-                    Return valor / (23.69 * 3600 * 24 / 1000)
+                    Return value / (23.69 * 3600 * 24 / 1000)
                 Case "°F"
-                    Return (valor - 32) * 5 / 9 + 273.15
+                    Return (value - 32) * 5 / 9 + 273.15
                 Case "°F."
-                    Return valor / 1.8
+                    Return value / 1.8
                 Case "F"
-                    Return (valor - 32) * 5 / 9 + 273.15
+                    Return (value - 32) * 5 / 9 + 273.15
                 Case "F."
-                    Return valor / 1.8
+                    Return value / 1.8
                 Case "cm"
-                    Return valor / 100
+                    Return value / 100
                 Case "cal/[mol.°C]"
-                    Return valor * 238.846 / 1000
+                    Return value * 238.846 / 1000
                 Case "cal/[mol.C]"
-                    Return valor * 238.846 / 1000
+                    Return value * 238.846 / 1000
                 Case "BTU/[lbmol.R]"
-                    Return valor * 1.8 * 0.947817
+                    Return value * 1.8 * 0.947817
                 Case Else
-                    Return valor
+                    Return value
             End Select
 
         End Function
 
-        Public Function ConverterDoSI(ByVal unidade As String, ByVal valor As Double)
+        Public Function ConvertFromSI(ByVal unit As String, ByVal value As Double)
 
-            Select Case unidade
+            Select Case unit
 
                 Case "m/s"
-                    Return valor
+                    Return value
                 Case "cm/s"
-                    Return valor * 100
+                    Return value * 100
                 Case "mm/s"
-                    Return valor * 1000
+                    Return value * 1000
                 Case "km/h"
-                    Return valor * 3.6
+                    Return value * 3.6
                 Case "ft/h"
-                    Return valor * 11811
+                    Return value * 11811
                 Case "ft/min"
-                    Return valor * 196.85
+                    Return value * 196.85
                 Case "ft/s"
-                    Return valor * 3.28084
+                    Return value * 3.28084
                 Case "in/s"
-                    Return valor * 39.3701
+                    Return value * 39.3701
 
                 Case "kPa"
-                    Return valor * 0.001
+                    Return value * 0.001
                 Case "ftH2O"
-                    Return valor * 0.000334
+                    Return value * 0.000334
                 Case "inH2O"
-                    Return valor * 0.00401463
+                    Return value * 0.00401463
                 Case "inHg"
-                    Return valor * 0.000295301
+                    Return value * 0.000295301
                 Case "lbf/ft2"
-                    Return valor * 0.0208854
+                    Return value * 0.0208854
                 Case "mbar"
-                    Return valor * 0.01
+                    Return value * 0.01
                 Case "mH2O"
-                    Return valor * 0.000101972
+                    Return value * 0.000101972
                 Case "mmH2O"
-                    Return valor * 0.101972
+                    Return value * 0.101972
                 Case "mmHg"
-                    Return valor * 0.00750064
+                    Return value * 0.00750064
                 Case "MPa"
-                    Return valor * 0.000001
+                    Return value * 0.000001
                 Case "psi"
-                    Return valor * 0.000145038
+                    Return value * 0.000145038
                 Case "bar"
-                    Return valor / 100000
+                    Return value / 100000
                 Case "kPag"
-                    Return (valor - 101325) / 1000
+                    Return (value - 101325) / 1000
                 Case "barg"
-                    Return (valor - 101325) / 100000
+                    Return (value - 101325) / 100000
                 Case "kgf/cm2g"
-                    Return (valor - 101325) / 101325 * 1.033
+                    Return (value - 101325) / 101325 * 1.033
                 Case "psig"
-                    Return (valor - 101325) * 0.000145038
+                    Return (value - 101325) * 0.000145038
 
                 Case "kg/d"
-                    Return valor * 60 * 60 * 24
+                    Return value * 60 * 60 * 24
                 Case "kg/min"
-                    Return valor * 60
+                    Return value * 60
                 Case "lb/h"
-                    Return valor * 7936.64
+                    Return value * 7936.64
                 Case "lb/min"
-                    Return valor * 132.277
+                    Return value * 132.277
                 Case "lb/s"
                     Return 2.20462
 
                 Case "bbl/h"
-                    Return valor * 22643.3
+                    Return value * 22643.3
                 Case "bbl/d"
-                    Return valor * 543440
+                    Return value * 543440
                 Case "ft3/min"
-                    Return valor * 35.3147 * 60
+                    Return value * 35.3147 * 60
                 Case "ft3/s"
-                    Return valor * 35.3147
+                    Return value * 35.3147
                 Case "gal[UK]/h"
-                    Return valor * 791889
+                    Return value * 791889
                 Case "gal[UK]/s"
-                    Return valor * 219.969
+                    Return value * 219.969
                 Case "gal[US]/h"
-                    Return valor * 951019
+                    Return value * 951019
                 Case "gal[US]/min"
-                    Return valor * 15850.3
+                    Return value * 15850.3
                 Case "L/h"
-                    Return valor * 3600000.0
+                    Return value * 3600000.0
                 Case "L/min"
-                    Return valor * 60000
+                    Return value * 60000
                 Case "L/s"
-                    Return valor * 1000
+                    Return value * 1000
                 Case "m3/d"
-                    Return valor * 3600 * 24
+                    Return value * 3600 * 24
 
                 Case "mol/h"
-                    Return valor * 3600
+                    Return value * 3600
                 Case "mol/d"
-                    Return valor * 3600 * 24
+                    Return value * 3600 * 24
                 Case "kmol/s"
-                    Return valor / 1000
+                    Return value / 1000
                 Case "kmol/h"
-                    Return valor / 1000 * 3600
+                    Return value / 1000 * 3600
                 Case "kmol/d"
-                    Return valor / 1000 * 3600 * 24
+                    Return value / 1000 * 3600 * 24
 
                 Case "BTU/h"
-                    Return valor * 3412.14
+                    Return value * 3412.14
                 Case "BTU/s"
-                    Return valor * 0.947817
+                    Return value * 0.947817
                 Case "cal/s"
-                    Return valor * 238.846
+                    Return value * 238.846
                 Case "HP"
-                    Return valor * 1.35962
+                    Return value * 1.35962
                 Case "kcal/h"
-                    Return valor * 859.845
+                    Return value * 859.845
                 Case "kJ/h"
-                    Return valor * 3600
+                    Return value * 3600
                 Case "kJ/d"
-                    Return valor * 3600 * 24
+                    Return value * 3600 * 24
                 Case "MW"
-                    Return valor * 0.001
+                    Return value * 0.001
                 Case "W"
-                    Return valor * 1000
+                    Return value * 1000
 
                 Case "BTU/lb"
-                    Return valor * 0.429923
+                    Return value * 0.429923
                 Case "cal/g"
-                    Return valor * 0.238846
+                    Return value * 0.238846
                 Case "kcal/kg"
-                    Return valor * 0.238846
+                    Return value * 0.238846
 
                 Case "kJ/kmol"
-                    Return valor
+                    Return value
                 Case "cal/mol"
-                    Return valor / 0.0041868 / 1000
+                    Return value / 0.0041868 / 1000
                 Case "BTU/lbmol"
-                    Return valor / 1.05506 / 1000
+                    Return value / 1.05506 / 1000
                 Case "kJ/[kmol.K]"
-                    Return valor
+                    Return value
                 Case "cal/[mol.°C]"
-                    Return valor / 0.0041868 / 1000
+                    Return value / 0.0041868 / 1000
                 Case "cal/[mol.C]"
-                    Return valor / 0.0041868 / 1000
+                    Return value / 0.0041868 / 1000
                 Case "BTU/[lbmol.R]"
-                    Return valor / 1.05506 / 1000
+                    Return value / 1.05506 / 1000
 
-                Case "K.m2/W"                           'fouling factor
-                    Return valor
+                Case "K.m2/W"
+                    Return value
                 Case "C.cm2.s/cal"
-                    Return valor / 0.000023885
+                    Return value / 0.000023885
                 Case "ft2.h.F/BTU"
-                    Return valor / 0.17611
+                    Return value / 0.17611
 
-                Case "m2"                               'area
-                    Return valor
+                Case "m2"
+                    Return value
                 Case "cm2"
-                    Return valor * 10000.0
+                    Return value * 10000.0
                 Case "ft2"
-                    Return valor * 10.7639
-                Case "h"                                'tempo
-                    Return valor * 3600
+                    Return value * 10.7639
+                Case "h"
+                    Return value * 3600
                 Case "s"
-                    Return valor
+                    Return value
                 Case "min."
-                    Return valor * 60
-                Case "ft3"                              'volume
-                    Return valor * 35.3147
+                    Return value * 60
+                Case "ft3"
+                    Return value * 35.3147
                 Case "m3"
-                    Return valor
+                    Return value
                 Case "cm3"
-                    Return valor * 1000000.0
+                    Return value * 1000000.0
                 Case "L"
-                    Return valor * 1000.0
-                Case "cm3/mol"                          'volume molar'
-                    Return valor * 1000.0
+                    Return value * 1000.0
+                Case "cm3/mol"
+                    Return value * 1000.0
                 Case "m3/kmol"
-                    Return valor
+                    Return value
                 Case "m3/mol"
-                    Return valor / 1000
+                    Return value / 1000
                 Case "ft3/lbmol"
-                    Return valor * 35.3147 * 1000
-                Case "mm"                               'comprimento'
-                    Return valor * 1000
+                    Return value * 35.3147 * 1000
+                Case "mm"
+                    Return value * 1000
                 Case "in.", "in"
-                    Return valor * 39.3701
-                Case "dyn"                              'força
-                    Return valor * 100000
+                    Return value * 39.3701
+                Case "dyn"
+                    Return value * 100000
                 Case "N"
-                    Return valor
+                    Return value
                 Case "lbf"
-                    Return valor * 0.224809
-                Case "mol/L"                            'conc molar
-                    Return valor
+                    Return value * 0.224809
+                Case "mol/L"
+                    Return value
                 Case "kmol/m3"
-                    Return valor
+                    Return value
                 Case "mol/cm3"
-                    Return valor / 1000000.0 * 1000
+                    Return value / 1000000.0 * 1000
                 Case "mol/mL"
-                    Return valor / 1000000.0 * 1000
+                    Return value / 1000000.0 * 1000
                 Case "lbmol/ft3"
-                    Return valor * 35.3147 * 1000
-                Case "g/L"                              'conc mássica
-                    Return valor
+                    Return value * 35.3147 * 1000
+                Case "g/L"
+                    Return value
                 Case "kg/m3"
-                    Return valor
+                    Return value
                 Case "g/cm3"
-                    Return valor / 1000000.0 * 1000
+                    Return value / 1000000.0 * 1000
                 Case "g/mL"
-                    Return valor / 1000000.0 * 1000
+                    Return value / 1000000.0 * 1000
                 Case "lbm/ft3"
-                    Return valor * 0.062428
-                Case "m2/s"                              'k.visc
-                    Return valor
+                    Return value * 0.062428
+                Case "m2/s"
+                    Return value
                 Case "ft/s2"
-                    Return valor * 3.28084
+                    Return value * 3.28084
                 Case "cm2/s"
-                    Return valor * 10000.0
-                Case "W/[m2.K]"                              'HTC
-                    Return valor
+                    Return value * 10000.0
+                Case "W/[m2.K]"
+                    Return value
                 Case "BTU/[ft2.h.R]"
-                    Return valor * 0.17611
+                    Return value * 0.17611
                 Case "cal/[cm.s.°C]"
-                    Return valor * 0.0000238846
+                    Return value * 0.0000238846
                 Case "cal/[cm.s.C]"
-                    Return valor * 0.0000238846
-                Case "m3/kg"                                'vol especif
-                    Return valor
+                    Return value * 0.0000238846
+                Case "m3/kg"
+                    Return value
                 Case "ft3/lbm"
-                    Return valor / 0.062428
+                    Return value / 0.062428
                 Case "cm3/g"
-                    Return valor * 1000
+                    Return value * 1000
                 Case "kmol/[m3.s]"
-                    Return valor / 1000                            'taxa reacao
+                    Return value / 1000
                 Case "kmol/[m3.min.]"
-                    Return valor * 60 / 1000
+                    Return value * 60 / 1000
                 Case "kmol/[m3.h]"
-                    Return valor * 3600 / 1000
+                    Return value * 3600 / 1000
                 Case "mol/[m3.s]"
-                    Return valor
+                    Return value
                 Case "mol/[m3.min.]"
-                    Return valor * 60
+                    Return value * 60
                 Case "mol/[m3.h]"
-                    Return valor * 3600
+                    Return value * 3600
                 Case "mol/[L.s]"
-                    Return valor * 1000
+                    Return value * 1000
                 Case "mol/[L.min.]"
-                    Return valor * 60 * 1000
+                    Return value * 60 * 1000
                 Case "mol/[L.h]"
-                    Return valor * 3600 * 1000
+                    Return value * 3600 * 1000
                 Case "mol/[cm3.s]"
-                    Return valor / 1000000.0
+                    Return value / 1000000.0
                 Case "mol/[cm3.min.]"
-                    Return valor * 60 / 1000000.0
+                    Return value * 60 / 1000000.0
                 Case "mol/[cm3.h]"
-                    Return valor * 3600 / 1000000.0
+                    Return value * 3600 / 1000000.0
                 Case "lbmol.[ft3.h]"
-                    Return valor * 3600 / 35.3147 / 1000
-                Case "°C"                               'temperatura e demais
-                    Return valor - 273.15
-                Case "C"                               'temperatura e demais
-                    Return valor - 273.15
+                    Return value * 3600 / 35.3147 / 1000
+                Case "°C"
+                    Return value - 273.15
+                Case "C"
+                    Return value - 273.15
                 Case "°C."
-                    Return valor
+                    Return value
                 Case "C."
-                    Return valor
+                    Return value
                 Case "atm"
-                    Return valor / 101325
+                    Return value / 101325
                 Case "g/s"
-                    Return valor * 1000
+                    Return value * 1000
                 Case "mol/s"
-                    Return valor
+                    Return value
                 Case "cal/g"
-                    Return valor * 0.238846
+                    Return value * 0.238846
                 Case "g/cm3"
-                    Return valor / 1000
+                    Return value / 1000
                 Case "dyn/cm"
-                    Return valor / 0.001
+                    Return value / 0.001
                 Case "dyn/cm2"
-                    Return valor / 0.001
+                    Return value / 0.001
                 Case "cal/[cm.s.°C]"
-                    Return valor * 0.00238846
+                    Return value * 0.00238846
                 Case "cal/[cm.s.C]"
-                    Return valor * 0.00238846
+                    Return value * 0.00238846
                 Case "cm3/s"
-                    Return valor / 0.000001
+                    Return value / 0.000001
                 Case "cal/[g.°C]"
-                    Return valor * 0.238846
+                    Return value * 0.238846
                 Case "cal/[g.C]"
-                    Return valor * 0.238846
+                    Return value * 0.238846
                 Case "cSt"
-                    Return valor * 1000000.0
+                    Return value * 1000000.0
                 Case "mm2/s"
-                    Return valor * 1000000.0
+                    Return value * 1000000.0
                 Case "Pa.s"
-                    Return valor
+                    Return value
                 Case "cP"
-                    Return valor * 1000
+                    Return value * 1000
                 Case "kcal/h"
-                    Return valor * 859.845
+                    Return value * 859.845
                 Case "R"
-                    Return valor * 1.8
+                    Return value * 1.8
                 Case "R."
-                    Return valor * 1.8
+                    Return value * 1.8
                 Case "lbf/ft2"
-                    Return valor * 0.0208854
+                    Return value * 0.0208854
                 Case "lbm/h"
-                    Return valor * 7936.64
+                    Return value * 7936.64
                 Case "lbmol/h"
-                    Return valor / 453.59237 * 3600
+                    Return value / 453.59237 * 3600
                 Case "BTU/lbm"
-                    Return valor * 0.429923
+                    Return value * 0.429923
                 Case "lbf/in"
-                    Return valor * 0.00571015
+                    Return value * 0.00571015
                 Case "BTU/[ft.h.R]"
-                    Return valor * 0.577789
+                    Return value * 0.577789
                 Case "ft3/s"
-                    Return valor * 35.3147
+                    Return value * 35.3147
                 Case "BTU/[lbm.R]"
-                    Return valor * 0.238846
+                    Return value * 0.238846
                 Case "ft2/s"
-                    Return valor * 10.7639
+                    Return value * 10.7639
                 Case "lbm/[ft.s]"
-                    Return valor * 0.671969
+                    Return value * 0.671969
                 Case "BTU/h"
-                    Return valor * 3412.14
+                    Return value * 3412.14
                 Case "ft"
-                    Return valor * 3.28084
-                    'Personalizados
+                    Return value * 3.28084
+                    'Customs
                 Case "kgf/cm2_a"
-                    Return valor / 101325 * 1.033
+                    Return value / 101325 * 1.033
                 Case "kgf/cm2"
-                    Return valor / 101325 * 1.033
+                    Return value / 101325 * 1.033
                 Case "kgf/cm2_g"
-                    Return valor * 1.033 / 101325 - 1.033
+                    Return value * 1.033 / 101325 - 1.033
                 Case "kg/h"
-                    Return valor * 3600
+                    Return value * 3600
                 Case "kg/d"
-                    Return valor * 3600 * 24
+                    Return value * 3600 * 24
                 Case "m3/h"
-                    Return valor * 3600
+                    Return value * 3600
                 Case "m3/d"
-                    Return valor * 3600 * 24
+                    Return value * 3600 * 24
                 Case "m3/d @ BR"
-                    Return valor * (24.055 * 3600 * 24 / 1000)
+                    Return value * (24.055 * 3600 * 24 / 1000)
                 Case "m3/d @ CNTP"
-                    Return valor * (22.71 * 3600 * 24 / 1000)
+                    Return value * (22.71 * 3600 * 24 / 1000)
                 Case "m3/d @ NC"
-                    Return valor * (22.71 * 3600 * 24 / 1000)
+                    Return value * (22.71 * 3600 * 24 / 1000)
                 Case "m3/d @ SC"
-                    Return valor * (23.69 * 3600 * 24 / 1000)
+                    Return value * (23.69 * 3600 * 24 / 1000)
                 Case "°F"
-                    Return (valor - 273.15) * 9 / 5 + 32
+                    Return (value - 273.15) * 9 / 5 + 32
                 Case "°F."
-                    Return valor * 1.8
+                    Return value * 1.8
                 Case "F"
-                    Return (valor - 273.15) * 9 / 5 + 32
+                    Return (value - 273.15) * 9 / 5 + 32
                 Case "F."
-                    Return valor * 1.8
+                    Return value * 1.8
                 Case "cm"
-                    Return valor * 100
+                    Return value * 100
                 Case "cal/[mol.°C]"
-                    Return valor / 238.846 * 1000
+                    Return value / 238.846 * 1000
                 Case "cal/[mol.C]"
-                    Return valor / 238.846 * 1000
+                    Return value / 238.846 * 1000
                 Case "BTU/[lbmol.R]"
-                    Return valor / 1.8 / 0.947817
+                    Return value / 1.8 / 0.947817
                 Case Else
-                    Return valor
+                    Return value
             End Select
 
         End Function

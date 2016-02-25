@@ -15,11 +15,10 @@
 '
 '    You should have received a copy of the GNU General Public License
 '    along with DTL.  If not, see <http://www.gnu.org/licenses/>.
-Imports filehelpers
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
-    <System.Serializable()> Public Class GS
+    <Serializable()> Public Class GS
 
         Sub New()
 
@@ -118,7 +117,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
             Dim n, R, coeff(3) As Double
             Dim Vant(0, 4) As Double
-            Dim criterioOK As Boolean = False
+            Dim criterionOK As Boolean = False
             Dim ZV As Double
             Dim AG, BG, aml, bml As Double
             Dim t1, t2, t3, t4 As Double
@@ -253,7 +252,6 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
         End Function
 
     End Class
-
 
 End Namespace
 

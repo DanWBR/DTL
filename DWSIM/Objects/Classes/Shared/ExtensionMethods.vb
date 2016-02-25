@@ -1,6 +1,6 @@
 Module Extensions
 
-    <System.Runtime.CompilerServices.Extension()> _
+    <Runtime.CompilerServices.Extension()>
     Public Function ToArrayString(vector As Double()) As String
 
         Dim retstr As String = "{ "
@@ -14,7 +14,7 @@ Module Extensions
 
     End Function
 
-    <System.Runtime.CompilerServices.Extension()> _
+    <Runtime.CompilerServices.Extension()>
     Public Function ToArrayString(vector As String()) As String
 
         Dim retstr As String = "{ "
@@ -28,7 +28,7 @@ Module Extensions
 
     End Function
 
-    <System.Runtime.CompilerServices.Extension()> _
+    <Runtime.CompilerServices.Extension()>
     Public Function ToArrayString(vector As Object()) As String
 
         Dim retstr As String = "{ "
@@ -42,7 +42,7 @@ Module Extensions
 
     End Function
 
-    <System.Runtime.CompilerServices.Extension()> _
+    <Runtime.CompilerServices.Extension()>
     Public Function ToArrayString(vector As Array) As String
 
         Dim retstr As String = "{ "
@@ -56,17 +56,17 @@ Module Extensions
 
     End Function
 
-    <System.Runtime.CompilerServices.Extension()> _
+    <Runtime.CompilerServices.Extension()>
     Public Function IsValid(d As Double) As Boolean
         If Double.IsNaN(d) Or Double.IsInfinity(d) Then Return False Else Return True
     End Function
 
-    <System.Runtime.CompilerServices.Extension()> _
-    Public Function IsValid(d As Nullable(Of Double)) As Boolean
+    <Runtime.CompilerServices.Extension()>
+    Public Function IsValid(d As Double?) As Boolean
         If Double.IsNaN(d.GetValueOrDefault) Or Double.IsInfinity(d.GetValueOrDefault) Then Return False Else Return True
     End Function
 
-    <System.Runtime.CompilerServices.Extension()> _
+    <Runtime.CompilerServices.Extension()>
     Public Function IsPositive(d As Double) As Boolean
         If d.IsValid() Then
             If d > 0.0# Then Return True Else Return False
@@ -75,8 +75,8 @@ Module Extensions
         End If
     End Function
 
-    <System.Runtime.CompilerServices.Extension()> _
-    Public Function IsPositive(d As Nullable(Of Double)) As Boolean
+    <Runtime.CompilerServices.Extension()>
+    Public Function IsPositive(d As Double?) As Boolean
         If d.GetValueOrDefault.IsValid() Then
             If d.GetValueOrDefault > 0.0# Then Return True Else Return False
         Else
@@ -84,7 +84,7 @@ Module Extensions
         End If
     End Function
 
-    <System.Runtime.CompilerServices.Extension()> _
+    <Runtime.CompilerServices.Extension()>
     Public Function IsNegative(d As Double) As Boolean
         If d.IsValid() Then
             If d < 0.0# Then Return True Else Return False
@@ -93,8 +93,8 @@ Module Extensions
         End If
     End Function
 
-    <System.Runtime.CompilerServices.Extension()> _
-    Public Function IsNegative(d As Nullable(Of Double)) As Boolean
+    <Runtime.CompilerServices.Extension()>
+    Public Function IsNegative(d As Double?) As Boolean
         If d.GetValueOrDefault.IsValid() Then
             If d.GetValueOrDefault < 0.0# Then Return True Else Return False
         Else
@@ -108,8 +108,8 @@ Module Extensions
     ''' <param name="val"></param>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    <System.Runtime.CompilerServices.Extension()> Public Function ExpY(val As Double) As Double
-        Dim tmp As Long = CLng(1512775 * val + 1072632447)
+    <Runtime.CompilerServices.Extension()> Public Function ExpY(val As Double) As Double
+        Dim tmp As Long = 1512775 * val + 1072632447
         Return BitConverter.Int64BitsToDouble(tmp << 32)
     End Function
 
@@ -121,7 +121,7 @@ Module Extensions
     ''' <param name="vector"></param>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    <System.Runtime.CompilerServices.Extension()> Public Function ExpY(vector As Double()) As Double()
+    <Runtime.CompilerServices.Extension()> Public Function ExpY(vector As Double()) As Double()
 
         Dim vector2(vector.Length - 1) As Double
 
@@ -143,7 +143,7 @@ Module Extensions
     ''' <param name="vector"></param>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    <System.Runtime.CompilerServices.Extension()> Public Function LogY(vector As Double()) As Double()
+    <Runtime.CompilerServices.Extension()> Public Function LogY(vector As Double()) As Double()
 
         Dim vector2(vector.Length - 1) As Double
 
@@ -165,7 +165,7 @@ Module Extensions
     ''' <param name="vector"></param>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    <System.Runtime.CompilerServices.Extension()> Public Function MinY(vector As Double()) As Double
+    <Runtime.CompilerServices.Extension()> Public Function MinY(vector As Double()) As Double
 
         If My.MyApplication.UseSIMDExtensions Then
             Return Yeppp.Core.Min_V64f_S64f(vector, 0, vector.Length)
@@ -181,7 +181,7 @@ Module Extensions
     ''' <param name="vector"></param>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    <System.Runtime.CompilerServices.Extension()> Public Function MaxY(vector As Double()) As Double
+    <Runtime.CompilerServices.Extension()> Public Function MaxY(vector As Double()) As Double
 
         If My.MyApplication.UseSIMDExtensions Then
             Return Yeppp.Core.Max_V64f_S64f(vector, 0, vector.Length)
@@ -197,7 +197,7 @@ Module Extensions
     ''' <param name="vector"></param>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    <System.Runtime.CompilerServices.Extension()> Public Function SumY(vector As Double()) As Double
+    <Runtime.CompilerServices.Extension()> Public Function SumY(vector As Double()) As Double
 
         If My.MyApplication.UseSIMDExtensions Then
             Return Yeppp.Core.Sum_V64f_S64f(vector, 0, vector.Length)
@@ -213,7 +213,7 @@ Module Extensions
     ''' <param name="vector"></param>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    <System.Runtime.CompilerServices.Extension()> Public Function AbsSumY(vector As Double()) As Double
+    <Runtime.CompilerServices.Extension()> Public Function AbsSumY(vector As Double()) As Double
 
         If My.MyApplication.UseSIMDExtensions Then
             Return Yeppp.Core.SumAbs_V64f_S64f(vector, 0, vector.Length)
@@ -229,7 +229,7 @@ Module Extensions
     ''' <param name="vector"></param>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    <System.Runtime.CompilerServices.Extension()> Public Function AbsSqrSumY(vector As Double()) As Double
+    <Runtime.CompilerServices.Extension()> Public Function AbsSqrSumY(vector As Double()) As Double
 
         If My.MyApplication.UseSIMDExtensions Then
             Return Yeppp.Core.SumSquares_V64f_S64f(vector, 0, vector.Length)
@@ -245,7 +245,7 @@ Module Extensions
     ''' <param name="vector"></param>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    <System.Runtime.CompilerServices.Extension()> Public Function NegateY(vector As Double()) As Double()
+    <Runtime.CompilerServices.Extension()> Public Function NegateY(vector As Double()) As Double()
 
         Dim vector0(vector.Length - 1) As Double
 
@@ -268,7 +268,7 @@ Module Extensions
     ''' <param name="vector2"></param>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    <System.Runtime.CompilerServices.Extension()> Public Function MultiplyY(vector As Double(), vector2 As Double()) As Double()
+    <Runtime.CompilerServices.Extension()> Public Function MultiplyY(vector As Double(), vector2 As Double()) As Double()
 
         Dim vector0(vector.Length - 1) As Double
 
@@ -291,7 +291,7 @@ Module Extensions
     ''' <param name="vector2"></param>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    <System.Runtime.CompilerServices.Extension()> Public Function DivideY(vector As Double(), vector2 As Double()) As Double()
+    <Runtime.CompilerServices.Extension()> Public Function DivideY(vector As Double(), vector2 As Double()) As Double()
 
         Dim vector0(vector.Length - 1) As Double
 
@@ -319,7 +319,7 @@ Module Extensions
     ''' <param name="vector2"></param>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    <System.Runtime.CompilerServices.Extension()> Public Function SubtractY(vector As Double(), vector2 As Double()) As Double()
+    <Runtime.CompilerServices.Extension()> Public Function SubtractY(vector As Double(), vector2 As Double()) As Double()
 
         Dim vector0(vector.Length - 1) As Double
 
@@ -335,7 +335,7 @@ Module Extensions
 
     End Function
 
-    <System.Runtime.CompilerServices.Extension()> Public Function SubtractInversesY(vector As Double(), vector2 As Double()) As Double()
+    <Runtime.CompilerServices.Extension()> Public Function SubtractInversesY(vector As Double(), vector2 As Double()) As Double()
 
         Dim vector0(vector.Length - 1) As Double
         Dim invvector1(vector.Length - 1), invvector2(vector.Length - 1) As Double
@@ -357,7 +357,7 @@ Module Extensions
 
     End Function
 
-    <System.Runtime.CompilerServices.Extension()> Public Function SubtractInverseY(vector As Double(), vector2 As Double()) As Double()
+    <Runtime.CompilerServices.Extension()> Public Function SubtractInverseY(vector As Double(), vector2 As Double()) As Double()
 
         Dim vector0(vector.Length - 1) As Double
 
@@ -383,7 +383,7 @@ Module Extensions
     ''' <param name="vector"></param>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    <System.Runtime.CompilerServices.Extension()> Public Function MultiplyConstY(vector As Double(), constant As Double) As Double()
+    <Runtime.CompilerServices.Extension()> Public Function MultiplyConstY(vector As Double(), constant As Double) As Double()
 
         Dim vector0(vector.Length - 1) As Double
 
@@ -406,7 +406,7 @@ Module Extensions
     ''' <param name="vector"></param>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    <System.Runtime.CompilerServices.Extension()> Public Function NormalizeY(vector As Double()) As Double()
+    <Runtime.CompilerServices.Extension()> Public Function NormalizeY(vector As Double()) As Double()
 
         Dim vector0(vector.Length - 1) As Double
         Dim sum As Double = vector.SumY
@@ -430,7 +430,7 @@ Module Extensions
     ''' <param name="vector2"></param>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    <System.Runtime.CompilerServices.Extension()> Public Function AddY(vector As Double(), vector2 As Double()) As Double()
+    <Runtime.CompilerServices.Extension()> Public Function AddY(vector As Double(), vector2 As Double()) As Double()
 
         Dim vector0 As Double() = vector.Clone()
 
@@ -452,7 +452,7 @@ Module Extensions
     ''' <param name="vector"></param>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    <System.Runtime.CompilerServices.Extension()> Public Function AddConstY(vector As Double(), constant As Double) As Double()
+    <Runtime.CompilerServices.Extension()> Public Function AddConstY(vector As Double(), constant As Double) As Double()
 
         Dim vector0 As Double() = vector.Clone()
 
@@ -477,7 +477,7 @@ Module Extensions
     ''' <param name="twoDimensionalArray"></param>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    <System.Runtime.CompilerServices.Extension> Public Function ToJaggedArray(Of T)(twoDimensionalArray As t(,)) As t()()
+    <Runtime.CompilerServices.Extension> Public Function ToJaggedArray(Of T)(twoDimensionalArray As t(,)) As t()()
 
         Dim rowsFirstIndex As Integer = twoDimensionalArray.GetLowerBound(0)
         Dim rowsLastIndex As Integer = twoDimensionalArray.GetUpperBound(0)
@@ -506,7 +506,7 @@ Module Extensions
     ''' <param name="jaggedArray"></param>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    <System.Runtime.CompilerServices.Extension> Public Function FromJaggedArray(Of T)(jaggedArray As t()()) As t(,)
+    <Runtime.CompilerServices.Extension> Public Function FromJaggedArray(Of T)(jaggedArray As t()()) As t(,)
 
         Dim rowsFirstIndex As Integer = jaggedArray.GetLowerBound(0)
         Dim rowsLastIndex As Integer = jaggedArray.GetUpperBound(0)

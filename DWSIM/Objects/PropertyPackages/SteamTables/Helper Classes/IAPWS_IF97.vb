@@ -1,6 +1,6 @@
 ﻿Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
-    <System.Serializable()> Public Class IAPWS_IF97
+    <Serializable()> Public Class IAPWS_IF97
 
         '  water97_v13: A collection of Visual Basic functions
         '  for calculating properties of water and steam.
@@ -721,7 +721,7 @@
             '
             Call InitFieldsreg2()
 
-            gamma0reg2 = System.Math.Log(pi)
+            gamma0reg2 = Math.Log(pi)
             For i = 1 To 9
 
 
@@ -911,7 +911,7 @@
             Call InitFieldsreg3()
 
 
-            fireg3 = nreg3(1) * System.Math.Log(delta)
+            fireg3 = nreg3(1) * Math.Log(delta)
             For i = 2 To 40
 
 
@@ -1044,7 +1044,7 @@
             Next i
 
 
-            psi1 = System.Math.Exp(delta * psi1)
+            psi1 = Math.Exp(delta * psi1)
 
 
 
@@ -1092,7 +1092,7 @@
             Next i
 
 
-            lamb1 = System.Math.Exp(delta * lamb1)
+            lamb1 = Math.Exp(delta * lamb1)
             '
             ' v1.1: calculation of lamb2 corrected
             '
@@ -1181,7 +1181,7 @@
 
 
 
-            lamb2 = 0.0013848 / psivisc(tau, delta) * (tau * delta) ^ (-2) * dpidtau ^ 2 * (delta * ddeltadpi) ^ 0.4678 * delta ^ 0.5 * System.Math.Exp(-18.66 * (1 / tau - 1) ^ 2 - (delta - 1) ^ 4)
+            lamb2 = 0.0013848 / psivisc(tau, delta) * (tau * delta) ^ (-2) * dpidtau ^ 2 * (delta * ddeltadpi) ^ 0.4678 * delta ^ 0.5 * Math.Exp(-18.66 * (1 / tau - 1) ^ 2 - (delta - 1) ^ 4)
 
 
 
@@ -1520,15 +1520,9 @@
             ' pressure in bar
             '
 
-
             tau = 540.0# / temperature
 
-
             pi = 0.1 * pressure
-
-
-
-
 
             enthalpyreg2 = 0.001 * rgas_water * temperature * tau * (gamma0taureg2(tau, pi) + gammartaureg2(tau, pi))
             ''
@@ -1544,14 +1538,9 @@
             ' pressure in bar
             '
 
-
             tau = 540.0# / temperature
 
-
             pi = 0.1 * pressure
-
-
-
 
             cpreg2 = -0.001 * rgas_water * tau ^ 2 * (gamma0tautaureg2(tau, pi) + gammartautaureg2(tau, pi))
             ''
@@ -1567,18 +1556,9 @@
             ' pressure in bar
             '
 
-
             tau = 540.0# / temperature
 
-
             pi = 0.1 * pressure
-
-
-
-
-
-
-
 
             cvreg2 = 0.001 * rgas_water * (-tau ^ 2 * (gamma0tautaureg2(tau, pi) + gammartautaureg2(tau, pi)) - (1 + pi * gammarpireg2(tau, pi) - tau * pi * gammarpitaureg2(tau, pi)) ^ 2 / (1 - pi ^ 2 * gammarpipireg2(tau, pi)))
             ''
@@ -1594,15 +1574,9 @@
             ' density in kg/m^3
             '
 
-
             tau = tc_water / temperature
 
-
             delta = density / dc_water
-
-
-
-
 
             pressreg3 = density * rgas_water * temperature * delta * fideltareg3(tau, delta) / 100000.0#
             ''
@@ -1618,14 +1592,9 @@
             ' density in kg/m^3
             '
 
-
             tau = tc_water / temperature
 
-
             delta = density / dc_water
-
-
-
 
             energyreg3 = 0.001 * rgas_water * temperature * tau * fitaureg3(tau, delta)
             ''
@@ -1641,14 +1610,10 @@
             ' density in kg/m^3
             '
 
-
             tau = tc_water / temperature
 
 
             delta = density / dc_water
-
-
-
 
             entropyreg3 = 0.001 * rgas_water * (tau * fitaureg3(tau, delta) - fireg3(tau, delta))
             ''
@@ -1664,16 +1629,9 @@
             ' density in kg/m^3
             '
 
-
             tau = tc_water / temperature
 
-
             delta = density / dc_water
-
-
-
-
-
 
             enthalpyreg3 = 0.001 * rgas_water * temperature * (tau * fitaureg3(tau, delta) + delta * fideltareg3(tau, delta))
             ''
@@ -1688,18 +1646,9 @@
             ' temperature in K
             ' density in kg/m^3
             '
-
-
             tau = tc_water / temperature
 
-
             delta = density / dc_water
-
-
-
-
-
-
 
             cpreg3 = 0.001 * rgas_water * (-tau ^ 2 * fitautaureg3(tau, delta) + (delta * fideltareg3(tau, delta) - delta * tau * fideltataureg3(tau, delta)) ^ 2 / (2 * delta * fideltareg3(tau, delta) + delta ^ 2 * fideltadeltareg3(tau, delta)))
             ''
@@ -1744,8 +1693,6 @@
             ' densreg3 = -2: not converged
             '
 
-
-
             If temperature < tc_water And pressure < pSatW(temperature) Then
 
                 densold = 100.0#
@@ -1762,22 +1709,11 @@
 
                 delta = densold / dc_water
 
-
-
-
-
                 derivprho = rgas_water * temperature / dc_water * (2 * densold * fideltareg3(tau, delta) + densold ^ 2 / dc_water * fideltadeltareg3(tau, delta))
-
-
-
-
-
 
                 densnew = densold + (pressure * 100000.0# - rgas_water * temperature * densold ^ 2 / dc_water * fideltareg3(tau, delta)) / derivprho
 
-
-
-                diffdens = System.Math.Abs(densnew - densold)
+                diffdens = Math.Abs(densnew - densold)
                 If diffdens < 0.000005 Then
 
 
@@ -2965,7 +2901,6 @@
             ' cvSatVapPW = -1: pressure outside range
             '
 
-
             If pressure >= pSatW(273.15) And pressure <= pSatW(623.15) Then
                 '  region 2
 
@@ -3010,36 +2945,26 @@
             If temperature >= 273.15 And temperature <= 623.15 Then
                 '  region 1
 
-
                 pressure = pSatW(temperature)
-
 
                 density = 1 / volreg1(temperature, pressure)
 
-
                 delta = density / 317.763
 
-
                 tau = 647.226 / temperature
-
 
                 viscSatLiqTW = 0.000055071 * psivisc(tau, delta)
 
             ElseIf temperature > 623.15 And temperature <= tc_water Then
                 '  region 3
 
-
                 pressure = pSatW(temperature)
-
 
                 density = densreg3(temperature, pressure)
 
-
                 delta = density / 317.763
 
-
                 tau = 647.226 / temperature
-
 
                 viscSatLiqTW = 0.000055071 * psivisc(tau, delta)
             Else
@@ -3434,7 +3359,6 @@
 
             ElseIf pressure > pSatW(623.15) And pressure <= pc_water Then
                 '  region 3
-
 
                 temperature = tSatW(pressure)
 

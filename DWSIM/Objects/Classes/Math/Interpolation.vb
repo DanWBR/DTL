@@ -1,6 +1,3 @@
-Imports System
-Imports DTL.DTL.MathEx
-
 Namespace DTL.MathEx.Interpolation
 
     '************************************************************************
@@ -163,7 +160,7 @@ Namespace DTL.MathEx.Interpolation
             j = 0
             s = t - a
             For i = 1 To n - 1
-                x = a + CDbl((i)) / CDbl((n - 1)) * (b - a)
+                x = a + i / (n - 1) * (b - a)
                 If Math.Abs(t - x) < Math.Abs(s) Then
                     s = t - x
                     j = i
@@ -190,7 +187,7 @@ Namespace DTL.MathEx.Interpolation
             w = 1.0R
             For i = 0 To n - 1
                 If i <> j Then
-                    v = s * w / (t - (a + CDbl((i)) / CDbl((n - 1)) * (b - a)))
+                    v = s * w / (t - (a + i / (n - 1) * (b - a)))
                     s1 = s1 + v * f(i)
                     s2 = s2 + v
                 Else
@@ -565,7 +562,7 @@ Namespace DTL.MathEx.Interpolation
         '         Copyright 28.05.2007 by Bochkanov Sergey
         '    ************************************************************************
 
-        Public Shared Sub nevilledifferentiation(ByRef x As Double(), ByVal f As Double(), ByVal n As Integer, ByVal t As Double, ByRef p As Double, ByRef dp As Double, _
+        Public Shared Sub nevilledifferentiation(ByRef x As Double(), ByVal f As Double(), ByVal n As Integer, ByVal t As Double, ByRef p As Double, ByRef dp As Double,
          ByRef d2p As Double)
             Dim m As Integer = 0
             Dim i As Integer = 0

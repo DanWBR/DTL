@@ -138,6 +138,6 @@ MonoxidoDeCarbono	Metano	0.974
 Kriptonio	Oxigenio	0.989
 SulfetoDeHidrogenio	iButano	0.947
 OxidoNitroso	Metano	1.017
-Agua	DioxidoDeCarbono	0.92
-Agua	Amonia	1.152
-Agua	Metanol	0.979
+Water	DioxidoDeCarbono	0.92
+Water	Amonia	1.152
+Water	Metanol	0.979
