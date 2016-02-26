@@ -1446,7 +1446,7 @@
     <COSMODBName>PHENOL</COSMODBName>
   </component>
   <component>
-    <Name>Glicerol</Name>
+    <Name>Glycerol</Name>
     <CAS_Number>56-81-5</CAS_Number>
     <Formula>C3H8O3</Formula>
     <Molar_Weight>92.095</Molar_Weight>
@@ -1678,7 +1678,7 @@
       <element name="O">1</element>
       <element name="H">8</element>
     </elements>
-    <COSMODBName>Iso-propanol</COSMODBName>
+    <COSMODBName>ISO-PROPANOL</COSMODBName>
   </component>
   <component>
     <Name>1Pentanol</Name>

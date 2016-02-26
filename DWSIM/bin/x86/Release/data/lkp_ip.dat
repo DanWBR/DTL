@@ -46,8 +46,8 @@ Propane	N-nonane	1.115
 Propane	N-decane	1.139
 Propylene	N-butane	1.01
 Propylene	Iso-butane	1.009
-Propylene	isobuteno	1.006
-N-butane	Iso-butane	1.001
+Propylene	Iso-butane	1.006
+N-butane	Iso-butene	1.001
 N-butane	N-pentane	0.994
 N-butane	Iso-pentane	0.998
 N-butane	N-hexane	1.018
@@ -75,7 +75,7 @@ Benzene	cycle-Hexane	0.979
 Benzene	N-heptane	0.985
 Benzene	N-octane	0.987
 Benzene	N-nonane	0.982
-Benzene	iOctano	1.034
+Benzene	Iso-octane	1.034
 Benzene	N-nonane	1.047
 Benzene	N-decane	0.999
 cycle-Hexane	N-heptane	1.01

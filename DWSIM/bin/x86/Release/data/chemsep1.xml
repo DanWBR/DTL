@@ -14184,7 +14184,7 @@
 
 <compound>
 <LibraryIndex name="Index"  value="1104" />
-<CompoundID name="Name"  value="Iso-propanol" />
+<CompoundID name="Name"  value="Isopropanol" />
 <StructureFormula name="Structure"  value="CH3CH(OH)CH3" />
 <Family name="Family"  value="46" />
 <CriticalTemperature name="Critical temperature"  units="K"  value="508.3" />
@@ -93419,7 +93419,7 @@
 
 <compound>
 <LibraryIndex name="Index"  value="6864" />
-<CompoundID name="Name"  value="DiIso-propanolamine" />
+<CompoundID name="Name"  value="Diisopropanolamine" />
 <StructureFormula name="Structure"  value="CH3CH(OH)CH2NHCH2CH(OH)CH3" />
 <Family name="Family"  value="68" />
 <CriticalTemperature name="Critical temperature"  units="K"  value="672" />

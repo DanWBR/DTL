@@ -1,4 +1,4 @@
-*;Methane (C1);Ethane (C2);Propane (C3);Iso-butane (iC4);N-butane (nC4);Iso-pentane (iC5);N-pentane (nC5);N-hexane (nC6);N-heptane (nC7);N-octane (nC8);N-nonane (nC9);N-decane (nC10);Oxygen (O2);Nitrogen (N2);Water (H2O);Carbon-dioxide (CO2);Hydrogen-sulfide (H2S);Benzene;Toluene;O-xylene;M-xylene;P-xylene;Ethyl-benzene;Phenol;Glicerol;Methanol;Ethanol;2-propanol;1-Pentanol;1-Hexanol;2-Heptanol;1-Octanol;1-Decanol;3-metil-1-butanol;1.2-Propanediol;Methyl-ethyl-ketone;Ethyleneglicol;Cycle-Propane
+*;Methane (C1);Ethane (C2);Propane (C3);Iso-butane (iC4);N-butane (nC4);Iso-pentane (iC5);N-pentane (nC5);N-hexane (nC6);N-heptane (nC7);N-octane (nC8);N-nonane (nC9);N-decane (nC10);Oxygen (O2);Nitrogen (N2);Water (H2O);Carbon-dioxide (CO2);Hydrogen-sulfide (H2S);Benzene;Toluene;O-xylene;M-xylene;P-xylene;Ethyl-benzene;Phenol;Glycerol;Methanol;Ethanol;2-propanol;1-Pentanol;1-Hexanol;2-Heptanol;1-Octanol;1-Decanol;3-metil-1-butanol;1.2-Propanediol;Methyl-ethyl-ketone;Ethylene-glicol;Cycle-Propane
 Methane (C1);-;-0.0033;0.021;0.0256;0.0185;-0.0056;0.023;0.04;0.0401;0.0496;0.0474;0.0411;;;0.5;0.0885;0.1356;0.0807;0.097;;0.0844;;;;;;;;;;;;;;;;;
 Ethane (C2);-0.0033;-;0.0011;-0.0067;0.0089;;0.0078;-0.04;0.0074;0.0185;;0.0144;;;0.5;0.13;0.0952;0.0322;;;;;;;;0.027;;;;;;;;;;;;
 Propane (C3);0.021;0.0011;-;-0.0078;0.0033;0.0111;0.0267;0.0007;0.0056;0;0;0;;;0.5;;;0.0233;;;;;;;;;;;;;;;;;;;;
@@ -35,5 +35,5 @@ Ethanol;;;0.0315;;;;;;;;;;;;;;;;;;;;;;;;-;;;;;;;;;;;
 3-metil-1-butanol;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-;;;;
 1.2-Propanediol;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-;;;
 Methyl-ethyl-ketone;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-;;
-Ethyleneglicol;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-;
+Ethylene-glicol;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;-;
 Cycle-Propane;;;;;;;;;;;;;;;0.5;;;;;;;;;;;;;;;;;;;;;;;-
