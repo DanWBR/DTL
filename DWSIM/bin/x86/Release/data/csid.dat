@@ -1,25 +1,25 @@
 CHEMSEP 2 component IDs;CHEMSEP 2 Names;DWSIM Names
-1;Methane;Metano
-2;Ethane;Etano
-3;Propane;Propano
-4;Isobutane;iButano
-5;N-butane;nButano
-7;N-pentane;nPentano
-8;Isopentane;iPentano
+1;Methane;Methane
+2;Ethane;Ethane
+3;Propane;Propane
+4;Isobutane;I-butane
+5;N-butane;N-butane
+7;N-pentane;N-pentane
+8;Isopentane;I-pentane
 9;Neopentane;
-11;N-hexane;nHexano
+11;N-hexane;N-hexane
 12;2-methylpentane;
 13;3-methylpentane;
 14;2,2-dimethylbutane;
 15;2,3-dimethylbutane;
-17;N-heptane;nHeptano
-27;N-octane;nOctano
+17;N-heptane;N-heptane
+27;N-octane;N-octane
 40;2,2,3-trimethylpentane;
 41;2,2,4-trimethylpentane;
 42;2,3,3-trimethylpentane;
 43;2,3,4-trimethylpentane;
-46;N-nonane;nNonano
-56;N-decane;nDecano
+46;N-nonane;N-nonane
+56;N-decane;N-decane
 63;N-undecane;
 64;N-dodecane;
 65;N-tridecane;
@@ -63,12 +63,12 @@ CHEMSEP 2 component IDs;CHEMSEP 2 Names;DWSIM Names
 403;Ethylacetylene;
 404;Dimethylacetylene;
 418;Vinylacetylene;
-501;Benzene;Benzeno
-502;Toluene;Tolueno
-504;Ethylbenzene;Etilbenzeno
-505;O-xylene;Oxileno
-506;M-xylene;Mxileno
-507;P-xylene;Pxileno
+501;Benzene;Benzene
+502;Toluene;Toluene
+504;Ethylbenzene;Ethyl-benzene
+505;O-xylene;O-xylene
+506;M-xylene;M-xylene
+507;P-xylene;P-xylene
 509;N-propylbenzene;
 510;Cumene;
 514;1,2,3-trimethylbenzene;
@@ -93,11 +93,11 @@ CHEMSEP 2 component IDs;CHEMSEP 2 Names;DWSIM Names
 820;Indane;
 899;Nitrous oxide;
 900;Nitrogen dioxide;
-901;Oxygen;Oxigenio
+901;Oxygen;Oxygen
 902;Hydrogen;
-905;Nitrogen;Nitrogenio
+905;Nitrogen;Nitrogen
 908;Carbon monoxide;
-909;Carbon dioxide;DioxidoDeCarbono
+909;Carbon dioxide;Carbon-dioxide
 910;Sulfur dioxide;
 911;Sulfur trioxide;
 912;Nitric oxide;
@@ -111,15 +111,15 @@ CHEMSEP 2 component IDs;CHEMSEP 2 Names;DWSIM Names
 1003;Propanal;
 1006;2-methylpropanal;
 1051;Acetone;
-1052;Methyl ethyl ketone;MetilEtilCetona
+1052;Methyl ethyl ketone;Methyl-ethyl-ketone
 1053;3-pentanone;
 1054;Methyl isobutyl ketone;
 1061;Methyl isopropyl ketone;
 1080;Cyclohexanone;
-1101;Methanol;Metanol
-1102;Ethanol;Etanol
+1101;Methanol;Methanol
+1102;Ethanol;Ethanol
 1103;1-propanol;
-1104;Isopropanol;Isopropanol
+1104;Isopropanol;Iso-propanol
 1105;1-butanol;
 1106;2-methyl-1-propanol;
 1107;2-butanol;
@@ -127,7 +127,7 @@ CHEMSEP 2 component IDs;CHEMSEP 2 Names;DWSIM Names
 1111;2-methyl-2-butanol;
 1114;1-hexanol;
 1151;Cyclohexanol;
-1181;Phenol;Fenol
+1181;Phenol;Phenol
 1182;O-cresol;
 1183;M-cresol;
 1184;P-cresol;
@@ -213,7 +213,7 @@ CHEMSEP 2 component IDs;CHEMSEP 2 Names;DWSIM Names
 1907;Hydrogen iodide;
 1911;Ammonia;
 1921;Water;Water
-1922;Hydrogen sulfide;SulfetoDeHidrogenio
+1922;Hydrogen sulfide;Hydrogen-sulfide
 1938;Carbon disulfide;
 2856;N,n-dimethylacetamide;
 4865;Trichloroacetaldehyde;
