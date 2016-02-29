@@ -31,7 +31,7 @@ Ethane	N-Decane	1.237
 Ethylene	N-Butane	0.998
 Ethylene	Benzene	1.094
 Ethylene	N-Heptane	1.163
-Acetileno	Ethylene	0.948
+Acetylene	Ethylene	0.948
 Propane	Propylene	0.992
 Propane	N-Butane	1.003
 Propane	I-Butane	1.003
@@ -46,7 +46,7 @@ Propane	N-Nonane	1.115
 Propane	N-Decane	1.139
 Propylene	N-Butane	1.01
 Propylene	I-Butane	1.009
-Propylene	isobuteno	1.006
+Propylene	I-butene	1.006
 N-Butane	I-Butane	1.001
 N-Butane	N-Pentane	0.994
 N-Butane	I-Pentane	0.998
@@ -118,7 +118,7 @@ Carbon-dioxide	N-Nonane	1.126
 Carbon-dioxide	N-Decane	1.16
 Carbon-dioxide	Hydrogen-sulfide	0.922
 Carbon-dioxide	R12	0.969
-Carbon-dioxide	Methanel	1.069
+Carbon-dioxide	Methanol	1.069
 Hydrogen	Methane	1.216
 Hydrogen	Ethane	1.604
 Hydrogen	Ethylene	1.498
@@ -140,4 +140,4 @@ Hydrogen-sulfide	I-Butane	0.947
 Nitrous-oxide	Methane	1.017
 Water	Carbon-dioxide	0.92
 Water	Ammonia	1.152
-Water	Methanel	0.979
+Water	Methanol	0.979
