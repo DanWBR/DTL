@@ -1,4 +1,4 @@
-Module Extensions
+Public Module Extensions
 
     <Runtime.CompilerServices.Extension()>
     Public Function ToArrayString(vector As Double()) As String
@@ -477,7 +477,7 @@ Module Extensions
     ''' <param name="twoDimensionalArray"></param>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    <Runtime.CompilerServices.Extension> Public Function ToJaggedArray(Of T)(twoDimensionalArray As t(,)) As t()()
+    <Runtime.CompilerServices.Extension> Public Function ToJaggedArray(Of T)(twoDimensionalArray As T(,)) As T()()
 
         Dim rowsFirstIndex As Integer = twoDimensionalArray.GetLowerBound(0)
         Dim rowsLastIndex As Integer = twoDimensionalArray.GetUpperBound(0)
@@ -506,7 +506,7 @@ Module Extensions
     ''' <param name="jaggedArray"></param>
     ''' <returns></returns>
     ''' <remarks></remarks>
-    <Runtime.CompilerServices.Extension> Public Function FromJaggedArray(Of T)(jaggedArray As t()()) As t(,)
+    <Runtime.CompilerServices.Extension> Public Function FromJaggedArray(Of T)(jaggedArray As T()()) As T(,)
 
         Dim rowsFirstIndex As Integer = jaggedArray.GetLowerBound(0)
         Dim rowsLastIndex As Integer = jaggedArray.GetUpperBound(0)
