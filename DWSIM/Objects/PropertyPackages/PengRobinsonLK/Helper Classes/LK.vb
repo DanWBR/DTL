@@ -29,7 +29,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
         Function MixCritProp_LK(ByVal Vz As Object, ByVal VTc As Object, ByVal VPc As Object, ByVal Vw As Object)
 
             Dim Pcm, Tcm, Vcm, wm As Double
-            Dim n As Integer = UBound(Vz)
+            Dim n As Integer = Vz.Length - 1
             Dim VZc(n), VVc(n) As Double
 
             Dim i, j As Integer
@@ -87,7 +87,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Dim Tc(), Pc(), w(), Tr() As Double
             Dim i As Integer
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             ReDim Tc(n), Pc(n), w(n), Tr(n)
 
@@ -134,7 +134,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Dim Tc(), Pc(), w(), Tr() As Double
             Dim i As Integer
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             ReDim Tc(n), Pc(n), w(n), Tr(n)
 
@@ -577,7 +577,7 @@ Final3:
             Dim Tc(), Pc(), Vc(), w(), Tr() As Double
             Dim i
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             ReDim Tc(n), Pc(n), Vc(n), w(n), Tr(n)
 

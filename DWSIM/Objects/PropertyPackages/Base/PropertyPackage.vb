@@ -525,7 +525,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
         Function ObjectCopy(ByVal obj As Object) As Object
 
-            Dim objMemStream As New MemoryStream(50000)
+            Dim objMemStream As New MemoryStream(500000)
             Dim objBinaryFormatter As New BinaryFormatter(Nothing, New StreamingContext(StreamingContextStates.Clone))
 
             objBinaryFormatter.Serialize(objMemStream, obj)
@@ -651,10 +651,8 @@ Namespace DTL.SimulationObjects.PropertyPackages
         ''' <remarks>The composition vector must follow the same sequence as the components which were added in the material stream.</remarks>
         Public Overridable Overloads Function DW_CalcKvalue(ByVal Vx As Array, ByVal Vy As Array, ByVal T As Double, ByVal P As Double, Optional ByVal type As String = "LV") As Object
 
-            Dim fugvap As Object = Nothing
-            Dim fugliq As Object = Nothing
-
-            Dim alreadymt As Boolean = False
+            Dim fugvap As Double() = Nothing
+            Dim fugliq As Double() = Nothing
 
             If My.MyApplication._EnableParallelProcessing Then
                 My.MyApplication.IsRunningParallelTasks = True
@@ -682,44 +680,46 @@ Namespace DTL.SimulationObjects.PropertyPackages
                 End If
             End If
 
-            Dim n As Integer = UBound(fugvap)
+            Dim n As Integer = fugvap.Length - 1
             Dim i As Integer
             Dim K(n) As Double
 
-            For i = 0 To n
-                K(i) = fugliq(i) / fugvap(i)
-            Next
+            K = fugliq.DivideY(fugvap)
 
-            i = 0
-            For Each subst As Substance In Me.CurrentMaterialStream.Phases(1).Components.Values
-                If K(i) = 0 Or Double.IsInfinity(K(i)) Or Double.IsNaN(K(i)) Then
-                    Dim Pc, Tc, w As Double
-                    Pc = subst.ConstantProperties.Critical_Pressure
-                    Tc = subst.ConstantProperties.Critical_Temperature
-                    w = subst.ConstantProperties.Acentric_Factor
-                    If type = "LV" Then
-                        K(i) = Pc / P * Math.Exp(5.373 * (1 + w) * (1 - Tc / T))
-                    Else
-                        K(i) = 1.0#
-                    End If
-                End If
-                i += 1
-            Next
+            If Double.IsNaN(K.SumY) Or Double.IsInfinity(K.SumY) Then
 
-            If Me.AUX_CheckTrivial(K) Then
                 i = 0
                 For Each subst As Substance In Me.CurrentMaterialStream.Phases(1).Components.Values
-                    Dim Pc, Tc, w As Double
-                    Pc = subst.ConstantProperties.Critical_Pressure
-                    Tc = subst.ConstantProperties.Critical_Temperature
-                    w = subst.ConstantProperties.Acentric_Factor
-                    If type = "LV" Then
-                        K(i) = Pc / P * Math.Exp(5.373 * (1 + w) * (1 - Tc / T))
-                    Else
-                        K(i) = 1.0#
+                    If K(i) = 0 Or Double.IsInfinity(K(i)) Or Double.IsNaN(K(i)) Then
+                        Dim Pc, Tc, w As Double
+                        Pc = subst.ConstantProperties.Critical_Pressure
+                        Tc = subst.ConstantProperties.Critical_Temperature
+                        w = subst.ConstantProperties.Acentric_Factor
+                        If type = "LV" Then
+                            K(i) = Pc / P * Math.Exp(5.373 * (1 + w) * (1 - Tc / T))
+                        Else
+                            K(i) = 1.0#
+                        End If
                     End If
                     i += 1
                 Next
+
+                If Me.AUX_CheckTrivial(K) Then
+                    i = 0
+                    For Each subst As Substance In Me.CurrentMaterialStream.Phases(1).Components.Values
+                        Dim Pc, Tc, w As Double
+                        Pc = subst.ConstantProperties.Critical_Pressure
+                        Tc = subst.ConstantProperties.Critical_Temperature
+                        w = subst.ConstantProperties.Acentric_Factor
+                        If type = "LV" Then
+                            K(i) = Pc / P * Math.Exp(5.373 * (1 + w) * (1 - Tc / T))
+                        Else
+                            K(i) = 1.0#
+                        End If
+                        i += 1
+                    Next
+                End If
+
             End If
 
             Return K
@@ -738,7 +738,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
             Dim i As Integer
             Dim result = Me.FlashBase.Flash_PT(Vx, P, T, Me)
-            Dim n As Integer = UBound(Vx)
+            Dim n As Integer = Vx.Length - 1
             Dim K(n) As Double
 
             i = 0
@@ -761,7 +761,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
             Next
 
             If Me.AUX_CheckTrivial(K) Then
-                For i = 0 To UBound(Vx)
+                For i = 0 To Vx.Length - 1
                     K(i) = Me.AUX_PVAPi(i, T) / P
                     i += 1
                 Next
@@ -892,7 +892,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
                 fugvap = Me.DW_CalcFugCoeff(Vx, T, P, State.Vapor)
             End If
 
-            Dim n As Integer = UBound(Vx)
+            Dim n As Integer = Vx.Length - 1
             Dim i As Integer
 
             Dim g, gid, gexv, gexl As Double
@@ -4100,7 +4100,7 @@ Final3:
 
         Public Overridable Function DW_CalcSolidEnthalpy(ByVal T As Double, ByVal Vx As Double(), cprops As List(Of ConstantProperties)) As Double
 
-            Dim n As Integer = UBound(Vx)
+            Dim n As Integer = Vx.Length - 1
             Dim i As Integer
             Dim HS As Double = 0.0#
             Dim Cpi As Double
@@ -4130,7 +4130,7 @@ Final3:
 
         Public Overridable Function DW_CalcSolidHeatCapacityCp(ByVal T As Double, ByVal Vx As Double(), cprops As List(Of ConstantProperties)) As Double
 
-            Dim n As Integer = UBound(Vx)
+            Dim n As Integer = Vx.Length - 1
             Dim i As Integer
             Dim Cp As Double = 0.0#
             Dim Cpi As Double
@@ -4725,7 +4725,7 @@ Final3:
             Dim sum As Double = 0
             Dim i, n As Integer
 
-            n = UBound(Vx)
+            n = Vx.Length - 1
 
             Dim Vxnew(n) As Double
 
@@ -4745,7 +4745,7 @@ Final3:
 
             Dim i, n As Integer
 
-            n = UBound(Vx)
+            n = Vx.Length - 1
 
             Dim Vx2(n) As Double
 
@@ -4761,7 +4761,7 @@ Final3:
 
             Dim i, n As Integer
 
-            n = UBound(Vx)
+            n = Vx.Length - 1
 
             For i = 0 To n
                 If Vx(i) <> 0 Then Return i
@@ -4790,7 +4790,7 @@ Final3:
 
             Dim i, c, n As Integer
 
-            n = UBound(Vx)
+            n = Vx.Length - 1
 
             c = 0
             For i = 0 To n
@@ -4846,7 +4846,7 @@ Final3:
 
         Public Function AUX_CONVERT_MOL_TO_MASS(ByVal Vz As Object) As Double()
 
-            Dim Vwe(UBound(Vz)) As Double
+            Dim Vwe(Vz.Length - 1) As Double
             Dim mol_x_mm As Double = 0
             Dim i As Integer = 0
             Dim sub1 As Substance
@@ -4871,7 +4871,7 @@ Final3:
 
         Public Function AUX_CONVERT_MASS_TO_MOL(ByVal Vz As Object) As Double()
 
-            Dim Vw(UBound(Vz)) As Double
+            Dim Vw(Vz.Length - 1) As Double
             Dim mass_div_mm As Double
             Dim i As Integer = 0
             Dim sub1 As Substance
@@ -4893,7 +4893,7 @@ Final3:
         Public Function AUX_CalculateSumSquares(ByVal Vz As Object) As Double
 
             Dim n, i As Integer
-            n = UBound(Vz)
+            n = Vz.Length - 1
             Dim sum As Double = 0.0#
 
             For i = 0 To n
@@ -4907,7 +4907,7 @@ Final3:
         Public Function AUX_CalculateAbsSumSquares(ByVal Vz As Object) As Double
 
             Dim n, i As Integer
-            n = UBound(Vz)
+            n = Vz.Length - 1
             Dim sum As Double = 0.0#
 
             For i = 0 To n
@@ -4921,7 +4921,7 @@ Final3:
         Public Function AUX_CalculateSum(ByVal Vz As Object) As Double
 
             Dim n, i As Integer
-            n = UBound(Vz)
+            n = Vz.Length - 1
             Dim sum As Double = 0.0#
 
             For i = 0 To n
@@ -4935,7 +4935,7 @@ Final3:
         Public Function AUX_CalculateAbsSum(ByVal Vz As Object) As Double
 
             Dim n, i As Integer
-            n = UBound(Vz)
+            n = Vz.Length - 1
             Dim sum As Double = 0.0#
 
             For i = 0 To n

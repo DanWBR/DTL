@@ -328,7 +328,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
             Dim i, n
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             i = 0
 
@@ -348,7 +348,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
             Dim i, n
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             i = 0
 
@@ -368,7 +368,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
             Dim i, j, n
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             i = 0
             Vcm = 0.0#
@@ -387,7 +387,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
             Dim i, n
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             i = 0
 
@@ -407,7 +407,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
             Dim i, n
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             i = 0
 
@@ -427,7 +427,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
             Dim i, n
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             i = 0
 
@@ -483,7 +483,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         Function condlm_li(ByVal VVl, ByVal Vcondl, ByVal Vz) As Double
 
-            Dim n = UBound(Vz)
+            Dim n = Vz.Length - 1
 
             Dim phi(n) As Double, sumz, i, j
 
@@ -569,7 +569,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Dim Tc(), Pc(), Vc(), w(), Zc(), alpha(), m(), a(,), b(,), Z, Tr() As Double
             Dim i, j, dadT
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             ReDim ai(n), bi(n), ci(n), a(n, n), b(n, n)
             ReDim Tc(n), Pc(n), Vc(n), Zc(n), w(n), alpha(n), m(n), Tr(n)
@@ -769,7 +769,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Dim vetor(8) As Double
             Dim Tc(), Pc(), Vc(), W(), Zc(), a, b, c, Tr() As Double
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             ReDim Zc(n), Tc(n), Pc(n), Vc(n), W(n), Tr(n)
 

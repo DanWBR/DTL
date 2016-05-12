@@ -429,7 +429,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
         Function dfidRbb_H(ByVal Rbb, ByVal Kb0, ByVal Vz, ByVal Vu, ByVal sum_Hvi0, ByVal DHv, ByVal DHl, ByVal HT) As Double
 
             Dim i As Integer = 0
-            Dim n = UBound(Vz)
+            Dim n = Vz.Length - 1
 
             Dim Vpbb2(n), L2, V2, Kb2 As Double
 
@@ -454,7 +454,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
         Function dfidRbb_S(ByVal Rbb, ByVal Kb0, ByVal Vz, ByVal Vu, ByVal sum_Hvi0, ByVal DHv, ByVal DHl, ByVal ST) As Double
 
             Dim i As Integer = 0
-            Dim n = UBound(Vz)
+            Dim n = Vz.Length - 1
 
             Dim Vpbb2(n), L, V As Double
 
@@ -744,7 +744,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
                 lnfug = prn.CalcLnFug(T, P, Vx, Me.RET_VKij, Me.RET_VTC, Me.RET_VPC, Me.RET_VW, Nothing, "V")
             End If
 
-            Dim n As Integer = UBound(lnfug)
+            Dim n As Integer = lnfug.Length - 1
             Dim i As Integer
             Dim fugcoeff(n) As Double
 

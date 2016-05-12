@@ -22,7 +22,8 @@
     </ApplicationIcon>
     <TargetZone>LocalIntranet</TargetZone>
     <SignAssembly>false</SignAssembly>
-    <AssemblyOriginatorKeyFile>DTL.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
     <OptionStrict>Off</OptionStrict>
     <OptionCompare>Binary</OptionCompare>
     <FileUpgradeFlags>
@@ -129,6 +130,10 @@
     <Reference Include="FileHelpers">
       <HintPath>References\FileHelpers.dll</HintPath>
     </Reference>
+    <Reference Include="Interop.CAPEOPEN110">
+      <HintPath>References\Interop.CAPEOPEN110.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
     <Reference Include="Mapack, Version=1.0.9.0, Culture=neutral">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>References\Mapack.dll</HintPath>
@@ -137,11 +142,10 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="Yeppp.CLR.Bundle">
-      <HintPath>References\Yeppp.CLR.Bundle.dll</HintPath>
+      <HintPath>..\packages\Yeppp.CLR.Bundle.1.0.1-prerelease\lib\net20\Yeppp.CLR.Bundle.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Import Include="DTL.DTL.ClassesBasicasTermodinamica" />
     <Import Include="Microsoft.VisualBasic" />
     <Import Include="System" />
     <Import Include="System.Collections" />
@@ -248,7 +252,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="DTL.snk" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>
@@ -330,17 +333,6 @@
     <EmbeddedResource Include="bin\x86\Release\data\uniquac.dat" />
     <EmbeddedResource Include="bin\x86\Release\data\uniquacip.dat" />
     <None Include="My Project\DataSources\RssItem.datasource" />
-  </ItemGroup>
-  <ItemGroup>
-    <COMReference Include="CAPEOPEN110">
-      <Guid>{4A5E2E81-C093-11D4-9F1B-0010A4D198C2}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>1</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </COMReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />

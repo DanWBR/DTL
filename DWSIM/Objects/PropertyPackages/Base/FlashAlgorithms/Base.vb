@@ -294,7 +294,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
             WriteDebugInfo("Starting Liquid Phase Stability Test @ T = " & T & " K & P = " & P & " Pa for the following trial phases:")
 
             Dim i, j, c, n, o, l, nt, maxits As Integer
-            n = UBound(Vz)
+            n = Vz.Length - 1
             nt = UBound(VzArray, 1)
 
             Dim Y, K As Double(,), tol As Double
@@ -1002,7 +1002,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
         Private Function ConvertToMassFractions(ByVal Vz As Double()) As Double()
 
-            Dim Vwe(UBound(Vz)) As Double
+            Dim Vwe(Vz.Length - 1) As Double
             Dim mol_x_mm As Double = 0
             Dim i As Integer = 0
             For Each sub1 As ConstantProperties In CompoundProperties

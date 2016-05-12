@@ -52,7 +52,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
             Me.itol = PP.Parameters("PP_PTFILT")
             Me.maxit_i = CInt(PP.Parameters("PP_PTFMII"))
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             Dim Vn(n) As String, Vx(n), Vy(n), Vx_ant(n), Vy_ant(n), Vp(n), Ki(n), Ki_ant(n), fi(n) As Double
 
@@ -276,7 +276,7 @@ out:        Return New Object() {L, V, Vx, Vy, ecount, 0.0#, PP.RET_NullVector, 
 
             d1 = Date.Now
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             PP = PP
             Hf = H
@@ -391,7 +391,7 @@ out:        Return New Object() {L, V, Vx, Vy, ecount, 0.0#, PP.RET_NullVector, 
 
             d1 = Date.Now
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             Hf = H
             Pf = P
@@ -559,7 +559,7 @@ out:        Return New Object() {L, V, Vx, Vy, ecount, 0.0#, PP.RET_NullVector, 
 
             d1 = Date.Now
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             PP = PP
             Sf = S
@@ -673,7 +673,7 @@ out:        Return New Object() {L, V, Vx, Vy, ecount, 0.0#, PP.RET_NullVector, 
 
             d1 = Date.Now
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             Sf = S
             Pf = P
@@ -840,7 +840,7 @@ out:        Return New Object() {L, V, Vx, Vy, ecount, 0.0#, PP.RET_NullVector, 
             Me.itol = PP.Parameters("PP_PTFILT")
             Me.maxit_i = CInt(PP.Parameters("PP_PTFMII"))
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             PP = PP
             Vf = V
@@ -1198,7 +1198,7 @@ out:        Return New Object() {L, V, Vx, Vy, ecount, 0.0#, PP.RET_NullVector, 
             Me.itol = PP.Parameters("PP_PTFILT")
             Me.maxit_i = CInt(PP.Parameters("PP_PTFMII"))
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             PP = PP
             Vf = V
@@ -1519,7 +1519,7 @@ out:        Return New Object() {L, V, Vx, Vy, ecount, 0.0#, PP.RET_NullVector, 
 
         Function OBJ_FUNC_PH_FLASH(ByVal Type As String, ByVal X As Double, ByVal P As Double, ByVal Vz() As Double, ByVal PP As PropertyPackage) As Object
 
-            Dim n = UBound(Vz)
+            Dim n = Vz.Length - 1
             Dim L, V, Vx(), Vy(), _Hl, _Hv, T As Double
 
             If Type = "PT" Then
@@ -1556,7 +1556,7 @@ out:        Return New Object() {L, V, Vx, Vy, ecount, 0.0#, PP.RET_NullVector, 
 
         Function OBJ_FUNC_PS_FLASH(ByVal Type As String, ByVal X As Double, ByVal P As Double, ByVal Vz() As Double, ByVal PP As PropertyPackage) As Object
 
-            Dim n = UBound(Vz)
+            Dim n = Vz.Length - 1
             Dim L, V, Vx(), Vy(), _Sl, _Sv, T As Double
 
             If Type = "PT" Then

@@ -59,7 +59,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
             Dim i, m, k As Integer
 
-            Dim n = UBound(Vx)
+            Dim n = Vx.Length - 1
 
             Dim Vgammac(n), Vgammar(n), Vgamma(n) As Double
             Dim Q(n), R(n), j(n), L(n), val As Double

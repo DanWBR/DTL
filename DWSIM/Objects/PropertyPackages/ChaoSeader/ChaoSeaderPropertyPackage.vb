@@ -481,7 +481,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
         Function dfidRbb_H(ByVal Rbb, ByVal Kb0, ByVal Vz, ByVal Vu, ByVal sum_Hvi0, ByVal DHv, ByVal DHl, ByVal HT) As Double
 
             Dim i As Integer = 0
-            Dim n = UBound(Vz)
+            Dim n = Vz.Length - 1
 
             Dim Vpbb2(n), L2, V2, Kb2 As Double
 
@@ -506,7 +506,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
         Function dfidRbb_S(ByVal Rbb, ByVal Kb0, ByVal Vz, ByVal Vu, ByVal sum_Hvi0, ByVal DHv, ByVal DHl, ByVal ST) As Double
 
             Dim i As Integer = 0
-            Dim n = UBound(Vz)
+            Dim n = Vz.Length - 1
 
             Dim Vpbb2(n), L, V As Double
 
@@ -787,7 +787,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
         Public Overrides Function DW_CalcFugCoeff(ByVal Vx As Array, ByVal T As Double, ByVal P As Double, ByVal st As State) As Double()
 
-            Dim n As Integer = UBound(Vx)
+            Dim n As Integer = Vx.Length - 1
             Dim i As Integer
 
             Dim nu(n), ac(n), fugcoef(n) As Double

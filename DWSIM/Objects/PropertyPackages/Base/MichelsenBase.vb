@@ -136,7 +136,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
         Private Function StabTest(ByVal T As Double, ByVal P As Double, ByVal Vz As Array, ByVal VKij As Object, ByVal VTc As Array, ByVal VPc As Array, ByVal Vw As Array, Optional ByVal VzArray(,) As Double = Nothing, Optional ByVal otherargs As Object = Nothing)
 
             Dim i, j, c, n, o, l As Integer
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             Dim Y, K As Double(,)
 
@@ -421,7 +421,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
             Dim n, i, ci As Integer
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             Dim K(n), Kant(n), lnfugl(n), lnfugv(n), x(n), y(n), xsum, ysum, v, vant, l As Double
 
@@ -602,7 +602,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
             Dim n, i, ci As Integer
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             Dim K(n), K1(n), Kant(n), K1ant(n), b1(n), b2(n), lnfugl(n), lnfugl1(n), lnfugv(n), x(n), x1(n), y(n), xsum, xsum1, ysum, v, l, lant, l1, l1ant As Double
 
@@ -857,7 +857,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
             Dim n, i As Integer
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             Dim K(n), Kant(n), lnfugl(n), lnfugv(n), x(n), y(n), xsum, ysum, v, vant, l As Double
 
@@ -1004,7 +1004,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
         Private Function CalcV(ByVal Vz As Object, ByVal KI As Object) As Double
 
-            Dim n = UBound(Vz)
+            Dim n = Vz.Length - 1
 
             Dim i As Integer
 
@@ -1114,7 +1114,7 @@ Final3:
         Private Function OFunc_V(ByVal V As Double, ByVal Vz As Object, ByVal KI As Object) As Double
 
             Dim i As Integer
-            Dim n = UBound(Vz)
+            Dim n = Vz.Length - 1
             Dim result As Double
 
             i = 0
@@ -1133,7 +1133,7 @@ Final3:
 
         Function _dKdT(ByVal T As Double, ByVal P As Double, ByVal Vx As Object, ByVal Vy As Object, ByVal VKij As Object, ByVal VTc As Object, ByVal VPc As Object, ByVal Vw As Object, Optional ByVal otherargs As Object = Nothing) As Object
 
-            Dim n = UBound(Vx)
+            Dim n = Vx.Length - 1
 
             Dim LN_CFL(n), LN_CFV(n) As Double
             Dim i As Integer
@@ -1176,7 +1176,7 @@ Final:
 
         Function _dKdP(ByVal T As Double, ByVal P As Double, ByVal Vx As Object, ByVal Vy As Object, ByVal VKij As Object, ByVal VTc As Object, ByVal VPc As Object, ByVal Vw As Object, Optional ByVal otherargs As Object = Nothing) As Object
 
-            Dim n = UBound(Vx)
+            Dim n = Vx.Length - 1
 
             Dim LN_CFL(n), LN_CFV(n) As Double
             Dim i As Integer
@@ -1372,7 +1372,7 @@ Final:
             Dim dFdP As Double
             Dim cnt As Integer = 0
 
-            Dim n = UBound(Vx)
+            Dim n = Vx.Length - 1
 
             Dim chk As Boolean = False
             Dim marker2 As Integer
@@ -1668,7 +1668,7 @@ Final:
             Dim dFdT As Double
             Dim cnt As Integer = 0
 
-            Dim n = UBound(Vx)
+            Dim n = Vx.Length - 1
 
             Dim chk As Boolean = False
             Dim marker2 As Integer
@@ -1818,7 +1818,7 @@ Final:
 
             'calculate numerical derivatives with a 4-point differencing scheme
 
-            Dim n As Integer = UBound(Vz)
+            Dim n As Integer = Vz.Length - 1
 
             Dim i As Integer
 
@@ -1847,7 +1847,7 @@ Final:
 
             'calculate numerical derivatives with a 4-point differencing scheme
 
-            Dim n As Integer = UBound(Vz)
+            Dim n As Integer = Vz.Length - 1
 
             Dim i As Integer
 
@@ -1874,7 +1874,7 @@ Final:
 
         Private Function perturb_n(ByVal i As Integer, ByVal h As Double, ByVal Vx As Array)
 
-            Dim n As Integer = UBound(Vx)
+            Dim n As Integer = Vx.Length - 1
             Dim j As Integer = 0
 
             Dim ntot As Double = 1
@@ -1902,7 +1902,7 @@ Final:
 
         Private Function Qij(ByVal T As Double, ByVal V As Double, ByVal Vz As Array, ByVal VTc As Array, ByVal VPc As Array, ByVal Vw As Array, ByVal VKIj As Array, Optional ByVal otherargs As Object = Nothing) As Mapack.Matrix
 
-            Dim n As Integer = UBound(Vz)
+            Dim n As Integer = Vz.Length - 1
 
             Dim mat As Mapack.Matrix = New Mapack.Matrix(n + 1, n + 1)
             Dim el(n) As Object
@@ -1951,7 +1951,7 @@ Final:
 
         Private Function TripleSum(ByVal Dn As Array, ByVal T As Double, ByVal V As Double, ByVal Vz As Array, ByVal VTc As Array, ByVal VPc As Array, ByVal Vw As Array, ByVal VKIj As Object, Optional ByVal otherargs As Object = Nothing) As Double
 
-            Dim n As Integer = UBound(Vz)
+            Dim n As Integer = Vz.Length - 1
 
             Dim mat(n, n) As Object
             Dim el(n) As Object
@@ -1996,7 +1996,7 @@ Final:
             Dim i As Integer
             Dim n As Double
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             Dim Dn(n)
 
@@ -2084,7 +2084,7 @@ Final:
             Dim n, R As Double
             Dim i, nsub As Integer
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             Dim b As Double
 
@@ -2174,7 +2174,7 @@ Final2:
             Dim n, R, P, T As Double
             Dim i As Integer
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             Dim Tc(n), Pc(n)
             Dim b As Double

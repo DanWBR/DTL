@@ -143,7 +143,7 @@ Namespace DTL.MathEx
 
         Shared Function Sum(ByVal vx As Array)
 
-            Dim n = UBound(vx)
+            Dim n = Vx.Length - 1
             Dim i As Integer
             Dim sumv As Double
 
@@ -158,7 +158,7 @@ Namespace DTL.MathEx
 
         Shared Function AbsSum(ByVal vx As Array)
 
-            Dim n = UBound(vx)
+            Dim n = Vx.Length - 1
             Dim i As Integer
             Dim sumv As Double
 
@@ -173,7 +173,7 @@ Namespace DTL.MathEx
 
         Shared Function SumSqr(ByVal vx As Array)
 
-            Dim n = UBound(vx)
+            Dim n = Vx.Length - 1
             Dim i As Integer
             Dim sumv As Double
 

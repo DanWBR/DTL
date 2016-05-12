@@ -427,7 +427,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
         Function dfidRbb_H(ByVal Rbb, ByVal Kb0, ByVal Vz, ByVal Vu, ByVal sum_Hvi0, ByVal DHv, ByVal DHl, ByVal HT) As Double
 
             Dim i As Integer = 0
-            Dim n = UBound(Vz)
+            Dim n = Vz.Length - 1
 
             Dim Vpbb2(n), L2, V2, Kb2 As Double
 
@@ -452,7 +452,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
         Function dfidRbb_S(ByVal Rbb, ByVal Kb0, ByVal Vz, ByVal Vu, ByVal sum_Hvi0, ByVal DHv, ByVal DHl, ByVal ST) As Double
 
             Dim i As Integer = 0
-            Dim n = UBound(Vz)
+            Dim n = Vz.Length - 1
 
             Dim Vpbb2(n), L, V As Double
 
@@ -725,7 +725,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
             Dim prn As New ThermoPlugs.PR
 
-            Dim n As Integer = UBound(Vx)
+            Dim n As Integer = Vx.Length - 1
             Dim lnfug(n), ativ(n) As Double
             Dim fugcoeff(n) As Double
             Dim i As Integer

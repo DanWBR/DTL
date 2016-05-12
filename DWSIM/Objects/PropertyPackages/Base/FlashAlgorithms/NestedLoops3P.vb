@@ -59,7 +59,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
             Me.itol = PP.Parameters("PP_PTFILT")
             Me.maxit_i = CInt(PP.Parameters("PP_PTFMII"))
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             proppack = PP
 
@@ -316,7 +316,7 @@ out:
                 End If
 
                 Dim nt As Integer = Me.StabSearchCompIDs.Length - 1
-                Dim nc As Integer = UBound(Vz)
+                Dim nc As Integer = Vz.Length - 1
 
                 If nt = -1 Then nt = nc
 
@@ -375,11 +375,11 @@ out:
                                 k = j
                             End If
                         Next
-                        For i = 0 To UBound(Vz)
+                        For i = 0 To Vz.Length - 1
                             vx2est(i) = stresult(1)(k, i)
                         Next
                     Else
-                        For i = 0 To UBound(Vz)
+                        For i = 0 To Vz.Length - 1
                             vx2est(i) = stresult(1)(m, i)
                         Next
                     End If
@@ -396,7 +396,7 @@ out:
 
                     If gl < gv Then 'test phase is liquid-like.
 
-                        Dim vx1e(UBound(Vz)), vx2e(UBound(Vz)) As Double
+                        Dim vx1e(Vz.Length - 1), vx2e(Vz.Length - 1) As Double
 
                         Dim maxl As Double = Common.Max(vx2est)
                         Dim imaxl As Integer = Array.IndexOf(vx2est, maxl)
@@ -476,7 +476,7 @@ out:
             Me.itol = PP.Parameters("PP_PTFILT")
             Me.maxit_i = CInt(PP.Parameters("PP_PTFMII"))
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             proppack = PP
 
@@ -783,7 +783,7 @@ out:
 
             d1 = Date.Now
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             proppack = PP
             Hf = H
@@ -864,7 +864,7 @@ alt:            Tf = bo.BrentOpt(Tinf, Tsup, 4, tolEXT, maxitEXT, Nothing)
 
             d1 = Date.Now
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             proppack = PP
             Sf = S
@@ -943,7 +943,7 @@ alt:            Tf = bo.BrentOpt(Tinf, Tsup, 4, tolEXT, maxitEXT, Nothing)
 
             Dim tmp = Me.Flash_PT(Vz, Pf, T, proppack)
 
-            Dim n = UBound(Vz)
+            Dim n = Vz.Length - 1
 
             Dim L1, L2, V, Vx1(), Vx2(), Vy() As Double
 
@@ -980,7 +980,7 @@ alt:            Tf = bo.BrentOpt(Tinf, Tsup, 4, tolEXT, maxitEXT, Nothing)
 
             Dim tmp = Me.Flash_PT(Vz, Pf, T, proppack)
 
-            Dim n = UBound(Vz)
+            Dim n = Vz.Length - 1
 
             Dim L1, L2, V, Vx1(), Vx2(), Vy() As Double
 
@@ -1036,7 +1036,7 @@ alt:            Tf = bo.BrentOpt(Tinf, Tsup, 4, tolEXT, maxitEXT, Nothing)
             Me.itol = PP.Parameters("PP_PTFILT")
             Me.maxit_i = CInt(PP.Parameters("PP_PTFMII"))
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             proppack = PP
             Vf = V
@@ -1360,7 +1360,7 @@ alt:            Tf = bo.BrentOpt(Tinf, Tsup, 4, tolEXT, maxitEXT, Nothing)
             Me.itol = PP.Parameters("PP_PTFILT")
             Me.maxit_i = CInt(PP.Parameters("PP_PTFMII"))
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             proppack = PP
             Vf = V

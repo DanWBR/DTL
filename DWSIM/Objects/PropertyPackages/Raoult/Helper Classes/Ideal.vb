@@ -25,7 +25,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
             Dim i, n As Integer
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             Dim R, DHres As Double
 
@@ -67,7 +67,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Dim n As Double
             Dim i As Integer
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             i = 0
             Dim MMm = 0

@@ -592,7 +592,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
                 lnfug = Me.m_lk.CalcLnFug("V", T, P, Vx, Me.RET_VKij, Me.RET_VTC, Me.RET_VPC, Me.RET_VW, Me.RET_VMM, Me.RET_VVC, Me.RET_Hid(298.15, T, Vx))
             End If
 
-            Dim n As Integer = UBound(lnfug)
+            Dim n As Integer = lnfug.Length - 1
             Dim i As Integer
             Dim fugcoeff(n) As Double
 

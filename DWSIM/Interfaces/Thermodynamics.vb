@@ -1865,6 +1865,7 @@ Namespace Thermodynamics
             Return fractions
 
         End Function
+
         ''' <summary>
         ''' Calculates a PH Flash using the referenced Property Package.
         ''' </summary>
@@ -1965,6 +1966,7 @@ Namespace Thermodynamics
             Return fractions
 
         End Function
+
         ''' <summary>
         ''' Calculates a PS Flash using the referenced Property Package.
         ''' </summary>
@@ -2551,6 +2553,71 @@ Namespace Thermodynamics
             Return results
 
         End Function
+
+
+        ''' <summary>
+        ''' Setups a Material Stream with the specified compounds and associated it with the property package.
+        ''' </summary>
+        ''' <param name="proppack">Property Package instance</param>
+        ''' <param name="compounds">Compounds to add</param>
+        ''' <param name="molefractions">Compound mole fractions</param>
+        ''' <remarks></remarks>
+        <Runtime.InteropServices.DispId(40)> Public Sub SetupPropertyPackage(
+            ByVal proppack As PropertyPackage,
+            ByVal compounds As String(),
+            ByVal molefractions As Double())
+
+            Dim pp As PropertyPackage
+
+            pp = proppack
+            TransferComps(pp)
+
+            Dim ms As New Streams.MaterialStream("", "")
+
+            For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
+                For Each c As String In compounds
+                    phase.Components.Add(c, New Substance(c, ""))
+                    phase.Components(c).ConstantProperties = pp._availablecomps(c)
+                Next
+            Next
+
+            For Each c As String In compounds
+                Dim tmpcomp As ConstantProperties = pp._availablecomps(c)
+                If Not pp._selectedcomps.ContainsKey(c) Then pp._selectedcomps.Add(c, tmpcomp)
+            Next
+
+            ms.SetOverallComposition(molefractions)
+
+            ms._pp = pp
+            pp.SetMaterial(ms)
+
+        End Sub
+
+        ''' <summary>
+        ''' Setups a Material Stream with the specified compounds.
+        ''' </summary>
+        ''' <param name="compounds">Compounds to add</param>
+        ''' <param name="molefractions">Compound mole fractions</param>
+        ''' <remarks></remarks>
+        <Runtime.InteropServices.DispId(40)> Public Function CreateMaterialStream(
+            ByVal compounds As String(),
+            ByVal molefractions As Double()) As DTL.SimulationObjects.Streams.MaterialStream
+
+            Dim ms As New Streams.MaterialStream("", "")
+
+            For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
+                For Each c As String In compounds
+                    phase.Components.Add(c, New Substance(c, ""))
+                    phase.Components(c).ConstantProperties = _availablecomps(c)
+                Next
+            Next
+
+            ms.SetOverallComposition(molefractions)
+
+            Return ms
+
+        End Function
+
     End Class
 
 End Namespace

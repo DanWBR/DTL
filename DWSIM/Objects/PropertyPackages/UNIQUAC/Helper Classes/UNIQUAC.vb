@@ -105,7 +105,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         Function GAMMA(ByVal T As Double, ByVal Vx As Array, ByVal Vids As Array, ByVal VQ As Array, ByVal VR As Array, ByVal index As Integer)
 
-            Dim n As Integer = UBound(Vx)
+            Dim n As Integer = Vx.Length - 1
 
             Dim tau_ij(n, n), tau_ji(n, n), a12(n, n), a21(n, n) As Double
 
@@ -216,7 +216,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         Function GAMMA_DINF(ByVal T, ByVal Vx, ByVal Vids, ByVal VQ, ByVal VR, ByVal index)
 
-            Dim n As Integer = UBound(Vx)
+            Dim n As Integer = Vx.Length - 1
 
             Dim tau_ij(n, n), tau_ji(n, n), a12(n, n), a21(n, n), Vx2(n) As Double
 
@@ -334,7 +334,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         Function GAMMA_MR(ByVal T, ByVal Vx, ByVal Vids, ByVal VQ, ByVal VR)
 
-            Dim n As Integer = UBound(Vx)
+            Dim n As Integer = Vx.Length - 1
 
             Dim tau_ij(n, n), tau_ji(n, n), a12(n, n), a21(n, n) As Double
 
@@ -446,7 +446,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         Function GAMMA_DINF_MR(ByVal T, ByVal Vx, ByVal Vids, ByVal VQ, ByVal VR, ByVal index)
 
-            Dim n As Integer = UBound(Vx)
+            Dim n As Integer = Vx.Length - 1
 
             Dim tau_ij(n, n), tau_ji(n, n), a12(n, n), a21(n, n), Vx2(n) As Double
 

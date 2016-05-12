@@ -55,7 +55,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
             Me.itol = PP.Parameters("PP_PTFILT")
             Me.maxit_i = CInt(PP.Parameters("PP_PTFMII"))
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             proppack = PP
 
@@ -356,7 +356,7 @@ out:        Return New Object() {L, V, Vx, Vy, ecount, 0.0#, Vx, 0.0#, PP.RET_Nu
             Me.itol = PP.Parameters("PP_PHFILT")
             Me.etol = PP.Parameters("PP_PHFELT")
 
-            Me.n = UBound(Vz)
+            Me.n = Vz.Length - 1
 
             proppack = PP
             Hf = H * PP.AUX_MMM(Vz)
@@ -778,7 +778,7 @@ restart:    Do
             Me.itol = PP.Parameters("PP_PSFILT")
             Me.etol = PP.Parameters("PP_PSFELT")
 
-            Me.n = UBound(Vz)
+            Me.n = Vz.Length - 1
 
             proppack = PP
             Sf = S * PP.AUX_MMM(Vz)
@@ -1190,7 +1190,7 @@ restart:    Do
             Me.itol = PP.Parameters("PP_PTFILT")
             Me.maxit_i = CInt(PP.Parameters("PP_PTFMII"))
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             proppack = PP
             Vf = V
@@ -1470,7 +1470,7 @@ final:      d2 = Date.Now
             Me.etol = PP.Parameters("PP_PTFELT")
             Me.maxit_e = CInt(PP.Parameters("PP_PTFMEI"))
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             proppack = PP
             Vf = V

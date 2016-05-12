@@ -69,7 +69,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
             Me.itol = PP.Parameters("PP_PTFILT")
             Me.maxit_i = CInt(PP.Parameters("PP_PTFMII"))
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             Dim Vn(n) As String, Vx(n), Vy(n), Vx_ant(n), Vy_ant(n), Vp(n), Ki(n), Ki_ant(n), fi(n), Vs(n), Vs_ant(n), activcoeff(n) As Double
 
@@ -399,7 +399,7 @@ out:        Return New Object() {L, V, Vxl, Vxv, ecount, 0.0#, PP.RET_NullVector
 
             d1 = Date.Now
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             PP = PP
             Hf = H
@@ -488,7 +488,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 100, tolEXT, maxitEXT, {P, Vz, PP})
 
             d1 = Date.Now
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             PP = PP
             Sf = S
@@ -593,7 +593,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
             tmp = Me.Flash_PT(Vz, P, T, pp)
             Dim L, V, S, Vx(), Vy(), Vs(), _Hv, _Hl, _Hs As Double
 
-            Dim n = UBound(Vz)
+            Dim n = Vz.Length - 1
 
             L = tmp(0)
             V = tmp(1)
@@ -627,7 +627,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
             tmp = Me.Flash_PT(Vz, P, T, pp)
             Dim L, V, Ssf, Vx(), Vy(), Vs(), _Sv, _Sl, _Ss As Double
 
-            Dim n = UBound(Vz)
+            Dim n = Vz.Length - 1
 
             L = tmp(0)
             V = tmp(1)
@@ -688,7 +688,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
             Me.itol = PP.Parameters("PP_PTFILT")
             Me.maxit_i = CInt(PP.Parameters("PP_PTFMII"))
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             PP = PP
             L = V
@@ -927,7 +927,7 @@ alt:            T = bo.BrentOpt(Tinf, Tsup, 10, tolEXT, maxitEXT, {P, Vz, PP})
             Me.itol = PP.Parameters("PP_PTFILT")
             Me.maxit_i = CInt(PP.Parameters("PP_PTFMII"))
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             PP = PP
             L = V

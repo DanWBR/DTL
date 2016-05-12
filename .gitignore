@@ -1,0 +1,12 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/DTLTest/bin/Debug
+/DTLTest/obj/Debug
+/DTLTest2/bin/Debug
+/DTLTest2/obj/x86/Debug
+/DTLTest3/bin/Debug
+/DTLTest3/obj/Debug
+/DWSIM/bin/Debug
+/DWSIM/obj/Debug

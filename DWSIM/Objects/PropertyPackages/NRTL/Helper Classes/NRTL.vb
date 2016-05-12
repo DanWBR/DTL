@@ -124,7 +124,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         Function GAMMA(ByVal T As Double, ByVal Vx As Array, ByVal Vids As Array, ByVal index As Integer) As Double
 
-            Dim n As Integer = UBound(Vx)
+            Dim n As Integer = Vx.Length - 1
 
             Dim sum1(n), sum2(n), sum3(n), sum4(n), sum5(n) As Double
             Dim Gij(n, n), tau_ij(n, n), Gji(n, n), tau_ji(n, n), alpha12(n, n) As Double
@@ -223,7 +223,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         Function GAMMA_DINF(ByVal T As Double, ByVal Vx As Array, ByVal Vids As Array, ByVal index As Integer) As Double
 
-            Dim n As Integer = UBound(Vx)
+            Dim n As Integer = Vx.Length - 1
 
             Dim sum1(n), sum2(n), sum3(n), sum4(n), sum5(n), Vx2(n) As Double
             Dim Gij(n, n), tau_ij(n, n), Gji(n, n), tau_ji(n, n), alpha12(n, n) As Double
@@ -332,7 +332,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         Function GAMMA_MR(ByVal T As Double, ByVal Vx As Array, ByVal Vids As Array) As Array
 
-            Dim n As Integer = UBound(Vx)
+            Dim n As Integer = Vx.Length - 1
 
             Dim Gij(n, n), tau_ij(n, n), Gji(n, n), tau_ji(n, n), alpha12(n, n) As Double
 
@@ -430,7 +430,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         Function GAMMA_DINF_MR(ByVal T As Double, ByVal Vx As Array, ByVal Vids As Array, ByVal index As Integer) As Array
 
-            Dim n As Integer = UBound(Vx)
+            Dim n As Integer = Vx.Length - 1
 
             Dim sum1(n), sum2(n), sum3(n), sum4(n), sum5(n), Vx2(n) As Double
             Dim Gij(n, n), tau_ij(n, n), Gji(n, n), tau_ji(n, n), alpha12(n, n) As Double

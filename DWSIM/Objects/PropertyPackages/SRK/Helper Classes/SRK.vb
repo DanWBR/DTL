@@ -94,7 +94,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Dim n, R, coeff(3), tmp() As Double
             Dim Tc(), Pc(), W(), alpha(), Vant(0, 4), m(), a(,), b(,), Tr() As Double
 
-            n = UBound(Vx)
+            n = Vx.Length - 1
 
             ReDim ai(n), bi(n), tmp(n + 1), a(n, n), b(n, n)
             ReDim aml2(n), amv2(n)
@@ -236,7 +236,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Dim Tc(), Pc(), Vc(), w(), Zc(), alpha(), m(), a(,), b(,), Z, Tr() As Double
             Dim i, j, dadT
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             ReDim ai(n), bi(n), ci(n), a(n, n), b(n, n)
             ReDim Tc(n), Pc(n), Vc(n), Zc(n), w(n), alpha(n), m(n), Tr(n)
@@ -413,7 +413,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Dim Tc(), Pc(), Vc(), w(), Zc(), alpha(), m(), a(,), b(,), Z, Tr() As Double
             Dim i, j, dadT
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             ReDim ai(n), bi(n), ci(n), a(n, n), b(n, n)
             ReDim Tc(n), Pc(n), Vc(n), Zc(n), w(n), alpha(n), m(n), Tr(n)
@@ -594,7 +594,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
             Dim Tc(), Pc(), Vc(), w(), Zc(), alpha(), m(), a(,), b(,), Z, Tr() As Double
             Dim i, j, dadT
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             ReDim ai(n), bi(n), ci(n), a(n, n), b(n, n)
             ReDim Tc(n), Pc(n), Vc(n), Zc(n), w(n), alpha(n), m(n), Tr(n)
@@ -794,7 +794,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary
 
         Function ESTIMATE_V(ByVal Vz As Object, ByVal KI As Object) As Double
 
-            Dim n = UBound(Vz)
+            Dim n = Vz.Length - 1
 
             Dim i As Integer
 
@@ -904,7 +904,7 @@ Final3:
         Function OF_V(ByVal V As Double, ByVal Vz As Object, ByVal KI As Object) As Double
 
             Dim i As Integer
-            Dim n = UBound(Vz)
+            Dim n = Vz.Length - 1
             Dim result As Double
 
             i = 0
@@ -984,7 +984,7 @@ Final3:
             Dim ZV As Double
             Dim AG, BG, aml, bml As Double
 
-            n = UBound(Vx)
+            n = Vx.Length - 1
 
             ReDim ai(n), bi(n), tmp(n + 1), a(n, n), b(n, n)
             ReDim aml2(n), amv2(n)
@@ -1179,7 +1179,7 @@ Final3:
             Dim AG, BG, aml, bml As Double
             Dim t1, t2, t3, t4, t5 As Double
 
-            n = UBound(Vx)
+            n = Vx.Length - 1
 
             Dim ai(n), bi(n), tmp(n + 1), a(n, n), b(n, n)
             Dim aml2(n), amv2(n), LN_CF(n), PHI(n)

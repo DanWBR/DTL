@@ -87,7 +87,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
             Me.itol = PP.Parameters("PP_PTFILT")
             Me.maxit_i = CInt(PP.Parameters("PP_PTFMII"))
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             proppack = PP
 
@@ -307,7 +307,7 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                 If result(0) > 0 Then ' we have a liquid phase
 
                     Dim nt As Integer = Me.StabSearchCompIDs.Length - 1
-                    Dim nc As Integer = UBound(Vz)
+                    Dim nc As Integer = Vz.Length - 1
 
                     If nt = -1 Then nt = nc
 
@@ -366,11 +366,11 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
                                     k = j
                                 End If
                             Next
-                            For i = 0 To UBound(Vz)
+                            For i = 0 To Vz.Length - 1
                                 vx2est(i) = stresult(1)(k, i)
                             Next
                         Else
-                            For i = 0 To UBound(Vz)
+                            For i = 0 To Vz.Length - 1
                                 vx2est(i) = stresult(1)(m, i)
                             Next
                         End If
@@ -521,7 +521,7 @@ out:        Return result
 
             d1 = Date.Now
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             Hf = H
             Pf = P
@@ -697,7 +697,7 @@ out:        Return result
 
             d1 = Date.Now
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             Sf = S
             Pf = P
@@ -857,7 +857,7 @@ out:        Return result
 
         Function OBJ_FUNC_PH_FLASH(ByVal Type As String, ByVal X As Double, ByVal P As Double, ByVal Vz() As Double, ByVal PP As PropertyPackage) As Object
 
-            Dim n = UBound(Vz)
+            Dim n = Vz.Length - 1
             Dim L1, L2, V, Vx1(), Vx2(), Vy() As Double
 
             If Type = "PT" Then
@@ -928,7 +928,7 @@ out:        Return result
 
         Function OBJ_FUNC_PS_FLASH(ByVal Type As String, ByVal X As Double, ByVal P As Double, ByVal Vz() As Double, ByVal PP As PropertyPackage) As Object
 
-            Dim n = UBound(Vz)
+            Dim n = Vz.Length - 1
             Dim L1, L2, V, Vx1(), Vx2(), Vy() As Double
 
             If Type = "PT" Then
@@ -1100,7 +1100,7 @@ out:        Return result
             If result(0) > 0 Then
 
                 Dim nt As Integer = Me.StabSearchCompIDs.Length - 1
-                Dim nc As Integer = UBound(Vz)
+                Dim nc As Integer = Vz.Length - 1
 
                 If nt = -1 Then nt = nc
                 n = nc
@@ -1156,11 +1156,11 @@ out:        Return result
                                 k = j
                             End If
                         Next
-                        For i = 0 To UBound(Vz)
+                        For i = 0 To Vz.Length - 1
                             vx2est(i) = stresult(1)(k, i)
                         Next
                     Else
-                        For i = 0 To UBound(Vz)
+                        For i = 0 To Vz.Length - 1
                             vx2est(i) = stresult(1)(m, i)
                         Next
                     End If
@@ -1221,7 +1221,7 @@ out:        Return result
             If result(0) > 0 Then
 
                 Dim nt As Integer = Me.StabSearchCompIDs.Length - 1
-                Dim nc As Integer = UBound(Vz)
+                Dim nc As Integer = Vz.Length - 1
 
                 If nt = -1 Then nt = nc
                 n = nc
@@ -1277,11 +1277,11 @@ out:        Return result
                                 k = j
                             End If
                         Next
-                        For i = 0 To UBound(Vz)
+                        For i = 0 To Vz.Length - 1
                             vx2est(i) = stresult(1)(k, i)
                         Next
                     Else
-                        For i = 0 To UBound(Vz)
+                        For i = 0 To Vz.Length - 1
                             vx2est(i) = stresult(1)(m, i)
                         Next
                     End If
@@ -1334,7 +1334,7 @@ out:        Return result
             Me.itol = PP.Parameters("PP_PTFILT")
             Me.maxit_i = CInt(PP.Parameters("PP_PTFMII"))
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             proppack = PP
 
@@ -1611,7 +1611,7 @@ out:        Return New Object() {L1, V, Vx1, Vy, T, ecount, Ki1, L2, Vx2, 0.0#, 
             Me.itol = PP.Parameters("PP_PTFILT")
             Me.maxit_i = CInt(PP.Parameters("PP_PTFMII"))
 
-            n = UBound(Vz)
+            n = Vz.Length - 1
 
             proppack = PP
 
