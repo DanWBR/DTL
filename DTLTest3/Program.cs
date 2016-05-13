@@ -18,10 +18,10 @@ namespace DTLTest3
             DTL.Thermodynamics.Calculator dtlc = new DTL.Thermodynamics.Calculator();
             dtlc.Initialize();
 
-            // e nable parallel threads on low level calculations
+            // enables parallel threads for low level calculations
             dtlc.EnableParallelProcessing();
 
-            //enable SIMD acceleration on vector operations
+            //enables SIMD acceleration for vector operations
             dtlc.EnableSIMDExtensions();
 
             PropertyPackage prpp = dtlc.GetPropPackInstance("Peng-Robinson (PR)");
@@ -34,7 +34,7 @@ namespace DTLTest3
             
             Stopwatch sw = new Stopwatch();
 
-            // call a flash calculation 100x through the default interface
+            // calls a flash calculation 100x through the default interface
 
             sw.Start();
             for (int i = 0; i < 100; i++)
@@ -46,9 +46,9 @@ namespace DTLTest3
             Console.WriteLine(sw.ElapsedMilliseconds.ToString());
             Console.ReadKey();
 
-            // call a flash calculation 100x through the object-oriented structured function
+            // calls a flash calculation 100x through the object-oriented structured function
 
-            //create a material stream and associate it with the property package.
+            //creates a material stream and associates it with the property package.
             prpp.SetMaterial(dtlc.CreateMaterialStream(comps, fracs));
 
             sw.Restart();
@@ -61,7 +61,7 @@ namespace DTLTest3
             Console.WriteLine(sw.ElapsedMilliseconds.ToString());
             Console.ReadKey();
 
-            // call a flash calculation 100x directly through the flash algorithm instance
+            // calls a flash calculation 100x directly through the flash algorithm instance
 
             sw.Restart();
             for (int i = 0; i < 100; i++)
@@ -73,7 +73,7 @@ namespace DTLTest3
             Console.WriteLine(sw.ElapsedMilliseconds.ToString());
             Console.ReadKey();
 
-            // call a flash calculation 100x using Parallel.For
+            // calsl a flash calculation 100x using Parallel.For
 
             // this will make sure that a new flash algorithm instance is created to avoid thread locking
             prpp.ForceNewFlashAlgorithmInstance = true;
