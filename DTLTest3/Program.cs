@@ -35,7 +35,7 @@ namespace DTLTest3
             // flash algorithm type
             // 0 or 2 = NL VLE, 1 = IO VLE, 3 = IO VLLE, 4 = Gibbs VLE, 5 = Gibbs VLLE, 6 = NL VLLE, 7 = NL SLE, 8 = NL Immisc., 9 = Simple LLE               
 
-            int flashalg = 4;
+            int flashalg = 0;
 
             Stopwatch sw = new Stopwatch();
 
