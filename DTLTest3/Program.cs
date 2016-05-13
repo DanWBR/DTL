@@ -26,14 +26,17 @@ namespace DTLTest3
 
             PropertyPackage prpp = dtlc.GetPropPackInstance("Peng-Robinson (PR)");
 
-            prpp.FlashAlgorithm = 4;
-
             double P = 101325;
             double h = 0;
 
             string[] comps = new string[] { "Water", "Methane" };
             double[] fracs = new double[] { 0.01, 0.99 };
-            
+
+            // flash algorithm type
+            // 0 or 2 = NL VLE, 1 = IO VLE, 3 = IO VLLE, 4 = Gibbs VLE, 5 = Gibbs VLLE, 6 = NL VLLE, 7 = NL SLE, 8 = NL Immisc., 9 = Simple LLE               
+
+            int flashalg = 4;
+
             Stopwatch sw = new Stopwatch();
 
             // calls a flash calculation 100x through the default interface
@@ -41,7 +44,7 @@ namespace DTLTest3
             sw.Start();
             for (int i = 0; i < 100; i++)
             {
-                object[,] result = dtlc.PHFlash(prpp, 0, P + i, h, comps, fracs, null, null, null, null, 300d);
+                object[,] result = dtlc.PHFlash(prpp, flashalg, P + i, h, comps, fracs, null, null, null, null, 300d);
             }
             sw.Stop();
 
@@ -52,6 +55,8 @@ namespace DTLTest3
 
             //creates a material stream and associates it with the property package.
             prpp.SetMaterial(dtlc.CreateMaterialStream(comps, fracs));
+
+            prpp.FlashAlgorithm = flashalg;
 
             sw.Restart();
             for (int i = 0; i < 100; i++)
@@ -65,17 +70,21 @@ namespace DTLTest3
 
             // calls a flash calculation 100x directly through the flash algorithm instance
 
+            prpp.FlashAlgorithm = flashalg;
+
             sw.Restart();
             for (int i = 0; i < 100; i++)
             {
-                var result = prpp.FlashBase.Flash_PH(fracs, P + i, h, 300d, prpp, true, null);
+                var result = prpp.FlashBase.Flash_PH(fracs, P + i, h, 300d, prpp, false, null);
             }
             sw.Stop();
 
             Console.WriteLine(sw.ElapsedMilliseconds.ToString());
             Console.ReadKey();
 
-            // calsl a flash calculation 100x using Parallel.For
+            // calls a flash calculation 100x using Parallel.For
+
+            prpp.FlashAlgorithm = flashalg;
 
             // this will make sure that a new flash algorithm instance is created to avoid thread locking
             prpp.ForceNewFlashAlgorithmInstance = true;
