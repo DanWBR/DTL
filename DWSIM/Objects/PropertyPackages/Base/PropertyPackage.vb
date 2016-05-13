@@ -344,12 +344,6 @@ Namespace DTL.SimulationObjects.PropertyPackages
         ''' <remarks></remarks>
         Public ReadOnly Property FlashBase() As Auxiliary.FlashAlgorithms.FlashAlgorithm
             Get
-                If Not My.Application.CAPEOPENMode And Not My.MyApplication.IsRunningParallelTasks Then
-                    If Not Me.Parameters.ContainsKey("PP_FLASHALGORITHM") Then
-                        Me.Parameters.Add("PP_FLASHALGORITHM", 2)
-                    End If
-                    Me.FlashAlgorithm = Me.Parameters("PP_FLASHALGORITHM")
-                End If
                 '2 = Global Def., 0 = NL VLE, 1 = IO VLE, 3 = IO VLLE, 4 = Gibbs VLE, 5 = Gibbs VLLE, 6 = NL VLLE, 7 = NL SLE, 8 = NL Immisc., 9 = Simple LLE
                 Select Case FlashAlgorithm
                     Case 0, 2

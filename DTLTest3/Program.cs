@@ -26,6 +26,8 @@ namespace DTLTest3
 
             PropertyPackage prpp = dtlc.GetPropPackInstance("Peng-Robinson (PR)");
 
+            prpp.FlashAlgorithm = 4;
+
             double P = 101325;
             double h = 0;
 
