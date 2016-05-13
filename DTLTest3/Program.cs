@@ -23,19 +23,18 @@ namespace DTLTest3
 
             //enable SIMD acceleration on vector operations
             dtlc.EnableSIMDExtensions();
-            
-            PropertyPackage prppBase = dtlc.GetPropPackInstance("Peng-Robinson (PR)");
-            double P = 101325;
-            double h = 0;
 
             PropertyPackage prpp = dtlc.GetPropPackInstance("Peng-Robinson (PR)");
 
-            Stopwatch sw = new Stopwatch();
+            double P = 101325;
+            double h = 0;
 
             string[] comps = new string[] { "Water", "Methane" };
             double[] fracs = new double[] { 0.01, 0.99 };
+            
+            Stopwatch sw = new Stopwatch();
 
-            // call a flash calculation through the default interface
+            // call a flash calculation 100x through the default interface
 
             sw.Start();
             for (int i = 0; i < 100; i++)
@@ -47,7 +46,7 @@ namespace DTLTest3
             Console.WriteLine(sw.ElapsedMilliseconds.ToString());
             Console.ReadKey();
 
-            // call a flash calculation through the object-oriented structured function
+            // call a flash calculation 100x through the object-oriented structured function
 
             //create a material stream and associate it with the property package.
             prpp.SetMaterial(dtlc.CreateMaterialStream(comps, fracs));
@@ -62,7 +61,7 @@ namespace DTLTest3
             Console.WriteLine(sw.ElapsedMilliseconds.ToString());
             Console.ReadKey();
 
-            // call a flash calculation directly through the flash algorithm instance
+            // call a flash calculation 100x directly through the flash algorithm instance
 
             sw.Restart();
             for (int i = 0; i < 100; i++)
@@ -74,7 +73,7 @@ namespace DTLTest3
             Console.WriteLine(sw.ElapsedMilliseconds.ToString());
             Console.ReadKey();
 
-            // call a flash calculation using Parallel.For
+            // call a flash calculation 100x using Parallel.For
 
             // this will make sure that a new flash algorithm instance is created to avoid thread locking
             prpp.ForceNewFlashAlgorithmInstance = true;
