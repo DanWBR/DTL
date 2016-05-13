@@ -322,7 +322,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
         End Property
 
         ''' <summary>
-        ''' Returns the flash algorithm selected for this property package.
+        ''' Gets or sets the flash algorithm for this property package.
         ''' </summary>
         ''' <value></value>
         ''' <returns>A FlashMethod value with information about the selected flash algorithm.</returns>
