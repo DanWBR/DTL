@@ -60,6 +60,8 @@
     <WarningsAsErrors>
     </WarningsAsErrors>
     <UseVSHostingProcess>true</UseVSHostingProcess>
+    <RemoveIntegerChecks>true</RemoveIntegerChecks>
+    <Optimize>true</Optimize>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>

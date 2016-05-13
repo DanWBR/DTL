@@ -17,7 +17,13 @@ namespace DTLTest3
 
             DTL.Thermodynamics.Calculator dtlc = new DTL.Thermodynamics.Calculator();
             dtlc.Initialize();
+
+            // e nable parallel threads on low level calculations
             dtlc.EnableParallelProcessing();
+
+            //enable SIMD acceleration on vector operations
+            dtlc.EnableSIMDExtensions();
+            
             PropertyPackage prppBase = dtlc.GetPropPackInstance("Peng-Robinson (PR)");
             double P = 101325;
             double h = 0;
@@ -42,6 +48,9 @@ namespace DTLTest3
             Console.ReadKey();
 
             // call a flash calculation through the object-oriented structured function
+
+            //create a material stream and associate it with the property package.
+            prpp.SetMaterial(dtlc.CreateMaterialStream(comps, fracs));
 
             sw.Restart();
             for (int i = 0; i < 100; i++)
@@ -69,7 +78,7 @@ namespace DTLTest3
 
             // this will make sure that a new flash algorithm instance is created to avoid thread locking
             prpp.ForceNewFlashAlgorithmInstance = true;
-
+          
             sw.Restart();
             Parallel.For(0, 100, (int i) =>
             {

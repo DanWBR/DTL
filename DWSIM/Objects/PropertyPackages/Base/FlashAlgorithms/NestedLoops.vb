@@ -1542,8 +1542,8 @@ out:        Return New Object() {L, V, Vx, Vy, ecount, 0.0#, PP.RET_NullVector, 
             _Hl = 0.0#
 
             Dim mmg, mml As Double
-            If V > 0 Then _Hv = PP.DW_CalcEnthalpy(Vy, T, P, State.Vapor)
-            If L > 0 Then _Hl = PP.DW_CalcEnthalpy(Vx, T, P, State.Liquid)
+            If V > 0.0# Then _Hv = PP.DW_CalcEnthalpy(Vy, T, P, State.Vapor)
+            If L > 0.0# Then _Hl = PP.DW_CalcEnthalpy(Vx, T, P, State.Liquid)
             mmg = PP.AUX_MMM(Vy)
             mml = PP.AUX_MMM(Vx)
 
@@ -1579,8 +1579,8 @@ out:        Return New Object() {L, V, Vx, Vy, ecount, 0.0#, PP.RET_NullVector, 
             _Sl = 0.0#
             Dim mmg, mml As Double
 
-            If V > 0 Then _Sv = PP.DW_CalcEntropy(Vy, T, P, State.Vapor)
-            If L > 0 Then _Sl = PP.DW_CalcEntropy(Vx, T, P, State.Liquid)
+            If V > 0.0# Then _Sv = PP.DW_CalcEntropy(Vy, T, P, State.Vapor)
+            If L > 0.0# Then _Sl = PP.DW_CalcEntropy(Vx, T, P, State.Liquid)
             mmg = PP.AUX_MMM(Vy)
             mml = PP.AUX_MMM(Vx)
 
