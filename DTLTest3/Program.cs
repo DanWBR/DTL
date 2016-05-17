@@ -15,6 +15,53 @@ namespace DTLTest3
         static void Main(string[] args)
         {
 
+            Test1();
+
+        }
+
+        static void Test1()
+        {
+
+            DTL.Thermodynamics.Calculator dtlc = new DTL.Thermodynamics.Calculator();
+            dtlc.Initialize();
+            string[] comps = new string[] { "Water", "Methane" };
+            double[] fracs = new double[] { 0.01, 0.99 };
+            double P = 101325;
+            double h = 0;
+            Parallel.For(0, 5000, (int i) =>
+            {
+                
+                PropertyPackage prpp = dtlc.GetPropPackInstance("Peng-Robinson (PR)");
+                
+                dtlc.SetupPropertyPackage(prpp, comps, fracs);
+
+                //set stream conditions for mixture phase ("0")
+
+                prpp.CurrentMaterialStream.Phases["0"].SPMProperties.pressure = P + i;
+                prpp.CurrentMaterialStream.Phases["0"].SPMProperties.enthalpy = h;
+                prpp.CurrentMaterialStream.SpecType = MaterialStream.Flashspec.Pressure_and_Enthalpy;
+
+                //calculate the stream - equilibrium and properties
+                prpp.CurrentMaterialStream.Calculate(true, true);
+
+                Double t = prpp.CurrentMaterialStream.Phases["0"].SPMProperties.temperature.GetValueOrDefault();
+                
+                //get vapor phase ("2") density
+                double rho = prpp.CurrentMaterialStream.Phases["2"].SPMProperties.density.GetValueOrDefault();
+
+                //phase IDs: 0 - mixture, 1 - overall liquid, 2 = vapor, 3 = liquid 1, 4 = liquid 2, 5 = liquid 3, 6 = aqueous, 7 = solid
+
+                Console.WriteLine(t.ToString() + " " + rho.ToString());
+
+            });
+
+        
+        }
+
+
+        static void Test2()
+        {
+
             DTL.Thermodynamics.Calculator dtlc = new DTL.Thermodynamics.Calculator();
             dtlc.Initialize();
 

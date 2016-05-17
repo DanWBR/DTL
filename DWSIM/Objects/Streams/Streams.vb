@@ -126,6 +126,125 @@ Namespace DTL.SimulationObjects.Streams
             End Get
         End Property
 
+        Public Sub Calculate(equilibrium As Boolean, properties As Boolean)
+
+            Dim T As Double = Me.Phases(0).SPMProperties.temperature.GetValueOrDefault
+            Dim P As Double = Me.Phases(0).SPMProperties.pressure.GetValueOrDefault
+            Dim W As Double = Me.Phases(0).SPMProperties.massflow.GetValueOrDefault
+            Dim Q As Double = Me.Phases(0).SPMProperties.molarflow.GetValueOrDefault
+            Dim QV As Double = Me.Phases(0).SPMProperties.volumetric_flow.GetValueOrDefault
+            Dim H As Double = Me.Phases(0).SPMProperties.enthalpy.GetValueOrDefault
+
+            Dim subs As DTL.BaseThermoClasses.Substance
+            Dim comp As Double = 0.0#
+            For Each subs In Me.Phases(0).Components.Values
+                comp += subs.MolarFraction.GetValueOrDefault
+            Next
+
+            Me.CalcPhaseMassComposition(PropertyPackages.Phase.Mixture)
+
+            Dim foption As Integer
+
+            With Me.PropertyPackage
+
+                .CurrentMaterialStream = Me
+
+                If W > 0.0# And comp >= 0.0# Then
+                    foption = 0
+                    .DW_ClearMolarFlow()
+                ElseIf Q > 0.0# And comp >= 0.0# Then
+                    foption = 1
+                    .DW_ClearMassFlow()
+                ElseIf QV > 0.0# And comp >= 0.0# Then
+                    foption = 2
+                    Me.Phases(0).SPMProperties.molarflow = 1.0#
+                    Me.Phases(0).SPMProperties.massflow = 1.0#
+                End If
+
+                If equilibrium Then
+
+                    Select Case Me.SpecType
+                        Case SimulationObjects.Streams.MaterialStream.Flashspec.Temperature_and_Pressure
+                            .DW_CalcEquilibrium(DTL.SimulationObjects.PropertyPackages.FlashSpec.T, DTL.SimulationObjects.PropertyPackages.FlashSpec.P)
+                        Case SimulationObjects.Streams.MaterialStream.Flashspec.Pressure_and_Enthalpy
+                            .DW_CalcEquilibrium(DTL.SimulationObjects.PropertyPackages.FlashSpec.P, DTL.SimulationObjects.PropertyPackages.FlashSpec.H)
+                        Case SimulationObjects.Streams.MaterialStream.Flashspec.Pressure_and_Entropy
+                            .DW_CalcEquilibrium(DTL.SimulationObjects.PropertyPackages.FlashSpec.P, DTL.SimulationObjects.PropertyPackages.FlashSpec.S)
+                        Case SimulationObjects.Streams.MaterialStream.Flashspec.Pressure_and_VaporFraction
+                            .DW_CalcEquilibrium(DTL.SimulationObjects.PropertyPackages.FlashSpec.P, DTL.SimulationObjects.PropertyPackages.FlashSpec.VAP)
+                        Case SimulationObjects.Streams.MaterialStream.Flashspec.Temperature_and_VaporFraction
+                            .DW_CalcEquilibrium(DTL.SimulationObjects.PropertyPackages.FlashSpec.T, DTL.SimulationObjects.PropertyPackages.FlashSpec.VAP)
+                    End Select
+
+                End If
+
+                If properties Then
+
+                    If Me.Phases(3).SPMProperties.molarfraction.GetValueOrDefault > 0.0# Then
+                        .DW_CalcPhaseProps(DTL.SimulationObjects.PropertyPackages.Phase.Liquid1)
+                    Else
+                        .DW_ClearPhaseProps(DTL.SimulationObjects.PropertyPackages.Phase.Liquid1)
+                    End If
+                    If Me.Phases(4).SPMProperties.molarfraction.GetValueOrDefault > 0.0# Then
+                        .DW_CalcPhaseProps(DTL.SimulationObjects.PropertyPackages.Phase.Liquid2)
+                    Else
+                        .DW_ClearPhaseProps(DTL.SimulationObjects.PropertyPackages.Phase.Liquid2)
+                    End If
+                    If Me.Phases(5).SPMProperties.molarfraction.GetValueOrDefault > 0.0# Then
+                        .DW_CalcPhaseProps(DTL.SimulationObjects.PropertyPackages.Phase.Liquid3)
+                    Else
+                        .DW_ClearPhaseProps(DTL.SimulationObjects.PropertyPackages.Phase.Liquid3)
+                    End If
+                    If Me.Phases(6).SPMProperties.molarfraction.GetValueOrDefault > 0.0# Then
+                        .DW_CalcPhaseProps(DTL.SimulationObjects.PropertyPackages.Phase.Aqueous)
+                    Else
+                        .DW_ClearPhaseProps(DTL.SimulationObjects.PropertyPackages.Phase.Aqueous)
+                    End If
+                    If Me.Phases(7).SPMProperties.molarfraction.GetValueOrDefault > 0.0# Then
+                        .DW_CalcSolidPhaseProps()
+                    Else
+                        .DW_ClearPhaseProps(DTL.SimulationObjects.PropertyPackages.Phase.Solid)
+                    End If
+                    If Me.Phases(2).SPMProperties.molarfraction.GetValueOrDefault > 0.0# Then
+                        .DW_CalcPhaseProps(DTL.SimulationObjects.PropertyPackages.Phase.Vapor)
+                    Else
+                        .DW_ClearPhaseProps(DTL.SimulationObjects.PropertyPackages.Phase.Vapor)
+                    End If
+
+                    If Me.Phases(2).SPMProperties.molarfraction.GetValueOrDefault >= 0.0# And Me.Phases(2).SPMProperties.molarfraction.GetValueOrDefault <= 1.0# Then
+                        .DW_CalcPhaseProps(DTL.SimulationObjects.PropertyPackages.Phase.Liquid)
+                    Else
+                        .DW_ClearPhaseProps(DTL.SimulationObjects.PropertyPackages.Phase.Liquid)
+                    End If
+
+                    Select Case foption
+                        Case 0, 1
+                            .DW_CalcCompMolarFlow(-1)
+                            .DW_CalcCompMassFlow(-1)
+                            .DW_CalcCompVolFlow(-1)
+                            .DW_CalcLiqMixtureProps()
+                            .DW_CalcOverallProps()
+                            .DW_CalcTwoPhaseProps(DTL.SimulationObjects.PropertyPackages.Phase.Liquid, DTL.SimulationObjects.PropertyPackages.Phase.Vapor)
+                            .DW_CalcVolumetricFlow()
+                            .DW_CalcKvalue()
+                        Case 2
+                            .DW_CalcLiqMixtureProps()
+                            .DW_CalcOverallProps()
+                            Me.Phases(0).SPMProperties.massflow = QV * Me.Phases(0).SPMProperties.density.GetValueOrDefault
+                            .DW_CalcMolarFlow()
+                            .DW_CalcCompMolarFlow(-1)
+                            .DW_CalcCompMassFlow(-1)
+                            .DW_CalcCompVolFlow(-1)
+                            .DW_CalcTwoPhaseProps(DTL.SimulationObjects.PropertyPackages.Phase.Liquid, DTL.SimulationObjects.PropertyPackages.Phase.Vapor)
+                            .DW_CalcKvalue()
+                    End Select
+
+                End If
+
+            End With
+
+        End Sub
+
         Public Sub Assign(ByVal ASource As MaterialStream)
 
             Me.AtEquilibrium = ASource.AtEquilibrium

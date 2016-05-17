@@ -492,7 +492,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
         ''' <value></value>
         ''' <returns></returns>
         ''' <remarks></remarks>
-        Friend Property CurrentMaterialStream() As MaterialStream
+        Public Property CurrentMaterialStream() As MaterialStream
             Get
                 Return m_ms
             End Get
