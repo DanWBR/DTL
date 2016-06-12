@@ -1,8 +1,9 @@
 # DWSIM Standalone Thermodynamics Library
 Version 3.1.0.0
+
 Copyright 2015 Daniel Medeiros
 
-The DWSIM Standalone Thermodynamics Library is a .NET/Mono managed dynamic link library (DLL) that exposes DWSIM�s thermodynamics engine to external applications using a simple programming interface, with no dependency on external components. 
+The DWSIM Standalone Thermodynamics Library is a .NET/Mono managed dynamic link library (DLL) that exposes DWSIM's thermodynamics engine to external applications using a simple programming interface, with no dependency on external components. 
 
 DWSIM Standalone Thermodynamics Library is free for commercial and non-commercial use. Read the license.txt file for more details.
 
@@ -12,7 +13,7 @@ To use the library in your .NET projects, add a reference to the DWSIM.Thermodyn
 
 To use the library in other languages/ecosystems through its COM interface, you must register it with Administrator privileges using RegAsm, which can be found in your .NET 4.0 installation directory (usually C:\Windows\Microsoft.NET\Framework\v4.0.30319\). After finding the tool, open a DOS console window and run the following command:
 
-"RegAsm.exe /tlb:DWSIM.Thermodynamics.tlb DWSIM.Thermodynamics.dll"
+`"RegAsm.exe /tlb:DWSIM.Thermodynamics.tlb DWSIM.Thermodynamics.dll"`
 
 This will create and register the type library automatically, making it callable through COM.
 
