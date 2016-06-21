@@ -12,7 +12,7 @@ Imports System.Runtime.InteropServices
 <Assembly: AssemblyDescription("DWSIM Thermodynamics Library (DTL)")>
 <Assembly: AssemblyCompany("DWSIM Project")>
 <Assembly: AssemblyProduct("DWSIM")>
-<Assembly: AssemblyCopyright("Copyright 2007-2015 Daniel Wagner O. de Medeiros")>
+<Assembly: AssemblyCopyright("Copyright 2007-2016 Daniel Wagner O. de Medeiros")> 
 <Assembly: AssemblyTrademark("DWSIM")>
 
 <Assembly: ComVisible(True)>
@@ -31,7 +31,7 @@ Imports System.Runtime.InteropServices
 ' by using the '*' as shown below:
 ' <Assembly: AssemblyVersion("1.0.*")> 
 
-<Assembly: AssemblyVersion("3.2.0")>
+<Assembly: AssemblyVersion("3.3.0")> 
 '<Assembly: AssemblyFileVersion("1.6")> 
 
 <Assembly: NeutralResourcesLanguageAttribute("pt-BR")>
