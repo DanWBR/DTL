@@ -19,13 +19,17 @@ namespace DTLTest3
 
         }
 
+
         static void Test1()
         {
 
             DTL.Thermodynamics.Calculator dtlc = new DTL.Thermodynamics.Calculator();
             dtlc.Initialize();
-            string[] comps = new string[] { "Water", "Methane" };
-            double[] fracs = new double[] { 0.01, 0.99 };
+            string[] comps = new string[] { "Ethane", "Methane" };
+            double[] fracs = new double[] { 0.5, 0.5 };
+
+            double[] critpt = dtlc.CalcTrueCriticalPoint("PR", comps, fracs);
+
             double P = 101325;
             double h = 0;
             Parallel.For(0, 5000, (int i) =>

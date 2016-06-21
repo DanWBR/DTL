@@ -178,6 +178,7 @@
     <Compile Include="Objects\Classes\Math\MatrixOps.vb" />
     <Compile Include="Objects\Classes\Math\SysLin.vb" />
     <Compile Include="Objects\Classes\Shared\ExtensionMethods.vb" />
+    <Compile Include="Objects\CriticalPoint\CRITPT.vb" />
     <Compile Include="Objects\PropertyPackages\Base\FlashAlgorithms\Base.vb" />
     <Compile Include="Objects\PropertyPackages\Base\FlashAlgorithms\BostonBrittInsideOut.vb" />
     <Compile Include="Objects\PropertyPackages\Base\FlashAlgorithms\BostonFournierInsideOut3P.vb" />

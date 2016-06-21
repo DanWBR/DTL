@@ -2562,7 +2562,7 @@ Namespace Thermodynamics
         ''' <param name="compounds">Compounds to add</param>
         ''' <param name="molefractions">Compound mole fractions</param>
         ''' <remarks></remarks>
-        <Runtime.InteropServices.DispId(40)> Public Sub SetupPropertyPackage(
+        <Runtime.InteropServices.DispId(42)> Public Sub SetupPropertyPackage(
             ByVal proppack As PropertyPackage,
             ByVal compounds As String(),
             ByVal molefractions As Double())
@@ -2599,7 +2599,7 @@ Namespace Thermodynamics
         ''' <param name="compounds">Compounds to add</param>
         ''' <param name="molefractions">Compound mole fractions</param>
         ''' <remarks></remarks>
-        <Runtime.InteropServices.DispId(40)> Public Function CreateMaterialStream(
+        <Runtime.InteropServices.DispId(43)> Public Function CreateMaterialStream(
             ByVal compounds As String(),
             ByVal molefractions As Double()) As DTL.SimulationObjects.Streams.MaterialStream
 
@@ -2617,6 +2617,82 @@ Namespace Thermodynamics
             Return ms
 
         End Function
+
+        ''' <summary>
+        ''' Calculates the True Critical Point for a mixture using PR or SRK Equation of State.
+        ''' </summary>
+        ''' <param name="model">'PR' for Peng-Robinson EOS, 'SRK' for Soave-Redlich-Kwong EOS.</param>
+        ''' <param name="compounds">Compound names</param>
+        ''' <param name="molefractions">Vector of mixture mole fractions</param>
+        ''' <param name="ip1">Interaction Parameters Set #1.</param>
+        ''' <param name="ip2">Interaction Parameters Set #2.</param>
+        ''' <param name="ip3">Interaction Parameters Set #3.</param>
+        ''' <param name="ip4">Interaction Parameters Set #4.</param>
+        ''' <returns>A 3-element double vector containing the Critical Temperature in K, Critical Pressure in Pa and Critical Volume in m3/kmol, on this order.</returns>
+        ''' <remarks></remarks>
+        <Runtime.InteropServices.DispId(44)> Public Function CalcTrueCriticalPoint(model As String,
+                                                                                           compounds As String(),
+                                                                                           molefractions As Double(),
+                                                                                           Optional ByVal ip1 As Object = Nothing,
+                                                                                           Optional ByVal ip2 As Object = Nothing,
+                                                                                           Optional ByVal ip3 As Object = Nothing,
+                                                                                           Optional ByVal ip4 As Object = Nothing) As Double()
+
+            Dim ppm As New CAPEOPENPropertyPackageManager()
+
+            Dim pp As PropertyPackage = Nothing
+
+            If model = "PR" Then
+                pp = ppm.GetPropertyPackage("Peng-Robinson (PR)")
+            ElseIf model = "SRK" Then
+                pp = ppm.GetPropertyPackage("Soave-Redlich-Kwong (SRK)")
+            End If
+
+            TransferComps(pp)
+
+            If model = "PR" Then
+                SetIP("Peng-Robinson (PR)", pp, compounds, ip1, ip2, ip3, ip4)
+            ElseIf model = "SRK" Then
+                SetIP("Soave-Redlich-Kwong (SRK)", pp, compounds, ip1, ip2, ip3, ip4)
+            End If
+
+            ppm.Dispose()
+            ppm = Nothing
+
+            Dim ms As New Streams.MaterialStream("", "")
+
+            For Each phase As DTL.BaseThermoClasses.Phase In ms.Phases.Values
+                For Each c As String In compounds
+                    phase.Components.Add(c, New Substance(c, ""))
+                    phase.Components(c).ConstantProperties = pp._availablecomps(c)
+                Next
+            Next
+
+            For Each c As String In compounds
+                Dim tmpcomp As ConstantProperties = pp._availablecomps(c)
+                If Not pp._selectedcomps.ContainsKey(c) Then pp._selectedcomps.Add(c, tmpcomp)
+            Next
+
+            ms.SetOverallComposition(molefractions)
+            ms._pp = pp
+            pp.SetMaterial(ms)
+
+            Dim results As New ArrayList
+
+            With pp
+                If model = "PR" Then
+                    results = New DTL.Utilities.TrueCriticalPoint.PengRobinson().CRITPT_PR(.RET_VMOL(PropertyPackages.Phase.Mixture),
+                                                                                           .RET_VTC(), .RET_VPC(), .RET_VVC(), .RET_VW(), .RET_VKij(), 0.0#)
+                ElseIf model = "SRK" Then
+                    results = New DTL.Utilities.TrueCriticalPoint.SoaveRedlichKwong().CRITPT_PR(.RET_VMOL(PropertyPackages.Phase.Mixture),
+                                                                                           .RET_VTC(), .RET_VPC(), .RET_VVC(), .RET_VW(), .RET_VKij(), 0.0#)
+                End If
+            End With
+
+            If results.Count > 0 Then Return results(0) Else Throw New Exception("No critical point found.")
+
+        End Function
+
 
     End Class
 
