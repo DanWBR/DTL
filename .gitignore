@@ -10,3 +10,10 @@
 /DTLTest3/obj/Debug
 /DWSIM/bin/Debug
 /DWSIM/obj/Debug
+obj
+/DWSIM/bin/Release/Help
+/DTLTest/bin/Release
+/DTLTest2/bin/Release
+/DTLTest3/bin/Release
+/DWSIM/bin/Release
+*.suo
