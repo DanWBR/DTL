@@ -34,12 +34,12 @@ Namespace DTL.Utilities.TrueCriticalPoint
             Dim V, Vc_sup, Vc_inf As Double
 
             Dim stmp(2) As Double
-            Dim n, R As Double
+            Dim n As Integer, R As Double
             Dim i As Integer
 
             n = UBound(Vz)
 
-            Dim Tc(n), Pc(n)
+            Dim Tc(n), Pc(n) As Double
             Dim b As Double
 
             'estimar temperatura e pressão críticas iniciais
@@ -202,14 +202,14 @@ Final2:
         Function QIJ_HES_MAT(ByVal T, ByVal V, ByVal Vz, ByVal VTc, ByVal VPc, ByVal VVc, ByVal Vw, ByVal VKIj) As Mapack.Matrix
 
             Dim i, j As Integer
-            Dim n As Double
+            Dim n As Integer
 
             Dim am, bm, R As Double
 
             n = UBound(Vz)
 
-            Dim ai(n), b(n), c(n), tmp(2, n + 1), a(n, n), am2(n)
-            Dim Tc(n), Pc(n), Vc(n), Zc(n), w(n), alpha(n), Tr(n)
+            Dim ai(n), b(n), c(n), tmp(2, n + 1), a(n, n), am2(n) As Double
+            Dim Tc(n), Pc(n), Vc(n), Zc(n), w(n), alpha(n), Tr(n) As Double
 
             'estimar temperatura e pressão críticas iniciais
 
@@ -217,23 +217,19 @@ Final2:
 
             i = 0
             Do
-                If Vz(i) <> 0 Then
-                    Tc(i) = VTc(i)
-                    Tr(i) = T / Tc(i)
-                    Pc(i) = VPc(i)
-                    w(i) = Vw(i)
-                End If
+                Tc(i) = VTc(i)
+                Tr(i) = T / Tc(i)
+                Pc(i) = VPc(i)
+                w(i) = Vw(i)
                 i = i + 1
             Loop Until i = n + 1
 
             i = 0
             Do
-                If Vz(i) <> 0 Then
-                    alpha(i) = (1 + (0.37464 + 1.54226 * w(i) - 0.26992 * w(i) ^ 2) * (1 - (T / Tc(i)) ^ 0.5)) ^ 2
-                    ai(i) = 0.45724 * alpha(i) * R ^ 2 * Tc(i) ^ 2 / Pc(i)
-                    b(i) = 0.0778 * R * Tc(i) / Pc(i)
-                    c(i) = (0.37464 + 1.54226 * w(i) - 0.26992 * w(i) ^ 2)
-                End If
+                alpha(i) = (1 + (0.37464 + 1.54226 * w(i) - 0.26992 * w(i) ^ 2) * (1 - (T / Tc(i)) ^ 0.5)) ^ 2
+                ai(i) = 0.45724 * alpha(i) * R ^ 2 * Tc(i) ^ 2 / Pc(i)
+                b(i) = 0.0778 * R * Tc(i) / Pc(i)
+                c(i) = (0.37464 + 1.54226 * w(i) - 0.26992 * w(i) ^ 2)
                 i = i + 1
             Loop Until i = n + 1
 
@@ -352,7 +348,7 @@ Final2:
             Loop Until i = n + 1
 
             'get maximum value
-            Dim max As Double = 0
+            Dim max As Double = 0.0#
             i = 0
             Do
                 j = 0
@@ -382,16 +378,16 @@ Final2:
             Dim T, Tc_sup, Tc_inf As Double
 
             Dim i, j As Integer
-            Dim n As Double
+            Dim n As Integer
 
             Dim am, bm, R As Double
 
             n = UBound(Vz)
 
-            Dim Dn(n)
+            Dim Dn(n) As Double
 
-            Dim ai(n), b(n), c(n), tmp(2, n + 1), a(n, n), am2(n)
-            Dim Tc(n), Pc(n), Vc(n), Zc(n), w(n), alpha(n), Tr(n)
+            Dim ai(n), b(n), c(n), tmp(2, n + 1), a(n, n), am2(n) As Double
+            Dim Tc(n), Pc(n), Vc(n), Zc(n), w(n), alpha(n), Tr(n) As Double
 
             Tc_inf = MathEx.Common.Min(VTc) * 0.5
             Tc_sup = MathEx.Common.Max(VTc) * 1.5
@@ -426,7 +422,7 @@ Final2:
 
             iter = 0
             Do
-                If (fb > 0 And fc > 0) Or (fb < 0 And fc < 0) Then
+                If (fb > 0.0# And fc > 0.0#) Or (fb < 0.0# And fc < 0.0#) Then
                     cc = aa
                     fc = fa
                     dd = bb - aa
@@ -442,7 +438,7 @@ Final2:
                 End If
                 tol1 = 0.00000001
                 xm = 0.5 * (cc - bb)
-                If (Math.Abs(xm) <= tol1) Or (fb = 0) Then GoTo Final
+                If (Math.Abs(xm) <= tol1) Or (fb = 0.0#) Then GoTo Final
                 If Math.Abs(fb) < tol1 Then GoTo Final
                 If (Math.Abs(ee) >= tol1) And (Math.Abs(fa) > Math.Abs(fb)) Then
                     ss = fb / fa
@@ -683,14 +679,14 @@ Final2:
 
             Dim T, Tc_sup, Tc_inf As Double
 
-            Dim n As Double
+            Dim n As Integer
 
             n = UBound(Vz)
 
-            Dim Dn(n)
+            Dim Dn(n) As Double
 
-            Dim ai(n), b(n), c(n), tmp(2, n + 1), a(n, n), am2(n)
-            Dim Tc(n), Pc(n), Vc(n), Zc(n), w(n), alpha(n), Tr(n)
+            Dim ai(n), b(n), c(n), tmp(2, n + 1), a(n, n), am2(n) As Double
+            Dim Tc(n), Pc(n), Vc(n), Zc(n), w(n), alpha(n), Tr(n) As Double
 
             Tc_inf = MathEx.Common.Min(VTc) * 0.5
             Tc_sup = MathEx.Common.Min(VTc) * 1.5

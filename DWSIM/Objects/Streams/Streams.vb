@@ -3135,7 +3135,7 @@ Namespace DTL.SimulationObjects.Streams
                         res.Add(Math.Log(Me.Phases(f1).Components(c).MolarFraction.GetValueOrDefault / Me.Phases(f2).Components(c).MolarFraction.GetValueOrDefault))
                     Next
                 Case "surfacetension"
-                    res.Add(Me.Phases(f2).TPMProperties.surfaceTension.GetValueOrDefault)
+                    res.Add(Me.Phases(0).TPMProperties.surfaceTension.GetValueOrDefault)
                 Case Else
                     Throw New Exception
             End Select

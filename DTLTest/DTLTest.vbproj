@@ -7,7 +7,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{B444F627-6E4F-467E-B736-F9D117849788}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <StartupObject>DTLTest.Module1</StartupObject>
+    <StartupObject>DTLTest.test</StartupObject>
     <RootNamespace>DTLTest</RootNamespace>
     <AssemblyName>DTLTest</AssemblyName>
     <FileAlignment>512</FileAlignment>
@@ -61,6 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Module1.vb" />
+    <Compile Include="Module2.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>

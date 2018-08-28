@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using DTL.DTL.SimulationObjects.PropertyPackages;
 using DTL.DTL.SimulationObjects.Streams;
-using DTL;
 
 namespace DTLTest3
 {
@@ -15,7 +11,7 @@ namespace DTLTest3
         static void Main(string[] args)
         {
 
-            Test1();
+            Test2();
 
         }
 
@@ -25,8 +21,8 @@ namespace DTLTest3
 
             DTL.Thermodynamics.Calculator dtlc = new DTL.Thermodynamics.Calculator();
             dtlc.Initialize();
-            string[] comps = new string[] { "Ethane", "Methane" };
-            double[] fracs = new double[] { 0.5, 0.5 };
+            string[] comps = new string[] { "Ethane", "Methane", "Propane" };
+            double[] fracs = new double[] { 0.5, 0.5, 1e-6 };
 
             double[] critpt = dtlc.CalcTrueCriticalPoint("PR", comps, fracs);
 

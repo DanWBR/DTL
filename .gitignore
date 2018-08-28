@@ -17,3 +17,4 @@ obj
 /DTLTest3/bin/Release
 /DWSIM/bin/Release
 *.suo
+/.vs/DTL/v15/Server/sqlite3

@@ -852,7 +852,7 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
             Dim T As Double
 
-            T = Me.CurrentMaterialStream.Phases(0).SPMProperties.temperature
+            T = Me.CurrentMaterialStream.Phases(0).SPMProperties.temperature.GetValueOrDefault
             Me.CurrentMaterialStream.Phases(0).TPMProperties.surfaceTension = Me.AUX_SURFTM(T)
 
         End Sub
@@ -3133,21 +3133,18 @@ Final3:
 
         Public Function AUX_LIQVISCm(ByVal T As Double, Optional ByVal phaseid As Integer = 3) As Double
 
-            Dim val, val2, logvisc, result As Double
+            Dim val, lval, sval, result As Double
             Dim subst As Substance
 
             val = 0
-            val2 = 0
             For Each subst In Me.CurrentMaterialStream.Phases(phaseid).Components.Values
-                'logvisc = Math.Log(Me.AUX_LIQVISCi(subst.Name, T))
-                If Not Double.IsInfinity(logvisc) Then
-                    val += subst.MolarFraction.GetValueOrDefault * Me.AUX_LIQVISCi(subst.Name, T)
-                Else
-                    val2 += subst.MolarFraction.GetValueOrDefault
-                End If
+                sval = Me.AUX_LIQVISCi(subst.Name, T)
+                lval = Log(sval)
+                If sval = 0 Then lval = 0.0
+                val += subst.MolarFraction.GetValueOrDefault * lval
             Next
 
-            result = (val / (1 - val2))
+            result = Exp(val)
 
             Return result
 
@@ -3258,7 +3255,7 @@ Final3:
             Dim subst As Substance
             Dim ftotal As Double = 1
 
-            For Each subst In Me.CurrentMaterialStream.Phases(1).Components.Values
+            For Each subst In Me.CurrentMaterialStream.Phases(3).Components.Values
                 If T / subst.ConstantProperties.Critical_Temperature < 1 Then
                     With subst.ConstantProperties
                         If .SurfaceTensionEquation <> "" And .SurfaceTensionEquation <> "0" And Not .IsIon And Not .IsSalt Then
