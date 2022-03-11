@@ -780,7 +780,8 @@ Namespace DTL.MathEx.SysLin
             Dim strError As String = ""
 
             If SVDDecomposition(sA, sU, sW, sV, strError) = False Then
-                MsgBox("Algebra.Solve: SVD gives error '" & strError & "'", MsgBoxStyle.Critical + MsgBoxStyle.OkOnly)
+                'MsgBox("Algebra.Solve: SVD gives error '" & strError & "'", MsgBoxStyle.Critical + MsgBoxStyle.OkOnly)
+                Throw New ApplicationException("Algebra.Solve: SVD gives error '" & strError & "'")
                 Return False
             End If
 
@@ -1459,7 +1460,8 @@ Namespace DTL.MathEx.SysLin
             If (((iAHiCol) <> (iBHiRow)) Or _
                 ((iAHiRow) <> (iCHiRow)) Or _
                 ((iBHiCol) <> (iCHiCol))) Then
-                MsgBox("Algebra.Product: Incompatible matrix dimensions", MsgBoxStyle.OkOnly + MsgBoxStyle.Critical)
+                'MsgBox("Algebra.Product: Incompatible matrix dimensions", MsgBoxStyle.OkOnly + MsgBoxStyle.Critical)
+                Throw New ApplicationException("Algebra.Product: Incompatible matrix dimensions")
             End If
 
             For i = 0 To iCHiRow
@@ -1660,7 +1662,8 @@ Namespace DTL.MathEx.SysLin
             Try
                 FileOpen(5, strFile, OpenMode.Input, OpenAccess.Read)
             Catch e As Exception
-                MsgBox("Algebra.Load:" & e.Message, MsgBoxStyle.OkOnly + MsgBoxStyle.Critical)
+                'MsgBox("Algebra.Load:" & e.Message, MsgBoxStyle.OkOnly + MsgBoxStyle.Critical)
+                Throw New ApplicationException("Algebra.Load:" & e.Message)
                 Return False
             End Try
 
@@ -1741,7 +1744,8 @@ Namespace DTL.MathEx.SysLin
                 Next i
                 FileClose(5)
             Catch e As Exception
-                MsgBox("Algebra.Save (file = " & strFile & "):" & e.Message, MsgBoxStyle.OkOnly + MsgBoxStyle.Critical)
+                'MsgBox("Algebra.Save (file = " & strFile & "):" & e.Message, MsgBoxStyle.OkOnly + MsgBoxStyle.Critical)
+                Throw New ApplicationException("Algebra.Save (file = " & strFile & "):" & e.Message)
             End Try
         End Sub
 

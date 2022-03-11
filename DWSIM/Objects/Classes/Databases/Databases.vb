@@ -66,6 +66,11 @@ Namespace DTL.Databases
             Dim csid As ChemSepNameIDPair
             Dim csidc() As ChemSepNameIDPair
             Dim fh1 As New FileHelperEngine(Of ChemSepNameIDPair)
+            If My.Resources.Culture Is Nothing Then
+                My.Resources.Culture = System.Globalization.CultureInfo.CreateSpecificCulture("en")
+            End If
+
+
             With fh1
                 Using stream As Stream = New MemoryStream(My.Resources.csid)
                     Using reader As New StreamReader(stream)

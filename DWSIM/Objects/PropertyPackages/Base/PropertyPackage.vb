@@ -23,10 +23,14 @@ Imports System.Runtime.Serialization
 Imports System.IO
 Imports System.Math
 Imports System.Runtime.InteropServices.ComTypes
-Imports CAPEOPEN110
+Imports DTL.CAPEOPEN110
+'Imports CAPEOPEN110
 Imports System.Runtime.InteropServices
 Imports System.Threading.Tasks
 Imports DTL.DTL.MathEx
+Imports System.Data
+Imports Microsoft.VisualBasic
+Imports System
 
 Namespace DTL.SimulationObjects.PropertyPackages
 
@@ -100,15 +104,17 @@ Namespace DTL.SimulationObjects.PropertyPackages
     ''' <remarks>The base class is inherited by each implemented property package, which contains its own methods.</remarks>
     <Serializable()> Public MustInherit Class PropertyPackage
 
-        'CAPE-OPEN 1.0 Interfaces
-        Implements ICloneable, ICapeIdentification, ICapeThermoPropertyPackage, ICapeUtilities, ICapeThermoEquilibriumServer, ICapeThermoCalculationRoutine
 
-        'CAPE-OPEN 1.1 Interfaces
-        Implements ICapeThermoPhases, ICapeThermoPropertyRoutine, ICapeThermoCompounds, ICapeThermoUniversalConstant
-        Implements ICapeThermoMaterialContext, ICapeThermoEquilibriumRoutine
+        ''CAPE-OPEN 1.0 Interfaces
+        'Implements ICloneable, ICapeIdentification, ICapeThermoPropertyPackage, ICapeUtilities, ICapeThermoEquilibriumServer, ICapeThermoCalculationRoutine
+        Implements ICloneable
 
-        'CAPE-OPEN Error Interfaces
-        Implements ECapeUser, ECapeUnknown, ECapeRoot
+        ''CAPE-OPEN 1.1 Interfaces
+        'Implements ICapeThermoPhases, ICapeThermoPropertyRoutine, ICapeThermoCompounds, ICapeThermoUniversalConstant
+        'Implements ICapeThermoMaterialContext, ICapeThermoEquilibriumRoutine
+
+        ''CAPE-OPEN Error Interfaces
+        'Implements ECapeUser, ECapeUnknown, ECapeRoot
 
         'IDisposable
         Implements IDisposable
@@ -152,6 +158,9 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
         Public Property ForceNewFlashAlgorithmInstance As Boolean = False
 
+        Public _selectedcomps As New Dictionary(Of String, ConstantProperties)
+        Public _availablecomps As New Dictionary(Of String, ConstantProperties)
+
         <NonSerialized()> Private _como As Object 'CAPE-OPEN Material Object
 
 #Region "Constructor"
@@ -163,16 +172,16 @@ Namespace DTL.SimulationObjects.PropertyPackages
 
         Sub New(ByVal capeopenmode As Boolean)
 
-            My.Application.CAPEOPENMode = capeopenmode
+            ' My.Application.CAPEOPENMode = capeopenmode
 
-            If capeopenmode Then
+            '  If capeopenmode Then
 
-                'initialize collections
+            'initialize collections
 
-                _selectedcomps = New Dictionary(Of String, ConstantProperties)
-                _availablecomps = New Dictionary(Of String, ConstantProperties)
+            _selectedcomps = New Dictionary(Of String, ConstantProperties)
+            _availablecomps = New Dictionary(Of String, ConstantProperties)
 
-            End If
+            '  End If
 
             Initialize()
 
@@ -5038,7 +5047,7 @@ Final3:
         ''' <value></value>
         ''' <returns>CapeString</returns>
         ''' <remarks>Implements CapeOpen.ICapeIdentification.ComponentDescription</remarks>
-        Public Overridable Property ComponentDescription() As String Implements ICapeIdentification.ComponentDescription
+        Public Overridable Property ComponentDescription() As String 'Implements ICapeIdentification.ComponentDescription
             Get
                 Return _compdesc
             End Get
@@ -5053,7 +5062,7 @@ Final3:
         ''' <value></value>
         ''' <returns>CapeString</returns>
         ''' <remarks>Implements CapeOpen.ICapeIdentification.ComponentName</remarks>
-        Public Overridable Property ComponentName() As String Implements ICapeIdentification.ComponentName
+        Public Overridable Property ComponentName() As String 'Implements ICapeIdentification.ComponentName
             Get
                 Return _compname
             End Get
@@ -5062,15 +5071,15 @@ Final3:
             End Set
         End Property
 
-        Public Sub PropList1(ByRef props As Object, ByRef phases As Object, ByRef calcType As Object) Implements ICapeThermoCalculationRoutine.PropList
+        Public Sub PropList1(ByRef props As Object, ByRef phases As Object, ByRef calcType As Object) 'Implements ICapeThermoCalculationRoutine.PropList
             Throw New NotImplementedException
         End Sub
 
-        Public Function PropCheck1(ByVal materialObject As Object, ByVal flashType As String, ByVal props As Object) As Object Implements ICapeThermoEquilibriumServer.PropCheck
+        Public Function PropCheck1(ByVal materialObject As Object, ByVal flashType As String, ByVal props As Object) As Object 'Implements ICapeThermoEquilibriumServer.PropCheck
             Throw New NotImplementedException
         End Function
 
-        Public Function ValidityCheck1(ByVal materialObject As Object, ByVal props As Object) As Object Implements ICapeThermoEquilibriumServer.ValidityCheck
+        Public Function ValidityCheck1(ByVal materialObject As Object, ByVal props As Object) As Object 'Implements ICapeThermoEquilibriumServer.ValidityCheck
             Throw New NotImplementedException
         End Function
 
@@ -5092,10 +5101,11 @@ Final3:
         ''' Through the returned error one cannot see which has failed, plus the additional arguments available in a
         ''' CalcProp call (such as calculation type) cannot be specified in a CalcEquilibrium call. Advice is to perform a
         ''' CalcEquilibrium, get the phaseIDs and perform a CalcProp for the existing phases.</para></remarks>
-        Public Overridable Sub CalcEquilibrium(ByVal materialObject As Object, ByVal flashType As String, ByVal props As Object) Implements ICapeThermoPropertyPackage.CalcEquilibrium
+        Public Overridable Sub CalcEquilibrium(ByVal materialObject As Object, ByVal flashType As String, ByVal props As Object) 'Implements ICapeThermoPropertyPackage.CalcEquilibrium
 
-            Dim mymat As ICapeThermoMaterial = materialObject
-            Me.CurrentMaterialStream = mymat
+            'Dim mymat As ICapeThermoMaterial = materialObject
+            'Me.CurrentMaterialStream = mymat
+            Me.CurrentMaterialStream = materialObject
             Select Case flashType.ToLower
                 Case "tp"
                     Me.DW_CalcEquilibrium(FlashSpec.T, FlashSpec.P)
@@ -5134,7 +5144,7 @@ Final3:
         ''' mixture, use “Mixture” CalcType. For pure compound fugacity
         ''' coefficients, use “Pure” CalcType.</param>
         ''' <remarks></remarks>
-        Public Overridable Sub CalcProp(ByVal materialObject As Object, ByVal props As Object, ByVal phases As Object, ByVal calcType As String) Implements ICapeThermoPropertyPackage.CalcProp
+        Public Overridable Sub CalcProp(ByVal materialObject As Object, ByVal props As Object, ByVal phases As Object, ByVal calcType As String) 'Implements ICapeThermoPropertyPackage.CalcProp
             Dim mymat As MaterialStream = materialObject
             Me.CurrentMaterialStream = mymat
             Dim ph As String() = phases
@@ -5161,7 +5171,7 @@ Final3:
         ''' <param name="props">The list of properties.</param>
         ''' <returns>Compound Constant values.</returns>
         ''' <remarks></remarks>
-        Public Overridable Function GetComponentConstant(ByVal materialObject As Object, ByVal props As Object) As Object Implements ICapeThermoPropertyPackage.GetComponentConstant
+        Public Overridable Function GetComponentConstant(ByVal materialObject As Object, ByVal props As Object) As Object 'Implements ICapeThermoPropertyPackage.GetComponentConstant
             Dim vals As New ArrayList
             Dim mymat As MaterialStream = materialObject
             For Each c As Substance In mymat.Phases(0).Components.Values
@@ -5213,21 +5223,21 @@ Final3:
         ''' 'casno’ argument instead of the compIds. The reason is that different PMEs may give different names to the same
         ''' chemical compounds, whereas CAS Numbers are universal. Therefore, it is recommended to provide a value for the
         ''' casno argument wherever available.</remarks>
-        Public Overridable Sub GetComponentList(ByRef compIds As Object, ByRef formulae As Object, ByRef names As Object, ByRef boilTemps As Object, ByRef molWt As Object, ByRef casNo As Object) Implements ICapeThermoPropertyPackage.GetComponentList
+        Public Overridable Sub GetComponentList(ByRef compIds As Object, ByRef formulae As Object, ByRef names As Object, ByRef boilTemps As Object, ByRef molWt As Object, ByRef casNo As Object) 'Implements ICapeThermoPropertyPackage.GetComponentList
 
             Dim ids, formulas, nms, bts, casnos, molws As New ArrayList
 
-            If My.Application.CAPEOPENMode Then
-                For Each c As ConstantProperties In _selectedcomps.Values
-                    ids.Add(c.Name)
-                    formulas.Add(c.Formula)
-                    nms.Add(App.GetComponentName(c.Name))
-                    bts.Add(c.Normal_Boiling_Point)
-                    casnos.Add(c.CAS_Number)
-                    molws.Add(c.Molar_Weight)
-                Next
-            Else
-                For Each c As Substance In Me.CurrentMaterialStream.Phases(0).Components.Values
+            'If My.Application.CAPEOPENMode Then
+            '    For Each c As ConstantProperties In _selectedcomps.Values
+            '        ids.Add(c.Name)
+            '        formulas.Add(c.Formula)
+            '        nms.Add(App.GetComponentName(c.Name))
+            '        bts.Add(c.Normal_Boiling_Point)
+            '        casnos.Add(c.CAS_Number)
+            '        molws.Add(c.Molar_Weight)
+            '    Next
+            'Else
+            For Each c As Substance In Me.CurrentMaterialStream.Phases(0).Components.Values
                     ids.Add(c.ConstantProperties.Name)
                     formulas.Add(c.ConstantProperties.Formula)
                     nms.Add(App.GetComponentName(c.ConstantProperties.Name))
@@ -5235,7 +5245,7 @@ Final3:
                     casnos.Add(c.ConstantProperties.CAS_Number)
                     molws.Add(c.ConstantProperties.Molar_Weight)
                 Next
-            End If
+            'End If
 
             Dim _i(ids.Count - 1) As String
             Dim _f(ids.Count - 1) As String
@@ -5275,7 +5285,7 @@ Final3:
         ''' </summary>
         ''' <returns>The list of phases supported by the Property Package.</returns>
         ''' <remarks></remarks>
-        Public Overridable Function GetPhaseList() As Object Implements ICapeThermoPropertyPackage.GetPhaseList
+        Public Overridable Function GetPhaseList() As Object 'Implements ICapeThermoPropertyPackage.GetPhaseList
             Dim pl As New ArrayList
             For Each pi As PhaseInfo In Me.PhaseMappings.Values
                 If pi.PhaseLabel <> "Disabled" Then
@@ -5302,7 +5312,7 @@ Final3:
         ''' must return the identifiers of all supported derivative and non-derivative properties. For instance, a Property
         ''' Package could return the following list:
         ''' enthalpy, enthalpy.Dtemperature, entropy, entropy.Dpressure.</remarks>
-        Public Overridable Function GetPropList() As Object Implements ICapeThermoPropertyPackage.GetPropList
+        Public Overridable Function GetPropList() As Object 'Implements ICapeThermoPropertyPackage.GetPropList
             Dim arr As New ArrayList
             With arr
                 .Add("vaporPressure")
@@ -5355,7 +5365,7 @@ Final3:
         ''' <param name="props">List of requested Universal Constants;</param>
         ''' <returns>Values of Universal Constants.</returns>
         ''' <remarks></remarks>
-        Public Overridable Function GetUniversalConstant(ByVal materialObject As Object, ByVal props As Object) As Object Implements ICapeThermoPropertyPackage.GetUniversalConstant
+        Public Overridable Function GetUniversalConstant(ByVal materialObject As Object, ByVal props As Object) As Object 'Implements ICapeThermoPropertyPackage.GetUniversalConstant
             Dim res As New ArrayList
             For Each p As String In props
                 Select Case p.ToLower
@@ -5386,7 +5396,7 @@ Final3:
         ''' argument list does not include a phase specification, implementations vary. It is generally expected that
         ''' PropCheck at least verifies that the Property is available for calculation in the property Package. However,
         ''' this can also be verified with PropList. It is advised not to use PropCheck.</remarks>
-        Public Overridable Function PropCheck(ByVal materialObject As Object, ByVal props As Object) As Object Implements ICapeThermoPropertyPackage.PropCheck
+        Public Overridable Function PropCheck(ByVal materialObject As Object, ByVal props As Object) As Object 'Implements ICapeThermoPropertyPackage.PropCheck
             Return True
         End Function
 
@@ -5397,7 +5407,7 @@ Final3:
         ''' <param name="props">The list of properties to check.</param>
         ''' <returns>The properties for which reliability is checked.</returns>
         ''' <remarks>The ValidityCheck method must not be used, since the ICapeThermoReliability interface is not yet defined.</remarks>
-        Public Overridable Function ValidityCheck(ByVal materialObject As Object, ByVal props As Object) As Object Implements ICapeThermoPropertyPackage.ValidityCheck
+        Public Overridable Function ValidityCheck(ByVal materialObject As Object, ByVal props As Object) As Object 'Implements ICapeThermoPropertyPackage.ValidityCheck
             Return True
         End Function
 
@@ -5419,9 +5429,9 @@ Final3:
         ''' see which has failed, plus the additional arguments to CalcProp (such as calculation type) cannot be
         ''' specified. Advice is to perform a CalcEquilibrium, get the phaseIDs and perform a CalcProp for those
         ''' phases.</remarks>
-        Public Overridable Sub CalcEquilibrium2(ByVal materialObject As Object, ByVal flashType As String, ByVal props As Object) Implements ICapeThermoEquilibriumServer.CalcEquilibrium
-            CalcEquilibrium(materialObject, flashType, props)
-        End Sub
+        'Public Overridable Sub CalcEquilibrium2(ByVal materialObject As Object, ByVal flashType As String, ByVal props As Object) Implements ICapeThermoEquilibriumServer.CalcEquilibrium
+        '    CalcEquilibrium(materialObject, flashType, props)
+        'End Sub
 
         ''' <summary>
         ''' Returns the flash types, properties, phases, and calculation types that are supported by a given Equilibrium Server Routine.
@@ -5431,24 +5441,24 @@ Final3:
         ''' <param name="phases">List of supported phases.</param>
         ''' <param name="calcType">List of supported calculation types.</param>
         ''' <remarks></remarks>
-        Public Overridable Sub PropList(ByRef flashType As Object, ByRef props As Object, ByRef phases As Object, ByRef calcType As Object) Implements ICapeThermoEquilibriumServer.PropList
+        Public Overridable Sub PropList(ByRef flashType As Object, ByRef props As Object, ByRef phases As Object, ByRef calcType As Object) 'Implements ICapeThermoEquilibriumServer.PropList
             props = GetPropList()
             flashType = New String() {"TP", "PH", "PS", "TVF", "PVF", "PT", "HP", "SP", "VFT", "VFP"}
             phases = New String() {"Vapor", "Liquid1", "Liquid2", "Solid", "Overall"}
             calcType = New String() {"Mixture"}
         End Sub
 
-        Public Overridable Sub CalcProp1(ByVal materialObject As Object, ByVal props As Object, ByVal phases As Object, ByVal calcType As String) Implements ICapeThermoCalculationRoutine.CalcProp
-            CalcProp(materialObject, props, phases, calcType)
-        End Sub
+        'Public Overridable Sub CalcProp1(ByVal materialObject As Object, ByVal props As Object, ByVal phases As Object, ByVal calcType As String) Implements ICapeThermoCalculationRoutine.CalcProp
+        '    CalcProp(materialObject, props, phases, calcType)
+        'End Sub
 
-        Public Overridable Function PropCheck2(ByVal materialObject As Object, ByVal props As Object) As Object Implements ICapeThermoCalculationRoutine.PropCheck
-            Return True
-        End Function
+        'Public Overridable Function PropCheck2(ByVal materialObject As Object, ByVal props As Object) As Object Implements ICapeThermoCalculationRoutine.PropCheck
+        '    Return True
+        'End Function
 
-        Public Overridable Function ValidityCheck2(ByVal materialObject As Object, ByVal props As Object) As Object Implements ICapeThermoCalculationRoutine.ValidityCheck
-            Return True
-        End Function
+        'Public Overridable Function ValidityCheck2(ByVal materialObject As Object, ByVal props As Object) As Object Implements ICapeThermoCalculationRoutine.ValidityCheck
+        '    Return True
+        'End Function
 
 #End Region
 
@@ -5480,7 +5490,7 @@ Final3:
         ''' must be returned for those combinations and an ECapeThrmPropertyNotAvailable exception
         ''' must be raised. If the exception is raised, the client should check all the values returned to
         ''' determine which is undefined.</remarks>
-        Public Overridable Function GetCompoundConstant(ByVal props As Object, ByVal compIds As Object) As Object Implements ICapeThermoCompounds.GetCompoundConstant
+        Public Overridable Function GetCompoundConstant(ByVal props As Object, ByVal compIds As Object) As Object 'Implements ICapeThermoCompounds.GetCompoundConstant
             Dim vals As New ArrayList
             For Each s As String In compIds
                 Dim c As Substance = Me.CurrentMaterialStream.Phases(0).Components(s)
@@ -5553,24 +5563,24 @@ Final3:
         ''' argument. It is the responsibility of the client to maintain appropriate data structures that
         ''' allow it to reconcile the different Compound identifiers used by different Property Packages
         ''' and any native property system.</remarks>
-        Public Overridable Sub GetCompoundList(ByRef compIds As Object, ByRef formulae As Object, ByRef names As Object, ByRef boilTemps As Object, ByRef molwts As Object, ByRef casnos As Object) Implements ICapeThermoCompounds.GetCompoundList
+        Public Overridable Sub GetCompoundList(ByRef compIds As Object, ByRef formulae As Object, ByRef names As Object, ByRef boilTemps As Object, ByRef molwts As Object, ByRef casnos As Object) 'Implements ICapeThermoCompounds.GetCompoundList
             GetComponentList(compIds, formulae, names, boilTemps, molwts, casnos)
         End Sub
 
-        ''' <summary>
-        ''' Returns the list of supported constant Physical Properties.
-        ''' </summary>
-        ''' <returns>List of identifiers for all supported constant Physical Properties. The standard constant property identifiers are listed in section 7.5.2.</returns>
-        ''' <remarks>GetConstPropList returns identifiers for all the constant Physical Properties that can be
-        ''' retrieved by the GetCompoundConstant method. If no properties are supported,
-        ''' UNDEFINED should be returned. The CAPE-OPEN standards do not define a minimum list
-        ''' of Physical Properties to be made available by a software component that implements the
-        ''' ICapeThermoCompounds interface.
-        ''' A component that implements the ICapeThermoCompounds interface may return constant
-        ''' Physical Property identifiers which do not belong to the list defined in section 7.5.2.
-        ''' However, these proprietary identifiers may not be understood by most of the clients of this
-        ''' component.</remarks>
-        Public Overridable Function GetConstPropList() As Object Implements ICapeThermoCompounds.GetConstPropList
+        '''' <summary>
+        '''' Returns the list of supported constant Physical Properties.
+        '''' </summary>
+        '''' <returns>List of identifiers for all supported constant Physical Properties. The standard constant property identifiers are listed in section 7.5.2.</returns>
+        '''' <remarks>GetConstPropList returns identifiers for all the constant Physical Properties that can be
+        '''' retrieved by the GetCompoundConstant method. If no properties are supported,
+        '''' UNDEFINED should be returned. The CAPE-OPEN standards do not define a minimum list
+        '''' of Physical Properties to be made available by a software component that implements the
+        '''' ICapeThermoCompounds interface.
+        '''' A component that implements the ICapeThermoCompounds interface may return constant
+        '''' Physical Property identifiers which do not belong to the list defined in section 7.5.2.
+        '''' However, these proprietary identifiers may not be understood by most of the clients of this
+        '''' component.</remarks>
+        Public Overridable Function GetConstPropList() As Object 'Implements ICapeThermoCompounds.GetConstPropList
             Dim vals As New ArrayList
             With vals
                 .Add("molecularweight")
@@ -5590,32 +5600,32 @@ Final3:
             Return arr2
         End Function
 
-        ''' <summary>
-        ''' Returns the number of Compounds supported.
-        ''' </summary>
-        ''' <returns>Number of Compounds supported.</returns>
-        ''' <remarks>The number of Compounds returned by this method must be equal to the number of
-        ''' Compound identifiers that are returned by the GetCompoundList method of this interface. It
-        ''' must be zero or a positive number.</remarks>
-        Public Overridable Function GetNumCompounds() As Integer Implements ICapeThermoCompounds.GetNumCompounds
-            If My.Application.CAPEOPENMode Then
-                Return Me._selectedcomps.Count
-            Else
-                Return Me.CurrentMaterialStream.Phases(0).Components.Count
-            End If
-        End Function
+        '''' <summary>
+        '''' Returns the number of Compounds supported.
+        '''' </summary>
+        '''' <returns>Number of Compounds supported.</returns>
+        '''' <remarks>The number of Compounds returned by this method must be equal to the number of
+        '''' Compound identifiers that are returned by the GetCompoundList method of this interface. It
+        '''' must be zero or a positive number.</remarks>
+        'Public Overridable Function GetNumCompounds() As Integer Implements ICapeThermoCompounds.GetNumCompounds
+        '    If My.Application.CAPEOPENMode Then
+        '        Return Me._selectedcomps.Count
+        '    Else
+        '        Return Me.CurrentMaterialStream.Phases(0).Components.Count
+        '    End If
+        'End Function
 
-        ''' <summary>
-        ''' Returns the values of pressure-dependent Physical Properties for the specified pure Compounds.
-        ''' </summary>
-        ''' <param name="props">The list of Physical Property identifiers. Valid identifiers for pressure-dependent 
-        ''' Physical Properties are listed in section 7.5.4</param>
-        ''' <param name="pressure">Pressure (in Pa) at which Physical Properties are evaluated</param>
-        ''' <param name="compIds">List of Compound identifiers for which Physical Properties are to be retrieved. 
-        ''' Set compIds to UNDEFINED to denote all Compounds in the component that implements the ICapeThermoCompounds interface.</param>
-        ''' <param name="propVals">Property values for the Compounds specified.</param>
-        ''' <remarks></remarks>
-        Public Overridable Sub GetPDependentProperty(ByVal props As Object, ByVal pressure As Double, ByVal compIds As Object, ByRef propVals As Object) Implements ICapeThermoCompounds.GetPDependentProperty
+        '''' <summary>
+        '''' Returns the values of pressure-dependent Physical Properties for the specified pure Compounds.
+        '''' </summary>
+        '''' <param name="props">The list of Physical Property identifiers. Valid identifiers for pressure-dependent 
+        '''' Physical Properties are listed in section 7.5.4</param>
+        '''' <param name="pressure">Pressure (in Pa) at which Physical Properties are evaluated</param>
+        '''' <param name="compIds">List of Compound identifiers for which Physical Properties are to be retrieved. 
+        '''' Set compIds to UNDEFINED to denote all Compounds in the component that implements the ICapeThermoCompounds interface.</param>
+        '''' <param name="propVals">Property values for the Compounds specified.</param>
+        '''' <remarks></remarks>
+        Public Overridable Sub GetPDependentProperty(ByVal props As Object, ByVal pressure As Double, ByVal compIds As Object, ByRef propVals As Object) 'Implements ICapeThermoCompounds.GetPDependentProperty
             Dim vals As New ArrayList
             For Each c As String In compIds
                 For Each p As String In props
@@ -5630,48 +5640,48 @@ Final3:
             propVals = arr2
         End Sub
 
-        ''' <summary>
-        ''' Returns the list of supported pressure-dependent properties.
-        ''' </summary>
-        ''' <returns>The list of Physical Property identifiers for all supported pressure-dependent properties. The standard identifiers are listed in section 7.5.4</returns>
-        ''' <remarks>GetPDependentPropList returns identifiers for all the pressure-dependent properties that can
-        ''' be retrieved by the GetPDependentProperty method. If no properties are supported
-        ''' UNDEFINED should be returned. The CAPE-OPEN standards do not define a minimum list
-        ''' of Physical Properties to be made available by a software component that implements the
-        ''' ICapeThermoCompounds interface.
-        ''' A component that implements the ICapeThermoCompounds interface may return identifiers
-        ''' which do not belong to the list defined in section 7.5.4. However, these proprietary
-        ''' identifiers may not be understood by most of the clients of this component.</remarks>
-        Public Overridable Function GetPDependentPropList() As Object Implements ICapeThermoCompounds.GetPDependentPropList
+        '''' <summary>
+        '''' Returns the list of supported pressure-dependent properties.
+        '''' </summary>
+        '''' <returns>The list of Physical Property identifiers for all supported pressure-dependent properties. The standard identifiers are listed in section 7.5.4</returns>
+        '''' <remarks>GetPDependentPropList returns identifiers for all the pressure-dependent properties that can
+        '''' be retrieved by the GetPDependentProperty method. If no properties are supported
+        '''' UNDEFINED should be returned. The CAPE-OPEN standards do not define a minimum list
+        '''' of Physical Properties to be made available by a software component that implements the
+        '''' ICapeThermoCompounds interface.
+        '''' A component that implements the ICapeThermoCompounds interface may return identifiers
+        '''' which do not belong to the list defined in section 7.5.4. However, these proprietary
+        '''' identifiers may not be understood by most of the clients of this component.</remarks>
+        Public Overridable Function GetPDependentPropList() As Object 'Implements ICapeThermoCompounds.GetPDependentPropList
             Return New String() {"boilingPointTemperature"}
         End Function
 
-        ''' <summary>
-        ''' Returns the values of temperature-dependent Physical Properties for the specified pure Compounds.
-        ''' </summary>
-        ''' <param name="props">The list of Physical Property identifiers. Valid identifiers for 
-        ''' temperature-dependent Physical Properties are listed in section 7.5.3</param>
-        ''' <param name="temperature">Temperature (in K) at which properties are evaluated</param>
-        ''' <param name="compIds">List of Compound identifiers for which Physical Properties are to be retrieved. 
-        ''' Set compIds to UNDEFINED to denote all Compounds in the component that implements the ICapeThermoCompounds interface.</param>
-        ''' <param name="propVals">Physical Property values for the Compounds specified.</param>
-        ''' <remarks>The GetTDependentPropList method can be used in order to check which Physical
-        ''' Properties are available.
-        ''' If the number of requested Physical Properties is P and the number of Compounds is C, the
-        ''' propvals array will contain C*P values. The first C will be the values for the first requested
-        ''' Physical Property followed by C values for the second Physical Property, and so on.
-        ''' Properties are returned in a fixed set of units as specified in section 7.5.3.
-        ''' If the compIds argument is set to UNDEFINED this is a request to return property values for
-        ''' all compounds in the component that implements the ICapeThermoCompounds interface
-        ''' with the compound order the same as that returned by the GetCompoundList method. For
-        ''' example, if the interface is implemented by a Property Package component the property
-        ''' request with compIds set to UNDEFINED means all compounds in the Property Package
-        ''' rather than all compounds in the Material Object passed to the Property package.
-        ''' If any Physical Property is not available for one or more Compounds, then undefined values
-        ''' must be returned for those combinations and an ECapeThrmPropertyNotAvailable exception
-        ''' must be raised. If the exception is raised, the client should check all the values returned to
-        ''' determine which is undefined.</remarks>
-        Public Overridable Sub GetTDependentProperty(ByVal props As Object, ByVal temperature As Double, ByVal compIds As Object, ByRef propVals As Object) Implements ICapeThermoCompounds.GetTDependentProperty
+        '''' <summary>
+        '''' Returns the values of temperature-dependent Physical Properties for the specified pure Compounds.
+        '''' </summary>
+        '''' <param name="props">The list of Physical Property identifiers. Valid identifiers for 
+        '''' temperature-dependent Physical Properties are listed in section 7.5.3</param>
+        '''' <param name="temperature">Temperature (in K) at which properties are evaluated</param>
+        '''' <param name="compIds">List of Compound identifiers for which Physical Properties are to be retrieved. 
+        '''' Set compIds to UNDEFINED to denote all Compounds in the component that implements the ICapeThermoCompounds interface.</param>
+        '''' <param name="propVals">Physical Property values for the Compounds specified.</param>
+        '''' <remarks>The GetTDependentPropList method can be used in order to check which Physical
+        '''' Properties are available.
+        '''' If the number of requested Physical Properties is P and the number of Compounds is C, the
+        '''' propvals array will contain C*P values. The first C will be the values for the first requested
+        '''' Physical Property followed by C values for the second Physical Property, and so on.
+        '''' Properties are returned in a fixed set of units as specified in section 7.5.3.
+        '''' If the compIds argument is set to UNDEFINED this is a request to return property values for
+        '''' all compounds in the component that implements the ICapeThermoCompounds interface
+        '''' with the compound order the same as that returned by the GetCompoundList method. For
+        '''' example, if the interface is implemented by a Property Package component the property
+        '''' request with compIds set to UNDEFINED means all compounds in the Property Package
+        '''' rather than all compounds in the Material Object passed to the Property package.
+        '''' If any Physical Property is not available for one or more Compounds, then undefined values
+        '''' must be returned for those combinations and an ECapeThrmPropertyNotAvailable exception
+        '''' must be raised. If the exception is raised, the client should check all the values returned to
+        '''' determine which is undefined.</remarks>
+        Public Overridable Sub GetTDependentProperty(ByVal props As Object, ByVal temperature As Double, ByVal compIds As Object, ByRef propVals As Object) 'Implements ICapeThermoCompounds.GetTDependentProperty
             Dim vals As New ArrayList
             For Each c As String In compIds
                 For Each p As String In props
@@ -5710,20 +5720,20 @@ Final3:
             propVals = arr2
         End Sub
 
-        ''' <summary>
-        ''' Returns the list of supported temperature-dependent Physical Properties.
-        ''' </summary>
-        ''' <returns>The list of Physical Property identifiers for all supported temperature-dependent 
-        ''' properties. The standard identifiers are listed in section 7.5.3</returns>
-        ''' <remarks>GetTDependentPropList returns identifiers for all the temperature-dependent Physical
-        ''' Properties that can be retrieved by the GetTDependentProperty method. If no properties are
-        ''' supported UNDEFINED should be returned. The CAPE-OPEN standards do not define a
-        ''' minimum list of properties to be made available by a software component that implements
-        ''' the ICapeThermoCompounds interface.
-        ''' A component that implements the ICapeThermoCompounds interface may return identifiers
-        ''' which do not belong to the list defined in section 7.5.3. However, these proprietary identifiers
-        ''' may not be understood by most of the clients of this component.</remarks>
-        Public Overridable Function GetTDependentPropList() As Object Implements ICapeThermoCompounds.GetTDependentPropList
+        '''' <summary>
+        '''' Returns the list of supported temperature-dependent Physical Properties.
+        '''' </summary>
+        '''' <returns>The list of Physical Property identifiers for all supported temperature-dependent 
+        '''' properties. The standard identifiers are listed in section 7.5.3</returns>
+        '''' <remarks>GetTDependentPropList returns identifiers for all the temperature-dependent Physical
+        '''' Properties that can be retrieved by the GetTDependentProperty method. If no properties are
+        '''' supported UNDEFINED should be returned. The CAPE-OPEN standards do not define a
+        '''' minimum list of properties to be made available by a software component that implements
+        '''' the ICapeThermoCompounds interface.
+        '''' A component that implements the ICapeThermoCompounds interface may return identifiers
+        '''' which do not belong to the list defined in section 7.5.3. However, these proprietary identifiers
+        '''' may not be understood by most of the clients of this component.</remarks>
+        Public Overridable Function GetTDependentPropList() As Object 'Implements ICapeThermoCompounds.GetTDependentPropList
             Dim vals As New ArrayList
             With vals
                 .Add("heatOfVaporization")
@@ -5745,7 +5755,7 @@ Final3:
             Return arr2
         End Function
 
-        Public Overridable Function GetNumPhases() As Integer Implements ICapeThermoPhases.GetNumPhases
+        Public Overridable Function GetNumPhases() As Integer 'Implements ICapeThermoPhases.GetNumPhases
             Dim i As Integer = 0
             For Each pi As PhaseInfo In Me.PhaseMappings.Values
                 If pi.PhaseLabel <> "Disabled" Then
@@ -5755,57 +5765,57 @@ Final3:
             Return i
         End Function
 
-        ''' <summary>
-        ''' Returns information on an attribute associated with a Phase for the purpose of understanding 
-        ''' what lies behind a Phase label.
-        ''' </summary>
-        ''' <param name="phaseLabel">A (single) Phase label. This must be one of the values returned by GetPhaseList method.</param>
-        ''' <param name="phaseAttribute">One of the Phase attribute identifiers from the table below.</param>
-        ''' <returns>The value corresponding to the Phase attribute identifier – see table below.</returns>
-        ''' <remarks>GetPhaseInfo is intended to allow a PME, or other client, to identify a Phase with an arbitrary
-        ''' label. A PME, or other client, will need to do this to map stream data into a Material
-        ''' Object, or when importing a Property Package. If the client cannot identify the Phase, it can
-        ''' ask the user to provide a mapping based on the values of these properties.
-        ''' The list of supported Phase attributes is defined in the following table:
-        ''' 
-        ''' Phase attribute identifier            Supported values
-        ''' 
-        ''' StateOfAggregation                    One of the following strings:
-        '''                                       Vapor
-        '''                                       Liquid
-        '''                                       Solid
-        '''                                       Unknown
-        ''' 
-        ''' KeyCompoundId                         The identifier of the Compound (compId as returned by GetCompoundList) 
-        '''                                       that is expected to be present in highest concentration in the Phase. 
-        '''                                       May be undefined in which case UNDEFINED should be returned.
-        ''' 
-        ''' ExcludedCompoundId                    The identifier of the Compound (compId as returned by
-        '''                                       GetCompoundList) that is expected to be present in low or zero
-        '''                                       concentration in the Phase. May not be defined in which case
-        '''                                       UNDEFINED should be returned.
-        ''' 
-        ''' DensityDescription                    A description that indicates the density range expected for the Phase.
-        '''                                       One of the following strings or UNDEFINED:
-        '''                                       Heavy
-        '''                                       Light
-        ''' 
-        ''' UserDescription                       A description that helps the user or PME to identify the Phase.
-        '''                                       It can be any string or UNDEFINED.
-        ''' 
-        ''' TypeOfSolid                           A description that provides more information about a solid Phase. For
-        '''                                       Phases with a “Solid” state of aggregation it may be one of the
-        '''                                       following standard strings or UNDEFINED:
-        '''                                       PureSolid
-        '''                                       SolidSolution
-        '''                                       HydrateI
-        '''                                       HydrateII
-        '''                                       HydrateH
-        '''                                       Other values may be returned for solid Phases but these may not be
-        '''                                       understood by most clients.
-        '''                                       For Phases with any other state of aggregation it must be
-        '''                                       UNDEFINED.</remarks>
-        Public Overridable Function GetPhaseInfo(ByVal phaseLabel As String, ByVal phaseAttribute As String) As Object Implements ICapeThermoPhases.GetPhaseInfo
+        '''' <summary>
+        '''' Returns information on an attribute associated with a Phase for the purpose of understanding 
+        '''' what lies behind a Phase label.
+        '''' </summary>
+        '''' <param name="phaseLabel">A (single) Phase label. This must be one of the values returned by GetPhaseList method.</param>
+        '''' <param name="phaseAttribute">One of the Phase attribute identifiers from the table below.</param>
+        '''' <returns>The value corresponding to the Phase attribute identifier – see table below.</returns>
+        '''' <remarks>GetPhaseInfo is intended to allow a PME, or other client, to identify a Phase with an arbitrary
+        '''' label. A PME, or other client, will need to do this to map stream data into a Material
+        '''' Object, or when importing a Property Package. If the client cannot identify the Phase, it can
+        '''' ask the user to provide a mapping based on the values of these properties.
+        '''' The list of supported Phase attributes is defined in the following table:
+        '''' 
+        '''' Phase attribute identifier            Supported values
+        '''' 
+        '''' StateOfAggregation                    One of the following strings:
+        ''''                                       Vapor
+        ''''                                       Liquid
+        ''''                                       Solid
+        ''''                                       Unknown
+        '''' 
+        '''' KeyCompoundId                         The identifier of the Compound (compId as returned by GetCompoundList) 
+        ''''                                       that is expected to be present in highest concentration in the Phase. 
+        ''''                                       May be undefined in which case UNDEFINED should be returned.
+        '''' 
+        '''' ExcludedCompoundId                    The identifier of the Compound (compId as returned by
+        ''''                                       GetCompoundList) that is expected to be present in low or zero
+        ''''                                       concentration in the Phase. May not be defined in which case
+        ''''                                       UNDEFINED should be returned.
+        '''' 
+        '''' DensityDescription                    A description that indicates the density range expected for the Phase.
+        ''''                                       One of the following strings or UNDEFINED:
+        ''''                                       Heavy
+        ''''                                       Light
+        '''' 
+        '''' UserDescription                       A description that helps the user or PME to identify the Phase.
+        ''''                                       It can be any string or UNDEFINED.
+        '''' 
+        '''' TypeOfSolid                           A description that provides more information about a solid Phase. For
+        ''''                                       Phases with a “Solid” state of aggregation it may be one of the
+        ''''                                       following standard strings or UNDEFINED:
+        ''''                                       PureSolid
+        ''''                                       SolidSolution
+        ''''                                       HydrateI
+        ''''                                       HydrateII
+        ''''                                       HydrateH
+        ''''                                       Other values may be returned for solid Phases but these may not be
+        ''''                                       understood by most clients.
+        ''''                                       For Phases with any other state of aggregation it must be
+        ''''                                       UNDEFINED.</remarks>
+        Public Overridable Function GetPhaseInfo(ByVal phaseLabel As String, ByVal phaseAttribute As String) As Object 'Implements ICapeThermoPhases.GetPhaseInfo
             Dim retval As Object = Nothing
             Select Case phaseLabel
                 Case "Vapor"
@@ -5859,29 +5869,29 @@ Final3:
             Return retval
         End Function
 
-        ''' <summary>
-        ''' Returns Phase labels and other important descriptive information for all the Phases supported.
-        ''' </summary>
-        ''' <param name="phaseLabels">he list of Phase labels for the Phases supported. A Phase label can 
-        ''' be any string but each Phase must have a unique label. If, for some reason, no Phases are 
-        ''' supported an UNDEFINED value should be returned for the phaseLabels. The number of Phase labels 
-        ''' must also be equal to the number of Phases returned by the GetNumPhases method.</param>
-        ''' <param name="stateOfAggregation">The physical State of Aggregation associated with each of the 
-        ''' Phases. This must be one of the following strings: ”Vapor”, “Liquid”, “Solid” or “Unknown”. Each 
-        ''' Phase must have a single State of Aggregation. The value must not be left undefined, but may be 
-        ''' set to “Unknown”.</param>
-        ''' <param name="keyCompoundId">The key Compound for the Phase. This must be the Compound identifier 
-        ''' (as returned by GetCompoundList), or it may be undefined in which case a UNDEFINED value is returned. 
-        ''' The key Compound is an indication of the Compound that is expected to be present in high concentration 
-        ''' in the Phase, e.g. water for an aqueous liquid phase. Each Phase can have a single key Compound.</param>
-        ''' <remarks>The Phase label allows the phase to be uniquely identified in methods of the ICapeThermo-
-        ''' Phases interface and other CAPE-OPEN interfaces. The State of Aggregation and key
-        ''' Compound provide a way for the PME, or other client, to interpret the meaning of a Phase
-        ''' label in terms of the physical characteristics of the Phase.
-        ''' All arrays returned by this method must be of the same length, i.e. equal to the number of
-        ''' Phase labels.
-        ''' To get further information about a Phase, use the GetPhaseInfo method.</remarks>
-        Public Overridable Sub GetPhaseList1(ByRef phaseLabels As Object, ByRef stateOfAggregation As Object, ByRef keyCompoundId As Object) Implements ICapeThermoPhases.GetPhaseList
+        '''' <summary>
+        '''' Returns Phase labels and other important descriptive information for all the Phases supported.
+        '''' </summary>
+        '''' <param name="phaseLabels">he list of Phase labels for the Phases supported. A Phase label can 
+        '''' be any string but each Phase must have a unique label. If, for some reason, no Phases are 
+        '''' supported an UNDEFINED value should be returned for the phaseLabels. The number of Phase labels 
+        '''' must also be equal to the number of Phases returned by the GetNumPhases method.</param>
+        '''' <param name="stateOfAggregation">The physical State of Aggregation associated with each of the 
+        '''' Phases. This must be one of the following strings: ”Vapor”, “Liquid”, “Solid” or “Unknown”. Each 
+        '''' Phase must have a single State of Aggregation. The value must not be left undefined, but may be 
+        '''' set to “Unknown”.</param>
+        '''' <param name="keyCompoundId">The key Compound for the Phase. This must be the Compound identifier 
+        '''' (as returned by GetCompoundList), or it may be undefined in which case a UNDEFINED value is returned. 
+        '''' The key Compound is an indication of the Compound that is expected to be present in high concentration 
+        '''' in the Phase, e.g. water for an aqueous liquid phase. Each Phase can have a single key Compound.</param>
+        '''' <remarks>The Phase label allows the phase to be uniquely identified in methods of the ICapeThermo-
+        '''' Phases interface and other CAPE-OPEN interfaces. The State of Aggregation and key
+        '''' Compound provide a way for the PME, or other client, to interpret the meaning of a Phase
+        '''' label in terms of the physical characteristics of the Phase.
+        '''' All arrays returned by this method must be of the same length, i.e. equal to the number of
+        '''' Phase labels.
+        '''' To get further information about a Phase, use the GetPhaseInfo method.</remarks>
+        Public Overridable Sub GetPhaseList1(ByRef phaseLabels As Object, ByRef stateOfAggregation As Object, ByRef keyCompoundId As Object) 'Implements ICapeThermoPhases.GetPhaseList
             Dim pl, sa, kci As New ArrayList, tmpstr As Object
             For Each pin As PhaseInfo In Me.PhaseMappings.Values
                 If pin.PhaseLabel <> "Disabled" Then
@@ -5901,66 +5911,66 @@ Final3:
             keyCompoundId = myarr3
         End Sub
 
-        ''' <summary>
-        ''' This method is used to calculate the natural logarithm of the fugacity coefficients (and
-        ''' optionally their derivatives) in a single Phase mixture. The values of temperature, pressure
-        ''' and composition are specified in the argument list and the results are also returned through
-        ''' the argument list.
-        ''' </summary>
-        ''' <param name="phaseLabel">Phase label of the Phase for which the properties are to be calculated. 
-        ''' The Phase label must be one of the strings returned by the GetPhaseList method on the ICapeThermoPhases interface.</param>
-        ''' <param name="temperature">The temperature (K) for the calculation.</param>
-        ''' <param name="pressure">The pressure (Pa) for the calculation.</param>
-        ''' <param name="moleNumbers">Number of moles of each Compound in the mixture.</param>
-        ''' <param name="fFlags">Code indicating whether natural logarithm of the fugacity coefficients and/or derivatives 
-        ''' should be calculated (see notes).</param>
-        ''' <param name="lnPhi">Natural logarithm of the fugacity coefficients (if requested).</param>
-        ''' <param name="lnPhiDT">Derivatives of natural logarithm of the fugacity coefficients w.r.t. temperature (if requested).</param>
-        ''' <param name="lnPhiDP">Derivatives of natural logarithm of the fugacity coefficients w.r.t. pressure (if requested).</param>
-        ''' <param name="lnPhiDn">Derivatives of natural logarithm of the fugacity coefficients w.r.t. mole numbers (if requested).</param>
-        ''' <remarks>This method is provided to allow the natural logarithm of the fugacity coefficient, which is
-        ''' the most commonly used thermodynamic property, to be calculated and returned in a highly
-        ''' efficient manner.
-        ''' The temperature, pressure and composition (mole numbers) for the calculation are specified
-        ''' by the arguments and are not obtained from the Material Object by a separate request. Likewise,
-        ''' any quantities calculated are returned through the arguments and are not stored in the
-        ''' Material Object. The state of the Material Object is not affected by calling this method. It
-        ''' should be noted however, that prior to calling CalcAndGetLnPhi a valid Material Object
-        ''' must have been defined by calling the SetMaterial method on the
-        ''' ICapeThermoMaterialContext interface of the component that implements the
-        ''' ICapeThermoPropertyRoutine interface. The compounds in the Material Object must have
-        ''' been identified and the number of values supplied in the moleNumbers argument must be
-        ''' equal to the number of Compounds in the Material Object.
-        ''' The fugacity coefficient information is returned as the natural logarithm of the fugacity
-        ''' coefficient. This is because thermodynamic models naturally provide the natural logarithm
-        ''' of this quantity and also a wider range of values may be safely returned.
-        ''' The quantities actually calculated and returned by this method are controlled by an integer
-        ''' code fFlags. The code is formed by summing contributions for the property and each
-        ''' derivative required using the enumerated constants eCapeCalculationCode (defined in the
-        ''' Thermo version 1.1 IDL) shown in the following table. For example, to calculate log
-        ''' fugacity coefficients and their T-derivatives the fFlags argument would be set to
-        ''' CAPE_LOG_FUGACITY_COEFFICIENTS + CAPE_T_DERIVATIVE.
-        ''' 
-        '''                                       code                            numerical value
-        ''' no calculation                        CAPE_NO_CALCULATION             0
-        ''' log fugacity coefficients             CAPE_LOG_FUGACITY_COEFFICIENTS  1
-        ''' T-derivative                          CAPE_T_DERIVATIVE               2
-        ''' P-derivative                          CAPE_P_DERIVATIVE               4
-        ''' mole number derivatives               CAPE_MOLE_NUMBERS_DERIVATIVES   8
-        ''' 
-        ''' If CalcAndGetLnPhi is called with fFlags set to CAPE_NO_CALCULATION no property
-        ''' values are returned.
-        ''' A typical sequence of operations for this method when implemented by a Property Package
-        ''' component would be:
-        ''' - Check that the phaseLabel specified is valid.
-        ''' - Check that the moleNumbers array contains the number of values expected
-        ''' (should be consistent with the last call to the SetMaterial method).
-        ''' - Calculate the requested properties/derivatives at the T/P/composition specified in
-        ''' the argument list.
-        ''' - Store values for the properties/derivatives in the corresponding arguments.
-        ''' Note that this calculation can be carried out irrespective of whether the Phase actually exists
-        ''' in the Material Object.</remarks>
-        Public Overridable Sub CalcAndGetLnPhi(ByVal phaseLabel As String, ByVal temperature As Double, ByVal pressure As Double, ByVal moleNumbers As Object, ByVal fFlags As Integer, ByRef lnPhi As Object, ByRef lnPhiDT As Object, ByRef lnPhiDP As Object, ByRef lnPhiDn As Object) Implements ICapeThermoPropertyRoutine.CalcAndGetLnPhi
+        '''' <summary>
+        '''' This method is used to calculate the natural logarithm of the fugacity coefficients (and
+        '''' optionally their derivatives) in a single Phase mixture. The values of temperature, pressure
+        '''' and composition are specified in the argument list and the results are also returned through
+        '''' the argument list.
+        '''' </summary>
+        '''' <param name="phaseLabel">Phase label of the Phase for which the properties are to be calculated. 
+        '''' The Phase label must be one of the strings returned by the GetPhaseList method on the ICapeThermoPhases interface.</param>
+        '''' <param name="temperature">The temperature (K) for the calculation.</param>
+        '''' <param name="pressure">The pressure (Pa) for the calculation.</param>
+        '''' <param name="moleNumbers">Number of moles of each Compound in the mixture.</param>
+        '''' <param name="fFlags">Code indicating whether natural logarithm of the fugacity coefficients and/or derivatives 
+        '''' should be calculated (see notes).</param>
+        '''' <param name="lnPhi">Natural logarithm of the fugacity coefficients (if requested).</param>
+        '''' <param name="lnPhiDT">Derivatives of natural logarithm of the fugacity coefficients w.r.t. temperature (if requested).</param>
+        '''' <param name="lnPhiDP">Derivatives of natural logarithm of the fugacity coefficients w.r.t. pressure (if requested).</param>
+        '''' <param name="lnPhiDn">Derivatives of natural logarithm of the fugacity coefficients w.r.t. mole numbers (if requested).</param>
+        '''' <remarks>This method is provided to allow the natural logarithm of the fugacity coefficient, which is
+        '''' the most commonly used thermodynamic property, to be calculated and returned in a highly
+        '''' efficient manner.
+        '''' The temperature, pressure and composition (mole numbers) for the calculation are specified
+        '''' by the arguments and are not obtained from the Material Object by a separate request. Likewise,
+        '''' any quantities calculated are returned through the arguments and are not stored in the
+        '''' Material Object. The state of the Material Object is not affected by calling this method. It
+        '''' should be noted however, that prior to calling CalcAndGetLnPhi a valid Material Object
+        '''' must have been defined by calling the SetMaterial method on the
+        '''' ICapeThermoMaterialContext interface of the component that implements the
+        '''' ICapeThermoPropertyRoutine interface. The compounds in the Material Object must have
+        '''' been identified and the number of values supplied in the moleNumbers argument must be
+        '''' equal to the number of Compounds in the Material Object.
+        '''' The fugacity coefficient information is returned as the natural logarithm of the fugacity
+        '''' coefficient. This is because thermodynamic models naturally provide the natural logarithm
+        '''' of this quantity and also a wider range of values may be safely returned.
+        '''' The quantities actually calculated and returned by this method are controlled by an integer
+        '''' code fFlags. The code is formed by summing contributions for the property and each
+        '''' derivative required using the enumerated constants eCapeCalculationCode (defined in the
+        '''' Thermo version 1.1 IDL) shown in the following table. For example, to calculate log
+        '''' fugacity coefficients and their T-derivatives the fFlags argument would be set to
+        '''' CAPE_LOG_FUGACITY_COEFFICIENTS + CAPE_T_DERIVATIVE.
+        '''' 
+        ''''                                       code                            numerical value
+        '''' no calculation                        CAPE_NO_CALCULATION             0
+        '''' log fugacity coefficients             CAPE_LOG_FUGACITY_COEFFICIENTS  1
+        '''' T-derivative                          CAPE_T_DERIVATIVE               2
+        '''' P-derivative                          CAPE_P_DERIVATIVE               4
+        '''' mole number derivatives               CAPE_MOLE_NUMBERS_DERIVATIVES   8
+        '''' 
+        '''' If CalcAndGetLnPhi is called with fFlags set to CAPE_NO_CALCULATION no property
+        '''' values are returned.
+        '''' A typical sequence of operations for this method when implemented by a Property Package
+        '''' component would be:
+        '''' - Check that the phaseLabel specified is valid.
+        '''' - Check that the moleNumbers array contains the number of values expected
+        '''' (should be consistent with the last call to the SetMaterial method).
+        '''' - Calculate the requested properties/derivatives at the T/P/composition specified in
+        '''' the argument list.
+        '''' - Store values for the properties/derivatives in the corresponding arguments.
+        '''' Note that this calculation can be carried out irrespective of whether the Phase actually exists
+        '''' in the Material Object.</remarks>
+        Public Overridable Sub CalcAndGetLnPhi(ByVal phaseLabel As String, ByVal temperature As Double, ByVal pressure As Double, ByVal moleNumbers As Object, ByVal fFlags As Integer, ByRef lnPhi As Object, ByRef lnPhiDT As Object, ByRef lnPhiDP As Object, ByRef lnPhiDn As Object) 'Implements ICapeThermoPropertyRoutine.CalcAndGetLnPhi
             Select Case fFlags
                 Case eCapeCalculationCode.CAPE_LOG_FUGACITY_COEFFICIENTS
                     'normalize mole fractions
@@ -5987,70 +5997,70 @@ Final3:
             End Select
         End Sub
 
-        ''' <summary>
-        ''' CalcSinglePhaseProp is used to calculate properties and property derivatives of a mixture in
-        ''' a single Phase at the current values of temperature, pressure and composition set in the
-        ''' Material Object. CalcSinglePhaseProp does not perform phase Equilibrium Calculations.
-        ''' </summary>
-        ''' <param name="props">The list of identifiers for the single-phase properties or derivatives to 
-        ''' be calculated. See sections 7.5.5 and 7.6 for the standard identifiers.</param>
-        ''' <param name="phaseLabel">Phase label of the Phase for which the properties are to be calculated. 
-        ''' The Phase label must be one of the strings returned by the GetPhaseList method on the 
-        ''' ICapeThermoPhases interface and the phase must be present in the Material Object.</param>
-        ''' <remarks>CalcSinglePhaseProp calculates properties, such as enthalpy or viscosity that are defined for
-        ''' a single Phase. Physical Properties that depend on more than one Phase, for example surface
-        ''' tension or K-values, are handled by CalcTwoPhaseProp method.
-        ''' Components that implement this method must get the input specification for the calculation
-        ''' (temperature, pressure and composition) from the associated Material Object and set the
-        ''' results in the Material Object.
-        ''' Thermodynamic and Physical Properties Components, such as a Property Package or Property
-        ''' Calculator, must implement the ICapeThermoMaterialContext interface so that an
-        ''' ICapeThermoMaterial interface can be passed via the SetMaterial method.
-        ''' The component that implements the ICapeThermoPropertyRoutine interface (e.g. a Property
-        ''' Package or Property Calculator) must also implement the ICapeThermoPhases interface so
-        ''' that it is possible to get a list of supported phases. The phaseLabel passed to this method
-        ''' must be one of the phase labels returned by the GetPhaseList method of the
-        ''' ICapeThermoPhases interface and it must also be present in the Material Object, ie. one of
-        ''' the phase labels returned by the GetPresentPhases method of the ICapeThermoMaterial
-        ''' interface. This latter condition will be satisfied if the phase is made present explicitly by
-        ''' calling the SetPresentPhases method or if any phase properties have been set by calling the
-        ''' SetSinglePhaseProp or SetTwoPhaseProp methods.
-        ''' A typical sequence of operations for CalcSinglePhaseProp when implemented by a Property
-        ''' Package component would be:
-        ''' - Check that the phaseLabel specified is valid.
-        ''' - Use the GetTPFraction method (of the Material Object specified in the last call to the
-        ''' SetMaterial method) to get the temperature, pressure and composition of the
-        ''' specified Phase.
-        ''' - Calculate the properties.
-        ''' - Store values for the properties of the Phase in the Material Object using the
-        ''' SetSinglePhaseProp method of the ICapeThermoMaterial interface.
-        ''' CalcSinglePhaseProp will request the input Property values it requires from the Material
-        ''' Object through GetSinglePhaseProp calls. If a requested property is not available, the
-        ''' exception raised will be ECapeThrmPropertyNotAvailable. If this error occurs then the
-        ''' Property Package can return it to the client, or request a different property. Material Object
-        ''' implementations must be able to supply property values using the client’s choice of basis by
-        ''' implementing conversion from one basis to another.
-        ''' Clients should not assume that Phase fractions and Compound fractions in a Material Object
-        ''' are normalised. Fraction values may also lie outside the range 0 to 1. If fractions are not
-        ''' normalised, or are outside the expected range, it is the responsibility of the Property Package
-        ''' to decide how to deal with the situation.
-        ''' It is recommended that properties are requested one at a time in order to simplify error
-        ''' handling. However, it is recognised that there are cases where the potential efficiency gains
-        ''' of requesting several properties simultaneously are more important. One such example
-        ''' might be when a property and its derivatives are required.
-        ''' If a client uses multiple properties in a call and one of them fails then the whole call should
-        ''' be considered to have failed. This implies that no value should be written back to the Material
-        ''' Object by the Property Package until it is known that the whole request can be satisfied.
-        ''' It is likely that a PME might request values of properties for a Phase at conditions of temperature,
-        ''' pressure and composition where the Phase does not exist (according to the
-        ''' mathematical/physical models used to represent properties). The exception
-        ''' ECapeThrmPropertyNotAvailable may be raised or an extrapolated value may be returned.
-        ''' It is responsibility of the implementer to decide how to handle this circumstance.</remarks>
-        Public Overridable Sub CalcSinglePhaseProp(ByVal props As Object, ByVal phaseLabel As String) Implements ICapeThermoPropertyRoutine.CalcSinglePhaseProp
+        '''' <summary>
+        '''' CalcSinglePhaseProp is used to calculate properties and property derivatives of a mixture in
+        '''' a single Phase at the current values of temperature, pressure and composition set in the
+        '''' Material Object. CalcSinglePhaseProp does not perform phase Equilibrium Calculations.
+        '''' </summary>
+        '''' <param name="props">The list of identifiers for the single-phase properties or derivatives to 
+        '''' be calculated. See sections 7.5.5 and 7.6 for the standard identifiers.</param>
+        '''' <param name="phaseLabel">Phase label of the Phase for which the properties are to be calculated. 
+        '''' The Phase label must be one of the strings returned by the GetPhaseList method on the 
+        '''' ICapeThermoPhases interface and the phase must be present in the Material Object.</param>
+        '''' <remarks>CalcSinglePhaseProp calculates properties, such as enthalpy or viscosity that are defined for
+        '''' a single Phase. Physical Properties that depend on more than one Phase, for example surface
+        '''' tension or K-values, are handled by CalcTwoPhaseProp method.
+        '''' Components that implement this method must get the input specification for the calculation
+        '''' (temperature, pressure and composition) from the associated Material Object and set the
+        '''' results in the Material Object.
+        '''' Thermodynamic and Physical Properties Components, such as a Property Package or Property
+        '''' Calculator, must implement the ICapeThermoMaterialContext interface so that an
+        '''' ICapeThermoMaterial interface can be passed via the SetMaterial method.
+        '''' The component that implements the ICapeThermoPropertyRoutine interface (e.g. a Property
+        '''' Package or Property Calculator) must also implement the ICapeThermoPhases interface so
+        '''' that it is possible to get a list of supported phases. The phaseLabel passed to this method
+        '''' must be one of the phase labels returned by the GetPhaseList method of the
+        '''' ICapeThermoPhases interface and it must also be present in the Material Object, ie. one of
+        '''' the phase labels returned by the GetPresentPhases method of the ICapeThermoMaterial
+        '''' interface. This latter condition will be satisfied if the phase is made present explicitly by
+        '''' calling the SetPresentPhases method or if any phase properties have been set by calling the
+        '''' SetSinglePhaseProp or SetTwoPhaseProp methods.
+        '''' A typical sequence of operations for CalcSinglePhaseProp when implemented by a Property
+        '''' Package component would be:
+        '''' - Check that the phaseLabel specified is valid.
+        '''' - Use the GetTPFraction method (of the Material Object specified in the last call to the
+        '''' SetMaterial method) to get the temperature, pressure and composition of the
+        '''' specified Phase.
+        '''' - Calculate the properties.
+        '''' - Store values for the properties of the Phase in the Material Object using the
+        '''' SetSinglePhaseProp method of the ICapeThermoMaterial interface.
+        '''' CalcSinglePhaseProp will request the input Property values it requires from the Material
+        '''' Object through GetSinglePhaseProp calls. If a requested property is not available, the
+        '''' exception raised will be ECapeThrmPropertyNotAvailable. If this error occurs then the
+        '''' Property Package can return it to the client, or request a different property. Material Object
+        '''' implementations must be able to supply property values using the client’s choice of basis by
+        '''' implementing conversion from one basis to another.
+        '''' Clients should not assume that Phase fractions and Compound fractions in a Material Object
+        '''' are normalised. Fraction values may also lie outside the range 0 to 1. If fractions are not
+        '''' normalised, or are outside the expected range, it is the responsibility of the Property Package
+        '''' to decide how to deal with the situation.
+        '''' It is recommended that properties are requested one at a time in order to simplify error
+        '''' handling. However, it is recognised that there are cases where the potential efficiency gains
+        '''' of requesting several properties simultaneously are more important. One such example
+        '''' might be when a property and its derivatives are required.
+        '''' If a client uses multiple properties in a call and one of them fails then the whole call should
+        '''' be considered to have failed. This implies that no value should be written back to the Material
+        '''' Object by the Property Package until it is known that the whole request can be satisfied.
+        '''' It is likely that a PME might request values of properties for a Phase at conditions of temperature,
+        '''' pressure and composition where the Phase does not exist (according to the
+        '''' mathematical/physical models used to represent properties). The exception
+        '''' ECapeThrmPropertyNotAvailable may be raised or an extrapolated value may be returned.
+        '''' It is responsibility of the implementer to decide how to handle this circumstance.</remarks>
+        Public Overridable Sub CalcSinglePhaseProp(ByVal props As Object, ByVal phaseLabel As String) 'Implements ICapeThermoPropertyRoutine.CalcSinglePhaseProp
 
-            If Not My.Application.CAPEOPENMode Then
+            'If Not My.Application.CAPEOPENMode Then
 
-                For Each pi As PhaseInfo In Me.PhaseMappings.Values
+            For Each pi As PhaseInfo In Me.PhaseMappings.Values
                     If phaseLabel = pi.PhaseLabel Then
                         For Each p As String In props
                             Me.DW_CalcProp(p, pi.DWPhaseID)
@@ -6060,281 +6070,281 @@ Final3:
                     End If
                 Next
 
-            Else
+            'Else
 
-                Dim res As New ArrayList
-                Dim comps As New ArrayList
+            '    Dim res As New ArrayList
+            '    Dim comps As New ArrayList
 
-                For Each c As Substance In Me.CurrentMaterialStream.Phases(0).Components.Values
-                    comps.Add(c.Name)
-                Next
+            '    For Each c As Substance In Me.CurrentMaterialStream.Phases(0).Components.Values
+            '        comps.Add(c.Name)
+            '    Next
 
-                Dim f As Integer = -1
-                Dim phs As Phase
-                Select Case phaseLabel.ToLower
-                    Case "overall"
-                        f = 0
-                        phs = Phase.Mixture
-                    Case Else
-                        For Each pi As PhaseInfo In Me.PhaseMappings.Values
-                            If phaseLabel = pi.PhaseLabel Then
-                                f = pi.DWPhaseIndex
-                                phs = pi.DWPhaseID
-                                Exit For
-                            End If
-                        Next
-                End Select
+            '    Dim f As Integer = -1
+            '    Dim phs As Phase
+            '    Select Case phaseLabel.ToLower
+            '        Case "overall"
+            '            f = 0
+            '            phs = Phase.Mixture
+            '        Case Else
+            '            For Each pi As PhaseInfo In Me.PhaseMappings.Values
+            '                If phaseLabel = pi.PhaseLabel Then
+            '                    f = pi.DWPhaseIndex
+            '                    phs = pi.DWPhaseID
+            '                    Exit For
+            '                End If
+            '            Next
+            '    End Select
 
-                If f = -1 Then
-                    Dim ex As New Exception("Invalid Phase ID", New ArgumentException)
-                    Dim hcode As Integer = 0
-                    ThrowCAPEException(ex, "Error", ex.Message, "ICapeThermoMaterial", ex.Source, ex.StackTrace, "CalcSinglePhaseProp", hcode)
-                End If
+            '    If f = -1 Then
+            '        Dim ex As New Exception("Invalid Phase ID", New ArgumentException)
+            '        Dim hcode As Integer = 0
+            '        ThrowCAPEException(ex, "Error", ex.Message, "ICapeThermoMaterial", ex.Source, ex.StackTrace, "CalcSinglePhaseProp", hcode)
+            '    End If
 
-                Dim basis As String = "Mole"
+            '    Dim basis As String = "Mole"
 
-                For Each [property] As String In props
+            '    For Each [property] As String In props
 
-                    Dim mymo As ICapeThermoMaterial = _como
-                    Dim T As Double
-                    Dim P As Double
-                    Dim Vx As Object = Nothing
+            '        Dim mymo As ICapeThermoMaterial = _como
+            '        Dim T As Double
+            '        Dim P As Double
+            '        Dim Vx As Object = Nothing
 
-                    mymo.GetTPFraction(phaseLabel, T, P, Vx)
+            '        mymo.GetTPFraction(phaseLabel, T, P, Vx)
 
-                    Me.CurrentMaterialStream.Phases(0).SPMProperties.temperature = T
-                    Me.CurrentMaterialStream.Phases(0).SPMProperties.pressure = P
-                    Me.CurrentMaterialStream.SetPhaseComposition(Vx, phs)
+            '        Me.CurrentMaterialStream.Phases(0).SPMProperties.temperature = T
+            '        Me.CurrentMaterialStream.Phases(0).SPMProperties.pressure = P
+            '        Me.CurrentMaterialStream.SetPhaseComposition(Vx, phs)
 
-                    If phs = Phase.Solid Then
-                        Me.DW_CalcSolidPhaseProps()
-                    Else
-                        Me.DW_CalcProp([property], phs)
-                    End If
+            '        If phs = Phase.Solid Then
+            '            Me.DW_CalcSolidPhaseProps()
+            '        Else
+            '            Me.DW_CalcProp([property], phs)
+            '        End If
 
-                    basis = "Mole"
-                    Select Case [property].ToLower
-                        Case "compressibilityfactor"
-                            res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.compressibilityFactor.GetValueOrDefault)
-                            basis = ""
-                        Case "heatofvaporization"
-                        Case "heatcapacity", "heatcapacitycp"
-                            Select Case basis
-                                Case "Molar", "molar", "mole", "Mole"
-                                    res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.heatCapacityCp.GetValueOrDefault * Me.AUX_MMM(phs))
-                                Case "Mass", "mass"
-                                    res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.heatCapacityCp.GetValueOrDefault * 1000)
-                            End Select
-                        Case "heatcapacitycv"
-                            Select Case basis
-                                Case "Molar", "molar", "mole", "Mole"
-                                    res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.heatCapacityCv.GetValueOrDefault * Me.AUX_MMM(phs))
-                                Case "Mass", "mass"
-                                    res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.heatCapacityCv.GetValueOrDefault * 1000)
-                            End Select
-                        Case "idealgasheatcapacity"
-                            If f = 1 Then
-                                res.Add(Me.CurrentMaterialStream.PropertyPackage.AUX_CPm(Phase.Liquid, Me.CurrentMaterialStream.Phases(0).SPMProperties.temperature * 1000))
-                            ElseIf f = 2 Then
-                                res.Add(Me.CurrentMaterialStream.PropertyPackage.AUX_CPm(Phase.Vapor, Me.CurrentMaterialStream.Phases(0).SPMProperties.temperature * 1000))
-                            Else
-                                res.Add(Me.CurrentMaterialStream.PropertyPackage.AUX_CPm(Phase.Solid, Me.CurrentMaterialStream.Phases(0).SPMProperties.temperature * 1000))
-                            End If
-                        Case "idealgasenthalpy"
-                            If f = 1 Then
-                                res.Add(Me.CurrentMaterialStream.PropertyPackage.RET_Hid(298.15, Me.CurrentMaterialStream.Phases(0).SPMProperties.temperature.GetValueOrDefault * 1000, Phase.Liquid))
-                            ElseIf f = 2 Then
-                                res.Add(Me.CurrentMaterialStream.PropertyPackage.RET_Hid(298.15, Me.CurrentMaterialStream.Phases(0).SPMProperties.temperature.GetValueOrDefault * 1000, Phase.Vapor))
-                            Else
-                                res.Add(Me.CurrentMaterialStream.PropertyPackage.RET_Hid(298.15, Me.CurrentMaterialStream.Phases(0).SPMProperties.temperature.GetValueOrDefault * 1000, Phase.Solid))
-                            End If
-                        Case "excessenthalpy"
-                            Select Case basis
-                                Case "Molar", "molar", "mole", "Mole"
-                                    res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.excessEnthalpy.GetValueOrDefault * Me.AUX_MMM(phs))
-                                Case "Mass", "mass"
-                                    res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.excessEnthalpy.GetValueOrDefault * 1000)
-                            End Select
-                        Case "excessentropy"
-                            Select Case basis
-                                Case "Molar", "molar", "mole", "Mole"
-                                    res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.excessEntropy.GetValueOrDefault * Me.AUX_MMM(phs))
-                                Case "Mass", "mass"
-                                    res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.excessEntropy.GetValueOrDefault * 1000)
-                            End Select
-                        Case "viscosity"
-                            res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.viscosity.GetValueOrDefault)
-                            basis = ""
-                        Case "thermalconductivity"
-                            res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.thermalConductivity.GetValueOrDefault)
-                            basis = ""
-                        Case "fugacity"
-                            For Each c As String In comps
-                                res.Add(Me.CurrentMaterialStream.Phases(f).Components(c).MolarFraction.GetValueOrDefault * Me.CurrentMaterialStream.Phases(f).Components(c).FugacityCoeff.GetValueOrDefault * Me.CurrentMaterialStream.Phases(0).SPMProperties.pressure.GetValueOrDefault)
-                            Next
-                            basis = ""
-                        Case "activity"
-                            For Each c As String In comps
-                                res.Add(Me.CurrentMaterialStream.Phases(f).Components(c).ActivityCoeff.GetValueOrDefault * Me.CurrentMaterialStream.Phases(f).Components(c).MolarFraction.GetValueOrDefault)
-                            Next
-                            basis = ""
-                        Case "fugacitycoefficient"
-                            For Each c As String In comps
-                                res.Add(Me.CurrentMaterialStream.Phases(f).Components(c).FugacityCoeff.GetValueOrDefault)
-                            Next
-                            basis = ""
-                        Case "activitycoefficient"
-                            For Each c As String In comps
-                                res.Add(Me.CurrentMaterialStream.Phases(f).Components(c).ActivityCoeff.GetValueOrDefault)
-                            Next
-                            basis = ""
-                        Case "logfugacitycoefficient"
-                            For Each c As String In comps
-                                res.Add(Math.Log(Me.CurrentMaterialStream.Phases(f).Components(c).FugacityCoeff.GetValueOrDefault))
-                            Next
-                            basis = ""
-                        Case "volume"
-                            res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.molecularWeight.GetValueOrDefault / Me.CurrentMaterialStream.Phases(f).SPMProperties.density.GetValueOrDefault / 1000)
-                        Case "density"
-                            res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.density.GetValueOrDefault / Me.AUX_MMM(phs) * 1000)
-                        Case "enthalpy", "enthalpynf"
-                            Select Case basis
-                                Case "Molar", "molar", "mole", "Mole"
-                                    Dim val = Me.CurrentMaterialStream.Phases(f).SPMProperties.molecularWeight.GetValueOrDefault
-                                    If val = 0.0# Then
-                                        res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.molar_enthalpy.GetValueOrDefault)
-                                    Else
-                                        res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.enthalpy.GetValueOrDefault * val)
-                                    End If
-                                Case "Mass", "mass"
-                                    res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.enthalpy.GetValueOrDefault * 1000)
-                            End Select
-                        Case "entropy", "entropynf"
-                            Select Case basis
-                                Case "Molar", "molar", "mole", "Mole"
-                                    Dim val = Me.CurrentMaterialStream.Phases(f).SPMProperties.molecularWeight.GetValueOrDefault
-                                    If val = 0.0# Then
-                                        res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.molar_entropy.GetValueOrDefault)
-                                    Else
-                                        res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.entropy.GetValueOrDefault * val)
-                                    End If
-                                Case "Mass", "mass"
-                                    res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.entropy.GetValueOrDefault * 1000)
-                            End Select
-                        Case "enthalpyf"
-                            Select Case basis
-                                Case "Molar", "molar", "mole", "Mole"
-                                    Dim val = Me.CurrentMaterialStream.Phases(f).SPMProperties.molecularWeight.GetValueOrDefault
-                                    If val = 0.0# Then
-                                        res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.molar_enthalpyF.GetValueOrDefault)
-                                    Else
-                                        res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.enthalpyF.GetValueOrDefault * val)
-                                    End If
-                                Case "Mass", "mass"
-                                    res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.enthalpyF.GetValueOrDefault * 1000)
-                            End Select
-                        Case "entropyf"
-                            Select Case basis
-                                Case "Molar", "molar", "mole", "Mole"
-                                    Dim val = Me.CurrentMaterialStream.Phases(f).SPMProperties.molecularWeight.GetValueOrDefault
-                                    If val = 0.0# Then
-                                        res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.molar_entropyF.GetValueOrDefault)
-                                    Else
-                                        res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.entropyF.GetValueOrDefault * val)
-                                    End If
-                                Case "Mass", "mass"
-                                    res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.entropy.GetValueOrDefault * 1000)
-                            End Select
-                        Case "moles"
-                            res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.molarflow.GetValueOrDefault)
-                            basis = ""
-                        Case "mass"
-                            res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.massflow.GetValueOrDefault)
-                            basis = ""
-                        Case "molecularweight"
-                            res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.molecularWeight.GetValueOrDefault)
-                            basis = ""
-                        Case "temperature"
-                            res.Add(Me.CurrentMaterialStream.Phases(0).SPMProperties.temperature.GetValueOrDefault)
-                            basis = ""
-                        Case "pressure"
-                            res.Add(Me.CurrentMaterialStream.Phases(0).SPMProperties.pressure.GetValueOrDefault)
-                            basis = ""
-                        Case "flow"
-                            Select Case basis
-                                Case "Molar", "molar", "mole", "Mole"
-                                    For Each c As String In comps
-                                        res.Add(Me.CurrentMaterialStream.Phases(f).Components(c).MolarFlow.GetValueOrDefault)
-                                    Next
-                                Case "Mass", "mass"
-                                    For Each c As String In comps
-                                        res.Add(Me.CurrentMaterialStream.Phases(f).Components(c).MassFlow.GetValueOrDefault)
-                                    Next
-                            End Select
-                        Case "fraction", "massfraction", "molarfraction"
-                            Select Case basis
-                                Case "Molar", "molar", "mole", "Mole"
-                                    For Each c As String In comps
-                                        res.Add(Me.CurrentMaterialStream.Phases(f).Components(c).MolarFraction.GetValueOrDefault)
-                                    Next
-                                Case "Mass", "mass"
-                                    For Each c As String In comps
-                                        res.Add(Me.CurrentMaterialStream.Phases(f).Components(c).MassFraction.GetValueOrDefault)
-                                    Next
-                                Case ""
-                                    If [property].ToLower.Contains("mole") Then
-                                        For Each c As String In comps
-                                            res.Add(Me.CurrentMaterialStream.Phases(f).Components(c).MolarFraction.GetValueOrDefault)
-                                        Next
-                                    ElseIf [property].ToLower.Contains("mass") Then
-                                        For Each c As String In comps
-                                            res.Add(Me.CurrentMaterialStream.Phases(f).Components(c).MassFraction.GetValueOrDefault)
-                                        Next
-                                    End If
-                            End Select
-                        Case "concentration"
-                            For Each c As String In comps
-                                res.Add(Me.CurrentMaterialStream.Phases(f).Components(c).MassFlow.GetValueOrDefault / Me.CurrentMaterialStream.Phases(f).SPMProperties.volumetric_flow.GetValueOrDefault)
-                            Next
-                            basis = ""
-                        Case "molarity"
-                            For Each c As String In comps
-                                res.Add(Me.CurrentMaterialStream.Phases(f).Components(c).MolarFlow.GetValueOrDefault / Me.CurrentMaterialStream.Phases(f).SPMProperties.volumetric_flow.GetValueOrDefault)
-                            Next
-                            basis = ""
-                        Case "phasefraction"
-                            Select Case basis
-                                Case "Molar", "molar", "mole", "Mole"
-                                    res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.molarfraction.GetValueOrDefault)
-                                Case "Mass", "mass"
-                                    res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.massfraction.GetValueOrDefault)
-                            End Select
-                        Case "totalflow"
-                            Select Case basis
-                                Case "Molar", "molar", "mole", "Mole"
-                                    res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.molarflow.GetValueOrDefault)
-                                Case "Mass", "mass"
-                                    res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.massflow.GetValueOrDefault)
-                            End Select
-                        Case Else
-                            Dim ex = New NotImplementedException()
-                            Dim hcode As Integer = 0
-                            ThrowCAPEException(ex, "Error", ex.Message, "ICapeThermoMaterial", ex.Source, ex.StackTrace, "CalcSinglePhaseProp", hcode)
-                    End Select
+            '        basis = "Mole"
+            '        Select Case [property].ToLower
+            '            Case "compressibilityfactor"
+            '                res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.compressibilityFactor.GetValueOrDefault)
+            '                basis = ""
+            '            Case "heatofvaporization"
+            '            Case "heatcapacity", "heatcapacitycp"
+            '                Select Case basis
+            '                    Case "Molar", "molar", "mole", "Mole"
+            '                        res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.heatCapacityCp.GetValueOrDefault * Me.AUX_MMM(phs))
+            '                    Case "Mass", "mass"
+            '                        res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.heatCapacityCp.GetValueOrDefault * 1000)
+            '                End Select
+            '            Case "heatcapacitycv"
+            '                Select Case basis
+            '                    Case "Molar", "molar", "mole", "Mole"
+            '                        res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.heatCapacityCv.GetValueOrDefault * Me.AUX_MMM(phs))
+            '                    Case "Mass", "mass"
+            '                        res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.heatCapacityCv.GetValueOrDefault * 1000)
+            '                End Select
+            '            Case "idealgasheatcapacity"
+            '                If f = 1 Then
+            '                    res.Add(Me.CurrentMaterialStream.PropertyPackage.AUX_CPm(Phase.Liquid, Me.CurrentMaterialStream.Phases(0).SPMProperties.temperature * 1000))
+            '                ElseIf f = 2 Then
+            '                    res.Add(Me.CurrentMaterialStream.PropertyPackage.AUX_CPm(Phase.Vapor, Me.CurrentMaterialStream.Phases(0).SPMProperties.temperature * 1000))
+            '                Else
+            '                    res.Add(Me.CurrentMaterialStream.PropertyPackage.AUX_CPm(Phase.Solid, Me.CurrentMaterialStream.Phases(0).SPMProperties.temperature * 1000))
+            '                End If
+            '            Case "idealgasenthalpy"
+            '                If f = 1 Then
+            '                    res.Add(Me.CurrentMaterialStream.PropertyPackage.RET_Hid(298.15, Me.CurrentMaterialStream.Phases(0).SPMProperties.temperature.GetValueOrDefault * 1000, Phase.Liquid))
+            '                ElseIf f = 2 Then
+            '                    res.Add(Me.CurrentMaterialStream.PropertyPackage.RET_Hid(298.15, Me.CurrentMaterialStream.Phases(0).SPMProperties.temperature.GetValueOrDefault * 1000, Phase.Vapor))
+            '                Else
+            '                    res.Add(Me.CurrentMaterialStream.PropertyPackage.RET_Hid(298.15, Me.CurrentMaterialStream.Phases(0).SPMProperties.temperature.GetValueOrDefault * 1000, Phase.Solid))
+            '                End If
+            '            Case "excessenthalpy"
+            '                Select Case basis
+            '                    Case "Molar", "molar", "mole", "Mole"
+            '                        res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.excessEnthalpy.GetValueOrDefault * Me.AUX_MMM(phs))
+            '                    Case "Mass", "mass"
+            '                        res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.excessEnthalpy.GetValueOrDefault * 1000)
+            '                End Select
+            '            Case "excessentropy"
+            '                Select Case basis
+            '                    Case "Molar", "molar", "mole", "Mole"
+            '                        res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.excessEntropy.GetValueOrDefault * Me.AUX_MMM(phs))
+            '                    Case "Mass", "mass"
+            '                        res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.excessEntropy.GetValueOrDefault * 1000)
+            '                End Select
+            '            Case "viscosity"
+            '                res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.viscosity.GetValueOrDefault)
+            '                basis = ""
+            '            Case "thermalconductivity"
+            '                res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.thermalConductivity.GetValueOrDefault)
+            '                basis = ""
+            '            Case "fugacity"
+            '                For Each c As String In comps
+            '                    res.Add(Me.CurrentMaterialStream.Phases(f).Components(c).MolarFraction.GetValueOrDefault * Me.CurrentMaterialStream.Phases(f).Components(c).FugacityCoeff.GetValueOrDefault * Me.CurrentMaterialStream.Phases(0).SPMProperties.pressure.GetValueOrDefault)
+            '                Next
+            '                basis = ""
+            '            Case "activity"
+            '                For Each c As String In comps
+            '                    res.Add(Me.CurrentMaterialStream.Phases(f).Components(c).ActivityCoeff.GetValueOrDefault * Me.CurrentMaterialStream.Phases(f).Components(c).MolarFraction.GetValueOrDefault)
+            '                Next
+            '                basis = ""
+            '            Case "fugacitycoefficient"
+            '                For Each c As String In comps
+            '                    res.Add(Me.CurrentMaterialStream.Phases(f).Components(c).FugacityCoeff.GetValueOrDefault)
+            '                Next
+            '                basis = ""
+            '            Case "activitycoefficient"
+            '                For Each c As String In comps
+            '                    res.Add(Me.CurrentMaterialStream.Phases(f).Components(c).ActivityCoeff.GetValueOrDefault)
+            '                Next
+            '                basis = ""
+            '            Case "logfugacitycoefficient"
+            '                For Each c As String In comps
+            '                    res.Add(Math.Log(Me.CurrentMaterialStream.Phases(f).Components(c).FugacityCoeff.GetValueOrDefault))
+            '                Next
+            '                basis = ""
+            '            Case "volume"
+            '                res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.molecularWeight.GetValueOrDefault / Me.CurrentMaterialStream.Phases(f).SPMProperties.density.GetValueOrDefault / 1000)
+            '            Case "density"
+            '                res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.density.GetValueOrDefault / Me.AUX_MMM(phs) * 1000)
+            '            Case "enthalpy", "enthalpynf"
+            '                Select Case basis
+            '                    Case "Molar", "molar", "mole", "Mole"
+            '                        Dim val = Me.CurrentMaterialStream.Phases(f).SPMProperties.molecularWeight.GetValueOrDefault
+            '                        If val = 0.0# Then
+            '                            res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.molar_enthalpy.GetValueOrDefault)
+            '                        Else
+            '                            res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.enthalpy.GetValueOrDefault * val)
+            '                        End If
+            '                    Case "Mass", "mass"
+            '                        res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.enthalpy.GetValueOrDefault * 1000)
+            '                End Select
+            '            Case "entropy", "entropynf"
+            '                Select Case basis
+            '                    Case "Molar", "molar", "mole", "Mole"
+            '                        Dim val = Me.CurrentMaterialStream.Phases(f).SPMProperties.molecularWeight.GetValueOrDefault
+            '                        If val = 0.0# Then
+            '                            res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.molar_entropy.GetValueOrDefault)
+            '                        Else
+            '                            res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.entropy.GetValueOrDefault * val)
+            '                        End If
+            '                    Case "Mass", "mass"
+            '                        res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.entropy.GetValueOrDefault * 1000)
+            '                End Select
+            '            Case "enthalpyf"
+            '                Select Case basis
+            '                    Case "Molar", "molar", "mole", "Mole"
+            '                        Dim val = Me.CurrentMaterialStream.Phases(f).SPMProperties.molecularWeight.GetValueOrDefault
+            '                        If val = 0.0# Then
+            '                            res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.molar_enthalpyF.GetValueOrDefault)
+            '                        Else
+            '                            res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.enthalpyF.GetValueOrDefault * val)
+            '                        End If
+            '                    Case "Mass", "mass"
+            '                        res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.enthalpyF.GetValueOrDefault * 1000)
+            '                End Select
+            '            Case "entropyf"
+            '                Select Case basis
+            '                    Case "Molar", "molar", "mole", "Mole"
+            '                        Dim val = Me.CurrentMaterialStream.Phases(f).SPMProperties.molecularWeight.GetValueOrDefault
+            '                        If val = 0.0# Then
+            '                            res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.molar_entropyF.GetValueOrDefault)
+            '                        Else
+            '                            res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.entropyF.GetValueOrDefault * val)
+            '                        End If
+            '                    Case "Mass", "mass"
+            '                        res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.entropy.GetValueOrDefault * 1000)
+            '                End Select
+            '            Case "moles"
+            '                res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.molarflow.GetValueOrDefault)
+            '                basis = ""
+            '            Case "mass"
+            '                res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.massflow.GetValueOrDefault)
+            '                basis = ""
+            '            Case "molecularweight"
+            '                res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.molecularWeight.GetValueOrDefault)
+            '                basis = ""
+            '            Case "temperature"
+            '                res.Add(Me.CurrentMaterialStream.Phases(0).SPMProperties.temperature.GetValueOrDefault)
+            '                basis = ""
+            '            Case "pressure"
+            '                res.Add(Me.CurrentMaterialStream.Phases(0).SPMProperties.pressure.GetValueOrDefault)
+            '                basis = ""
+            '            Case "flow"
+            '                Select Case basis
+            '                    Case "Molar", "molar", "mole", "Mole"
+            '                        For Each c As String In comps
+            '                            res.Add(Me.CurrentMaterialStream.Phases(f).Components(c).MolarFlow.GetValueOrDefault)
+            '                        Next
+            '                    Case "Mass", "mass"
+            '                        For Each c As String In comps
+            '                            res.Add(Me.CurrentMaterialStream.Phases(f).Components(c).MassFlow.GetValueOrDefault)
+            '                        Next
+            '                End Select
+            '            Case "fraction", "massfraction", "molarfraction"
+            '                Select Case basis
+            '                    Case "Molar", "molar", "mole", "Mole"
+            '                        For Each c As String In comps
+            '                            res.Add(Me.CurrentMaterialStream.Phases(f).Components(c).MolarFraction.GetValueOrDefault)
+            '                        Next
+            '                    Case "Mass", "mass"
+            '                        For Each c As String In comps
+            '                            res.Add(Me.CurrentMaterialStream.Phases(f).Components(c).MassFraction.GetValueOrDefault)
+            '                        Next
+            '                    Case ""
+            '                        If [property].ToLower.Contains("mole") Then
+            '                            For Each c As String In comps
+            '                                res.Add(Me.CurrentMaterialStream.Phases(f).Components(c).MolarFraction.GetValueOrDefault)
+            '                            Next
+            '                        ElseIf [property].ToLower.Contains("mass") Then
+            '                            For Each c As String In comps
+            '                                res.Add(Me.CurrentMaterialStream.Phases(f).Components(c).MassFraction.GetValueOrDefault)
+            '                            Next
+            '                        End If
+            '                End Select
+            '            Case "concentration"
+            '                For Each c As String In comps
+            '                    res.Add(Me.CurrentMaterialStream.Phases(f).Components(c).MassFlow.GetValueOrDefault / Me.CurrentMaterialStream.Phases(f).SPMProperties.volumetric_flow.GetValueOrDefault)
+            '                Next
+            '                basis = ""
+            '            Case "molarity"
+            '                For Each c As String In comps
+            '                    res.Add(Me.CurrentMaterialStream.Phases(f).Components(c).MolarFlow.GetValueOrDefault / Me.CurrentMaterialStream.Phases(f).SPMProperties.volumetric_flow.GetValueOrDefault)
+            '                Next
+            '                basis = ""
+            '            Case "phasefraction"
+            '                Select Case basis
+            '                    Case "Molar", "molar", "mole", "Mole"
+            '                        res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.molarfraction.GetValueOrDefault)
+            '                    Case "Mass", "mass"
+            '                        res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.massfraction.GetValueOrDefault)
+            '                End Select
+            '            Case "totalflow"
+            '                Select Case basis
+            '                    Case "Molar", "molar", "mole", "Mole"
+            '                        res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.molarflow.GetValueOrDefault)
+            '                    Case "Mass", "mass"
+            '                        res.Add(Me.CurrentMaterialStream.Phases(f).SPMProperties.massflow.GetValueOrDefault)
+            '                End Select
+            '            Case Else
+            '                Dim ex = New NotImplementedException()
+            '                Dim hcode As Integer = 0
+            '                ThrowCAPEException(ex, "Error", ex.Message, "ICapeThermoMaterial", ex.Source, ex.StackTrace, "CalcSinglePhaseProp", hcode)
+            '        End Select
 
-                    Dim i As Integer
-                    For i = 0 To res.Count - 1
-                        If Double.IsNaN(res(i)) Then res(i) = 0.0#
-                    Next
+            '        Dim i As Integer
+            '        For i = 0 To res.Count - 1
+            '            If Double.IsNaN(res(i)) Then res(i) = 0.0#
+            '        Next
 
-                    Dim arr(res.Count - 1) As Double
-                    Array.Copy(res.ToArray, arr, res.Count)
+            '        Dim arr(res.Count - 1) As Double
+            '        Array.Copy(res.ToArray, arr, res.Count)
 
-                    mymo.SetSinglePhaseProp([property], phaseLabel, basis, arr)
+            '        mymo.SetSinglePhaseProp([property], phaseLabel, basis, arr)
 
-                Next
+            '    Next
 
-            End If
+            'End If
 
         End Sub
         ''' <summary>
@@ -6365,70 +6375,70 @@ Final3:
         ''' interface. This latter condition will be satisfied if the phases are made present explicitly by
         ''' calling the SetPresentPhases method or if any phase properties have been set by calling the
         ''' SetSinglePhaseProp or SetTwoPhaseProp methods.</remarks>
-        Public Overridable Sub CalcTwoPhaseProp(ByVal props As Object, ByVal phaseLabels As Object) Implements ICapeThermoPropertyRoutine.CalcTwoPhaseProp
+        Public Overridable Sub CalcTwoPhaseProp(ByVal props As Object, ByVal phaseLabels As Object) 'Implements ICapeThermoPropertyRoutine.CalcTwoPhaseProp
 
             Me.DW_CalcTwoPhaseProps(Phase.Liquid, Phase.Vapor)
 
-            If My.Application.CAPEOPENMode Then
+            'If My.Application.CAPEOPENMode Then
 
-                Dim res As New ArrayList
-                Dim comps As New ArrayList
-                For Each c As Substance In Me.CurrentMaterialStream.Phases(0).Components.Values
-                    comps.Add(c.Name)
-                Next
+            '    Dim res As New ArrayList
+            '    Dim comps As New ArrayList
+            '    For Each c As Substance In Me.CurrentMaterialStream.Phases(0).Components.Values
+            '        comps.Add(c.Name)
+            '    Next
 
-                Dim basis As String = Nothing
+            '    Dim basis As String = Nothing
 
-                For Each [property] As String In props
-                    Select Case [property].ToLower
-                        Case "kvalue"
-                            For Each c As String In comps
-                                res.Add(Me.CurrentMaterialStream.Phases(0).Components(c).Kvalue)
-                            Next
-                        Case "logkvalue"
-                            For Each c As String In comps
-                                res.Add(Me.CurrentMaterialStream.Phases(0).Components(c).lnKvalue)
-                            Next
-                        Case "surfacetension"
-                            res.Add(Me.CurrentMaterialStream.Phases(0).TPMProperties.surfaceTension.GetValueOrDefault)
-                        Case Else
-                            Dim ex = New Exception
-                            Dim hcode As Integer = 0
-                            ThrowCAPEException(ex, "Error", ex.Message, "ICapeThermoMaterial", ex.Source, ex.StackTrace, "CalcTwoPhaseProp", hcode)
-                    End Select
+            '    For Each [property] As String In props
+            '        Select Case [property].ToLower
+            '            Case "kvalue"
+            '                For Each c As String In comps
+            '                    res.Add(Me.CurrentMaterialStream.Phases(0).Components(c).Kvalue)
+            '                Next
+            '            Case "logkvalue"
+            '                For Each c As String In comps
+            '                    res.Add(Me.CurrentMaterialStream.Phases(0).Components(c).lnKvalue)
+            '                Next
+            '            Case "surfacetension"
+            '                res.Add(Me.CurrentMaterialStream.Phases(0).TPMProperties.surfaceTension.GetValueOrDefault)
+            '            Case Else
+            '                Dim ex = New Exception
+            '                Dim hcode As Integer = 0
+            '                ThrowCAPEException(ex, "Error", ex.Message, "ICapeThermoMaterial", ex.Source, ex.StackTrace, "CalcTwoPhaseProp", hcode)
+            '        End Select
 
-                    Dim arr(res.Count - 1) As Double
-                    Array.Copy(res.ToArray, arr, res.Count)
+            '        Dim arr(res.Count - 1) As Double
+            '        Array.Copy(res.ToArray, arr, res.Count)
 
-                    Dim mymo As ICapeThermoMaterial = _como
-                    mymo.SetTwoPhaseProp([property], phaseLabels, basis, arr)
+            '        Dim mymo As ICapeThermoMaterial = _como
+            '        mymo.SetTwoPhaseProp([property], phaseLabels, basis, arr)
 
-                Next
+            '    Next
 
-            End If
+            'End If
 
         End Sub
 
-        ''' <summary>
-        ''' Checks whether it is possible to calculate a property with the CalcSinglePhaseProp method for a given Phase.
-        ''' </summary>
-        ''' <param name="property">The identifier of the property to check. To be valid this must be one of the supported 
-        ''' single-phase properties or derivatives (as given by the GetSinglePhasePropList method).</param>
-        ''' <param name="phaseLabel">The Phase label for the calculation check. This must be one of the labels 
-        ''' returned by the GetPhaseList method on the ICapeThermoPhases interface.</param>
-        ''' <returns>Set to True if the combination of property and phaseLabel is supported or False if 
-        ''' not supported.</returns>
-        ''' <remarks>The result of the check should only depend on the capabilities and configuration
-        ''' (Compounds and Phases supported) of the component that implements the
-        ''' ICapeThermoPropertyRoutine interface (e.g. a Property Package). It should not depend on
-        ''' whether a Material Object has been set nor on the state (temperature, pressure, composition
-        ''' etc.), or configuration of a Material Object that might be set.
-        ''' It is expected that the PME, or other client, will use this method to check whether the properties
-        ''' it requires are supported by the Property Package when the package is imported. If any
-        ''' essential properties are not available, the import process should be aborted.
-        ''' If either the property or the phaseLabel arguments are not recognised by the component that
-        ''' implements the ICapeThermoPropertyRoutine interface this method should return False.</remarks>
-        Public Overridable Function CheckSinglePhasePropSpec(ByVal [property] As String, ByVal phaseLabel As String) As Boolean Implements ICapeThermoPropertyRoutine.CheckSinglePhasePropSpec
+        '''' <summary>
+        '''' Checks whether it is possible to calculate a property with the CalcSinglePhaseProp method for a given Phase.
+        '''' </summary>
+        '''' <param name="property">The identifier of the property to check. To be valid this must be one of the supported 
+        '''' single-phase properties or derivatives (as given by the GetSinglePhasePropList method).</param>
+        '''' <param name="phaseLabel">The Phase label for the calculation check. This must be one of the labels 
+        '''' returned by the GetPhaseList method on the ICapeThermoPhases interface.</param>
+        '''' <returns>Set to True if the combination of property and phaseLabel is supported or False if 
+        '''' not supported.</returns>
+        '''' <remarks>The result of the check should only depend on the capabilities and configuration
+        '''' (Compounds and Phases supported) of the component that implements the
+        '''' ICapeThermoPropertyRoutine interface (e.g. a Property Package). It should not depend on
+        '''' whether a Material Object has been set nor on the state (temperature, pressure, composition
+        '''' etc.), or configuration of a Material Object that might be set.
+        '''' It is expected that the PME, or other client, will use this method to check whether the properties
+        '''' it requires are supported by the Property Package when the package is imported. If any
+        '''' essential properties are not available, the import process should be aborted.
+        '''' If either the property or the phaseLabel arguments are not recognised by the component that
+        '''' implements the ICapeThermoPropertyRoutine interface this method should return False.</remarks>
+        Public Overridable Function CheckSinglePhasePropSpec(ByVal [property] As String, ByVal phaseLabel As String) As Boolean 'Implements ICapeThermoPropertyRoutine.CheckSinglePhasePropSpec
             Select Case [property].ToLower
                 Case "compressibilityfactor", "heatofvaporization", "heatcapacity", "heatcapacitycv",
                     "idealgasheatcapacity", "idealgasenthalpy", "excessenthalpy", "excessentropy",
@@ -6441,49 +6451,49 @@ Final3:
             End Select
         End Function
 
-        ''' <summary>
-        ''' Checks whether it is possible to calculate a property with the CalcTwoPhaseProp method for a given set of Phases.
-        ''' </summary>
-        ''' <param name="property">The identifier of the property to check. To be valid this must be one of the supported 
-        ''' two-phase properties (including derivatives), as given by the GetTwoPhasePropList method.</param>
-        ''' <param name="phaseLabels">Phase labels of the Phases for which the properties are to be calculated. The Phase 
-        ''' labels must be two of the identifiers returned by the GetPhaseList method on the ICapeThermoPhases interface.</param>
-        ''' <returns>Set to True if the combination of property and phaseLabels is supported, or False if not supported.</returns>
-        ''' <remarks>The result of the check should only depend on the capabilities and configuration
-        ''' (Compounds and Phases supported) of the component that implements the
-        ''' ICapeThermoPropertyRoutine interface (e.g. a Property Package). It should not depend on
-        ''' whether a Material Object has been set nor on the state (temperature, pressure, composition
-        ''' etc.), or configuration of a Material Object that might be set.
-        ''' It is expected that the PME, or other client, will use this method to check whether the
-        ''' properties it requires are supported by the Property Package when the Property Package is
-        ''' imported. If any essential properties are not available, the import process should be aborted.
-        ''' If either the property argument or the values in the phaseLabels arguments are not
-        ''' recognised by the component that implements the ICapeThermoPropertyRoutine interface
-        ''' this method should return False.</remarks>
-        Public Overridable Function CheckTwoPhasePropSpec(ByVal [property] As String, ByVal phaseLabels As Object) As Boolean Implements ICapeThermoPropertyRoutine.CheckTwoPhasePropSpec
+        '''' <summary>
+        '''' Checks whether it is possible to calculate a property with the CalcTwoPhaseProp method for a given set of Phases.
+        '''' </summary>
+        '''' <param name="property">The identifier of the property to check. To be valid this must be one of the supported 
+        '''' two-phase properties (including derivatives), as given by the GetTwoPhasePropList method.</param>
+        '''' <param name="phaseLabels">Phase labels of the Phases for which the properties are to be calculated. The Phase 
+        '''' labels must be two of the identifiers returned by the GetPhaseList method on the ICapeThermoPhases interface.</param>
+        '''' <returns>Set to True if the combination of property and phaseLabels is supported, or False if not supported.</returns>
+        '''' <remarks>The result of the check should only depend on the capabilities and configuration
+        '''' (Compounds and Phases supported) of the component that implements the
+        '''' ICapeThermoPropertyRoutine interface (e.g. a Property Package). It should not depend on
+        '''' whether a Material Object has been set nor on the state (temperature, pressure, composition
+        '''' etc.), or configuration of a Material Object that might be set.
+        '''' It is expected that the PME, or other client, will use this method to check whether the
+        '''' properties it requires are supported by the Property Package when the Property Package is
+        '''' imported. If any essential properties are not available, the import process should be aborted.
+        '''' If either the property argument or the values in the phaseLabels arguments are not
+        '''' recognised by the component that implements the ICapeThermoPropertyRoutine interface
+        '''' this method should return False.</remarks>
+        Public Overridable Function CheckTwoPhasePropSpec(ByVal [property] As String, ByVal phaseLabels As Object) As Boolean 'Implements ICapeThermoPropertyRoutine.CheckTwoPhasePropSpec
             Return True
         End Function
 
-        ''' <summary>
-        ''' Returns the list of supported non-constant single-phase Physical Properties.
-        ''' </summary>
-        ''' <returns>List of all supported non-constant single-phase property identifiers. 
-        ''' The standard single-phase property identifiers are listed in section 7.5.5.</returns>
-        ''' <remarks>A non-constant property depends on the state of the Material Object.
-        ''' Single-phase properties, e.g. enthalpy, only depend on the state of one phase.
-        ''' GetSinglePhasePropList must return all the single-phase properties that can be calculated by
-        ''' CalcSinglePhaseProp. If derivatives can be calculated these must also be returned. The list
-        ''' of standard property identifiers in section 7.5.5 also contains properties such as temperature,
-        ''' pressure, fraction, phaseFraction, flow and totalFlow that are not usually calculated by the
-        ''' CalcSinglePhaseProp method and hence these property identifiers would not be returned by
-        ''' GetSinglePhasePropList. These properties would normally be used in calls to the
-        ''' Set/GetSinglePhaseProp methods of the ICapeThermoMaterial interface.
-        ''' If no single-phase properties are supported this method should return UNDEFINED.
-        ''' To get the list of supported two-phase properties, use GetTwoPhasePropList.
-        ''' A component that implements this method may return non-constant single-phase property
-        ''' identifiers which do not belong to the list defined in section 7.5.5. However, these
-        ''' proprietary identifiers may not be understood by most of the clients of this component.</remarks>
-        Public Overridable Function GetSinglePhasePropList() As Object Implements ICapeThermoPropertyRoutine.GetSinglePhasePropList
+        '''' <summary>
+        '''' Returns the list of supported non-constant single-phase Physical Properties.
+        '''' </summary>
+        '''' <returns>List of all supported non-constant single-phase property identifiers. 
+        '''' The standard single-phase property identifiers are listed in section 7.5.5.</returns>
+        '''' <remarks>A non-constant property depends on the state of the Material Object.
+        '''' Single-phase properties, e.g. enthalpy, only depend on the state of one phase.
+        '''' GetSinglePhasePropList must return all the single-phase properties that can be calculated by
+        '''' CalcSinglePhaseProp. If derivatives can be calculated these must also be returned. The list
+        '''' of standard property identifiers in section 7.5.5 also contains properties such as temperature,
+        '''' pressure, fraction, phaseFraction, flow and totalFlow that are not usually calculated by the
+        '''' CalcSinglePhaseProp method and hence these property identifiers would not be returned by
+        '''' GetSinglePhasePropList. These properties would normally be used in calls to the
+        '''' Set/GetSinglePhaseProp methods of the ICapeThermoMaterial interface.
+        '''' If no single-phase properties are supported this method should return UNDEFINED.
+        '''' To get the list of supported two-phase properties, use GetTwoPhasePropList.
+        '''' A component that implements this method may return non-constant single-phase property
+        '''' identifiers which do not belong to the list defined in section 7.5.5. However, these
+        '''' proprietary identifiers may not be understood by most of the clients of this component.</remarks>
+        Public Overridable Function GetSinglePhasePropList() As Object 'Implements ICapeThermoPropertyRoutine.GetSinglePhasePropList
             Dim arr As New ArrayList
             With arr
                 .Add("compressibilityFactor")
@@ -6512,36 +6522,36 @@ Final3:
             Return arr2
         End Function
 
-        ''' <summary>
-        ''' Returns the list of supported non-constant two-phase properties.
-        ''' </summary>
-        ''' <returns>List of all supported non-constant two-phase property identifiers. The standard two-phase 
-        ''' property identifiers are listed in section 7.5.6.</returns>
-        ''' <remarks>A non-constant property depends on the state of the Material Object. Two-phase properties
-        ''' are those that depend on more than one co-existing phase, e.g. K-values.
-        ''' GetTwoPhasePropList must return all the properties that can be calculated by
-        ''' CalcTwoPhaseProp. If derivatives can be calculated, these must also be returned.
-        ''' If no two-phase properties are supported this method should return UNDEFINED.
-        ''' To check whether a property can be evaluated for a particular set of phase labels use the
-        ''' CheckTwoPhasePropSpec method.
-        ''' A component that implements this method may return non-constant two-phase property
-        ''' identifiers which do not belong to the list defined in section 7.5.6. However, these
-        ''' proprietary identifiers may not be understood by most of the clients of this component.
-        ''' To get the list of supported single-phase properties, use GetSinglePhasePropList.</remarks>
-        Public Overridable Function GetTwoPhasePropList() As Object Implements ICapeThermoPropertyRoutine.GetTwoPhasePropList
+        '''' <summary>
+        '''' Returns the list of supported non-constant two-phase properties.
+        '''' </summary>
+        '''' <returns>List of all supported non-constant two-phase property identifiers. The standard two-phase 
+        '''' property identifiers are listed in section 7.5.6.</returns>
+        '''' <remarks>A non-constant property depends on the state of the Material Object. Two-phase properties
+        '''' are those that depend on more than one co-existing phase, e.g. K-values.
+        '''' GetTwoPhasePropList must return all the properties that can be calculated by
+        '''' CalcTwoPhaseProp. If derivatives can be calculated, these must also be returned.
+        '''' If no two-phase properties are supported this method should return UNDEFINED.
+        '''' To check whether a property can be evaluated for a particular set of phase labels use the
+        '''' CheckTwoPhasePropSpec method.
+        '''' A component that implements this method may return non-constant two-phase property
+        '''' identifiers which do not belong to the list defined in section 7.5.6. However, these
+        '''' proprietary identifiers may not be understood by most of the clients of this component.
+        '''' To get the list of supported single-phase properties, use GetSinglePhasePropList.</remarks>
+        Public Overridable Function GetTwoPhasePropList() As Object 'Implements ICapeThermoPropertyRoutine.GetTwoPhasePropList
             Return New String() {"kvalue", "logKvalue", "surfaceTension"}
         End Function
 
-        ''' <summary>
-        ''' Retrieves the value of a Universal Constant.
-        ''' </summary>
-        ''' <param name="constantId">Identifier of Universal Constant. The list of constants supported should be 
-        ''' obtained by using the GetUniversalConstantList method.</param>
-        ''' <returns>Value of Universal Constant. This could be a numeric or a string value. For numeric values 
-        ''' the units of measurement are specified in section 7.5.1.</returns>
-        ''' <remarks>Universal Constants (often called fundamental constants) are quantities like the gas constant,
-        ''' or the Avogadro constant.</remarks>
-        Public Overridable Function GetUniversalConstant1(ByVal constantId As String) As Object Implements ICapeThermoUniversalConstant.GetUniversalConstant
+        '''' <summary>
+        '''' Retrieves the value of a Universal Constant.
+        '''' </summary>
+        '''' <param name="constantId">Identifier of Universal Constant. The list of constants supported should be 
+        '''' obtained by using the GetUniversalConstantList method.</param>
+        '''' <returns>Value of Universal Constant. This could be a numeric or a string value. For numeric values 
+        '''' the units of measurement are specified in section 7.5.1.</returns>
+        '''' <remarks>Universal Constants (often called fundamental constants) are quantities like the gas constant,
+        '''' or the Avogadro constant.</remarks>
+        Public Overridable Function GetUniversalConstant1(ByVal constantId As String) As Object 'Implements ICapeThermoUniversalConstant.GetUniversalConstant
             Dim res As New ArrayList
             Select Case constantId.ToLower
                 Case "standardaccelerationofgravity"
@@ -6558,115 +6568,115 @@ Final3:
             Return arr2
         End Function
 
-        ''' <summary>
-        ''' Returns the identifiers of the supported Universal Constants.
-        ''' </summary>
-        ''' <returns>List of identifiers of Universal Constants. The list of standard identifiers is given in section 7.5.1.</returns>
-        ''' <remarks>A component may return Universal Constant identifiers that do not belong to the list defined
-        ''' in section 7.5.1. However, these proprietary identifiers may not be understood by most of the
-        ''' clients of this component.</remarks>
-        Public Overridable Function GetUniversalConstantList() As Object Implements ICapeThermoUniversalConstant.GetUniversalConstantList
+        '''' <summary>
+        '''' Returns the identifiers of the supported Universal Constants.
+        '''' </summary>
+        '''' <returns>List of identifiers of Universal Constants. The list of standard identifiers is given in section 7.5.1.</returns>
+        '''' <remarks>A component may return Universal Constant identifiers that do not belong to the list defined
+        '''' in section 7.5.1. However, these proprietary identifiers may not be understood by most of the
+        '''' clients of this component.</remarks>
+        Public Overridable Function GetUniversalConstantList() As Object 'Implements ICapeThermoUniversalConstant.GetUniversalConstantList
             Return New String() {"standardAccelerationOfGravity", "avogadroConstant", "boltzmannConstant", "molarGasConstant"}
         End Function
 
-        ''' <summary>
-        ''' CalcEquilibrium is used to calculate the amounts and compositions of Phases at equilibrium.
-        ''' CalcEquilibrium will calculate temperature and/or pressure if these are not among the two
-        ''' specifications that are mandatory for each Equilibrium Calculation considered.
-        ''' </summary>
-        ''' <param name="specification1">First specification for the Equilibrium Calculation. The 
-        ''' specification information is used to retrieve the value of the specification from the 
-        ''' Material Object. See below for details.</param>
-        ''' <param name="specification2">Second specification for the Equilibrium Calculation in 
-        ''' the same format as specification1.</param>
-        ''' <param name="solutionType">The identifier for the required solution type. The
-        ''' standard identifiers are given in the following list:
-        ''' Unspecified
-        ''' Normal
-        ''' Retrograde
-        ''' The meaning of these terms is defined below in the notes. Other identifiers may be supported 
-        ''' but their interpretation is not part of the CO standard.</param>
-        ''' <remarks>The specification1 and specification2 arguments provide the information necessary to
-        ''' retrieve the values of two specifications, for example the pressure and temperature, for the
-        ''' Equilibrium Calculation. The CheckEquilibriumSpec method can be used to check for
-        ''' supported specifications. Each specification variable contains a sequence of strings in the
-        ''' order defined in the following table (hence, the specification arguments may have 3 or 4
-        ''' items):
-        ''' 
-        ''' item                        meaning
-        ''' 
-        ''' property identifier         The property identifier can be any of the identifiers listed in section 7.5.5 but
-        '''                             only certain property specifications will normally be supported by any
-        '''                             Equilibrium Routine.
-        ''' 
-        ''' basis                       The basis for the property value. Valid settings for basis are given in section
-        '''                             7.4. Use UNDEFINED as a placeholder for a property for which basis does
-        '''                             not apply. For most Equilibrium Specifications, the result of the calculation
-        '''                             is not dependent on the basis, but, for example, for phase fraction
-        '''                             specifications the basis (Mole or Mass) does make a difference.
-        ''' 
-        ''' phase label                 The phase label denotes the Phase to which the specification applies. It must
-        '''                             either be one of the labels returned by GetPresentPhases, or the special value
-        '''                             “Overall”.
-        ''' 
-        ''' compound identifier         The compound identifier allows for specifications that depend on a particular
-        '''                             Compound. This item of the specification array is optional and may be
-        '''                             omitted. In case of a specification without compound identifier, the array
-        '''                             element may be present and empty, or may be absent.
-        '''                             The values corresponding to the specifications in the argument list and the overall
-        '''                             composition of the mixture must be set in the associated Material Object before a call to
-        '''                             CalcEquilibrium.
-        ''' 
-        ''' Components such as a Property Package or an Equilibrium Calculator must implement the
-        ''' ICapeThermoMaterialContext interface, so that an ICapeThermoMaterial interface can be
-        ''' passed via the SetMaterial method. It is the responsibility of the implementation of
-        ''' CalcEquilibrium to validate the Material Object before attempting a calculation.
-        ''' The Phases that will be considered in the Equilibrium Calculation are those that exist in the
-        ''' Material Object, i.e. the list of phases specified in a SetPresentPhases call. This provides a
-        ''' way for a client to specify whether, for example, a vapour-liquid, liquid-liquid, or vapourliquid-
-        ''' liquid calculation is required. CalcEquilibrium must use the GetPresentPhases method
-        ''' to retrieve the list of Phases and the associated Phase status flags. The Phase status flags may
-        ''' be used by the client to provide information about the Phases, for example whether estimates
-        ''' of the equilibrium state are provided. See the description of the GetPresentPhases and
-        ''' SetPresentPhases methods of the ICapeThermoMaterial interface for details. When the
-        ''' Equilibrium Calculation has been completed successfully, the SetPresentPhases method
-        ''' must be used to specify which Phases are present at equilibrium and the Phase status flags
-        ''' for the phases should be set to Cape_AtEquilibrium. This must include any Phases that are
-        ''' present in zero amount such as the liquid Phase in a dew point calculation.
-        ''' Some types of Phase equilibrium specifications may result in more than one solution. A
-        ''' common example of this is the case of a dew point calculation. However, CalcEquilibrium
-        ''' can provide only one solution through the Material Object. The solutionType argument
-        ''' allows the “Normal” or “Retrograde” solution to be explicitly requested. When none of the
-        ''' specifications includes a phase fraction, the solutionType argument should be set to
-        ''' “Unspecified”.
-        ''' 
-        ''' CalcEquilibrium must set the amounts (phase fractions), compositions, temperature and
-        ''' pressure for all Phases present at equilibrium, as well as the temperature and pressure for the
-        ''' overall mixture if not set as part of the calculation specifications. It must not set any other
-        ''' values – in particular it must not set any values for phases that are not present.
-        ''' 
-        ''' As an example, the following sequence of operations might be performed by
-        ''' CalcEquilibrium in the case of an Equilibrium Calculation at fixed pressure and temperature:
-        ''' 
-        ''' - With the ICapeThermoMaterial interface of the supplied Material Object:
-        ''' 
-        ''' -- Use the GetPresentPhases method to find the list of Phases that the Equilibrium
-        ''' Calculation should consider.
-        ''' 
-        ''' -- With the ICapeThermoCompounds interface of the Material Object use the
-        ''' GetCompoundList method to find which Compounds are present.
-        ''' 
-        ''' -- Use the GetOverallProp method to get the temperature, pressure and composition
-        ''' for the overall mixture.
-        ''' 
-        ''' - Perform the Equilibrium Calculation.
-        ''' 
-        ''' -- Use SetPresentPhases to specify the Phases present at equilibrium and set the
-        ''' Phase status flags to Cape_AtEquilibrium.
-        ''' 
-        ''' -- Use SetSinglePhaseProp to set pressure, temperature, Phase amount (or Phase
-        ''' fraction) and composition for all Phases present.</remarks>
-        Public Overridable Sub CalcEquilibrium1(ByVal specification1 As Object, ByVal specification2 As Object, ByVal solutionType As String) Implements ICapeThermoEquilibriumRoutine.CalcEquilibrium
+        '''' <summary>
+        '''' CalcEquilibrium is used to calculate the amounts and compositions of Phases at equilibrium.
+        '''' CalcEquilibrium will calculate temperature and/or pressure if these are not among the two
+        '''' specifications that are mandatory for each Equilibrium Calculation considered.
+        '''' </summary>
+        '''' <param name="specification1">First specification for the Equilibrium Calculation. The 
+        '''' specification information is used to retrieve the value of the specification from the 
+        '''' Material Object. See below for details.</param>
+        '''' <param name="specification2">Second specification for the Equilibrium Calculation in 
+        '''' the same format as specification1.</param>
+        '''' <param name="solutionType">The identifier for the required solution type. The
+        '''' standard identifiers are given in the following list:
+        '''' Unspecified
+        '''' Normal
+        '''' Retrograde
+        '''' The meaning of these terms is defined below in the notes. Other identifiers may be supported 
+        '''' but their interpretation is not part of the CO standard.</param>
+        '''' <remarks>The specification1 and specification2 arguments provide the information necessary to
+        '''' retrieve the values of two specifications, for example the pressure and temperature, for the
+        '''' Equilibrium Calculation. The CheckEquilibriumSpec method can be used to check for
+        '''' supported specifications. Each specification variable contains a sequence of strings in the
+        '''' order defined in the following table (hence, the specification arguments may have 3 or 4
+        '''' items):
+        '''' 
+        '''' item                        meaning
+        '''' 
+        '''' property identifier         The property identifier can be any of the identifiers listed in section 7.5.5 but
+        ''''                             only certain property specifications will normally be supported by any
+        ''''                             Equilibrium Routine.
+        '''' 
+        '''' basis                       The basis for the property value. Valid settings for basis are given in section
+        ''''                             7.4. Use UNDEFINED as a placeholder for a property for which basis does
+        ''''                             not apply. For most Equilibrium Specifications, the result of the calculation
+        ''''                             is not dependent on the basis, but, for example, for phase fraction
+        ''''                             specifications the basis (Mole or Mass) does make a difference.
+        '''' 
+        '''' phase label                 The phase label denotes the Phase to which the specification applies. It must
+        ''''                             either be one of the labels returned by GetPresentPhases, or the special value
+        ''''                             “Overall”.
+        '''' 
+        '''' compound identifier         The compound identifier allows for specifications that depend on a particular
+        ''''                             Compound. This item of the specification array is optional and may be
+        ''''                             omitted. In case of a specification without compound identifier, the array
+        ''''                             element may be present and empty, or may be absent.
+        ''''                             The values corresponding to the specifications in the argument list and the overall
+        ''''                             composition of the mixture must be set in the associated Material Object before a call to
+        ''''                             CalcEquilibrium.
+        '''' 
+        '''' Components such as a Property Package or an Equilibrium Calculator must implement the
+        '''' ICapeThermoMaterialContext interface, so that an ICapeThermoMaterial interface can be
+        '''' passed via the SetMaterial method. It is the responsibility of the implementation of
+        '''' CalcEquilibrium to validate the Material Object before attempting a calculation.
+        '''' The Phases that will be considered in the Equilibrium Calculation are those that exist in the
+        '''' Material Object, i.e. the list of phases specified in a SetPresentPhases call. This provides a
+        '''' way for a client to specify whether, for example, a vapour-liquid, liquid-liquid, or vapourliquid-
+        '''' liquid calculation is required. CalcEquilibrium must use the GetPresentPhases method
+        '''' to retrieve the list of Phases and the associated Phase status flags. The Phase status flags may
+        '''' be used by the client to provide information about the Phases, for example whether estimates
+        '''' of the equilibrium state are provided. See the description of the GetPresentPhases and
+        '''' SetPresentPhases methods of the ICapeThermoMaterial interface for details. When the
+        '''' Equilibrium Calculation has been completed successfully, the SetPresentPhases method
+        '''' must be used to specify which Phases are present at equilibrium and the Phase status flags
+        '''' for the phases should be set to Cape_AtEquilibrium. This must include any Phases that are
+        '''' present in zero amount such as the liquid Phase in a dew point calculation.
+        '''' Some types of Phase equilibrium specifications may result in more than one solution. A
+        '''' common example of this is the case of a dew point calculation. However, CalcEquilibrium
+        '''' can provide only one solution through the Material Object. The solutionType argument
+        '''' allows the “Normal” or “Retrograde” solution to be explicitly requested. When none of the
+        '''' specifications includes a phase fraction, the solutionType argument should be set to
+        '''' “Unspecified”.
+        '''' 
+        '''' CalcEquilibrium must set the amounts (phase fractions), compositions, temperature and
+        '''' pressure for all Phases present at equilibrium, as well as the temperature and pressure for the
+        '''' overall mixture if not set as part of the calculation specifications. It must not set any other
+        '''' values – in particular it must not set any values for phases that are not present.
+        '''' 
+        '''' As an example, the following sequence of operations might be performed by
+        '''' CalcEquilibrium in the case of an Equilibrium Calculation at fixed pressure and temperature:
+        '''' 
+        '''' - With the ICapeThermoMaterial interface of the supplied Material Object:
+        '''' 
+        '''' -- Use the GetPresentPhases method to find the list of Phases that the Equilibrium
+        '''' Calculation should consider.
+        '''' 
+        '''' -- With the ICapeThermoCompounds interface of the Material Object use the
+        '''' GetCompoundList method to find which Compounds are present.
+        '''' 
+        '''' -- Use the GetOverallProp method to get the temperature, pressure and composition
+        '''' for the overall mixture.
+        '''' 
+        '''' - Perform the Equilibrium Calculation.
+        '''' 
+        '''' -- Use SetPresentPhases to specify the Phases present at equilibrium and set the
+        '''' Phase status flags to Cape_AtEquilibrium.
+        '''' 
+        '''' -- Use SetSinglePhaseProp to set pressure, temperature, Phase amount (or Phase
+        '''' fraction) and composition for all Phases present.</remarks>
+        Public Overridable Sub CalcEquilibrium1(ByVal specification1 As Object, ByVal specification2 As Object, ByVal solutionType As String) 'Implements ICapeThermoEquilibriumRoutine.CalcEquilibrium
 
             Dim spec1, spec2 As FlashSpec
             If specification1(0).ToString.ToLower = "temperature" And specification2(0).ToString.ToLower = "pressure" Then
@@ -6705,48 +6715,48 @@ Final3:
 
             Dim T, P, Hm, Sm As Double
 
-            If My.Application.CAPEOPENMode Then
+            'If My.Application.CAPEOPENMode Then
 
-                Dim res As Object = Nothing
+            '    Dim res As Object = Nothing
 
-                Dim mys As ICapeThermoMaterial = _como
+            '    Dim mys As ICapeThermoMaterial = _como
 
-                If spec1 = FlashSpec.T And spec2 = P Then
-                    mys.GetOverallProp("temperature", Nothing, res)
-                    T = res(0)
-                    mys.GetOverallProp("pressure", Nothing, res)
-                    P = res(0)
-                    Me.CurrentMaterialStream.Phases(0).SPMProperties.temperature = T
-                    Me.CurrentMaterialStream.Phases(0).SPMProperties.pressure = P
-                ElseIf spec1 = FlashSpec.T And spec2 = FlashSpec.VAP Then
-                    mys.GetOverallProp("temperature", Nothing, res)
-                    T = res(0)
-                    Me.CurrentMaterialStream.Phases(0).SPMProperties.temperature = T
-                    mys.GetSinglePhaseProp("phaseFraction", "Vapor", "Mole", res)
-                    Me.CurrentMaterialStream.Phases(2).SPMProperties.molarfraction = res(0)
-                ElseIf spec1 = FlashSpec.P And spec2 = FlashSpec.H Then
-                    mys.GetOverallProp("pressure", Nothing, res)
-                    P = res(0)
-                    mys.GetOverallProp("enthalpy", "Mole", res)
-                    Hm = res(0) / AUX_MMM(Phase.Mixture)
-                    Me.CurrentMaterialStream.Phases(0).SPMProperties.enthalpy = Hm
-                    Me.CurrentMaterialStream.Phases(0).SPMProperties.pressure = P
-                ElseIf spec1 = FlashSpec.P And spec2 = FlashSpec.S Then
-                    mys.GetOverallProp("pressure", Nothing, res)
-                    P = res(0)
-                    mys.GetOverallProp("entropy", "Mole", res)
-                    Sm = res(0) / AUX_MMM(Phase.Mixture)
-                    Me.CurrentMaterialStream.Phases(0).SPMProperties.entropy = Sm
-                    Me.CurrentMaterialStream.Phases(0).SPMProperties.pressure = P
-                ElseIf spec1 = FlashSpec.P And spec2 = FlashSpec.VAP Then
-                    mys.GetOverallProp("pressure", Nothing, res)
-                    P = res(0)
-                    Me.CurrentMaterialStream.Phases(0).SPMProperties.pressure = P
-                    mys.GetSinglePhaseProp("phaseFraction", "Vapor", "Mole", res)
-                    Me.CurrentMaterialStream.Phases(2).SPMProperties.molarfraction = res(0)
-                End If
+            '    If spec1 = FlashSpec.T And spec2 = P Then
+            '        mys.GetOverallProp("temperature", Nothing, res)
+            '        T = res(0)
+            '        mys.GetOverallProp("pressure", Nothing, res)
+            '        P = res(0)
+            '        Me.CurrentMaterialStream.Phases(0).SPMProperties.temperature = T
+            '        Me.CurrentMaterialStream.Phases(0).SPMProperties.pressure = P
+            '    ElseIf spec1 = FlashSpec.T And spec2 = FlashSpec.VAP Then
+            '        mys.GetOverallProp("temperature", Nothing, res)
+            '        T = res(0)
+            '        Me.CurrentMaterialStream.Phases(0).SPMProperties.temperature = T
+            '        mys.GetSinglePhaseProp("phaseFraction", "Vapor", "Mole", res)
+            '        Me.CurrentMaterialStream.Phases(2).SPMProperties.molarfraction = res(0)
+            '    ElseIf spec1 = FlashSpec.P And spec2 = FlashSpec.H Then
+            '        mys.GetOverallProp("pressure", Nothing, res)
+            '        P = res(0)
+            '        mys.GetOverallProp("enthalpy", "Mole", res)
+            '        Hm = res(0) / AUX_MMM(Phase.Mixture)
+            '        Me.CurrentMaterialStream.Phases(0).SPMProperties.enthalpy = Hm
+            '        Me.CurrentMaterialStream.Phases(0).SPMProperties.pressure = P
+            '    ElseIf spec1 = FlashSpec.P And spec2 = FlashSpec.S Then
+            '        mys.GetOverallProp("pressure", Nothing, res)
+            '        P = res(0)
+            '        mys.GetOverallProp("entropy", "Mole", res)
+            '        Sm = res(0) / AUX_MMM(Phase.Mixture)
+            '        Me.CurrentMaterialStream.Phases(0).SPMProperties.entropy = Sm
+            '        Me.CurrentMaterialStream.Phases(0).SPMProperties.pressure = P
+            '    ElseIf spec1 = FlashSpec.P And spec2 = FlashSpec.VAP Then
+            '        mys.GetOverallProp("pressure", Nothing, res)
+            '        P = res(0)
+            '        Me.CurrentMaterialStream.Phases(0).SPMProperties.pressure = P
+            '        mys.GetSinglePhaseProp("phaseFraction", "Vapor", "Mole", res)
+            '        Me.CurrentMaterialStream.Phases(2).SPMProperties.molarfraction = res(0)
+            '    End If
 
-            End If
+            'End If
 
             Try
                 Me.DW_CalcEquilibrium(spec1, spec2)
@@ -6754,163 +6764,165 @@ Final3:
                 ThrowCAPEException(ex, ex.GetType.ToString, ex.ToString, "ICapeThermoEquilibriumRoutine", ex.ToString, "CalcEquilibrium", "", 0)
             End Try
 
-            If My.Application.CAPEOPENMode Then
+            'If My.Application.CAPEOPENMode Then
 
-                Dim ms As MaterialStream = Me.CurrentMaterialStream
-                Dim mo As ICapeThermoMaterial = _como
+            '    Dim ms As MaterialStream = Me.CurrentMaterialStream
+            '    Dim mo As ICapeThermoMaterial = _como
 
-                Dim vok As Boolean = False
-                Dim l1ok As Boolean = False
-                Dim l2ok As Boolean = False
-                Dim sok As Boolean = False
+            '    Dim vok As Boolean = False
+            '    Dim l1ok As Boolean = False
+            '    Dim l2ok As Boolean = False
+            '    Dim sok As Boolean = False
 
-                If ms.Phases(2).SPMProperties.molarfraction.HasValue Then vok = True
-                If ms.Phases(3).SPMProperties.molarfraction.HasValue Then l1ok = True
-                If ms.Phases(4).SPMProperties.molarfraction.HasValue Then l2ok = True
-                If ms.Phases(7).SPMProperties.molarfraction.HasValue Then sok = True
+            '    If ms.Phases(2).SPMProperties.molarfraction.HasValue Then vok = True
+            '    If ms.Phases(3).SPMProperties.molarfraction.HasValue Then l1ok = True
+            '    If ms.Phases(4).SPMProperties.molarfraction.HasValue Then l2ok = True
+            '    If ms.Phases(7).SPMProperties.molarfraction.HasValue Then sok = True
 
-                Dim phases As String() = Nothing
-                Dim statuses As eCapePhaseStatus() = Nothing
+            '    Dim phases As String() = Nothing
+            '    Dim statuses As eCapePhaseStatus() = Nothing
 
-                If vok And l1ok And l2ok Then
-                    phases = New String() {"Vapor", "Liquid", "Liquid2"}
-                    statuses = New eCapePhaseStatus() {eCapePhaseStatus.CAPE_ATEQUILIBRIUM, eCapePhaseStatus.CAPE_ATEQUILIBRIUM, eCapePhaseStatus.CAPE_ATEQUILIBRIUM}
-                ElseIf vok And l1ok And Not l2ok Then
-                    phases = New String() {"Vapor", "Liquid"}
-                    statuses = New eCapePhaseStatus() {eCapePhaseStatus.CAPE_ATEQUILIBRIUM, eCapePhaseStatus.CAPE_ATEQUILIBRIUM}
-                ElseIf vok And l1ok And Not l2ok And sok Then
-                    phases = New String() {"Vapor", "Liquid", "Solid"}
-                    statuses = New eCapePhaseStatus() {eCapePhaseStatus.CAPE_ATEQUILIBRIUM, eCapePhaseStatus.CAPE_ATEQUILIBRIUM, eCapePhaseStatus.CAPE_ATEQUILIBRIUM}
-                ElseIf vok And Not l1ok And l2ok Then
-                    phases = New String() {"Vapor", "Liquid2"}
-                    statuses = New eCapePhaseStatus() {eCapePhaseStatus.CAPE_ATEQUILIBRIUM, eCapePhaseStatus.CAPE_ATEQUILIBRIUM}
-                ElseIf Not vok And l1ok And l2ok Then
-                    phases = New String() {"Liquid", "Liquid2"}
-                    statuses = New eCapePhaseStatus() {eCapePhaseStatus.CAPE_ATEQUILIBRIUM, eCapePhaseStatus.CAPE_ATEQUILIBRIUM}
-                ElseIf vok And Not l1ok And Not l2ok Then
-                    phases = New String() {"Vapor"}
-                    statuses = New eCapePhaseStatus() {eCapePhaseStatus.CAPE_ATEQUILIBRIUM}
-                ElseIf Not vok And l1ok And Not l2ok Then
-                    phases = New String() {"Liquid"}
-                    statuses = New eCapePhaseStatus() {eCapePhaseStatus.CAPE_ATEQUILIBRIUM}
-                ElseIf vok And Not l1ok And sok Then
-                    phases = New String() {"Vapor", "Solid"}
-                    statuses = New eCapePhaseStatus() {eCapePhaseStatus.CAPE_ATEQUILIBRIUM, eCapePhaseStatus.CAPE_ATEQUILIBRIUM}
-                ElseIf Not vok And l1ok And sok Then
-                    phases = New String() {"Liquid", "Solid"}
-                    statuses = New eCapePhaseStatus() {eCapePhaseStatus.CAPE_ATEQUILIBRIUM, eCapePhaseStatus.CAPE_ATEQUILIBRIUM}
-                ElseIf Not vok And Not l1ok And l2ok Then
-                    phases = New String() {"Liquid2"}
-                    statuses = New eCapePhaseStatus() {eCapePhaseStatus.CAPE_ATEQUILIBRIUM}
-                ElseIf Not vok And Not l1ok And sok Then
-                    phases = New String() {"Solid"}
-                    statuses = New eCapePhaseStatus() {eCapePhaseStatus.CAPE_ATEQUILIBRIUM}
-                End If
+            '    If vok And l1ok And l2ok Then
+            '        phases = New String() {"Vapor", "Liquid", "Liquid2"}
+            '        statuses = New eCapePhaseStatus() {eCapePhaseStatus.CAPE_ATEQUILIBRIUM, eCapePhaseStatus.CAPE_ATEQUILIBRIUM, eCapePhaseStatus.CAPE_ATEQUILIBRIUM}
+            '    ElseIf vok And l1ok And Not l2ok Then
+            '        phases = New String() {"Vapor", "Liquid"}
+            '        statuses = New eCapePhaseStatus() {eCapePhaseStatus.CAPE_ATEQUILIBRIUM, eCapePhaseStatus.CAPE_ATEQUILIBRIUM}
+            '    ElseIf vok And l1ok And Not l2ok And sok Then
+            '        phases = New String() {"Vapor", "Liquid", "Solid"}
+            '        statuses = New eCapePhaseStatus() {eCapePhaseStatus.CAPE_ATEQUILIBRIUM, eCapePhaseStatus.CAPE_ATEQUILIBRIUM, eCapePhaseStatus.CAPE_ATEQUILIBRIUM}
+            '    ElseIf vok And Not l1ok And l2ok Then
+            '        phases = New String() {"Vapor", "Liquid2"}
+            '        statuses = New eCapePhaseStatus() {eCapePhaseStatus.CAPE_ATEQUILIBRIUM, eCapePhaseStatus.CAPE_ATEQUILIBRIUM}
+            '    ElseIf Not vok And l1ok And l2ok Then
+            '        phases = New String() {"Liquid", "Liquid2"}
+            '        statuses = New eCapePhaseStatus() {eCapePhaseStatus.CAPE_ATEQUILIBRIUM, eCapePhaseStatus.CAPE_ATEQUILIBRIUM}
+            '    ElseIf vok And Not l1ok And Not l2ok Then
+            '        phases = New String() {"Vapor"}
+            '        statuses = New eCapePhaseStatus() {eCapePhaseStatus.CAPE_ATEQUILIBRIUM}
+            '    ElseIf Not vok And l1ok And Not l2ok Then
+            '        phases = New String() {"Liquid"}
+            '        statuses = New eCapePhaseStatus() {eCapePhaseStatus.CAPE_ATEQUILIBRIUM}
+            '    ElseIf vok And Not l1ok And sok Then
+            '        phases = New String() {"Vapor", "Solid"}
+            '        statuses = New eCapePhaseStatus() {eCapePhaseStatus.CAPE_ATEQUILIBRIUM, eCapePhaseStatus.CAPE_ATEQUILIBRIUM}
+            '    ElseIf Not vok And l1ok And sok Then
+            '        phases = New String() {"Liquid", "Solid"}
+            '        statuses = New eCapePhaseStatus() {eCapePhaseStatus.CAPE_ATEQUILIBRIUM, eCapePhaseStatus.CAPE_ATEQUILIBRIUM}
+            '    ElseIf Not vok And Not l1ok And l2ok Then
+            '        phases = New String() {"Liquid2"}
+            '        statuses = New eCapePhaseStatus() {eCapePhaseStatus.CAPE_ATEQUILIBRIUM}
+            '    ElseIf Not vok And Not l1ok And sok Then
+            '        phases = New String() {"Solid"}
+            '        statuses = New eCapePhaseStatus() {eCapePhaseStatus.CAPE_ATEQUILIBRIUM}
+            '    End If
 
-                mo.SetPresentPhases(phases, statuses)
+            '    mo.SetPresentPhases(phases, statuses)
 
-                Dim nc As Integer = ms.Phases(0).Components.Count
-                T = ms.Phases(0).SPMProperties.temperature.GetValueOrDefault
-                P = ms.Phases(0).SPMProperties.pressure.GetValueOrDefault
+            '    Dim nc As Integer = ms.Phases(0).Components.Count
+            '    T = ms.Phases(0).SPMProperties.temperature.GetValueOrDefault
+            '    P = ms.Phases(0).SPMProperties.pressure.GetValueOrDefault
 
-                Dim vz(nc - 1), pf As Double, i As Integer
+            '    Dim vz(nc - 1), pf As Double, i As Integer
 
-                mo.SetOverallProp("temperature", Nothing, New Double() {T})
-                mo.SetOverallProp("pressure", Nothing, New Double() {P})
+            '    mo.SetOverallProp("temperature", Nothing, New Double() {T})
+            '    mo.SetOverallProp("pressure", Nothing, New Double() {P})
 
-                If vok Then
+            '    If vok Then
 
-                    i = 0
-                    For Each s As Substance In ms.Phases(2).Components.Values
-                        vz(i) = s.MolarFraction.GetValueOrDefault
-                        i += 1
-                    Next
-                    pf = ms.Phases(2).SPMProperties.molarfraction.GetValueOrDefault
+            '        i = 0
+            '        For Each s As Substance In ms.Phases(2).Components.Values
+            '            vz(i) = s.MolarFraction.GetValueOrDefault
+            '            i += 1
+            '        Next
+            '        pf = ms.Phases(2).SPMProperties.molarfraction.GetValueOrDefault
 
-                    mo.SetSinglePhaseProp("temperature", "Vapor", Nothing, New Double() {T})
-                    mo.SetSinglePhaseProp("pressure", "Vapor", Nothing, New Double() {P})
-                    mo.SetSinglePhaseProp("phasefraction", "Vapor", "Mole", New Double() {pf})
-                    mo.SetSinglePhaseProp("fraction", "Vapor", "Mole", vz)
+            '        mo.SetSinglePhaseProp("temperature", "Vapor", Nothing, New Double() {T})
+            '        mo.SetSinglePhaseProp("pressure", "Vapor", Nothing, New Double() {P})
+            '        mo.SetSinglePhaseProp("phasefraction", "Vapor", "Mole", New Double() {pf})
+            '        mo.SetSinglePhaseProp("fraction", "Vapor", "Mole", vz)
 
-                End If
+            '    End If
 
-                If l1ok Then
+            '    If l1ok Then
 
-                    i = 0
-                    For Each s As Substance In ms.Phases(3).Components.Values
-                        vz(i) = s.MolarFraction.GetValueOrDefault
-                        i += 1
-                    Next
-                    pf = ms.Phases(3).SPMProperties.molarfraction.GetValueOrDefault
+            '        i = 0
+            '        For Each s As Substance In ms.Phases(3).Components.Values
+            '            vz(i) = s.MolarFraction.GetValueOrDefault
+            '            i += 1
+            '        Next
+            '        pf = ms.Phases(3).SPMProperties.molarfraction.GetValueOrDefault
 
-                    mo.SetSinglePhaseProp("temperature", "Liquid", Nothing, New Double() {T})
-                    mo.SetSinglePhaseProp("pressure", "Liquid", Nothing, New Double() {P})
-                    mo.SetSinglePhaseProp("phasefraction", "Liquid", "Mole", New Double() {pf})
-                    mo.SetSinglePhaseProp("fraction", "Liquid", "Mole", vz)
+            '        mo.SetSinglePhaseProp("temperature", "Liquid", Nothing, New Double() {T})
+            '        mo.SetSinglePhaseProp("pressure", "Liquid", Nothing, New Double() {P})
+            '        mo.SetSinglePhaseProp("phasefraction", "Liquid", "Mole", New Double() {pf})
+            '        mo.SetSinglePhaseProp("fraction", "Liquid", "Mole", vz)
 
-                End If
+            '    End If
 
-                If l2ok Then
+            '    If l2ok Then
 
-                    i = 0
-                    For Each s As Substance In ms.Phases(4).Components.Values
-                        vz(i) = s.MolarFraction.GetValueOrDefault
-                        i += 1
-                    Next
-                    pf = ms.Phases(4).SPMProperties.molarfraction.GetValueOrDefault
+            '        i = 0
+            '        For Each s As Substance In ms.Phases(4).Components.Values
+            '            vz(i) = s.MolarFraction.GetValueOrDefault
+            '            i += 1
+            '        Next
+            '        pf = ms.Phases(4).SPMProperties.molarfraction.GetValueOrDefault
 
-                    mo.SetSinglePhaseProp("temperature", "Liquid2", Nothing, New Double() {T})
-                    mo.SetSinglePhaseProp("pressure", "Liquid2", Nothing, New Double() {P})
-                    mo.SetSinglePhaseProp("phasefraction", "Liquid2", "Mole", New Double() {pf})
-                    mo.SetSinglePhaseProp("fraction", "Liquid2", "Mole", vz)
+            '        mo.SetSinglePhaseProp("temperature", "Liquid2", Nothing, New Double() {T})
+            '        mo.SetSinglePhaseProp("pressure", "Liquid2", Nothing, New Double() {P})
+            '        mo.SetSinglePhaseProp("phasefraction", "Liquid2", "Mole", New Double() {pf})
+            '        mo.SetSinglePhaseProp("fraction", "Liquid2", "Mole", vz)
 
-                End If
+            '    End If
 
-                If sok Then
+            '    If sok Then
 
-                    i = 0
-                    For Each s As Substance In ms.Phases(7).Components.Values
-                        vz(i) = s.MolarFraction.GetValueOrDefault
-                        i += 1
-                    Next
-                    pf = ms.Phases(7).SPMProperties.molarfraction.GetValueOrDefault
+            '        i = 0
+            '        For Each s As Substance In ms.Phases(7).Components.Values
+            '            vz(i) = s.MolarFraction.GetValueOrDefault
+            '            i += 1
+            '        Next
+            '        pf = ms.Phases(7).SPMProperties.molarfraction.GetValueOrDefault
 
-                    mo.SetSinglePhaseProp("temperature", "Solid", Nothing, New Double() {T})
-                    mo.SetSinglePhaseProp("pressure", "Solid", Nothing, New Double() {P})
-                    mo.SetSinglePhaseProp("phasefraction", "Solid", "Mole", New Double() {pf})
-                    mo.SetSinglePhaseProp("fraction", "Solid", "Mole", vz)
+            '        mo.SetSinglePhaseProp("temperature", "Solid", Nothing, New Double() {T})
+            '        mo.SetSinglePhaseProp("pressure", "Solid", Nothing, New Double() {P})
+            '        mo.SetSinglePhaseProp("phasefraction", "Solid", "Mole", New Double() {pf})
+            '        mo.SetSinglePhaseProp("fraction", "Solid", "Mole", vz)
 
-                End If
+            '    End If
 
-            End If
+            'End If
 
         End Sub
-        ''' <summary>
-        ''' Checks whether the Property Package can support a particular type of Equilibrium Calculation.
-        ''' </summary>
-        ''' <param name="specification1">First specification for the Equilibrium Calculation.</param>
-        ''' <param name="specification2">Second specification for the Equilibrium Calculation.</param>
-        ''' <param name="solutionType">The required solution type.</param>
-        ''' <returns>Set to True if the combination of specifications and solutionType is supported 
-        ''' for a particular combination of present phases or False if not supported.</returns>
-        ''' <remarks>The meaning of the specification1, specification2 and solutionType arguments is the same as
-        ''' for the CalcEquilibrium method. If solutionType, specification1 and specification2
-        ''' arguments appear valid but the actual specifications are not supported or not recognised a
-        ''' False value should be returned.
-        ''' The result of the check should depend primarily on the capabilities and configuration
-        ''' (compounds and phases supported) of the component that implements the ICapeThermo-
-        ''' EquilibriumRoutine interface (egg. a Property package). A component that supports
-        ''' calculation specifications for any combination of supported phases is capable of checking
-        ''' the specification without any reference to a Material Object. However, it is possible that
-        ''' there may be restrictions on the combinations of phases supported in an equilibrium
-        ''' calculation. For example a component may support vapor-liquid and liquid-liquid
-        ''' calculations but not vapor-liquid-liquid calculations. In general it is therefore a necessary
-        ''' prerequisite that a Material Object has been set (using the SetMaterial method of the
-        ''' ICapeThermoMaterialContext interface) and that the SetPresentPhases method of the
-        ''' ICapeThermoMaterial interface has been called to specify the combination of phases for the
-        ''' equilibrium calculation. The result of the check should not depend on the state (temperature,
-        ''' pressure, composition etc.) of the Material Object.</remarks>
-        Public Overridable Function CheckEquilibriumSpec(ByVal specification1 As Object, ByVal specification2 As Object, ByVal solutionType As String) As Boolean Implements ICapeThermoEquilibriumRoutine.CheckEquilibriumSpec
+
+
+        '''' <summary>
+        '''' Checks whether the Property Package can support a particular type of Equilibrium Calculation.
+        '''' </summary>
+        '''' <param name="specification1">First specification for the Equilibrium Calculation.</param>
+        '''' <param name="specification2">Second specification for the Equilibrium Calculation.</param>
+        '''' <param name="solutionType">The required solution type.</param>
+        '''' <returns>Set to True if the combination of specifications and solutionType is supported 
+        '''' for a particular combination of present phases or False if not supported.</returns>
+        '''' <remarks>The meaning of the specification1, specification2 and solutionType arguments is the same as
+        '''' for the CalcEquilibrium method. If solutionType, specification1 and specification2
+        '''' arguments appear valid but the actual specifications are not supported or not recognised a
+        '''' False value should be returned.
+        '''' The result of the check should depend primarily on the capabilities and configuration
+        '''' (compounds and phases supported) of the component that implements the ICapeThermo-
+        '''' EquilibriumRoutine interface (egg. a Property package). A component that supports
+        '''' calculation specifications for any combination of supported phases is capable of checking
+        '''' the specification without any reference to a Material Object. However, it is possible that
+        '''' there may be restrictions on the combinations of phases supported in an equilibrium
+        '''' calculation. For example a component may support vapor-liquid and liquid-liquid
+        '''' calculations but not vapor-liquid-liquid calculations. In general it is therefore a necessary
+        '''' prerequisite that a Material Object has been set (using the SetMaterial method of the
+        '''' ICapeThermoMaterialContext interface) and that the SetPresentPhases method of the
+        '''' ICapeThermoMaterial interface has been called to specify the combination of phases for the
+        '''' equilibrium calculation. The result of the check should not depend on the state (temperature,
+        '''' pressure, composition etc.) of the Material Object.</remarks>
+        Public Overridable Function CheckEquilibriumSpec(ByVal specification1 As Object, ByVal specification2 As Object, ByVal solutionType As String) As Boolean 'Implements ICapeThermoEquilibriumRoutine.CheckEquilibriumSpec
             If specification1(0).ToString.ToLower = "temperature" And specification2(0).ToString.ToLower = "pressure" Then
                 Return True
             ElseIf specification1(0).ToString.ToLower = "pressure" And specification2(0).ToString.ToLower = "enthalpy" Then
@@ -6936,286 +6948,286 @@ Final3:
             End If
         End Function
 
-        ''' <summary>
-        ''' Allows the client of a component that implements this interface to pass an ICapeThermoMaterial 
-        ''' interface to the component, so that it can access the properties of a Material.
-        ''' </summary>
-        ''' <param name="material">The Material interface.</param>
-        ''' <remarks>The SetMaterial method allows a Thermodynamic and Physical Properties component, such
-        ''' as a Property Package, to be given the ICapeThermoMaterial interface of a Material Object.
-        ''' This interface gives the component access to the description of the Material for which
-        ''' Property Calculations or Equilibrium Calculations are required. The component can access
-        ''' property values directly using this interface. A client can also use the ICapeThermoMaterial
-        ''' interface to query a Material Object for its ICapeThermoCompounds and ICapeThermo-
-        ''' Phases interfaces, which provide access to Compound and Phase information, respectively.
-        ''' It is envisaged that the SetMaterial method will be used to check that the Material Interface
-        ''' supplied is valid and useable. For example, a Property Package may check that there are
-        ''' some Compounds in a Material Object and that those Compounds can be identified by the
-        ''' Property Package. In addition a Property Package may perform any initialisation that
-        ''' depends on the configuration of a Material Object. A Property Calculator component might
-        ''' typically use this method to query the Material Object for any required information
-        ''' concerning the Compounds.
-        ''' Calling the UnsetMaterial method of the ICapeThermoMaterialContext interface has the
-        ''' effect of removing the interface set by the SetMaterial method.
-        ''' After a call to SetMaterial() has been received, the object implementing the ICapeThermo-
-        ''' MaterialContext interface can assume that the number, name and order of compounds for
-        ''' that Material Object will remain fixed until the next call to SetMaterial() or UnsetMaterial().</remarks>
-        Public Overridable Sub SetMaterial(ByVal material As Object) Implements ICapeThermoMaterialContext.SetMaterial
+        '''' <summary>
+        '''' Allows the client of a component that implements this interface to pass an ICapeThermoMaterial 
+        '''' interface to the component, so that it can access the properties of a Material.
+        '''' </summary>
+        '''' <param name="material">The Material interface.</param>
+        '''' <remarks>The SetMaterial method allows a Thermodynamic and Physical Properties component, such
+        '''' as a Property Package, to be given the ICapeThermoMaterial interface of a Material Object.
+        '''' This interface gives the component access to the description of the Material for which
+        '''' Property Calculations or Equilibrium Calculations are required. The component can access
+        '''' property values directly using this interface. A client can also use the ICapeThermoMaterial
+        '''' interface to query a Material Object for its ICapeThermoCompounds and ICapeThermo-
+        '''' Phases interfaces, which provide access to Compound and Phase information, respectively.
+        '''' It is envisaged that the SetMaterial method will be used to check that the Material Interface
+        '''' supplied is valid and useable. For example, a Property Package may check that there are
+        '''' some Compounds in a Material Object and that those Compounds can be identified by the
+        '''' Property Package. In addition a Property Package may perform any initialisation that
+        '''' depends on the configuration of a Material Object. A Property Calculator component might
+        '''' typically use this method to query the Material Object for any required information
+        '''' concerning the Compounds.
+        '''' Calling the UnsetMaterial method of the ICapeThermoMaterialContext interface has the
+        '''' effect of removing the interface set by the SetMaterial method.
+        '''' After a call to SetMaterial() has been received, the object implementing the ICapeThermo-
+        '''' MaterialContext interface can assume that the number, name and order of compounds for
+        '''' that Material Object will remain fixed until the next call to SetMaterial() or UnsetMaterial().</remarks>
+        Public Overridable Sub SetMaterial(ByVal material As Object) 'Implements ICapeThermoMaterialContext.SetMaterial
             Me.CurrentMaterialStream = Nothing
             If _como IsNot Nothing Then
                 If Marshal.IsComObject(_como) Then
                     Marshal.ReleaseComObject(_como)
                 End If
             End If
-            If My.Application.CAPEOPENMode Then
-                _como = material
-                If TryCast(material, MaterialStream) Is Nothing Then
-                    Me.CurrentMaterialStream = COMaterialtoDWMaterial(material)
-                Else
-                    Me.CurrentMaterialStream = material
-                End If
-            Else
-                Me.CurrentMaterialStream = material
-            End If
+            'If My.Application.CAPEOPENMode Then
+            '    _como = material
+            '    If TryCast(material, MaterialStream) Is Nothing Then
+            '        Me.CurrentMaterialStream = COMaterialtoDWMaterial(material)
+            '    Else
+            '        Me.CurrentMaterialStream = material
+            '    End If
+            'Else
+            Me.CurrentMaterialStream = material
+            'End If
         End Sub
 
-        ''' <summary>
-        ''' Removes any previously set Material interface.
-        ''' </summary>
-        ''' <remarks>The UnsetMaterial method removes any Material interface previously set by a call to the
-        ''' SetMaterial method of the ICapeThermoMaterialContext interface. This means that any
-        ''' methods of other interfaces that depend on having a valid Material Interface, for example
-        ''' methods of the ICapeThermoPropertyRoutine or ICapeThermoEquilibriumRoutine
-        ''' interfaces, should behave in the same way as if the SetMaterial method had never been
-        ''' called.
-        ''' If UnsetMaterial is called before a call to SetMaterial it has no effect and no exception
-        ''' should be raised.</remarks>
-        Public Overridable Sub UnsetMaterial() Implements ICapeThermoMaterialContext.UnsetMaterial
+        '''' <summary>
+        '''' Removes any previously set Material interface.
+        '''' </summary>
+        '''' <remarks>The UnsetMaterial method removes any Material interface previously set by a call to the
+        '''' SetMaterial method of the ICapeThermoMaterialContext interface. This means that any
+        '''' methods of other interfaces that depend on having a valid Material Interface, for example
+        '''' methods of the ICapeThermoPropertyRoutine or ICapeThermoEquilibriumRoutine
+        '''' interfaces, should behave in the same way as if the SetMaterial method had never been
+        '''' called.
+        '''' If UnsetMaterial is called before a call to SetMaterial it has no effect and no exception
+        '''' should be raised.</remarks>
+        Public Overridable Sub UnsetMaterial() 'Implements ICapeThermoMaterialContext.UnsetMaterial
             Me.CurrentMaterialStream = Nothing
-            If My.Application.CAPEOPENMode Then
-                If _como IsNot Nothing Then
-                    If Marshal.IsComObject(_como) Then
-                        Marshal.ReleaseComObject(_como)
-                    End If
-                End If
-            End If
+            'If My.Application.CAPEOPENMode Then
+            '    If _como IsNot Nothing Then
+            '        If Marshal.IsComObject(_como) Then
+            '            Marshal.ReleaseComObject(_como)
+            '        End If
+            '    End If
+            'End If
         End Sub
 
-        ''' <summary>
-        ''' Converts a COM Material Object into a DWSIM Material Stream.
-        ''' </summary>
-        ''' <param name="material">The Material Object to convert from</param>
-        ''' <returns>A DWSIM Material Stream</returns>
-        ''' <remarks>This function is called by SetMaterial when DWSIM Property Packages are working in outside environments (CAPE-OPEN COSEs) like COCO/COFE.</remarks>
-        Friend Function COMaterialtoDWMaterial(ByVal material As Object) As MaterialStream
+        '''' <summary>
+        '''' Converts a COM Material Object into a DWSIM Material Stream.
+        '''' </summary>
+        '''' <param name="material">The Material Object to convert from</param>
+        '''' <returns>A DWSIM Material Stream</returns>
+        '''' <remarks>This function is called by SetMaterial when DWSIM Property Packages are working in outside environments (CAPE-OPEN COSEs) like COCO/COFE.</remarks>
+        'Friend Function COMaterialtoDWMaterial(ByVal material As Object) As MaterialStream
 
-            Dim ms As New MaterialStream(CType(material, ICapeIdentification).ComponentName, "")
-            For Each phase As BaseThermoClasses.Phase In ms.Phases.Values
-                For Each tmpcomp As ConstantProperties In _selectedcomps.Values
-                    phase.Components.Add(tmpcomp.Name, New Substance(tmpcomp.Name, ""))
-                    phase.Components(tmpcomp.Name).ConstantProperties = tmpcomp
-                Next
-            Next
+        '    Dim ms As New MaterialStream(CType(material, ICapeIdentification).ComponentName, "")
+        '    For Each phase As BaseThermoClasses.Phase In ms.Phases.Values
+        '        For Each tmpcomp As ConstantProperties In _selectedcomps.Values
+        '            phase.Components.Add(tmpcomp.Name, New Substance(tmpcomp.Name, ""))
+        '            phase.Components(tmpcomp.Name).ConstantProperties = tmpcomp
+        '        Next
+        '    Next
 
-            'transfer values
+        '    'transfer values
 
-            Dim mys As ICapeThermoMaterial = material
+        '    Dim mys As ICapeThermoMaterial = material
 
-            Dim Tv, Tl1, Tl2, Pv, Pl1, Pl2, xv, xl1, xl2 As Double
-            Dim Vz As Object = Nothing
-            Dim Vy As Object = Nothing
-            Dim Vx1 As Object = Nothing
-            Dim Vx2 As Object = Nothing
-            Dim Vwy As Object = Nothing
-            Dim Vwx1 As Object = Nothing
-            Dim Vwx2 As Object = Nothing
-            Dim labels As Object = Nothing
-            Dim statuses As Object = Nothing
-            Dim res As Object = Nothing
+        '    Dim Tv, Tl1, Tl2, Pv, Pl1, Pl2, xv, xl1, xl2 As Double
+        '    Dim Vz As Object = Nothing
+        '    Dim Vy As Object = Nothing
+        '    Dim Vx1 As Object = Nothing
+        '    Dim Vx2 As Object = Nothing
+        '    Dim Vwy As Object = Nothing
+        '    Dim Vwx1 As Object = Nothing
+        '    Dim Vwx2 As Object = Nothing
+        '    Dim labels As Object = Nothing
+        '    Dim statuses As Object = Nothing
+        '    Dim res As Object = Nothing
 
-            Try
-                mys.GetOverallProp("fraction", "Mole", res)
-                Vz = res
-            Catch ex As Exception
-                Vz = RET_NullVector()
-            End Try
+        '    Try
+        '        mys.GetOverallProp("fraction", "Mole", res)
+        '        Vz = res
+        '    Catch ex As Exception
+        '        Vz = RET_NullVector()
+        '    End Try
 
-            mys.GetPresentPhases(labels, statuses)
+        '    mys.GetPresentPhases(labels, statuses)
 
-            Dim data(0) As Double
+        '    Dim data(0) As Double
 
-            Dim i As Integer = 0
-            Dim n As Integer = UBound(labels)
+        '    Dim i As Integer = 0
+        '    Dim n As Integer = UBound(labels)
 
-            For i = 0 To n
-                If statuses(i) = eCapePhaseStatus.CAPE_ATEQUILIBRIUM Then
-                    Select Case labels(i)
-                        Case "Vapor"
-                            mys.GetTPFraction(labels(i), Tv, Pv, Vy)
-                        Case "Liquid"
-                            mys.GetTPFraction(labels(i), Tl1, Pl1, Vx1)
-                        Case "Liquid2"
-                            mys.GetTPFraction(labels(i), Tl2, Pl2, Vx2)
-                    End Select
-                    Select Case labels(i)
-                        Case "Vapor"
-                            mys.GetSinglePhaseProp("phasefraction", labels(i), "Mole", res)
-                            xv = res(0)
-                        Case "Liquid"
-                            mys.GetSinglePhaseProp("phasefraction", labels(i), "Mole", res)
-                            xl1 = res(0)
-                        Case "Liquid2"
-                            mys.GetSinglePhaseProp("phasefraction", labels(i), "Mole", res)
-                            xl2 = res(0)
-                    End Select
-                Else
-                    Select Case labels(i)
-                        Case "Vapor"
-                            xv = 0.0#
-                        Case "Liquid"
-                            xl1 = 0.0#
-                        Case "Liquid2"
-                            xl2 = 0.0#
-                    End Select
-                End If
-            Next
+        '    For i = 0 To n
+        '        If statuses(i) = eCapePhaseStatus.CAPE_ATEQUILIBRIUM Then
+        '            Select Case labels(i)
+        '                Case "Vapor"
+        '                    mys.GetTPFraction(labels(i), Tv, Pv, Vy)
+        '                Case "Liquid"
+        '                    mys.GetTPFraction(labels(i), Tl1, Pl1, Vx1)
+        '                Case "Liquid2"
+        '                    mys.GetTPFraction(labels(i), Tl2, Pl2, Vx2)
+        '            End Select
+        '            Select Case labels(i)
+        '                Case "Vapor"
+        '                    mys.GetSinglePhaseProp("phasefraction", labels(i), "Mole", res)
+        '                    xv = res(0)
+        '                Case "Liquid"
+        '                    mys.GetSinglePhaseProp("phasefraction", labels(i), "Mole", res)
+        '                    xl1 = res(0)
+        '                Case "Liquid2"
+        '                    mys.GetSinglePhaseProp("phasefraction", labels(i), "Mole", res)
+        '                    xl2 = res(0)
+        '            End Select
+        '        Else
+        '            Select Case labels(i)
+        '                Case "Vapor"
+        '                    xv = 0.0#
+        '                Case "Liquid"
+        '                    xl1 = 0.0#
+        '                Case "Liquid2"
+        '                    xl2 = 0.0#
+        '            End Select
+        '        End If
+        '    Next
 
-            Me.CurrentMaterialStream = ms
+        '    Me.CurrentMaterialStream = ms
 
-            'copy fractions
+        '    'copy fractions
 
-            With ms
-                i = 0
-                For Each s As Substance In .Phases(0).Components.Values
-                    s.MolarFraction = Vz(i)
-                    i += 1
-                Next
-                If Vy IsNot Nothing Then
-                    i = 0
-                    For Each s As Substance In .Phases(2).Components.Values
-                        s.MolarFraction = Vy(i)
-                        i += 1
-                    Next
-                    Vwy = Me.AUX_CONVERT_MOL_TO_MASS(Vy)
-                    i = 0
-                    For Each s As Substance In .Phases(2).Components.Values
-                        s.MassFraction = Vwy(i)
-                        i += 1
-                    Next
-                Else
-                    i = 0
-                    For Each s As Substance In .Phases(2).Components.Values
-                        s.MolarFraction = 0.0#
-                        i += 1
-                    Next
-                    i = 0
-                    For Each s As Substance In .Phases(2).Components.Values
-                        s.MassFraction = 0.0#
-                        i += 1
-                    Next
-                End If
-                .Phases(2).SPMProperties.molarfraction = xv
-                If Vx1 IsNot Nothing Then
-                    i = 0
-                    For Each s As Substance In .Phases(3).Components.Values
-                        s.MolarFraction = Vx1(i)
-                        i += 1
-                    Next
-                    Vwx1 = Me.AUX_CONVERT_MOL_TO_MASS(Vx1)
-                    i = 0
-                    For Each s As Substance In .Phases(3).Components.Values
-                        s.MassFraction = Vwx1(i)
-                        i += 1
-                    Next
-                Else
-                    i = 0
-                    For Each s As Substance In .Phases(3).Components.Values
-                        s.MolarFraction = 0.0#
-                        i += 1
-                    Next
-                    i = 0
-                    For Each s As Substance In .Phases(3).Components.Values
-                        s.MassFraction = 0.0#
-                        i += 1
-                    Next
-                End If
-                .Phases(3).SPMProperties.molarfraction = xl1
-                If Vx2 IsNot Nothing Then
-                    i = 0
-                    For Each s As Substance In .Phases(4).Components.Values
-                        s.MolarFraction = Vx2(i)
-                        i += 1
-                    Next
-                    Vwx2 = Me.AUX_CONVERT_MOL_TO_MASS(Vx2)
-                    i = 0
-                    For Each s As Substance In .Phases(4).Components.Values
-                        s.MassFraction = Vwx2(i)
-                        i += 1
-                    Next
-                Else
-                    i = 0
-                    For Each s As Substance In .Phases(4).Components.Values
-                        s.MolarFraction = 0.0#
-                        i += 1
-                    Next
-                    i = 0
-                    For Each s As Substance In .Phases(4).Components.Values
-                        s.MassFraction = 0.0#
-                        i += 1
-                    Next
-                End If
-                .Phases(4).SPMProperties.molarfraction = xl2
-            End With
+        '    With ms
+        '        i = 0
+        '        For Each s As Substance In .Phases(0).Components.Values
+        '            s.MolarFraction = Vz(i)
+        '            i += 1
+        '        Next
+        '        If Vy IsNot Nothing Then
+        '            i = 0
+        '            For Each s As Substance In .Phases(2).Components.Values
+        '                s.MolarFraction = Vy(i)
+        '                i += 1
+        '            Next
+        '            Vwy = Me.AUX_CONVERT_MOL_TO_MASS(Vy)
+        '            i = 0
+        '            For Each s As Substance In .Phases(2).Components.Values
+        '                s.MassFraction = Vwy(i)
+        '                i += 1
+        '            Next
+        '        Else
+        '            i = 0
+        '            For Each s As Substance In .Phases(2).Components.Values
+        '                s.MolarFraction = 0.0#
+        '                i += 1
+        '            Next
+        '            i = 0
+        '            For Each s As Substance In .Phases(2).Components.Values
+        '                s.MassFraction = 0.0#
+        '                i += 1
+        '            Next
+        '        End If
+        '        .Phases(2).SPMProperties.molarfraction = xv
+        '        If Vx1 IsNot Nothing Then
+        '            i = 0
+        '            For Each s As Substance In .Phases(3).Components.Values
+        '                s.MolarFraction = Vx1(i)
+        '                i += 1
+        '            Next
+        '            Vwx1 = Me.AUX_CONVERT_MOL_TO_MASS(Vx1)
+        '            i = 0
+        '            For Each s As Substance In .Phases(3).Components.Values
+        '                s.MassFraction = Vwx1(i)
+        '                i += 1
+        '            Next
+        '        Else
+        '            i = 0
+        '            For Each s As Substance In .Phases(3).Components.Values
+        '                s.MolarFraction = 0.0#
+        '                i += 1
+        '            Next
+        '            i = 0
+        '            For Each s As Substance In .Phases(3).Components.Values
+        '                s.MassFraction = 0.0#
+        '                i += 1
+        '            Next
+        '        End If
+        '        .Phases(3).SPMProperties.molarfraction = xl1
+        '        If Vx2 IsNot Nothing Then
+        '            i = 0
+        '            For Each s As Substance In .Phases(4).Components.Values
+        '                s.MolarFraction = Vx2(i)
+        '                i += 1
+        '            Next
+        '            Vwx2 = Me.AUX_CONVERT_MOL_TO_MASS(Vx2)
+        '            i = 0
+        '            For Each s As Substance In .Phases(4).Components.Values
+        '                s.MassFraction = Vwx2(i)
+        '                i += 1
+        '            Next
+        '        Else
+        '            i = 0
+        '            For Each s As Substance In .Phases(4).Components.Values
+        '                s.MolarFraction = 0.0#
+        '                i += 1
+        '            Next
+        '            i = 0
+        '            For Each s As Substance In .Phases(4).Components.Values
+        '                s.MassFraction = 0.0#
+        '                i += 1
+        '            Next
+        '        End If
+        '        .Phases(4).SPMProperties.molarfraction = xl2
+        '    End With
 
-            Return ms
+        '    Return ms
 
-        End Function
+        'End Function
 
 #End Region
 
-#Region "CAPE-OPEN ICapeUtilities Implementation"
+        '#Region "CAPE-OPEN ICapeUtilities Implementation"
 
-        Friend _availablecomps As Dictionary(Of String, ConstantProperties)
-        Friend _selectedcomps As Dictionary(Of String, ConstantProperties)
+        '        Friend _availablecomps As Dictionary(Of String, ConstantProperties)
+        '        Friend _selectedcomps As Dictionary(Of String, ConstantProperties)
 
-        Public ReadOnly Property AvailableCompounds As Dictionary(Of String, ConstantProperties)
-            Get
-                Return _availablecomps
-            End Get
-        End Property
+        '        Public ReadOnly Property AvailableCompounds As Dictionary(Of String, ConstantProperties)
+        '            Get
+        '                Return _availablecomps
+        '            End Get
+        '        End Property
 
-        Public ReadOnly Property SelectedCompounds As Dictionary(Of String, ConstantProperties)
-            Get
-                Return _selectedcomps
-            End Get
-        End Property
+        '        Public ReadOnly Property SelectedCompounds As Dictionary(Of String, ConstantProperties)
+        '            Get
+        '                Return _selectedcomps
+        '            End Get
+        '        End Property
 
-        <NonSerialized()> Friend _pme As Object
+        '        <NonSerialized()> Friend _pme As Object
 
-        ''' <summary>
-        ''' The PMC displays its user interface and allows the Flowsheet User to interact with it. If no user interface is
-        ''' available it returns an error.</summary>
-        ''' <remarks></remarks>
-        Public Overridable Sub Edit() Implements ICapeUtilities.Edit
+        '        ''' <summary>
+        '        ''' The PMC displays its user interface and allows the Flowsheet User to interact with it. If no user interface is
+        '        ''' available it returns an error.</summary>
+        '        ''' <remarks></remarks>
+        '        Public Overridable Sub Edit() Implements ICapeUtilities.Edit
 
-            'do nothing
+        '            'do nothing
 
-        End Sub
+        '        End Sub
 
-        ''' <summary>
-        ''' Initially, this method was only present in the ICapeUnit interface. Since ICapeUtilities.Initialize is now
-        ''' available for any kind of PMC, ICapeUnit. Initialize is deprecated.
-        ''' The PME will order the PMC to get initialized through this method. Any initialisation that could fail must be
-        ''' placed here. Initialize is guaranteed to be the first method called by the client (except low level methods such
-        ''' as class constructors or initialization persistence methods). Initialize has to be called once when the PMC is
-        ''' instantiated in a particular flowsheet.
-        ''' When the initialization fails, before signalling an error, the PMC must free all the resources that were
-        ''' allocated before the failure occurred. When the PME receives this error, it may not use the PMC anymore.
-        ''' The method terminate of the current interface must not either be called. Hence, the PME may only release
-        ''' the PMC through the middleware native mechanisms.
-        ''' </summary>
-        ''' <remarks></remarks>
-        Public Overridable Sub Initialize() Implements ICapeUtilities.Initialize
+        '        ''' <summary>
+        '        ''' Initially, this method was only present in the ICapeUnit interface. Since ICapeUtilities.Initialize is now
+        '        ''' available for any kind of PMC, ICapeUnit. Initialize is deprecated.
+        '        ''' The PME will order the PMC to get initialized through this method. Any initialisation that could fail must be
+        '        ''' placed here. Initialize is guaranteed to be the first method called by the client (except low level methods such
+        '        ''' as class constructors or initialization persistence methods). Initialize has to be called once when the PMC is
+        '        ''' instantiated in a particular flowsheet.
+        '        ''' When the initialization fails, before signalling an error, the PMC must free all the resources that were
+        '        ''' allocated before the failure occurred. When the PME receives this error, it may not use the PMC anymore.
+        '        ''' The method terminate of the current interface must not either be called. Hence, the PME may only release
+        '        ''' the PMC through the middleware native mechanisms.
+        '        ''' </summary>
+        '        ''' <remarks></remarks>
+        Public Overridable Sub Initialize() 'Implements ICapeUtilities.Initialize
 
             Me.m_ip = New DataTable
             Me.m_props = New Auxiliary.PROPS
@@ -7241,66 +7253,66 @@ Final3:
 
         End Sub
 
-        ''' <summary>
-        ''' Returns an ICapeCollection interface.
-        ''' </summary>
-        ''' <value></value>
-        ''' <returns>CapeInterface (ICapeCollection)</returns>
-        ''' <remarks>This interface will contain a collection of ICapeParameter interfaces.
-        ''' This method allows any client to access all the CO Parameters exposed by a PMC. Initially, this method was
-        ''' only present in the ICapeUnit interface. Since ICapeUtilities.GetParameters is now available for any kind of
-        ''' PMC, ICapeUnit.GetParameters is deprecated. Consult the “Open Interface Specification: Parameter
-        ''' Common Interface” document for more information about parameter. Consult the “Open Interface
-        ''' Specification: Collection Common Interface” document for more information about collection.
-        ''' If the PMC does not support exposing its parameters, it should raise the ECapeNoImpl error, instead of
-        ''' returning a NULL reference or an empty Collection. But if the PMC supports parameters but has for this call
-        ''' no parameters, it should return a valid ICapeCollection reference exposing zero parameters.</remarks>
-        Public Overridable ReadOnly Property parameters1() As Object Implements ICapeUtilities.parameters
-            Get
-                Throw New NotImplementedException
-            End Get
-        End Property
+        '        ''' <summary>
+        '        ''' Returns an ICapeCollection interface.
+        '        ''' </summary>
+        '        ''' <value></value>
+        '        ''' <returns>CapeInterface (ICapeCollection)</returns>
+        '        ''' <remarks>This interface will contain a collection of ICapeParameter interfaces.
+        '        ''' This method allows any client to access all the CO Parameters exposed by a PMC. Initially, this method was
+        '        ''' only present in the ICapeUnit interface. Since ICapeUtilities.GetParameters is now available for any kind of
+        '        ''' PMC, ICapeUnit.GetParameters is deprecated. Consult the “Open Interface Specification: Parameter
+        '        ''' Common Interface” document for more information about parameter. Consult the “Open Interface
+        '        ''' Specification: Collection Common Interface” document for more information about collection.
+        '        ''' If the PMC does not support exposing its parameters, it should raise the ECapeNoImpl error, instead of
+        '        ''' returning a NULL reference or an empty Collection. But if the PMC supports parameters but has for this call
+        '        ''' no parameters, it should return a valid ICapeCollection reference exposing zero parameters.</remarks>
+        '        Public Overridable ReadOnly Property parameters1() As Object Implements ICapeUtilities.parameters
+        '            Get
+        '                Throw New NotImplementedException
+        '            End Get
+        '        End Property
 
-        ''' <summary>
-        ''' Allows the PME to convey the PMC a reference to the former’s simulation context. 
-        ''' </summary>
-        ''' <value>The reference to the PME’s simulation context class. For the PMC to
-        ''' use this class, this reference will have to be converted to each of the
-        ''' defined CO Simulation Context interfaces.</value>
-        ''' <remarks>The simulation context
-        ''' will be PME objects which will expose a given set of CO interfaces. Each of these interfaces will allow the
-        ''' PMC to call back the PME in order to benefit from its exposed services (such as creation of material
-        ''' templates, diagnostics or measurement unit conversion). If the PMC does not support accessing the
-        ''' simulation context, it is recommended to raise the ECapeNoImpl error.
-        ''' Initially, this method was only present in the ICapeUnit interface. Since ICapeUtilities.SetSimulationContext
-        ''' is now available for any kind of PMC, ICapeUnit. SetSimulationContext is deprecated.</remarks>
-        Public Overridable WriteOnly Property simulationContext() As Object Implements ICapeUtilities.simulationContext
-            Set(ByVal value As Object)
-                _pme = value
-            End Set
-        End Property
+        '        ''' <summary>
+        '        ''' Allows the PME to convey the PMC a reference to the former’s simulation context. 
+        '        ''' </summary>
+        '        ''' <value>The reference to the PME’s simulation context class. For the PMC to
+        '        ''' use this class, this reference will have to be converted to each of the
+        '        ''' defined CO Simulation Context interfaces.</value>
+        '        ''' <remarks>The simulation context
+        '        ''' will be PME objects which will expose a given set of CO interfaces. Each of these interfaces will allow the
+        '        ''' PMC to call back the PME in order to benefit from its exposed services (such as creation of material
+        '        ''' templates, diagnostics or measurement unit conversion). If the PMC does not support accessing the
+        '        ''' simulation context, it is recommended to raise the ECapeNoImpl error.
+        '        ''' Initially, this method was only present in the ICapeUnit interface. Since ICapeUtilities.SetSimulationContext
+        '        ''' is now available for any kind of PMC, ICapeUnit. SetSimulationContext is deprecated.</remarks>
+        'Public Overridable WriteOnly Property simulationContext() As Object 'Implements ICapeUtilities.simulationContext
+        '    Set(ByVal value As Object)
+        '        _pme = value
+        '    End Set
+        'End Property
 
-        ''' <summary>
-        ''' Initially, this method was only present in the ICapeUnit interface. Since ICapeUtilities.Terminate is now
-        ''' available for any kind of PMC, ICapeUnit.Terminate is deprecated.
-        ''' The PME will order the PMC to get destroyed through this method. Any uninitialization that could fail must
-        ''' be placed here. ‘Terminate’ is guaranteed to be the last method called by the client (except low level methods
-        ''' such as class destructors). ‘Terminate’ may be called at any time, but may be only called once.
-        ''' When this method returns an error, the PME should report the user. However, after that the PME is not
-        ''' allowed to use the PMC anymore.
-        ''' The Unit specification stated that “Terminate may check if the data has been saved and return an error if
-        ''' not.” It is suggested not to follow this recommendation, since it’s the PME responsibility to save the state of
-        ''' the PMC before terminating it. In the case that a user wants to close a simulation case without saving it, it’s
-        ''' better to leave the PME to handle the situation instead of each PMC providing a different implementation.
-        ''' </summary>
-        ''' <remarks></remarks>
-        Public Overridable Sub Terminate() Implements ICapeUtilities.Terminate
+        '        ''' <summary>
+        '        ''' Initially, this method was only present in the ICapeUnit interface. Since ICapeUtilities.Terminate is now
+        '        ''' available for any kind of PMC, ICapeUnit.Terminate is deprecated.
+        '        ''' The PME will order the PMC to get destroyed through this method. Any uninitialization that could fail must
+        '        ''' be placed here. ‘Terminate’ is guaranteed to be the last method called by the client (except low level methods
+        '        ''' such as class destructors). ‘Terminate’ may be called at any time, but may be only called once.
+        '        ''' When this method returns an error, the PME should report the user. However, after that the PME is not
+        '        ''' allowed to use the PMC anymore.
+        '        ''' The Unit specification stated that “Terminate may check if the data has been saved and return an error if
+        '        ''' not.” It is suggested not to follow this recommendation, since it’s the PME responsibility to save the state of
+        '        ''' the PMC before terminating it. In the case that a user wants to close a simulation case without saving it, it’s
+        '        ''' better to leave the PME to handle the situation instead of each PMC providing a different implementation.
+        '        ''' </summary>
+        '        ''' <remarks></remarks>
+        Public Overridable Sub Terminate() 'Implements ICapeUtilities.Terminate
             Me.CurrentMaterialStream = Nothing
             If _como IsNot Nothing Then Marshal.ReleaseComObject(_como)
             Me.Dispose()
         End Sub
 
-#End Region
+        '#End Region
 
 #Region "CAPE-OPEN Error Interfaces"
 
@@ -7320,43 +7332,43 @@ Final3:
 
         Private _name, _description, _interfacename, _moreinfo, _operation, _scope As String, _code As Integer
 
-        Public ReadOnly Property Name() As String Implements ECapeRoot.name
+        Public ReadOnly Property Name() As String 'Implements ECapeRoot.name
             Get
                 Return _name
             End Get
         End Property
 
-        Public ReadOnly Property code() As Integer Implements ECapeUser.code
+        Public ReadOnly Property code() As Integer 'Implements ECapeUser.code
             Get
                 Return _code
             End Get
         End Property
 
-        Public ReadOnly Property description() As String Implements ECapeUser.description
+        Public ReadOnly Property description() As String 'Implements ECapeUser.description
             Get
                 Return _description
             End Get
         End Property
 
-        Public ReadOnly Property interfaceName() As String Implements ECapeUser.interfaceName
+        Public ReadOnly Property interfaceName() As String 'Implements ECapeUser.interfaceName
             Get
                 Return _interfacename
             End Get
         End Property
 
-        Public ReadOnly Property moreInfo() As String Implements ECapeUser.moreInfo
+        Public ReadOnly Property moreInfo() As String 'Implements ECapeUser.moreInfo
             Get
                 Return _moreinfo
             End Get
         End Property
 
-        Public ReadOnly Property operation() As String Implements ECapeUser.operation
+        Public ReadOnly Property operation() As String 'Implements ECapeUser.operation
             Get
                 Return _operation
             End Get
         End Property
 
-        Public ReadOnly Property scope() As String Implements ECapeUser.scope
+        Public ReadOnly Property scope() As String 'Implements ECapeUser.scope
             Get
                 Return _scope
             End Get
@@ -7382,13 +7394,13 @@ Final3:
                         _como = Nothing
                     End If
                 End If
-                If _pme IsNot Nothing Then
-                    If Marshal.IsComObject(_pme) Then
-                        Marshal.ReleaseComObject(_pme)
-                    Else
-                        _pme = Nothing
-                    End If
-                End If
+                'If _pme IsNot Nothing Then
+                '    If Marshal.IsComObject(_pme) Then
+                '        Marshal.ReleaseComObject(_pme)
+                '    Else
+                '        _pme = Nothing
+                '    End If
+                'End If
 
 
                 ' TODO: set large fields to null.

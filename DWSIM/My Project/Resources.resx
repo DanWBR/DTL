@@ -119,78 +119,78 @@
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="chemsep1" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\bin\x86\release\data\chemsep1.xml;System.Byte[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>..\Resources\chemsep1.xml;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="csid" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\bin\x86\release\data\csid.dat;System.Byte[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>..\Resources\csid.dat;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="dwsim" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\bin\x86\release\data\DWSIM.xml;System.Byte[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="joback" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\bin\x86\release\data\joback.txt;System.Byte[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="kij_pr" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\bin\x86\release\data\kij_pr.dat;System.Byte[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="kij_srk" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\bin\x86\release\data\kij_srk.dat;System.Byte[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="lkp_ip" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\bin\x86\release\data\lkp_ip.dat;System.Byte[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="modfac" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\bin\x86\release\data\modfac.txt;System.Byte[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="modfac_ip" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\bin\x86\release\data\modfac_ip.txt;System.Byte[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="nrtl" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\bin\x86\release\data\nrtl.dat;System.Byte[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="pcsaft" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\bin\x86\release\data\pcsaft.dat;System.Byte[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="pcsaft_ip" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\bin\x86\release\data\pcsaft_ip.dat;System.Byte[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="prsv2" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\bin\x86\release\data\prsv2.dat;System.Byte[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="prsv2_ip" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\bin\x86\release\data\prsv2_ip.dat;System.Byte[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="prsv2_ip_vl" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\bin\x86\release\data\prsv2_ip_vl.dat;System.Byte[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="pr_ip" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\bin\x86\release\data\pr_ip.dat;System.Byte[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="srk_ip" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\bin\x86\release\data\srk_ip.dat;System.Byte[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="unifac" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\bin\x86\release\data\unifac.txt;System.Byte[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="unifac_ip" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\bin\x86\release\data\unifac_ip.txt;System.Byte[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="unifac_ll_ip" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\bin\x86\release\data\unifac_ll_ip.txt;System.Byte[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="uniquac" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\bin\x86\release\data\uniquac.dat;System.Byte[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="uniquacip" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\bin\x86\release\data\uniquacip.dat;System.Byte[], mscorlib, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>..\Resources\DWSIM.xml;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="Henry" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\bin\x86\Release\data\Henry.txt;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>..\Resources\Henry.txt;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="joback" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\joback.txt;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="kij_pr" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\kij_pr.dat;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="kij_srk" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\kij_srk.dat;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="lkp_ip" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\lkp_ip.dat;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="modfac" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\modfac.txt;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="modfac_ip" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\modfac_ip.txt;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="NIST_MODFAC_IP" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\bin\x86\Release\data\NIST-MODFAC_IP.txt;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>..\Resources\NIST-MODFAC_IP.txt;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="NIST_MODFAC_RiQi" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\bin\x86\Release\data\NIST-MODFAC_RiQi.txt;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>..\Resources\NIST-MODFAC_RiQi.txt;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="nrtl" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\nrtl.dat;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="pcsaft" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\pcsaft.dat;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="pcsaft_ip" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\pcsaft_ip.dat;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="prsv2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\prsv2.dat;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="prsv2_ip" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\prsv2_ip.dat;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="prsv2_ip_vl" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\prsv2_ip_vl.dat;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="pr_ip" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\pr_ip.dat;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="srk_ip" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\srk_ip.dat;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="unifac" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\unifac.txt;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="unifac_ip" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\unifac_ip.txt;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="unifac_ll_ip" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\unifac_ll_ip.txt;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="uniquac" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\uniquac.dat;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="uniquacip" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\uniquacip.dat;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
 </root>

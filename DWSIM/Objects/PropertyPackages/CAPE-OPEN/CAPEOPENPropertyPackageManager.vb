@@ -4,7 +4,7 @@ Imports CAPEOPEN110
 <Serializable()> _
 Friend Class CAPEOPENPropertyPackageManager
 
-    Implements ICapeIdentification, ICapeThermoPropertyPackageManager, ICapeUtilities
+    'Implements ICapeIdentification, ICapeThermoPropertyPackageManager, ICapeUtilities
     Implements IDisposable
 
     Private _name, _description As String
@@ -14,7 +14,7 @@ Friend Class CAPEOPENPropertyPackageManager
         _description = "Exposes DTL Property Packages to clients using CAPE-OPEN Thermodynamic Interface Definitions"
     End Sub
 
-    Public Function GetPropertyPackage(ByVal PackageName As String) As Object Implements ICapeThermoPropertyPackageManager.GetPropertyPackage
+    Public Function GetPropertyPackage(ByVal PackageName As String) As Object 'Implements ICapeThermoPropertyPackageManager.GetPropertyPackage
         Dim pp As PropertyPackage = Nothing
         Select Case PackageName
             Case "Peng-Robinson (PR)"
@@ -72,13 +72,13 @@ Friend Class CAPEOPENPropertyPackageManager
         Return pp
     End Function
 
-    Public Function GetPropertyPackageList() As Object Implements ICapeThermoPropertyPackageManager.GetPropertyPackageList
-        Return New String() {"Peng-Robinson (PR)", "Peng-Robinson-Stryjek-Vera 2 (PRSV2-M)", "Peng-Robinson-Stryjek-Vera 2 (PRSV2-VL)", "Soave-Redlich-Kwong (SRK)", "Peng-Robinson / Lee-Kesler (PR/LK)", _
-                             "UNIFAC", "UNIFAC-LL", "Modified UNIFAC (Dortmund)", "Modified UNIFAC (NIST)", "NRTL", "UNIQUAC", _
+    Public Function GetPropertyPackageList() As Object 'Implements ICapeThermoPropertyPackageManager.GetPropertyPackageList
+        Return New String() {"Peng-Robinson (PR)", "Peng-Robinson-Stryjek-Vera 2 (PRSV2-M)", "Peng-Robinson-Stryjek-Vera 2 (PRSV2-VL)", "Soave-Redlich-Kwong (SRK)", "Peng-Robinson / Lee-Kesler (PR/LK)",
+                             "UNIFAC", "UNIFAC-LL", "Modified UNIFAC (Dortmund)", "Modified UNIFAC (NIST)", "NRTL", "UNIQUAC",
                             "Chao-Seader", "Grayson-Streed", "Lee-Kesler-Plöcker", "Raoult's Law", "IAPWS-IF97 Steam Tables"}
     End Function
 
-    Public Property ComponentDescription() As String Implements ICapeIdentification.ComponentDescription
+    Public Property ComponentDescription() As String 'Implements ICapeIdentification.ComponentDescription
         Get
             Return _description
         End Get
@@ -87,7 +87,7 @@ Friend Class CAPEOPENPropertyPackageManager
         End Set
     End Property
 
-    Public Property ComponentName() As String Implements ICapeIdentification.ComponentName
+    Public Property ComponentName() As String 'Implements ICapeIdentification.ComponentName
         Get
             Return _name
         End Get
@@ -96,27 +96,27 @@ Friend Class CAPEOPENPropertyPackageManager
         End Set
     End Property
 
-    Public Sub Edit() Implements ICapeUtilities.Edit
+    Public Sub Edit() 'Implements ICapeUtilities.Edit
         Throw New Exception("Edit() not implemented.")
     End Sub
 
-    Public Sub Initialize() Implements ICapeUtilities.Initialize
+    Public Sub Initialize() 'Implements ICapeUtilities.Initialize
         '
     End Sub
 
-    Public ReadOnly Property parameters() As Object Implements ICapeUtilities.parameters
+    Public ReadOnly Property parameters() As Object 'Implements ICapeUtilities.parameters
         Get
             Throw New NotImplementedException
         End Get
     End Property
 
-    Public WriteOnly Property simulationContext() As Object Implements ICapeUtilities.simulationContext
+    Public WriteOnly Property simulationContext() As Object 'Implements ICapeUtilities.simulationContext
         Set(ByVal value As Object)
             'do nothing
         End Set
     End Property
 
-    Public Sub Terminate() Implements ICapeUtilities.Terminate
+    Public Sub Terminate() 'Implements ICapeUtilities.Terminate
         Me.Dispose()
     End Sub
 

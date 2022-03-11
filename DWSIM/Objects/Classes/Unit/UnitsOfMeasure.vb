@@ -635,7 +635,7 @@ Namespace DTL.UnitsOfMeasure
 
     <Serializable()> Public Class Converter
 
-        Public Function ConvertToSI(ByVal unit As String, ByVal value As Double)
+        Public Function ConvertToSI(ByVal unit As String, ByVal value As Double) As Double
 
             Select Case unit
 
@@ -1008,7 +1008,7 @@ Namespace DTL.UnitsOfMeasure
 
         End Function
 
-        Public Function ConvertFromSI(ByVal unit As String, ByVal value As Double)
+        Public Function ConvertFromSI(ByVal unit As String, ByVal value As Double) As Double
 
             Select Case unit
 
