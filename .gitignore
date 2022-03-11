@@ -19,7 +19,7 @@ obj
 /DTLTest2/bin/Release
 /DTLTest3/bin/Release
 /DWSIM/bin/Release
-*.suo
+#*.suo
 /.vs/DTL/v15/Server/sqlite3
 
 ## Ignore Visual Studio temporary files, build results, and
@@ -29,7 +29,7 @@ obj
 
 # User-specific files
 *.rsuser
-*.suo
+#*.suo
 *.user
 *.userosscache
 *.sln.docstates
