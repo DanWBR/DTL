@@ -16,16 +16,6 @@
 '    You should have received a copy of the GNU General Public License
 '    along with DWSIM.  If not, see <http://www.gnu.org/licenses/>.
 
-Imports DWSIM.DWSIM.SimulationObjects.PropertyPackages
-Imports System.Math
-Imports System.Xml.Linq
-Imports System.Linq
-Imports DWSIM.DWSIM.ClassesBasicasTermodinamica
-Imports DWSIM.DWSIM.MathEx
-Imports DWSIM.DWSIM.MathEx.Common
-Imports Ciloci.Flee
-Imports DWSIM.DWSIM.Flowsheet.FlowsheetSolver
-
 Namespace DWSIM.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
     <System.Serializable()> Public Class ElectrolyteSVLE

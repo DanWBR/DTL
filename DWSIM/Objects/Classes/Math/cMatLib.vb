@@ -1,5 +1,5 @@
 Option Strict Off
-Option Explicit On 
+Option Explicit On
 
 Imports System.Math
 

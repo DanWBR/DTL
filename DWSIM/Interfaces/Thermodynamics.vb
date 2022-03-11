@@ -16,10 +16,10 @@
 '    You should have received a copy of the GNU General Public License
 '    along with DTL.  If not, see <http://www.gnu.org/licenses/>.
 '
+Imports DTL.CAPEOPEN110 'CAPEOPEN110
+Imports DTL.DTL.BaseThermoClasses
 Imports DTL.DTL.SimulationObjects
 Imports DTL.DTL.SimulationObjects.PropertyPackages
-Imports DTL.DTL.BaseThermoClasses
-Imports DTL.CAPEOPEN110 'CAPEOPEN110
 Imports DTL.DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
 Namespace Thermodynamics

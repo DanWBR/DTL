@@ -41,7 +41,7 @@ Namespace DTL.MathEx.BrentOpt
         '    Input parameters:
         '        a - left boundary of an interval to search minimum in.
         '        b - right boundary of an interval to search minimum in.
-        '        Epsilon ñ absolute error of the value of the function minimum.
+        '        Epsilon ÅEabsolute error of the value of the function minimum.
         '
         '    Output parameters:
         '        XMin - point of minimum.

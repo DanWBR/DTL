@@ -18,8 +18,6 @@
 
 Imports System.Math
 Imports DTL.DTL.MathEx
-Imports System.Threading.Tasks
-Imports System.Linq
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
@@ -261,12 +259,12 @@ out:        d2 = Date.Now
                     Dim task1 As Task = New Task(Sub()
                                                      fx = Herror(x1, {P, Vz, PP})
                                                  End Sub)
-                        Dim task2 As Task = New Task(Sub()
-                                                         fx2 = Herror(x1 + 1, {P, Vz, PP})
-                                                     End Sub)
-                        task1.Start()
-                        task2.Start()
-                        Task.WaitAll(task1, task2)
+                    Dim task2 As Task = New Task(Sub()
+                                                     fx2 = Herror(x1 + 1, {P, Vz, PP})
+                                                 End Sub)
+                    task1.Start()
+                    task2.Start()
+                    Task.WaitAll(task1, task2)
                     My.MyApplication.IsRunningParallelTasks = False
                 Else
                     fx = Herror(x1, {P, Vz, PP})

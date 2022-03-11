@@ -1,5 +1,4 @@
 ﻿Imports DTL.DTL.SimulationObjects.PropertyPackages
-Imports CAPEOPEN110
 
 <Serializable()> _
 Friend Class CAPEOPENPropertyPackageManager

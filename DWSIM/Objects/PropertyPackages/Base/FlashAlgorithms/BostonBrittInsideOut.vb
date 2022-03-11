@@ -19,8 +19,6 @@
 Imports System.Math
 Imports DTL.DTL.MathEx
 Imports DTL.DTL.MathEx.Common
-Imports System.Threading.Tasks
-Imports System.Linq
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 

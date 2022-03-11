@@ -17,10 +17,9 @@
 '    along with DWSIM.  If not, see <http://www.gnu.org/licenses/>.
 
 Imports System.Math
+Imports Cureos.Numerics
 Imports DTL.DTL.MathEx
 Imports DTL.DTL.MathEx.Common
-Imports Cureos.Numerics
-Imports System.Threading.Tasks
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 

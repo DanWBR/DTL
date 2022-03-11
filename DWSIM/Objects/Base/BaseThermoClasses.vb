@@ -16,10 +16,10 @@
 '    You should have received a copy of the GNU General Public License
 '    along with DWSIM.  If not, see <http://www.gnu.org/licenses/>.
 
-Imports System.Xml.Serialization
-Imports System.Runtime.Serialization.Formatters.Binary
-Imports System.Runtime.Serialization
 Imports System.IO
+Imports System.Runtime.Serialization
+Imports System.Runtime.Serialization.Formatters.Binary
+Imports System.Xml.Serialization
 
 Namespace DTL.BaseThermoClasses
 

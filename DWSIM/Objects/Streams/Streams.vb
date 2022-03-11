@@ -16,11 +16,10 @@
 '    You should have received a copy of the GNU General Public License
 '    along with DTL.  If not, see <http://www.gnu.org/licenses/>.
 
-Imports DTL.DTL.BaseThermoClasses
-Imports CapeOpen = CAPEOPEN110
-Imports DTL.DTL.SimulationObjects.PropertyPackages
 Imports System.Runtime.InteropServices
 Imports DTL.CAPEOPEN110
+Imports DTL.DTL.BaseThermoClasses
+Imports DTL.DTL.SimulationObjects.PropertyPackages
 'Imports CAPEOPEN110
 
 Namespace DTL.SimulationObjects.Streams

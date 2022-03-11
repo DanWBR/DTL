@@ -16,21 +16,18 @@
 '    You should have received a copy of the GNU General Public License
 '    along with DTL.  If not, see <http://www.gnu.org/licenses/>.
 
-Imports DTL.DTL.SimulationObjects.Streams
-Imports DTL.DTL.BaseThermoClasses
-Imports System.Runtime.Serialization.Formatters.Binary
-Imports System.Runtime.Serialization
+Imports System.Data
 Imports System.IO
 Imports System.Math
-Imports System.Runtime.InteropServices.ComTypes
-Imports DTL.CAPEOPEN110
 'Imports CAPEOPEN110
 Imports System.Runtime.InteropServices
-Imports System.Threading.Tasks
+Imports System.Runtime.InteropServices.ComTypes
+Imports System.Runtime.Serialization
+Imports System.Runtime.Serialization.Formatters.Binary
+Imports DTL.CAPEOPEN110
+Imports DTL.DTL.BaseThermoClasses
 Imports DTL.DTL.MathEx
-Imports System.Data
-Imports Microsoft.VisualBasic
-Imports System
+Imports DTL.DTL.SimulationObjects.Streams
 
 Namespace DTL.SimulationObjects.PropertyPackages
 
@@ -5238,13 +5235,13 @@ Final3:
             '    Next
             'Else
             For Each c As Substance In Me.CurrentMaterialStream.Phases(0).Components.Values
-                    ids.Add(c.ConstantProperties.Name)
-                    formulas.Add(c.ConstantProperties.Formula)
-                    nms.Add(App.GetComponentName(c.ConstantProperties.Name))
-                    bts.Add(c.ConstantProperties.Normal_Boiling_Point)
-                    casnos.Add(c.ConstantProperties.CAS_Number)
-                    molws.Add(c.ConstantProperties.Molar_Weight)
-                Next
+                ids.Add(c.ConstantProperties.Name)
+                formulas.Add(c.ConstantProperties.Formula)
+                nms.Add(App.GetComponentName(c.ConstantProperties.Name))
+                bts.Add(c.ConstantProperties.Normal_Boiling_Point)
+                casnos.Add(c.ConstantProperties.CAS_Number)
+                molws.Add(c.ConstantProperties.Molar_Weight)
+            Next
             'End If
 
             Dim _i(ids.Count - 1) As String
@@ -6061,14 +6058,14 @@ Final3:
             'If Not My.Application.CAPEOPENMode Then
 
             For Each pi As PhaseInfo In Me.PhaseMappings.Values
-                    If phaseLabel = pi.PhaseLabel Then
-                        For Each p As String In props
-                            Me.DW_CalcProp(p, pi.DWPhaseID)
-                        Next
-                        'Me.DW_CalcPhaseProps(pi.DWPhaseID)
-                        Exit For
-                    End If
-                Next
+                If phaseLabel = pi.PhaseLabel Then
+                    For Each p As String In props
+                        Me.DW_CalcProp(p, pi.DWPhaseID)
+                    Next
+                    'Me.DW_CalcPhaseProps(pi.DWPhaseID)
+                    Exit For
+                End If
+            Next
 
             'Else
 
