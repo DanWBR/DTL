@@ -1,4 +1,11 @@
-# DWSIM Standalone Thermodynamics Library
+# DWSIM Standalone Thermodynamics Library (Dot Net Core version)
+
+## Memo for Migration to Dot Net v6.0
+This forked repository is DTL which is complied with Dotnet v6.0.
+Thanks to good compatibility between Dotnet v6.0 and Dotnet framework v4.x, DTL library could be compiled on Dotnet v6.0 with minimum modification to its source code. This forked repository demonstrates the possibility to migrate DWSIM on the Dotnet v6.0 and later version. In general, Dotnet v6.0 has better performance than Dotnet framework v4.x, so it is recommended to migrate DWSIM into Dotnet v6.0/later. 
+In this forked repository, some dependensy is removed since their source code is not available, however, such dependensy could be also included once they are complied on Dotnet v6.0.
+
+
 Version 3.3.0.0
 
 Copyright 2016 Daniel Medeiros
