@@ -17,6 +17,7 @@
 '    along with DTL.  If not, see <http://www.gnu.org/licenses/>.
 '
 
+
 Imports System.IO
 Imports System.Runtime.InteropServices
 Imports System.Runtime.Serialization
@@ -90,6 +91,8 @@ Imports System.Runtime.Serialization.Formatters.Binary
         ObjectCopy = objBinaryFormatter.Deserialize(objMemStream)
 
         objMemStream.Close()
+
+
 
     End Function
 

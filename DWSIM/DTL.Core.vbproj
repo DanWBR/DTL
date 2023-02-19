@@ -2,7 +2,8 @@
 
   <PropertyGroup>
     <RootNamespace>DTL</RootNamespace>
-    <TargetFramework>netcoreapp6.0</TargetFramework>
+    <TargetFramework>netcoreapp7.0</TargetFramework>
+	  <NoWarn>$(NoWarn);SYSLIB0004;SYSLIB0011</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
