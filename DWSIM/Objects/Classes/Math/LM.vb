@@ -102,28 +102,28 @@ Namespace DTL.MathEx.LM
         '    modify stopping conditions.
         '
         '    Input parameters:
-        '        N       ñ   number of unknowns, N>0.
-        '        M       ñ   number of summable functions, M>=N.
-        '        X       ñ   initial solution approximation.
+        '        N       ÅE  number of unknowns, N>0.
+        '        M       ÅE  number of summable functions, M>=N.
+        '        X       ÅE  initial solution approximation.
         '                    Array whose index ranges from 1 to N.
-        '        EpsG    ñ   stopping criterionn. Iterations are stopped, if  cosine  of
+        '        EpsG    ÅE  stopping criterionn. Iterations are stopped, if  cosine  of
         '                    the angle between vector of function values  and  each  of
         '                    the  Jacobian  columns  if  less or equal EpsG by absolute
         '                    value. In fact this value defines stopping condition which
         '                    is based on the function gradient smallness.
-        '        EpsF    ñ   stopping criterionn. Iterations are  stopped,  if  relative
+        '        EpsF    ÅE  stopping criterionn. Iterations are  stopped,  if  relative
         '                    decreasing of sum of function values squares (real and
         '                    predicted on the base of extrapolation)  is  less or equal
         '                    EpsF.
-        '        EpsX    ñ   stopping criterionn. Iterations are  stopped,  if  relative
+        '        EpsX    ÅE  stopping criterionn. Iterations are  stopped,  if  relative
         '                    change of solution is less or equal EpsX.
-        '        MaxIts  ñ   stopping  criterionn.  Iterations  are  stopped,  if  their
+        '        MaxIts  ÅE  stopping  criterionn.  Iterations  are  stopped,  if  their
         '                    number exceeds MaxIts.
         '
         '    Output parameters:
-        '        X       ñ   solution
+        '        X       ÅE  solution
         '                    Array whose index ranges from 1 to N.
-        '        Info    ñ   a reason of a program completion:
+        '        Info    ÅE  a reason of a program completion:
         '                        * -1 wrong parameters were specified,
         '                        * 0 interrupted by user,
         '                        * 1 relative decrease of sum of function values

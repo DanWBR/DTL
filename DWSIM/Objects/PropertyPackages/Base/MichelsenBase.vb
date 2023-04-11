@@ -2179,7 +2179,7 @@ Final2:
             Dim Tc(n), Pc(n)
             Dim b As Double
 
-            'ESTIMATE temperatura e pressão críticas iniciais
+            'ESTIMATE temperatura e pressão crú‘icas iniciais
 
             R = 8.314
 
@@ -2199,7 +2199,7 @@ Final2:
                 i = i + 1
             Loop Until i = n + 1
 
-            'ESTIMATE temperatura e pressão críticas iniciais
+            'ESTIMATE temperatura e pressão crú‘icas iniciais
 
             If Vmax = 0 Then Vmax = b * multipl
             Vmin = b * 1.05

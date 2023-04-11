@@ -17,10 +17,8 @@
 '    along with DWSIM.  If not, see <http://www.gnu.org/licenses/>.
 
 Imports System.Math
-Imports System.Threading.Tasks
-Imports DTL.DTL.SimulationObjects.PropertyPackages.ThermoPlugs
 Imports DTL.DTL.BaseThermoClasses
-Imports System.Linq
+Imports DTL.DTL.SimulationObjects.PropertyPackages.ThermoPlugs
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 

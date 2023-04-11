@@ -16,15 +16,15 @@
 '    You should have received a copy of the GNU General Public License
 '    along with DTL.  If not, see <http://www.gnu.org/licenses/>.
 '
+Imports DTL.CAPEOPEN110 'CAPEOPEN110
+Imports DTL.DTL.BaseThermoClasses
 Imports DTL.DTL.SimulationObjects
 Imports DTL.DTL.SimulationObjects.PropertyPackages
-Imports DTL.DTL.BaseThermoClasses
-Imports CAPEOPEN110
 Imports DTL.DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
 Namespace Thermodynamics
 
-    <Serializable()> <ComClass(Calculator.ClassId, Calculator.InterfaceId, Calculator.EventsId)>
+    '<Serializable()> <ComClass(Calculator.ClassId, Calculator.InterfaceId, Calculator.EventsId)>
     Public Class Calculator
 
         Public Const ClassId As String = "5F2B671E-FA61-401e-8D14-71FB5B328F9B"

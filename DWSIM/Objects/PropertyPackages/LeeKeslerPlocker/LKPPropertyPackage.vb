@@ -21,7 +21,7 @@ Imports System.Math
 Namespace DTL.SimulationObjects.PropertyPackages
 
     <Runtime.InteropServices.Guid(LKPPropertyPackage.ClassId)> _
-      <Serializable()> Public Class LKPPropertyPackage
+    <Serializable()> Public Class LKPPropertyPackage
 
         Inherits PropertyPackage
 

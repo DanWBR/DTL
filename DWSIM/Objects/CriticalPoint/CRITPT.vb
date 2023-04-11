@@ -17,7 +17,6 @@
 '    along with DWSIM.  If not, see <http://www.gnu.org/licenses/>.
 
 Imports DTL.DTL.MathEx.Common
-Imports DTL.DTL.MathEx
 
 Namespace DTL.Utilities.TrueCriticalPoint
 

@@ -17,10 +17,9 @@
 '    along with DWSIM.  If not, see <http://www.gnu.org/licenses/>.
 
 Imports System.Math
+Imports Cureos.Numerics
 Imports DTL.DTL.MathEx
 Imports DTL.DTL.MathEx.Common
-Imports Cureos.Numerics
-Imports System.Threading.Tasks
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
@@ -263,18 +262,18 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
             Dim obj As Double
             Dim status As IpoptReturnCode
-            Using problem As New Ipopt(initval.Length, lconstr, uconstr, 0, Nothing, Nothing,
-             0, 0, AddressOf eval_f, AddressOf eval_g,
-             AddressOf eval_grad_f, AddressOf eval_jac_g, AddressOf eval_h)
-                problem.AddOption("tol", etol)
-                problem.AddOption("max_iter", maxit_e)
-                problem.AddOption("mu_strategy", "adaptive")
-                problem.AddOption("hessian_approximation", "limited-memory")
-                'problem.AddOption("hessian_approximation", "exact")
-                'problem.SetIntermediateCallback(AddressOf intermediate)
-                'solve the problem 
-                status = problem.SolveProblem(initval, obj, Nothing, Nothing, Nothing, Nothing)
-            End Using
+            'Using problem As New Ipopt(initval.Length, lconstr, uconstr, 0, Nothing, Nothing,
+            ' 0, 0, AddressOf eval_f, AddressOf eval_g,
+            ' AddressOf eval_grad_f, AddressOf eval_jac_g, AddressOf eval_h)
+            '    problem.AddOption("tol", etol)
+            '    problem.AddOption("max_iter", maxit_e)
+            '    problem.AddOption("mu_strategy", "adaptive")
+            '    problem.AddOption("hessian_approximation", "limited-memory")
+            '    'problem.AddOption("hessian_approximation", "exact")
+            '    'problem.SetIntermediateCallback(AddressOf intermediate)
+            '    'solve the problem 
+            '    status = problem.SolveProblem(initval, obj, Nothing, Nothing, Nothing, Nothing)
+            'End Using
 
             For i = 0 To initval.Length - 1
                 If Double.IsNaN(initval(i)) Then initval(i) = 0.0#
@@ -445,18 +444,18 @@ Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
                             Solver = numsolver.IPOPT
 
-                            Using problem As New Ipopt(initval2.Length, lconstr2, uconstr2, n + 1, glow, gup, (n + 1) * 2, 0,
-                                    AddressOf eval_f, AddressOf eval_g,
-                                    AddressOf eval_grad_f, AddressOf eval_jac_g, AddressOf eval_h)
-                                problem.AddOption("tol", etol)
-                                problem.AddOption("max_iter", maxit_e)
-                                problem.AddOption("mu_strategy", "adaptive")
-                                'problem.AddOption("mehrotra_algorithm", "yes")
-                                problem.AddOption("hessian_approximation", "limited-memory")
-                                'problem.SetIntermediateCallback(AddressOf intermediate)
-                                'solve the problem 
-                                status = problem.SolveProblem(initval2, obj, g, Nothing, Nothing, Nothing)
-                            End Using
+                            'Using problem As New Ipopt(initval2.Length, lconstr2, uconstr2, n + 1, glow, gup, (n + 1) * 2, 0,
+                            '        AddressOf eval_f, AddressOf eval_g,
+                            '        AddressOf eval_grad_f, AddressOf eval_jac_g, AddressOf eval_h)
+                            '    problem.AddOption("tol", etol)
+                            '    problem.AddOption("max_iter", maxit_e)
+                            '    problem.AddOption("mu_strategy", "adaptive")
+                            '    'problem.AddOption("mehrotra_algorithm", "yes")
+                            '    problem.AddOption("hessian_approximation", "limited-memory")
+                            '    'problem.SetIntermediateCallback(AddressOf intermediate)
+                            '    'solve the problem 
+                            '    status = problem.SolveProblem(initval2, obj, g, Nothing, Nothing, Nothing)
+                            'End Using
 
                             For i = 0 To initval2.Length - 1
                                 If Double.IsNaN(initval2(i)) Then initval2(i) = 0.0#

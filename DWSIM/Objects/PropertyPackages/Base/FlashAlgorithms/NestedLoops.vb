@@ -18,8 +18,6 @@
 
 Imports System.Math
 Imports DTL.DTL.MathEx
-Imports System.Threading.Tasks
-Imports System.Linq
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
@@ -322,10 +320,10 @@ out:        Return New Object() {L, V, Vx, Vy, ecount, 0.0#, PP.RET_NullVector, 
                         Dim task1 = Task.Factory.StartNew(Sub()
                                                               fx = Herror("PT", x1, P, Vz, PP)(0)
                                                           End Sub)
-                            Dim task2 = Task.Factory.StartNew(Sub()
-                                                                  fx2 = Herror("PT", x1 + epsilon(j), P, Vz, PP)(0)
-                                                              End Sub)
-                            Task.WaitAll(task1, task2)
+                        Dim task2 = Task.Factory.StartNew(Sub()
+                                                              fx2 = Herror("PT", x1 + epsilon(j), P, Vz, PP)(0)
+                                                          End Sub)
+                        Task.WaitAll(task1, task2)
                         My.MyApplication.IsRunningParallelTasks = False
                     Else
                         fx = Herror("PT", x1, P, Vz, PP)(0)
@@ -604,10 +602,10 @@ out:        Return New Object() {L, V, Vx, Vy, ecount, 0.0#, PP.RET_NullVector, 
                         Dim task1 = Task.Factory.StartNew(Sub()
                                                               fx = Serror("PT", x1, P, Vz, PP)(0)
                                                           End Sub)
-                            Dim task2 = Task.Factory.StartNew(Sub()
-                                                                  fx2 = Serror("PT", x1 + epsilon(j), P, Vz, PP)(0)
-                                                              End Sub)
-                            Task.WaitAll(task1, task2)
+                        Dim task2 = Task.Factory.StartNew(Sub()
+                                                              fx2 = Serror("PT", x1 + epsilon(j), P, Vz, PP)(0)
+                                                          End Sub)
+                        Task.WaitAll(task1, task2)
                         My.MyApplication.IsRunningParallelTasks = False
                     Else
                         fx = Serror("PT", x1, P, Vz, PP)(0)
@@ -706,12 +704,12 @@ out:        Return New Object() {L, V, Vx, Vy, ecount, 0.0#, PP.RET_NullVector, 
                                                       Sb = ErrRes1(0)
                                                       Tb = ErrRes1(1)
                                                   End Sub)
-                    Dim task2 = Task.Factory.StartNew(Sub()
-                                                          Dim ErrRes2 = Serror("PV", 1, P, Vz, PP)
-                                                          Sd = ErrRes2(0)
-                                                          Td = ErrRes2(1)
-                                                      End Sub)
-                    Task.WaitAll(task1, task2)
+                Dim task2 = Task.Factory.StartNew(Sub()
+                                                      Dim ErrRes2 = Serror("PV", 1, P, Vz, PP)
+                                                      Sd = ErrRes2(0)
+                                                      Td = ErrRes2(1)
+                                                  End Sub)
+                Task.WaitAll(task1, task2)
                 My.MyApplication.IsRunningParallelTasks = False
             Else
                 ErrRes = Serror("PV", 0, P, Vz, PP)

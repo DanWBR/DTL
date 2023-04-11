@@ -17,10 +17,9 @@
 '    along with DWSIM.  If not, see <http://www.gnu.org/licenses/>.
 
 Imports System.Math
+Imports DTL.DTL.BaseThermoClasses
 Imports DTL.DTL.MathEx
 Imports DTL.DTL.MathEx.Common
-Imports DTL.DTL.BaseThermoClasses
-Imports System.Linq
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 

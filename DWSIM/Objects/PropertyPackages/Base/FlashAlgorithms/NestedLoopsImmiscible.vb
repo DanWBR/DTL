@@ -17,10 +17,8 @@
 '    along with DWSIM.  If not, see <http://www.gnu.org/licenses/>.
 
 Imports System.Math
-Imports DTL.DTL.MathEx
-Imports System.Threading.Tasks
 Imports DTL.DTL.BaseThermoClasses
-Imports System.Linq
+Imports DTL.DTL.MathEx
 
 Namespace DTL.SimulationObjects.PropertyPackages.Auxiliary.FlashAlgorithms
 
@@ -202,12 +200,12 @@ out:        Return New Object() {xl1, V, Vx1, Vy, ecount, xl2, Vx2, 0.0#, PP.RET
                     Dim task1 As Task = New Task(Sub()
                                                      fx = Herror(x1, {P, Vz, PP})
                                                  End Sub)
-                        Dim task2 As Task = New Task(Sub()
-                                                         fx2 = Herror(x1 + 1, {P, Vz, PP})
-                                                     End Sub)
-                        task1.Start()
-                        task2.Start()
-                        Task.WaitAll(task1, task2)
+                    Dim task2 As Task = New Task(Sub()
+                                                     fx2 = Herror(x1 + 1, {P, Vz, PP})
+                                                 End Sub)
+                    task1.Start()
+                    task2.Start()
+                    Task.WaitAll(task1, task2)
                     My.MyApplication.IsRunningParallelTasks = False
                 Else
                     fx = Herror(x1, {P, Vz, PP})

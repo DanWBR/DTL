@@ -17,8 +17,8 @@
 '    along with DTL.  If not, see <http://www.gnu.org/licenses/>.
 
 'Imports DTL.SimulationObjects
-Imports DTL.DTL.SimulationObjects.PropertyPackages.Auxiliary
 Imports DTL.DTL.MathEx
+Imports DTL.DTL.SimulationObjects.PropertyPackages.Auxiliary
 
 Namespace DTL.SimulationObjects.PropertyPackages
 

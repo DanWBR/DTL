@@ -17,10 +17,11 @@
 '    along with DTL.  If not, see <http://www.gnu.org/licenses/>.
 '
 
-Imports System.Runtime.Serialization.Formatters.Binary
-Imports System.Runtime.Serialization
+
 Imports System.IO
 Imports System.Runtime.InteropServices
+Imports System.Runtime.Serialization
+Imports System.Runtime.Serialization.Formatters.Binary
 
 <Serializable()> <ComVisible(True)> Public MustInherit Class SimulationObjects_BaseClass
 
@@ -90,6 +91,8 @@ Imports System.Runtime.InteropServices
         ObjectCopy = objBinaryFormatter.Deserialize(objMemStream)
 
         objMemStream.Close()
+
+
 
     End Function
 
